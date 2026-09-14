@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-title-zh="混合检索与 Query Routing · AI 工程手册" data-i18n-title-en="Hybrid Retrieval and Query Routing · AI Engineering Handbook">混合检索与 Query Routing · AI 工程手册</title>
+<meta name="description" content="混合检索与 Query Routing：AI 工程手册技术章节，包含架构、权衡、失败模式、指标与生产实践。">
+<link rel="canonical" href="https://kevoyuan-ai-handbook.vercel.app/chapters/03-hybrid-retrieval-query-routing/">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/app.css?v=0bb27ad415ab"><link rel="stylesheet" href="/assets/home.css?v=32688d430c9d"><link rel="stylesheet" href="/assets/reader.css?v=18312fc8bcfe"></head>
+<body class="chapter-page"><a class="skip-link" href="#main-content">跳到正文</a>
+<header><button type="button" aria-label="打开章节导航" aria-controls="side" aria-expanded="false" id="menuBtn">☰</button><a class="brand" href="/">AI 工程手册</a><span id="curCh"><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></span><div class="tools"><a class="tbtn" href="/search/" aria-label="搜索手册">⌕</a><button type="button" class="tbtn" id="themeBtn" aria-label="切换深浅主题">☾</button><button class="lang-toggle" id="langToggle" type="button" aria-label="中 / EN：切换到英文">中 / EN</button></div></header>
+<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节"><a href="/chapters/02-enterprise-retrieval/"><i>02</i><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/03-hybrid-retrieval-query-routing/" aria-current="page"><i>03</i><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></a><a href="/chapters/04-rag-reliability-selective-answering/"><i>04</i><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/05-document-pdf-rag/"><i>05</i><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></a><a href="/chapters/06-skills-routing/"><i>06</i><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/07-memory-context-engineering/"><i>07</i><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/08-agent-orchestration/"><i>08</i><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/chapters/09-reliability-evaluation-observability/"><i>09</i><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></a></nav><div class="sd-f"><span class="i18n-text" data-i18n-zh="原章号 02–09" data-i18n-en="Original chapters 02–09">原章号 02–09</span></div></aside>
+<button aria-label="关闭章节导航" id="sideOverlay" type="button"></button>
+<main id="main-content" tabindex="-1"><section class="ch" id="ch3" style="--acc:var(--grn)">
+<div class="ch-head rv"><div class="ch-no"><small>CHAPTER</small>03</div><h1 class="ch-t"><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></h1><span class="ch-tag">HYBRID PIPELINE · RRF · ROUTER</span></div><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens why" data-tip-en="Why this design" data-tip-zh="为什么这样设计"><i>W</i><span>WHY</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="Enterprise knowledge bases contain natural-language explanations, domain terms, error codes, structured attributes, and entity relationships, so the recommended design is:" data-i18n-zh="企业知识库同时包含自然语言说明、专业术语、错误码、结构化属性与实体关系，所以推荐：">企业知识库同时包含自然语言说明、专业术语、错误码、结构化属性与实体关系，所以推荐：</span><strong>Exact + BM25 + Dense + Metadata + Optional Graph</strong>。</p>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Five-step Implementation Flow" data-i18n-zh="五步落地流程">五步落地流程</span></h2>
+<div class="bfs-canvas rv" id="fig-3-1">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.3.1</span>
+<h2 class="bfs-title">混合检索流水线</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Documents: Exact/Keyword fields · BM25 index · Dense vector index · Graph relationship store " data-i18n-zh="Documents：Exact/Keyword 字段 · BM25 索引 · Dense 向量索引 · Graph 关系库 ">Documents：Exact/Keyword 字段 · BM25 索引 · Dense 向量索引 · Graph 关系库 </span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="① Dual Indexes and Field Design" data-i18n-zh="① 双索引与字段设计">① 双索引与字段设计</span></div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">② Query Analysis</h2><div class="bfs-card-desc">query_type · domain · entities · identifiers · time_scope · risk · required evidence</div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="③ Permission and Metadata Filtering: Identity → Tenant / Role / ACL → Authorized Candidate Space" data-i18n-zh="③ 权限与元数据过滤：Identity → Tenant / Role / ACL → Authorized Candidate Space">③ 权限与元数据过滤：Identity → Tenant / Role / ACL → Authorized Candidate Space</span></h2></div></div><div class="bfs-grid bfs-g3" style="margin: 10px 0;"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">NODE</span></div>
+<h2 class="bfs-card-title">Exact Results</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">NODE</span></div>
+<h2 class="bfs-card-title">BM25 Results</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">NODE</span></div>
+<h2 class="bfs-card-title">Dense Results</h2></div></div><div style="display:flex;justify-content:center;margin:6px 0"><svg class="conv" preserveaspectratio="none" viewbox="0 0 420 26"><path d="M70 0 C70 16 210 8 210 24 M210 0 V24 M350 0 C350 16 210 8 210 24"></path></svg></div><div style="margin-bottom:10px"><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">④ Fusion（RRF）→ Reranker</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="BM25 score = 12.6 and cosine = 0.81 are on different scales and must not be added directly → fuse by rank" data-i18n-zh="BM25 score = 12.6 与 cosine = 0.81 量纲不同，不能直接相加 → 按排名融合">BM25 score = 12.6 与 cosine = 0.81 量纲不同，不能直接相加 → 按排名融合</span></div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="⑤ Evaluation" data-i18n-zh="⑤ 评估">⑤ 评估</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Retrieval: Recall@K · Hit Rate@K · MRR · NDCG · Precision@K" data-i18n-zh="检索：Recall@K · Hit Rate@K · MRR · NDCG · Precision@K">检索：Recall@K · Hit Rate@K · MRR · NDCG · Precision@K</span><br><span class="i18n-text" data-i18n-en="System: E2E correctness · Citation support · No-answer accuracy · Latency P50/P95 · Cost/query" data-i18n-zh="系统：E2E correctness · Citation support · No-answer accuracy · Latency P50/P95 · Cost/query">系统：E2E correctness · Citation support · No-answer accuracy · Latency P50/P95 · Cost/query</span></div></div></div></div>
+</div>
+</div>
+<div class="co en rv"><span class="co-t"><span class="i18n-text" data-i18n-en="90-second Core Answer" data-i18n-zh="90 秒核心表达">90 秒核心表达</span></span><p class="say">BM25 and dense retrieval are complementary rather than competing approaches. In enterprise RAG, I would combine exact lookup, lexical retrieval, and dense retrieval, apply permission and metadata filters, fuse the candidate lists using RRF or a learned ranker, and rerank the strongest candidates. The final design should be validated on a representative business evaluation set rather than chosen by intuition.</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Query Routing: Send Different Queries Down the Most Appropriate Path " data-i18n-zh="Query Routing：让不同 Query 走最合适的路径 ">Query Routing：让不同 Query 走最合适的路径 </span><small>§3.3</small></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens when" data-tip-en="When to use" data-tip-zh="什么时候使用"><i>W</i><span>WHEN</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens pitfall" data-tip-en="Common mistake" data-tip-zh="容易答错或做错的地方"><i>P</i><span>PITFALL</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="Routing is not about “how many retrievers the system supports.” It answers:" data-i18n-zh="Routing 解决的不是“系统支持多少种 Retriever”，而是：">Routing 解决的不是“系统支持多少种 Retriever”，而是：</span><strong><span class="i18n-text" data-i18n-en="What evidence does the current request need, which data path should be called, when should paths run in parallel, when should the system clarify, and when should it stop?" data-i18n-zh="当前请求需要什么证据、应该调用哪条数据路径、何时并行、何时澄清、何时停止。">当前请求需要什么证据、应该调用哪条数据路径、何时并行、何时澄清、何时停止。</span></strong></p>
+<div class="co warn rv interp-callout interp-pitfall interp-failure"><span class="co-t"><span class="i18n-text" data-i18n-en="Low-quality Answer" data-i18n-zh="低质量回答">低质量回答</span></span><p><span class="i18n-text" data-i18n-en="“Run Exact, BM25, Dense, Graph, and the database every time, then choose the best.” As a default for all requests, this ignores query-type differences, data-source boundaries, latency/cost budgets, permission risks, and recovery strategies." data-i18n-zh="“Exact、BM25、Dense、Graph 和数据库都跑一遍，再看哪个好。”——作为所有请求的默认策略，就没有体现 Query 类型差异、数据源边界、延迟成本预算、权限风险与恢复策略。">“Exact、BM25、Dense、Graph 和数据库都跑一遍，再看哪个好。”——作为所有请求的默认策略，就没有体现 Query 类型差异、数据源边界、延迟成本预算、权限风险与恢复策略。</span></p></div>
+<div class="tsc rv interp-matrix"><table>
+<thead><tr><th><span class="i18n-text" data-i18n-en="Query Type" data-i18n-zh="Query 类型">Query 类型</span></th><th><span class="i18n-text" data-i18n-en="Example" data-i18n-zh="示例">示例</span></th><th><span class="i18n-text" data-i18n-en="Preferred Path" data-i18n-zh="首选路径">首选路径</span></th><th><span class="i18n-text" data-i18n-en="Explanation" data-i18n-zh="说明">说明</span></th></tr></thead>
+<tbody>
+<tr><td><b><span class="i18n-text" data-i18n-en="Exact Identifier" data-i18n-zh="精确标识符">精确标识符</span></b></td><td><span class="i18n-text" data-i18n-en="Status of WO-8827391" data-i18n-zh="WO-8827391 的进度">WO-8827391 的进度</span></td><td>Exact field / DB lookup</td><td><span class="i18n-text" data-i18n-en="For primary keys, work-order IDs, and order IDs, prefer normalized deterministic lookup" data-i18n-zh="主键、工单号、订单号优先做规范化后的确定性查询">主键、工单号、订单号优先做规范化后的确定性查询</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Keyword / Terminology" data-i18n-zh="关键词 / 术语">关键词 / 术语</span></b></td><td><span class="i18n-text" data-i18n-en="Company annual-leave policy" data-i18n-zh="公司年假政策">公司年假政策</span></td><td>BM25 + Metadata</td><td><span class="i18n-text" data-i18n-en="Fixed terminology, policy names, and rare terms are well suited to lexical retrieval" data-i18n-zh="固定术语、政策名称、稀有词适合词法检索">固定术语、政策名称、稀有词适合词法检索</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Semantic / Process" data-i18n-zh="语义 / 流程">语义 / 流程</span></b></td><td><span class="i18n-text" data-i18n-en="How do I reimburse travel expenses?" data-i18n-zh="差旅费怎么报销？">差旅费怎么报销？</span></td><td>Dense + BM25 fallback</td><td><span class="i18n-text" data-i18n-en="Requires understanding paraphrases, colloquial language, and synonyms" data-i18n-zh="需要理解改写、口语和同义表达">需要理解改写、口语和同义表达</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Numerical Aggregation" data-i18n-zh="数值聚合">数值聚合</span></b></td><td><span class="i18n-text" data-i18n-en="Inventory turnover last December" data-i18n-zh="去年 12 月库存周转率">去年 12 月库存周转率</span></td><td>SQL / OLAP / Analytics</td><td><span class="i18n-text" data-i18n-en="Requires filtering, aggregation, and calculation; vector similarity must not be used to invent the number" data-i18n-zh="需要过滤、聚合和计算，不能靠向量相似度生成数值">需要过滤、聚合和计算，不能靠向量相似度生成数值</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Relationship / Multi-hop" data-i18n-zh="关系 / 多跳">关系 / 多跳</span></b></td><td><span class="i18n-text" data-i18n-en="Which products are affected if Supplier A stops production?" data-i18n-zh="供应商 A 停产影响哪些产品？">供应商 A 停产影响哪些产品？</span></td><td><span class="i18n-text" data-i18n-en="Graph + source-text support" data-i18n-zh="Graph + 原文支持">Graph + 原文支持</span></td><td><span class="i18n-text" data-i18n-en="Expand along entity relationships or the BOM chain" data-i18n-zh="沿实体关系或 BOM 链路展开">沿实体关系或 BOM 链路展开</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Hybrid Question" data-i18n-zh="混合问题">混合问题</span></b></td><td><span class="i18n-text" data-i18n-en="Why is WO-8827391 still unfinished?" data-i18n-zh="WO-8827391 为什么还没完成？">WO-8827391 为什么还没完成？</span></td><td>Exact/DB + BM25/Dense</td><td><span class="i18n-text" data-i18n-en="Must both locate the work order and understand the reason for its status" data-i18n-zh="既要定位工单，又要理解状态原因">既要定位工单，又要理解状态原因</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Insufficient Information" data-i18n-zh="信息不足">信息不足</span></b></td><td><span class="i18n-text" data-i18n-en="“How is it doing now?”" data-i18n-zh="“它现在怎么样？”">“它现在怎么样？”</span></td><td>Clarify</td><td><span class="i18n-text" data-i18n-en="If the entity or time range is missing, complete the input first instead of retrieving blindly" data-i18n-zh="缺少实体或时间范围时先补齐输入，不盲目检索">缺少实体或时间范围时先补齐输入，不盲目检索</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Non-knowledge-base Chitchat" data-i18n-zh="非知识库闲聊">非知识库闲聊</span></b></td><td><span class="i18n-text" data-i18n-en="Please polish this sentence" data-i18n-zh="帮我润色这句话">帮我润色这句话</span></td><td>Skip retrieval</td><td><span class="i18n-text" data-i18n-en="Retrieval can be skipped when no enterprise facts are needed;" data-i18n-zh="不依赖企业事实可不检索；">不依赖企业事实可不检索；</span><mark><span class="i18n-text" data-i18n-en="queries about enterprise facts should not casually bypass the knowledge base" data-i18n-zh="企业事实查询不应随意绕过知识库">企业事实查询不应随意绕过知识库</span></mark></td></tr>
+</tbody>
+</table></div>
+<div class="co warn rv interp-callout interp-pitfall"><span class="co-t"><span class="i18n-text" data-i18n-en="Important Correction" data-i18n-zh="特别纠正">特别纠正</span></span><p><span class="i18n-text" data-i18n-en="For identifier queries, the preferred path is usually" data-i18n-zh="编号查询的首选通常">编号查询的首选通常</span><strong><span class="i18n-text" data-i18n-en="not BM25" data-i18n-zh="不是 BM25">不是 BM25</span></strong><span class="i18n-text" data-i18n-en=", but a keyword/term query or exact database lookup. BM25 can be used as tolerant recall, but it is not a replacement for primary-key queries." data-i18n-zh="，而是 keyword/term query 或数据库精确查询。BM25 可以作为容错召回，但不是主键查询的替代品。">，而是 keyword/term query 或数据库精确查询。BM25 可以作为容错召回，但不是主键查询的替代品。</span></p></div>
+<div class="bfs-canvas bfs-compact-track rv" id="fig-3-2">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.3.2</span>
+<h2 class="bfs-title">四层请求分流</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Layer 1 · No Retrieval</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="translation · rewriting · format conversion · ordinary chitchat" data-i18n-zh="翻译 · 改写 · 格式转换 · 普通闲聊">翻译 · 改写 · 格式转换 · 普通闲聊</span></div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Layer 2 · Deterministic Retrieval</h2><div class="bfs-card-desc">Exact field · Database · SQL · Metadata</div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Layer 3 · Knowledge Retrieval</h2><div class="bfs-card-desc">BM25 · Dense · Graph</div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Layer 4 · Hybrid / Composed Retrieval</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="multi-retriever recall · RRF · Reranker · tool-chain composition" data-i18n-zh="多路召回 · RRF · Reranker · 工具链组合">多路召回 · RRF · Reranker · 工具链组合</span></div></div></div></div>
+<p style="font-size:13px;color:var(--mut);margin-top:12px"><strong><span class="i18n-text" data-i18n-en="May skip retrieval:" data-i18n-zh="可跳过：">可跳过：</span></strong><span class="i18n-text" data-i18n-en="translation, rewriting, format conversion, chitchat." data-i18n-zh="翻译、改写、格式转换、闲聊。">翻译、改写、格式转换、闲聊。</span><strong><span class="i18n-text" data-i18n-en="Must not skip retrieval:" data-i18n-zh="不应跳过：">不应跳过：</span></strong><span class="i18n-text" data-i18n-en="company policy, account status, real-time inventory, order progress, compliance conclusions. For high-risk questions, even if the model “knows,” evidence should come from an authoritative source." data-i18n-zh="公司政策、账户状态、实时库存、订单进度、合规结论。高风险问题即使模型“知道”，也应从权威来源取证。">公司政策、账户状态、实时库存、订单进度、合规结论。高风险问题即使模型“知道”，也应从权威来源取证。</span></p>
+</div>
+</div>
+<div class="bfs-canvas bfs-density-compact bfs-compact-list rv" id="fig-3-3">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.3.3</span>
+<h2 class="bfs-title">Router 完整执行流程</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">User Query</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Query Analyzer</h2><div class="bfs-card-desc">Intent / Entity / Identifier / Time / Calculation / Risk</div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Authorization + Capability Check</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Route Plan</h2><div class="bfs-card-desc">Exact | SQL | BM25 | Dense | Graph | Hybrid | Clarify | No Retrieval</div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Retriever / Tool Execution</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title">Fusion + Reranking（when needed）</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 7</span></div>
+<h2 class="bfs-card-title">Evidence Sufficiency + Answer Policy</h2></div></div></div>
+</div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Router Evolution Path " data-i18n-zh="Router 的演进路径 ">Router 的演进路径 </span><small><span class="i18n-text" data-i18n-en="From Rules to Continuous Training" data-i18n-zh="从规则到持续训练">从规则到持续训练</span></small></h2>
+<div class="evs rv">
+<div class="ev"><i>S0</i><b><span class="i18n-text" data-i18n-en="Deterministic Parsing" data-i18n-zh="确定性解析">确定性解析</span></b><small>Regex · identifier parser · schema validation</small></div>
+<div class="ev"><i>S1</i><b><span class="i18n-text" data-i18n-en="Rule-based Routing" data-i18n-zh="规则路由">规则路由</span></b><small><span class="i18n-text" data-i18n-en="business rules · keywords · field presence · risk conditions" data-i18n-zh="业务规则 · 关键词 · 字段存在性 · 风险条件">业务规则 · 关键词 · 字段存在性 · 风险条件</span></small></div>
+<div class="ev"><i>S2</i><b><span class="i18n-text" data-i18n-en="Lightweight Learned Routing" data-i18n-zh="轻量学习路由">轻量学习路由</span></b><small><span class="i18n-text" data-i18n-en="Logistic Regression · small classifier · embedding prototypes" data-i18n-zh="Logistic Regression · 小分类器 · Embedding 原型">Logistic Regression · 小分类器 · Embedding 原型</span></small></div>
+<div class="ev"><i>S3→S4</i><b><span class="i18n-text" data-i18n-en="LLM Fallback + Feedback-driven Improvement" data-i18n-zh="LLM Fallback + 反馈驱动">LLM Fallback + 反馈驱动</span></b><small><span class="i18n-text" data-i18n-en="Send long-tail / combined intents to the LLM; continuously update from logs and human corrections" data-i18n-zh="长尾 / 组合意图交 LLM；日志与人工纠错持续更新">长尾 / 组合意图交 LLM；日志与人工纠错持续更新</span></small></div>
+</div>
+<p class="rv" style="color:var(--mut);font-size:13.5px"><span class="i18n-text" data-i18n-en="The recommended strategy is not “start with the most complex model”: first measure the real Query distribution → cover frequent, low-ambiguity cases with rules → let a small model handle learnable boundaries → use the LLM only for low-confidence long-tail cases → build a training set from logs. Heuristics such as “rules cover 80%” or “upgrade after 20 rules + &gt;10% misrouting” are practical examples," data-i18n-zh="推荐策略不是“一开始就上最复杂模型”：先统计真实 Query 分布 → 规则覆盖高频低歧义 → 小模型处理可学习边界 → LLM 只接低置信长尾 → 日志建训练集。“规则覆盖 80%”“20 条规则 + 误路由 &gt;10% 再升级”是经验启发，">推荐策略不是“一开始就上最复杂模型”：先统计真实 Query 分布 → 规则覆盖高频低歧义 → 小模型处理可学习边界 → LLM 只接低置信长尾 → 日志建训练集。“规则覆盖 80%”“20 条规则 + 误路由 &gt;10% 再升级”是经验启发，</span><strong><span class="i18n-text" data-i18n-en="not universal standards" data-i18n-zh="不是通用标准">不是通用标准</span></strong>。</p>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--tea)"><div class="cd-h"><span class="ic">EMB</span><span class="i18n-text" data-i18n-en="Embedding / Small-model Router" data-i18n-zh="Embedding / 小模型 Router">Embedding / 小模型 Router</span></div><div class="lb"><span class="i18n-text" data-i18n-en="Strengths" data-i18n-zh="优势">优势</span></div><small><span class="i18n-text" data-i18n-en="Low latency · stable cost · suitable for high concurrency and fixed intent sets · quick cold start from prototype examples" data-i18n-zh="延迟低 · 成本稳定 · 适合高并发与固定意图集 · 原型样本快速冷启动">延迟低 · 成本稳定 · 适合高并发与固定意图集 · 原型样本快速冷启动</span></small><div class="lb"><span class="i18n-text" data-i18n-en="Limitations" data-i18n-zh="局限">局限</span></div><small><span class="i18n-text" data-i18n-en="Hard for combined intents · new domains require updated examples · similarity ≠ business executability" data-i18n-zh="组合意图难 · 新领域需更新样本 · 相似度 ≠ 业务可执行性">组合意图难 · 新领域需更新样本 · 相似度 ≠ 业务可执行性</span></small></div>
+<div class="cd" style="--c:var(--pur)"><div class="cd-h"><span class="ic">LLM</span>LLM Router</div><div class="lb"><span class="i18n-text" data-i18n-en="Strengths" data-i18n-zh="优势">优势</span></div><small><span class="i18n-text" data-i18n-en="Strong zero-shot and long-tail understanding · can extract entities, constraints, and multi-step needs · suitable for complex combined requests" data-i18n-zh="零样本与长尾理解强 · 能提取实体、约束、多步骤需求 · 适合复杂组合请求">零样本与长尾理解强 · 能提取实体、约束、多步骤需求 · 适合复杂组合请求</span></small><div class="lb"><span class="i18n-text" data-i18n-en="Limitations" data-i18n-zh="局限">局限</span></div><small><span class="i18n-text" data-i18n-en="Higher latency/cost · outputs require Schema Validation · may still choose nonexistent / unauthorized / inapplicable paths" data-i18n-zh="延迟成本高 · 输出需 Schema Validation · 仍可能选不存在 / 无权限 / 不适用的路径">延迟成本高 · 输出需 Schema Validation · 仍可能选不存在 / 无权限 / 不适用的路径</span></small></div>
+</div>
+<div class="co tip rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Common Production Combination" data-i18n-zh="常见生产组合">常见生产组合</span></span><p>Rules / Exact Parser → Lightweight Router → LLM Fallback for ambiguous tail。</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="RRF Fusion and “When to Run Every Path”" data-i18n-zh="RRF 融合与“何时都走一遍”">RRF 融合与“何时都走一遍”</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens when" data-tip-en="When to use" data-tip-zh="什么时候使用"><i>W</i><span>WHEN</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens pitfall" data-tip-en="Common mistake" data-tip-zh="容易答错或做错的地方"><i>P</i><span>PITFALL</span></span></div>
+<div class="grid g2 rv">
+<pre class="code" data-i18n-pre-en=" // Use ranks only; do not compare raw scores
+ RRF(d) = Σ 1 / (k + rank_i(d))
+
+ // rank_i(d): rank of document d in the i-th list
+ // k: smooths the influence of top ranks; 60 is a common example,
+ //    but validate it on your own evaluation set" data-i18n-pre-zh=" // 只利用排名，不比较原始分数
+ RRF(d) = Σ 1 / (k + rank_i(d))
+
+ // rank_i(d)：文档 d 在第 i 个列表中的名次
+ // k：平滑头部名次影响，常见示例 60，
+ //    但必须在自己的评测集上验证" data-l="RECIPROCAL RANK FUSION" style="margin:0"> // 只利用排名，不比较原始分数
+ RRF(d) = Σ 1 / (k + rank_i(d))
+
+ // rank_i(d)：文档 d 在第 i 个列表中的名次
+ // k：平滑头部名次影响，常见示例 60，
+ //    但必须在自己的评测集上验证</pre>
+<div class="cd" style="--c:var(--org);margin:0"><div class="cd-h"><span class="ic">WHEN</span><span class="i18n-text" data-i18n-en="When is multi-path parallel retrieval reasonable?" data-i18n-zh="什么时候多路并行反而合理？">什么时候多路并行反而合理？</span></div>
+<small><span class="i18n-text" data-i18n-en="① The Query contains both an ID and a natural-language reason; ② Router confidence is low and risk allows broader recall; ③ an offline investigation prioritizes recall; ④ building evaluation baselines to compare path contribution; ⑤ a single Retriever has a known blind spot." data-i18n-zh="① Query 同时含 ID 与自然语言原因；② Router 置信度低且风险允许扩大召回；③ 高召回优先的离线调查；④ 构建评测基线比较路径贡献；⑤ 单一 Retriever 有已知盲区。">① Query 同时含 ID 与自然语言原因；② Router 置信度低且风险允许扩大召回；③ 高召回优先的离线调查；④ 构建评测基线比较路径贡献；⑤ 单一 Retriever 有已知盲区。</span><br><br><strong><span class="i18n-text" data-i18n-en="But you must set:" data-i18n-zh="但必须设置：">但必须设置：</span></strong><span class="i18n-text" data-i18n-en="concurrency limits · timeout budgets · permission filtering · deduplication/fusion · degradation paths · cost trade-offs." data-i18n-zh="并发上限 · 超时预算 · 权限过滤 · 去重融合 · 降级路径 · 成本权衡。">并发上限 · 超时预算 · 权限过滤 · 去重融合 · 降级路径 · 成本权衡。</span><br><span class="i18n-text" data-i18n-en="RRF fuses candidates; it does not prove final relevance → still use Cross-Encoder / LLM Reranker → Evidence Validation." data-i18n-zh="RRF 是候选融合，不是最终相关性证明 → 还需 Cross-Encoder / LLM Reranker → Evidence Validation。">RRF 是候选融合，不是最终相关性证明 → 还需 Cross-Encoder / LLM Reranker → Evidence Validation。</span></small></div>
+</div>
+<div class="co en rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Mature Answer" data-i18n-zh="成熟表达">成熟表达</span></span><p class="say">Use the cheapest reliable route first, and expand retrieval only when the query or uncertainty requires it.</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Routing Failure and Recovery" data-i18n-zh="路由失败与恢复">路由失败与恢复</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens when" data-tip-en="When to use" data-tip-zh="什么时候使用"><i>W</i><span>WHEN</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens pitfall" data-tip-en="Common mistake" data-tip-zh="容易答错或做错的地方"><i>P</i><span>PITFALL</span></span></div>
+<div class="bfs-canvas rv" id="fig-3-4">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.3.4</span>
+<h2 class="bfs-title">Router 不是单点真理，需要显式恢复链</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g6"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Primary Route</h2></div><div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="No trustworthy candidates" data-i18n-zh="无可信候选">无可信候选</span></h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Query Rewrite / Alias Expansion" data-i18n-zh="Query Rewrite / Alias 扩展">Query Rewrite / Alias 扩展</span></h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Secondary Route</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Hybrid Retrieval</h2></div><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title">Clarify / Refuse / Escalate</h2></div></div>
+<div class="chips" style="margin-top:14px">
+<span class="chip" style="--c:var(--red)"><span class="i18n-text" data-i18n-en="routing_failure: selected the wrong data path" data-i18n-zh="routing_failure 选错数据路径">routing_failure 选错数据路径</span></span>
+<span class="chip" style="--c:var(--org)"><span class="i18n-text" data-i18n-en="retrieval_failure: selected the right path but retrieved nothing useful" data-i18n-zh="retrieval_failure 路径对但没召回">retrieval_failure 路径对但没召回</span></span>
+<span class="chip" style="--c:var(--amb)"><span class="i18n-text" data-i18n-en="data_failure: data is missing / stale / unauthorized" data-i18n-zh="data_failure 数据缺失/过期/无权限">data_failure 数据缺失/过期/无权限</span></span>
+<span class="chip" style="--c:var(--pur)"><span class="i18n-text" data-i18n-en="generation_failure: evidence is correct but the generated answer is wrong" data-i18n-zh="generation_failure 证据对但生成错">generation_failure 证据对但生成错</span></span>
+</div>
+</div>
+</div>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">EVAL</span><span class="i18n-text" data-i18n-en="Routing Evaluation (not just classification accuracy)" data-i18n-zh="路由评估（不只测分类准确率）">路由评估（不只测分类准确率）</span></div><small><span class="i18n-text" data-i18n-en="Router Top-1 / Top-K Accuracy · No-route / Clarify Accuracy · Identifier Extraction Accuracy · Per-route Recall@K and NDCG · " data-i18n-zh="Router Top-1 / Top-K Accuracy · No-route / Clarify Accuracy · Identifier Extraction Accuracy · Per-route Recall@K 与 NDCG · ">Router Top-1 / Top-K Accuracy · No-route / Clarify Accuracy · Identifier Extraction Accuracy · Per-route Recall@K 与 NDCG · </span><strong>Oracle-route Gap / Route Regret</strong><span class="i18n-text" data-i18n-en="(how far the current Router is from the best available offline path; this is closer to business outcome than intent-classification accuracy) · E2E Answer Correctness · Task Success · Fallback Rate · Latency P50/P95 · Cost/query · Unauthorized Route Rate" data-i18n-zh="（当前 Router 与离线最佳可用路径差多少，比意图分类准确率更接近业务结果）· E2E Answer Correctness · Task Success · Fallback Rate · Latency P50/P95 · Cost/query · Unauthorized Route Rate">（当前 Router 与离线最佳可用路径差多少，比意图分类准确率更接近业务结果）· E2E Answer Correctness · Task Success · Fallback Rate · Latency P50/P95 · Cost/query · Unauthorized Route Rate</span></small></div>
+<div class="cd" style="--c:var(--tea)"><div class="cd-h"><span class="ic">CACHE</span><span class="i18n-text" data-i18n-en="Latency, Caching, and Version Governance" data-i18n-zh="延迟、缓存与版本治理">延迟、缓存与版本治理</span></div><small><span class="i18n-text" data-i18n-en="Give the Router its own P50/P95 SLO; use rules/small models for frequent cases; reserve the LLM for the long tail; give slow paths timeout + fallback." data-i18n-zh="为 Router 单独设 P50/P95 SLO；规则/小模型解决高频；LLM 只处理长尾；慢路径设 timeout + fallback。">为 Router 单独设 P50/P95 SLO；规则/小模型解决高频；LLM 只处理长尾；慢路径设 timeout + fallback。</span><br><strong><span class="i18n-text" data-i18n-en="Cache Key should include at least:" data-i18n-zh="Cache Key 至少包含：">Cache Key 至少包含：</span></strong><span class="i18n-text" data-i18n-en="normalized_query · user/tenant/role · router_version · capability_registry_version · index_version · knowledge_snapshot. When the knowledge base or tool capabilities change, invalidate by TTL or version." data-i18n-zh="normalized_query · user/tenant/role · router_version · capability_registry_version · index_version · knowledge_snapshot。知识库或工具能力更新后需 TTL 或版本化失效。">normalized_query · user/tenant/role · router_version · capability_registry_version · index_version · knowledge_snapshot。知识库或工具能力更新后需 TTL 或版本化失效。</span></small></div>
+</div>
+<div class="co note rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Project Mapping · Honesty Boundary" data-i18n-zh="项目映射 · 诚信边界">项目映射 · 诚信边界</span></span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Bakery BI’s " data-i18n-zh="Bakery BI 的 ">Bakery BI 的 </span><code>router_agent.py</code> + <code>skill_loader.py</code><span class="i18n-text" data-i18n-en=" can demonstrate that you already have" data-i18n-zh=" 可证明你已有"> 可证明你已有</span><strong><span class="i18n-text" data-i18n-en="small-scale routing experience" data-i18n-zh="小规模路由实践">小规模路由实践</span></strong><span class="i18n-text" data-i18n-en="(intent routing, Skill contracts, fallback, data dependencies), but it is not a large-scale enterprise retrieval Router; AutodidactAgent’s core is " data-i18n-zh="（意图路由、Skill contract、fallback、数据依赖），但它不是大规模企业检索 Router；AutodidactAgent 的核心是 ">（意图路由、Skill contract、fallback、数据依赖），但它不是大规模企业检索 Router；AutodidactAgent 的核心是 </span><strong>Case-Based Reasoning Retriever</strong><span class="i18n-text" data-i18n-en=", so it should not be presented as a complete multi-path Query Router." data-i18n-zh="，不应说成完整多路径 Query Router。">，不应说成完整多路径 Query Router。</span></p></div>
+<div class="co en rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Mapping Script" data-i18n-zh="映射话术">映射话术</span></span><p class="say">I have implemented routing at a smaller application level and designed retrieval logic in a case-based agent. I have not yet operated a large production router across SQL, BM25, dense, and graph systems, but I understand how I would evolve and evaluate that architecture.</p></div>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">Query routing is not about choosing the fanciest retriever. It is about selecting the cheapest reliable evidence path for the current request, while preserving a fallback when that decision is uncertain.</p></div>
+<div class="bfs-canvas rv" id="dg2-query-routing">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>DECISION TREE · ROUTING MATRIX</span>
+<h2 class="bfs-title"><span class="i18n-text" data-i18n-en="Query Routing: Choose the Retrieval Path from Evidence Shape" data-i18n-zh="Query Routing：先判断证据形状，再选检索路径">Query Routing：先判断证据形状，再选检索路径</span></h2>
+<p class="bfs-subtitle"><span class="i18n-text" data-i18n-en="ID ➜ Exact; semantics ➜ Hybrid; relations ➜ Graph/Tool; missing info ➜ Clarify." data-i18n-zh="ID ➜ Exact；语义 ➜ Hybrid；关系 ➜ Graph/Tool；信息不足 ➜ Clarify。">ID ➜ Exact；语义 ➜ Hybrid；关系 ➜ Graph/Tool；信息不足 ➜ Clarify。</span></p>
+</div>
+<div class="bfs-meta"><div class="bfs-meta-item"><div class="bfs-meta-lbl">STRATEGY</div><div class="bfs-meta-val">EVIDENCE SHAPE</div></div><div class="bfs-meta-item"><div class="bfs-meta-lbl">DECISION</div><div class="bfs-meta-val">4 BRANCHES</div></div></div>
+</div>
+<div class="bfs-grid bfs-g4">
+<div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">CASE 1</span><span class="bfs-type-pill">EXACT ID</span></div>
+<div class="bfs-card-title">精确标识符？</div>
+<p class="bfs-card-desc">订单号 · VIN · 工单号<br><small style="color:var(--mut)">Exact / DB / Term Query</small></p>
+<div class="bfs-card-box">YES ➜ 确定性匹配优先</div>
+</div>
+<div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">CASE 2</span><span class="bfs-type-pill">SEMANTICS</span></div>
+<div class="bfs-card-title">自然语言语义？</div>
+<p class="bfs-card-desc">改写 · 同义词 · 流程问法<br><small style="color:var(--mut)">BM25 + Dense → Fusion → Rerank</small></p>
+<div class="bfs-card-box">YES ➜ 词法与语义互补融合</div>
+</div>
+<div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">CASE 3</span><span class="bfs-type-pill">RELATIONS</span></div>
+<div class="bfs-card-title">关系 / 聚合 / 实时数据？</div>
+<p class="bfs-card-desc">多跳 · SQL 聚合 · 实时库存<br><small style="color:var(--mut)">Graph / Database / Tool</small></p>
+<div class="bfs-card-box">YES ➜ 相似度不替代真实计算</div>
+</div>
+<div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">CASE 4</span><span class="bfs-type-pill">UNCERTAIN</span></div>
+<div class="bfs-card-title">输入信息是否足够？</div>
+<p class="bfs-card-desc">实体 · 时间 · 权限 · 风险<br><small style="color:var(--mut)">Clarify / Abstain / Escalate</small></p>
+<div class="bfs-card-box">NO ➜ 不确定时不盲目检索</div>
+</div>
+</div>
+<div class="bfs-card-box" style="margin-top:14px; border-left:3px solid var(--org)">
+<strong>WHY</strong>: 不同证据形状需要不同检索能力。<strong>GATE</strong>: 先判断证据需求，再选 Retriever。<strong>FAILURE</strong>: “所有路径都走一遍”不是路由。
+  </div>
+</div>
+<div class="interp-focus" data-interpret-lenses="tradeoff metric engineering" id="rag-context-budget">
+<h2 class="sub">Retrieval Budget ≠ Context Budget <small><span class="i18n-text" data-i18n-en="New · 2026-08-28" data-i18n-zh="新增 · 2026-08-28">新增 · 2026-08-28</span></small></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="“20 documents were retrieved, but the Context cannot fit them” is not solved by simply lowering TopK. You need to separate" data-i18n-zh="“召回 20 个文档，但 Context 放不下”不是简单把 TopK 调小，而是要把">“召回 20 个文档，但 Context 放不下”不是简单把 TopK 调小，而是要把</span><strong><span class="i18n-text" data-i18n-en="retrieval breadth, reranking candidates, and final context capacity" data-i18n-zh="召回广度、精排候选和最终上下文容量">召回广度、精排候选和最终上下文容量</span></strong><span class="i18n-text" data-i18n-en="into three independent budgets." data-i18n-zh="拆成三个独立预算。">拆成三个独立预算。</span></p>
+<div class="bfs-canvas rv" id="fig-3-8">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.3.8</span>
+<h2 class="bfs-title">Retrieve Broadly → Rank Precisely → Pack by Token Budget</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g5"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Broad Retrieval</h2><div class="bfs-card-desc">K_retrieve · protect recall</div></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Filter + Dedup</h2><div class="bfs-card-desc">ACL · metadata · near-duplicate</div></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Rerank</h2><div class="bfs-card-desc">K_rerank · precision</div></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Coverage Selection</h2><div class="bfs-card-desc">diversity · MMR · sub-question coverage</div></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Context Packing</h2><div class="bfs-card-desc">K_context · explicit token budget</div></div></div>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================= CH4 ======================= -->
+<nav class="page-nav" aria-label="章节翻页"><a href="/chapters/02-enterprise-retrieval/">← 02 <span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/04-rag-reliability-selective-answering/">04 <span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span> →</a></nav></main>
+<script src="/assets/app.js?v=02126beec081" defer></script>
+</body></html>

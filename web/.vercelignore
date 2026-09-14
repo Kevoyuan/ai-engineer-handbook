@@ -1,0 +1,11 @@
+build-multipage.mjs
+audit-fixes.mjs
+.vercel
+*.log
+rebuild.mjs
+qa*.mjs
+audit*.json
+README.md
+DESIGN.md
+chapters.json
+.gitignore

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-title-zh="可靠性、评估与可观测性 · AI 工程手册" data-i18n-title-en="Reliability, Evaluation, and Observability · AI Engineering Handbook">可靠性、评估与可观测性 · AI 工程手册</title>
+<meta name="description" content="可靠性、评估与可观测性：AI 工程手册技术章节，包含架构、权衡、失败模式、指标与生产实践。">
+<link rel="canonical" href="https://kevoyuan-ai-handbook.vercel.app/chapters/09-reliability-evaluation-observability/">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/app.css?v=0bb27ad415ab"><link rel="stylesheet" href="/assets/home.css?v=32688d430c9d"><link rel="stylesheet" href="/assets/reader.css?v=18312fc8bcfe"></head>
+<body class="chapter-page"><a class="skip-link" href="#main-content">跳到正文</a>
+<header><button type="button" aria-label="打开章节导航" aria-controls="side" aria-expanded="false" id="menuBtn">☰</button><a class="brand" href="/">AI 工程手册</a><span id="curCh"><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></span><div class="tools"><a class="tbtn" href="/search/" aria-label="搜索手册">⌕</a><button type="button" class="tbtn" id="themeBtn" aria-label="切换深浅主题">☾</button><button class="lang-toggle" id="langToggle" type="button" aria-label="中 / EN：切换到英文">中 / EN</button></div></header>
+<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节"><a href="/chapters/02-enterprise-retrieval/"><i>02</i><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/03-hybrid-retrieval-query-routing/"><i>03</i><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></a><a href="/chapters/04-rag-reliability-selective-answering/"><i>04</i><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/05-document-pdf-rag/"><i>05</i><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></a><a href="/chapters/06-skills-routing/"><i>06</i><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/07-memory-context-engineering/"><i>07</i><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/08-agent-orchestration/"><i>08</i><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/chapters/09-reliability-evaluation-observability/" aria-current="page"><i>09</i><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></a></nav><div class="sd-f"><span class="i18n-text" data-i18n-zh="原章号 02–09" data-i18n-en="Original chapters 02–09">原章号 02–09</span></div></aside>
+<button aria-label="关闭章节导航" id="sideOverlay" type="button"></button>
+<main id="main-content" tabindex="-1"><section class="ch" id="ch9" style="--acc:var(--red)">
+<div class="ch-head rv"><div class="ch-no"><small>CHAPTER</small>09</div><h1 class="ch-t"><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></h1><span class="ch-tag">HARNESS · G·D·T·J·M·R·F</span></div><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="The core of a reliable Agent is not “the model is smart,” but:" data-i18n-zh="可靠 Agent 的核心不是“模型很聪明”，而是：">可靠 Agent 的核心不是“模型很聪明”，而是：</span><strong>State · Validation · Retry · Fallback · Observability · Policy</strong>。</p>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="9.1–9.3 Structured Outputs, Validation Gates, and Failure Recovery" data-i18n-zh="9.1–9.3 结构化输出、验证门与失败恢复">9.1–9.3 结构化输出、验证门与失败恢复</span></h2>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--blu)"><div class="cd-h"><span class="ic">OUT</span>Structured Outputs + Validation Gates</div><small><span class="i18n-text" data-i18n-en="Model outputs pass a Schema: JSON Schema · Pydantic · Typed Objects · Enums; avoid executing free-form output directly." data-i18n-zh="模型输出通过 Schema：JSON Schema · Pydantic · Typed Objects · Enums；避免自由输出后直接执行。">模型输出通过 Schema：JSON Schema · Pydantic · Typed Objects · Enums；避免自由输出后直接执行。</span><br><strong><span class="i18n-text" data-i18n-en="Validation Types:" data-i18n-zh="验证类型：">验证类型：</span></strong>Schema · Business-rule · Permission · Artifact · Claim verification · Safety。</small><p class="say" style="font-size:13.5px;margin-top:8px">The model proposes completion. The harness proves completion.</p></div>
+<div class="tsc" style="margin:0"><table>
+<thead><tr><th><span class="i18n-text" data-i18n-en="Failure Type" data-i18n-zh="失败类型">失败类型</span></th><th><span class="i18n-text" data-i18n-en="Recovery Strategy (do not blind retry)" data-i18n-zh="恢复策略（不要 blind retry）">恢复策略（不要 blind retry）</span></th></tr></thead>
+<tbody>
+<tr><td><b>Transient API error</b></td><td>retry with backoff</td></tr>
+<tr><td><b>Invalid JSON</b></td><td>repair / constrained regeneration</td></tr>
+<tr><td><b>Missing input</b></td><td>clarify</td></tr>
+<tr><td><b>No evidence</b></td><td>retrieve more / refuse</td></tr>
+<tr><td><b>Tool unavailable</b></td><td>fallback tool / escalate</td></tr>
+</tbody>
+</table></div>
+</div>
+<div class="co note rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Safety and Permissions" data-i18n-zh="安全与权限">安全与权限</span></span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Identity → Permission-aware Retrieval → Authorized Context → Policy Gate → Tool Execution. Side-effecting actions (send email · delete data · deploy · approve payment) require: confirmation · approval · idempotency · audit log." data-i18n-zh="Identity → Permission-aware Retrieval → Authorized Context → Policy Gate → Tool Execution。有副作用的动作（send email · delete data · deploy · approve payment）需要：confirmation · approval · idempotency · audit log。">Identity → Permission-aware Retrieval → Authorized Context → Policy Gate → Tool Execution。有副作用的动作（send email · delete data · deploy · approve payment）需要：confirmation · approval · idempotency · audit log。</span></p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="9.4 Building an Evaluation System from 0 to 1" data-i18n-zh="9.4 从 0 到 1 搭建 Evaluation System">9.4 从 0 到 1 搭建 Evaluation System</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="Evaluation is not a test script run once before release; it is R&amp;D infrastructure across the Agent lifecycle. It ≠ one Judge Prompt ≠ one offline accuracy table ≠ one QA pass. It must answer three questions:" data-i18n-zh="Evaluation 不是发布前临时跑一次的测试脚本，而是贯穿 Agent 生命周期的研发基础设施。它 ≠ 一个 Judge Prompt ≠ 一张离线准确率表 ≠ 一次 QA。它必须回答三个问题：">Evaluation 不是发布前临时跑一次的测试脚本，而是贯穿 Agent 生命周期的研发基础设施。它 ≠ 一个 Judge Prompt ≠ 一张离线准确率表 ≠ 一次 QA。它必须回答三个问题：</span><strong><span class="i18n-text" data-i18n-en="① Is the current version better than the baseline? ② In which scenarios did it regress, and why? ③ Is the evidence sufficient to support release, rollback, or continued experimentation?" data-i18n-zh="① 当前版本是否比基线更好？② 在哪些场景变差、为什么？③ 证据是否足够支持发布、回滚或继续实验？">① 当前版本是否比基线更好？② 在哪些场景变差、为什么？③ 证据是否足够支持发布、回滚或继续实验？</span></strong></p>
+<div class="tsc rv interp-metrics"><table>
+<thead><tr><th><span class="i18n-text" data-i18n-en="Agent Type" data-i18n-zh="Agent 类型">Agent 类型</span></th><th><span class="i18n-text" data-i18n-en="Primary Business Outcome" data-i18n-zh="主要业务结果">主要业务结果</span></th><th><span class="i18n-text" data-i18n-en="Important Supporting Metrics" data-i18n-zh="重要辅助指标">重要辅助指标</span></th></tr></thead>
+<tbody>
+<tr><td><b><span class="i18n-text" data-i18n-en="Customer-service Agent" data-i18n-zh="客服 Agent">客服 Agent</span></b></td><td><span class="i18n-text" data-i18n-en="resolution rate · human escalation rate · satisfaction" data-i18n-zh="问题解决率 · 升级人工率 · 满意度">问题解决率 · 升级人工率 · 满意度</span></td><td><span class="i18n-text" data-i18n-en="factual correctness · policy compliance · response time" data-i18n-zh="事实正确性 · 政策遵循 · 响应时间">事实正确性 · 政策遵循 · 响应时间</span></td></tr>
+<tr><td><b>Coding Agent</b></td><td><span class="i18n-text" data-i18n-en="test pass rate · task completion rate" data-i18n-zh="测试通过率 · 任务完成率">测试通过率 · 任务完成率</span></td><td><span class="i18n-text" data-i18n-en="Patch correctness · regression count · Token and runtime cost" data-i18n-zh="Patch 正确性 · 回归数 · Token 与运行成本">Patch 正确性 · 回归数 · Token 与运行成本</span></td></tr>
+<tr><td><b>RAG Agent</b></td><td><span class="i18n-text" data-i18n-en="rate of correct answers supported by evidence" data-i18n-zh="受证据支持的正确答案率">受证据支持的正确答案率</span></td><td><span class="i18n-text" data-i18n-en="Citation · refusal accuracy · Recall@K" data-i18n-zh="Citation · 拒答准确率 · Recall@K">Citation · 拒答准确率 · Recall@K</span></td></tr>
+<tr><td><b><span class="i18n-text" data-i18n-en="Data-analysis Agent" data-i18n-zh="数据分析 Agent">数据分析 Agent</span></b></td><td><span class="i18n-text" data-i18n-en="calculation accuracy · actionability of insights" data-i18n-zh="计算结果正确率 · 洞察可执行性">计算结果正确率 · 洞察可执行性</span></td><td><span class="i18n-text" data-i18n-en="SQL correctness · data freshness · chart consistency" data-i18n-zh="SQL 正确率 · 数据新鲜度 · 图表一致性">SQL 正确率 · 数据新鲜度 · 图表一致性</span></td></tr>
+<tr><td><b>Workflow Agent</b></td><td><span class="i18n-text" data-i18n-en="end-to-end workflow success rate" data-i18n-zh="端到端流程成功率">端到端流程成功率</span></td><td><span class="i18n-text" data-i18n-en="tool success rate · retry rate · human takeover rate" data-i18n-zh="工具成功率 · 重试率 · 人工接管率">工具成功率 · 重试率 · 人工接管率</span></td></tr>
+</tbody>
+</table></div>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">Evaluation is useful only when its result changes an engineering or product decision.</p><p style="font-size:13.5px;color:var(--mut);margin-top:6px"><span class="i18n-text" data-i18n-en="Before building, define the Release Decision: allow merging a Prompt change? allow switching models? allow expanding traffic? trigger human review? automatically block release? automatically roll back?" data-i18n-zh="搭建前先写清 Release Decision：允许合并 Prompt 变更？允许切换模型？允许扩大流量？触发人工审查？自动阻断发布？自动回滚？">搭建前先写清 Release Decision：允许合并 Prompt 变更？允许切换模型？允许扩大流量？触发人工审查？自动阻断发布？自动回滚？</span></p></div>
+<div class="bfs-canvas rv" id="fig-9-1">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.1</span>
+<h2 class="bfs-title">Evaluation System 完整架构（两个数据面：Dataset 用于可重复运行与版本比较；Trajectory Store 记录某次执行到底发生了什么，二者不能混为一谈）</h2>
+<p class="bfs-subtitle">双数据面全景架构：评测数据集面 (Golden Testsets) 负责离线回归与版本打分；执行轨迹面 (Trajectory Store) 负责在线诊断与失败归因</p>
+</div>
+<div class="bfs-meta">
+<div class="bfs-meta-item"><div class="bfs-meta-lbl">DATA PLANES</div><div class="bfs-meta-val">DATASET vs TRAJECTORY</div></div>
+<div class="bfs-meta-item"><div class="bfs-meta-lbl">CIRCUIT</div><div class="bfs-meta-val">CONTINUOUS FLYWHEEL</div></div>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-card bfs-blue" style="margin-bottom:12px">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">INGESTION &amp; PRIVACY</span><span class="bfs-type-pill">INPUT LAYER</span></div>
+<h2 class="bfs-card-title">Real User Requests · Online Logs · Bad Cases · User Corrections</h2>
+<div class="bfs-card-desc"><strong>Trace Collection + Privacy Filter</strong>（全链路脱敏采集与流量镜像）</div>
+</div>
+
+<div class="bfs-grid bfs-g3" style="margin-bottom:12px">
+<div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">PLANE A</span><span class="bfs-type-pill">BENCHMARK</span></div>
+<h2 class="bfs-card-title">Dataset Manager</h2>
+<div class="bfs-card-desc">Synthetic · Human · Real · Edge · Safety</div>
+</div>
+
+<div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">PLANE B</span><span class="bfs-type-pill">OBSERVABILITY</span></div>
+<h2 class="bfs-card-title">Trajectory Store</h2>
+<div class="bfs-card-desc">Inputs · State · Tool Calls · Outputs · Errors · Versions</div>
+</div>
+
+<div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">FLYWHEEL</span><span class="bfs-type-pill">REGRESSION</span></div>
+<h2 class="bfs-card-title">↺ Regression Loop</h2>
+<div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Feed bad cases back into regression cases" data-i18n-zh="坏案例回流为回归用例">坏案例回流为回归用例</span></div>
+</div>
+</div>
+
+<div class="bfs-card bfs-purple" style="margin-bottom:12px">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">EXECUTION</span><span class="bfs-type-pill">AGENT RUNTIME</span></div>
+<h2 class="bfs-card-title">Agent Runtime：LLM + Prompt + Memory + Tools + Workflow + Policy</h2>
+</div>
+
+<div class="bfs-grid bfs-g3" style="margin-bottom:12px">
+<div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">JUDGE 1</span><span class="bfs-type-pill">DETERMINISTIC</span></div>
+<h2 class="bfs-card-title">Rule Judge</h2>
+<div class="bfs-card-desc">Schema · 精确数值 · 单元测试 · 正则断言</div>
+</div>
+
+<div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">JUDGE 2</span><span class="bfs-type-pill">SEMANTIC</span></div>
+<h2 class="bfs-card-title">LLM Judge</h2>
+<div class="bfs-card-desc">Rubric 规范 · CoT 思维链 · 忠实度打分</div>
+</div>
+
+<div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">JUDGE 3</span><span class="bfs-type-pill">HUMAN REVIEW</span></div>
+<h2 class="bfs-card-title">Human Judge</h2>
+<div class="bfs-card-desc">双盲标注 · 争议样本仲裁 · 一致性校准</div>
+</div>
+</div>
+
+<div class="bfs-grid bfs-g2" style="margin-bottom:12px">
+<div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">METRICS</span><span class="bfs-type-pill">MULTI-DIMENSIONAL</span></div>
+<h2 class="bfs-card-title">Metrics：Quality · Safety · Cost · Latency · Business KPI</h2>
+</div>
+
+<div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">ANALYTICS</span><span class="bfs-type-pill">DASHBOARD</span></div>
+<h2 class="bfs-card-title">Dashboard + Slice Comparison</h2>
+<div class="bfs-card-desc">多切片对比、版本基线比对与趋势监控</div>
+</div>
+</div>
+
+<div class="bfs-grid bfs-g2">
+<div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">GATE</span><span class="bfs-type-pill">CI/CD GATE</span></div>
+<h2 class="bfs-card-title">Release Gate：Ship / Canary / Hold / Rollback</h2>
+<div class="bfs-card-desc">自动化发布门禁阻断与金丝雀放量</div>
+</div>
+
+<div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">CLOSED LOOP</span><span class="bfs-type-pill">EVOLUTION</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Error Analysis + Root Cause → Dataset Evolution (back to Dataset Manager)" data-i18n-zh="Error Analysis + Root Cause → Dataset Evolution（回到 Dataset Manager）">Error Analysis + Root Cause → Dataset Evolution（回到 Dataset Manager）</span></h2>
+<div class="bfs-card-desc">归因分析驱动数据集持续进化与自愈</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid g2 rv" style="margin-top:16px">
+<div class="cd" style="--c:var(--org)"><div class="cd-h"><span class="ic">DATA</span><span class="i18n-text" data-i18n-en="Dataset Manager: More Than a Golden Set" data-i18n-zh="Dataset Manager：不只是 Golden Set">Dataset Manager：不只是 Golden Set</span></div>
+<div class="lb"><span class="i18n-text" data-i18n-en="Sources" data-i18n-zh="来源">来源</span></div><small>Synthetic · Human-authored · Historical Production · Online Bad Cases · Boundary · Safety/Permission · Adversarial · No-answer/Clarification</small>
+<div class="lb"><span class="i18n-text" data-i18n-en="Maintain at least four sets" data-i18n-zh="至少维护四个集合">至少维护四个集合</span></div><small><strong>Development</strong><span class="i18n-text" data-i18n-en="(daily Prompt/Tool/Workflow development) · " data-i18n-zh="（日常调 Prompt/Tool/Workflow）· ">（日常调 Prompt/Tool/Workflow）· </span><strong>Regression</strong><span class="i18n-text" data-i18n-en="(must pass on every release; derived from real historical failures) · " data-i18n-zh="（每次发布必须通过，来自历史真实失败）· ">（每次发布必须通过，来自历史真实失败）· </span><strong>Holdout</strong><span class="i18n-text" data-i18n-en="(the team should not repeatedly inspect it, to reduce overfitting) · " data-i18n-zh="（团队日常不能反复查看，防过拟合）· ">（团队日常不能反复查看，防过拟合）· </span><strong>Online Shadow</strong><span class="i18n-text" data-i18n-en="(compare old and new versions on real traffic without affecting users)" data-i18n-zh="（真实流量比较新旧版本但不影响用户）">（真实流量比较新旧版本但不影响用户）</span></small>
+<p class="say" style="font-size:13.5px;margin-top:8px">A golden set should be curated, deduplicated, versioned, and sliced—not merely accumulated.</p></div>
+<div>
+<pre class="code" data-l="EVAL CASE · JSON" style="margin:0"> {
+  <span class="k">"case_id"</span>: <span class="s">"eval_000184"</span>,
+  <span class="k">"input"</span>: <span class="s">"..."</span>,
+  <span class="k">"expected_outcome"</span>: <span class="s">"..."</span>,
+  <span class="k">"reference_evidence"</span>: [<span class="s">"doc_12#p7"</span>],
+  <span class="k">"slice"</span>: [<span class="s">"refund"</span>, <span class="s">"conflicting_policy"</span>, <span class="s">"de-DE"</span>],
+  <span class="k">"risk_level"</span>: <span class="s">"high"</span>,
+  <span class="k">"source"</span>: <span class="s">"production_bad_case"</span>,
+  <span class="k">"annotation_status"</span>: <span class="s">"adjudicated"</span>,
+  <span class="k">"dataset_version"</span>: <span class="s">"evalset_2026_07_29"</span>
+ }</pre>
+<div class="co note rv interp-callout interp-failure"><span class="co-t"><span class="i18n-text" data-i18n-en="Can 20–50 examples be enough to start?" data-i18n-zh="20–50 条即可启动？">20–50 条即可启动？</span></span><p style="font-size:13px"><span class="i18n-text" data-i18n-en="This is a practical heuristic, not a fixed standard. More precisely:" data-i18n-zh="这是实用启发，不是固定标准。更准确：">这是实用启发，不是固定标准。更准确：</span><em>Start with the smallest stratified set that can expose the system's main failure modes.</em><span class="i18n-text" data-i18n-en=" Cover: Normal · Boundary · Hard Negative · No-answer · Permission · Tool Failure · Conflicting Evidence · Long Context · Multi-step · Safety. Thirty easy examples of the same type have little evaluation value." data-i18n-zh=" 需覆盖：Normal · Boundary · Hard Negative · No-answer · Permission · Tool Failure · Conflicting Evidence · Long Context · Multi-step · Safety。30 条同类简单请求没有评估价值。"> 需覆盖：Normal · Boundary · Hard Negative · No-answer · Permission · Tool Failure · Conflicting Evidence · Long Context · Multi-step · Safety。30 条同类简单请求没有评估价值。</span></p></div>
+</div>
+</div>
+<pre class="code rv" data-i18n-data-l-en="TRACE SCHEMA · Replayable Single Execution" data-i18n-data-l-zh="TRACE SCHEMA · 可回放单次执行" data-l="TRACE SCHEMA · 可回放单次执行"> { <span class="k">"trace_id"</span>: <span class="s">"tr_9f31"</span>, <span class="k">"request_id"</span>: <span class="s">"req_882"</span>, <span class="k">"agent_version"</span>: <span class="s">"agent_1.8.0"</span>,
+   <span class="k">"model_version"</span>: <span class="s">"model_x"</span>, <span class="k">"prompt_version"</span>: <span class="s">"prompt_27"</span>, <span class="k">"workflow_version"</span>: <span class="s">"graph_14"</span>,
+   <span class="k">"tool_registry_version"</span>: <span class="s">"tools_9"</span>, <span class="k">"memory_snapshot"</span>: <span class="s">"mem_snapshot_311"</span>,
+   <span class="k">"steps"</span>: [{ <span class="k">"step"</span>: <span class="n">1</span>, <span class="k">"state"</span>: <span class="s">"retrieve_policy"</span>, <span class="k">"tool"</span>: <span class="s">"search_policy"</span>,
+              <span class="k">"arguments"</span>: {<span class="k">"country"</span>: <span class="s">"DE"</span>}, <span class="k">"result_status"</span>: <span class="s">"success"</span>, <span class="k">"latency_ms"</span>: <span class="n">184</span> }],
+   <span class="k">"final_output"</span>: <span class="s">"..."</span>, <span class="k">"validation_result"</span>: <span class="s">"..."</span>, <span class="k">"cost"</span>: <span class="n">0.032</span>, <span class="k">"latency_ms"</span>: <span class="n">2840</span> }</pre>
+<div class="co warn rv interp-callout interp-pitfall"><span class="co-t"><span class="i18n-text" data-i18n-en="Technical Boundary" data-i18n-zh="技术边界">技术边界</span></span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Do not treat hidden Chain-of-Thought as a required Evaluation Trace. Record: model-visible messages · structured decisions · tool calls and arguments · tool observations · workflow states · validation outcomes · compact decision summaries." data-i18n-zh="不要把隐藏 Chain-of-Thought 当作必须存储的 Evaluation Trace。应记录：model-visible messages · structured decisions · tool calls 与参数 · tool observations · workflow states · validation outcomes · compact decision summaries。">不要把隐藏 Chain-of-Thought 当作必须存储的 Evaluation Trace。应记录：model-visible messages · structured decisions · tool calls 与参数 · tool observations · workflow states · validation outcomes · compact decision summaries。</span></p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Judge Routing: Rule / LLM / Human Is Routing, Not Replacement" data-i18n-zh="Judge Routing：Rule / LLM / Human 是路由，不是替代">Judge Routing：Rule / LLM / Human 是路由，不是替代</span></h2>
+<div class="bfs-canvas rv" id="fig-9-2">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.2</span>
+<h2 class="bfs-title">Judge 决策树</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Can a deterministic rule decide it? (Schema · exact numbers · unit tests · SQL results · citation existence · prohibited tool · permission violation · latency/cost budget)" data-i18n-zh="能用确定性规则判定吗？（Schema · 精确数值 · 单测 · SQL 结果 · 引用存在 · 禁用工具 · 权限违规 · 延迟/成本预算）">能用确定性规则判定吗？（Schema · 精确数值 · 单测 · SQL 结果 · 引用存在 · 禁用工具 · 权限违规 · 延迟/成本预算）</span></h2></div></div><div class="bfs-grid bfs-g3" style="margin: 10px 0;"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">NODE</span></div>
+<h2 class="bfs-card-title">Yes → Rule Judge</h2><div class="bfs-card-desc">Deterministic · Cheap · Fast · Easy to debug</div></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">NODE</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="No, but can a calibrated model judge it by Rubric? (Helpfulness · completeness · policy explanation · semantic support · tone · trajectory quality) → LLM Judge" data-i18n-zh="No，但校准后的模型可按 Rubric 判定？（Helpfulness · 完整性 · 政策解释 · 语义支持 · 语气 · 轨迹质量）→ LLM Judge">No，但校准后的模型可按 Rubric 判定？（Helpfulness · 完整性 · 政策解释 · 语义支持 · 语气 · 轨迹质量）→ LLM Judge</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Must have Rubric · reference examples · output Schema · Temperature control · Judge version · calibration set · human-agreement measurement" data-i18n-zh="必须有 Rubric · 参考例 · 输出 Schema · Temperature 控制 · Judge 版本 · 校准集 · 人工一致性度量">必须有 Rubric · 参考例 · 输出 Schema · Temperature 控制 · Judge 版本 · 校准集 · 人工一致性度量</span></div></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">NODE</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="No / high risk / disagreement → Human Review + Adjudication" data-i18n-zh="No / 高风险 / 分歧 → Human Review + Adjudication">No / 高风险 / 分歧 → Human Review + Adjudication</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Double annotation · Reviewer guidelines · Inter-rater agreement (human Judges are not inherently error-free either)" data-i18n-zh="Double annotation · Reviewer guidelines · Inter-rater agreement（人工 Judge 也非天然无误）">Double annotation · Reviewer guidelines · Inter-rater agreement（人工 Judge 也非天然无误）</span></div></div></div></div>
+</div>
+</div>
+<div class="grid g2 rv">
+<pre class="code" data-i18n-data-l-en="HIGH-QUALITY RUBRIC → JUDGE OUTPUT" data-i18n-data-l-zh="高质量 RUBRIC → JUDGE 输出" data-i18n-pre-en=' ✗ Low quality: "Is this answer good? Score 1–5."
+ ✓ Break it into observable criteria:
+ Correctness   Are key facts consistent with evidence? Wrong direction/value?
+ Completeness  Are all subquestions covered? Do omissions affect decisions?
+ Grounding     Does every Claim have evidence? Does the citation entail it?
+ Policy        Are permission, refusal, and escalation rules followed?
+ Actionability Can the user complete the next step?
+
+ // Recommended Judge output
+ { "score": 3, "pass": false,
+   "failed_criteria": ["citation_does_not_support_claim"],
+   "evidence": ["The answer says 30 days, but the cited policy says 14 days"],
+   "repair_hint": "Retrieve the current German policy and answer both subquestions" }' data-i18n-pre-zh=' ✗ 低质量："Is this answer good? Score 1–5."
+ ✓ 拆成可观察标准：
+ Correctness  关键事实与证据一致？方向/数值错？
+ Completeness 覆盖全部子问题？遗漏影响决策？
+ Grounding   每个 Claim 有证据？引用蕴含 Claim？
+ Policy      遵守权限、拒答、升级规则？
+ Actionability 用户能据此完成下一步？
+
+ // Judge 推荐输出
+ { "score": 3, "pass": false,
+   "failed_criteria": ["citation_does_not_support_claim"],
+   "evidence": ["答案说 30 天，引用政策写 14 天"],
+   "repair_hint": "取当前德国政策并回答两个子问题" }' data-l="高质量 RUBRIC → JUDGE 输出" style="margin:0"> ✗ 低质量："Is this answer good? Score 1–5."
+ ✓ 拆成可观察标准：
+ Correctness  关键事实与证据一致？方向/数值错？
+ Completeness 覆盖全部子问题？遗漏影响决策？
+ Grounding   每个 Claim 有证据？引用蕴含 Claim？
+ Policy      遵守权限、拒答、升级规则？
+ Actionability 用户能据此完成下一步？
+
+ // Judge 推荐输出
+ { "score": 3, "pass": false,
+   "failed_criteria": ["citation_does_not_support_claim"],
+   "evidence": ["答案说 30 天，引用政策写 14 天"],
+   "repair_hint": "取当前德国政策并回答两个子问题" }</pre>
+<div class="co must interp-callout interp-engineering interp-pitfall" style="margin:0"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">Evaluators should produce repair instructions, not only scores.</p>
+<p style="font-size:13.5px;margin-top:10px"><strong><span class="i18n-text" data-i18n-en="Do not collapse Metrics into one average; inspect five categories separately:" data-i18n-zh="Metrics 不要放进同一个平均数，分五类看：">Metrics 不要放进同一个平均数，分五类看：</span></strong></p>
+<div class="chips" style="margin-top:6px">
+<span class="chip" style="--c:var(--grn)">Outcome：Task Success · Answer Correctness · No-answer Acc · Citation Support</span>
+<span class="chip" style="--c:var(--blu)">Process：Tool Selection · Argument Correctness · Plan Completion · Recovery · Loop Rate</span>
+<span class="chip" style="--c:var(--tea)">Efficiency：Latency P50/P95/P99 · Token · Cost/Success · Retry · Cache Hit</span>
+<span class="chip" style="--c:var(--red)">Safety：Policy Violation · Unauthorized Retrieval · Sensitive Exposure · False Refusal/Allow</span>
+<span class="chip" style="--c:var(--amb)">Business：CSAT · Deflection · Conversion · Time Saved · Support Cost</span>
+</div>
+<p style="font-size:13px;color:var(--mut);margin-top:8px"><span class="i18n-text" data-i18n-en="The overview should show Overall + Query Slice + Risk Slice + Language/Region + Tool/Workflow Version + New vs Regression." data-i18n-zh="总览同时展示 Overall + Query Slice + Risk Slice + Language/Region + Tool/Workflow Version + New vs Regression。">总览同时展示 Overall + Query Slice + Risk Slice + Language/Region + Tool/Workflow Version + New vs Regression。</span></p>
+</div>
+</div>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--blu)"><div class="cd-h"><span class="ic">OFFLINE</span><span class="i18n-text" data-i18n-en="Offline Evaluation" data-i18n-zh="离线评估">离线评估</span></div><small><span class="i18n-text" data-i18n-en="Use cases: Prompt/Model/Tool/Memory/Workflow comparison · regression testing · release-candidate validation. Fix dataset version · judge version · model settings · tool mocks / data snapshot · random seed, otherwise version comparisons are not reproducible." data-i18n-zh="用途：Prompt/Model/Tool/Memory/Workflow 对比 · 回归测试 · 发布候选验证。必须固定：dataset version · judge version · model settings · tool mocks / data snapshot · random seed，否则版本比较不可复现。">用途：Prompt/Model/Tool/Memory/Workflow 对比 · 回归测试 · 发布候选验证。必须固定：dataset version · judge version · model settings · tool mocks / data snapshot · random seed，否则版本比较不可复现。</span></small>
+<div class="tsc" style="margin:10px 0 0;box-shadow:none"><table style="min-width:0"><thead><tr><th>Version</th><th>Dataset</th><th>Judge</th><th><span class="i18n-text" data-i18n-en="Result" data-i18n-zh="结果">结果</span></th></tr></thead><tbody><tr><td>Baseline</td><td>Regression v12</td><td>Judge v4</td><td><b>82.1%</b></td></tr><tr><td>Candidate A</td><td>Regression v12</td><td>Judge v4</td><td><b>85.4%</b></td></tr><tr><td>Candidate B</td><td>Regression v12</td><td>Judge v4</td><td><b>84.8%</b></td></tr></tbody></table></div></div>
+<div class="cd" style="--c:var(--org)"><div class="cd-h"><span class="ic">ONLINE</span><span class="i18n-text" data-i18n-en="Online Evaluation" data-i18n-zh="在线评估">在线评估</span></div><small><span class="i18n-text" data-i18n-en="Monitor: Distribution Shift · Tool Reliability · Latency · User Corrections · Fallback · Human Escalation · Business Outcomes." data-i18n-zh="关注：Distribution Shift · Tool Reliability · Latency · User Corrections · Fallback · Human Escalation · Business Outcomes。">关注：Distribution Shift · Tool Reliability · Latency · User Corrections · Fallback · Human Escalation · Business Outcomes。</span><br><strong><span class="i18n-text" data-i18n-en="Patterns:" data-i18n-zh="模式：">模式：</span></strong><span class="i18n-text" data-i18n-en="Shadow (new version runs without affecting users) → A/B Test → Canary (small percentage of real traffic) → Human Review Sampling → Continuous Monitoring + alerts." data-i18n-zh="Shadow（新版本运行不影响用户）→ A/B Test → Canary（小比例真实流量）→ Human Review Sampling → Continuous Monitoring + 告警。">Shadow（新版本运行不影响用户）→ A/B Test → Canary（小比例真实流量）→ Human Review Sampling → Continuous Monitoring + 告警。</span><br><strong><span class="i18n-text" data-i18n-en="Online feedback is biased:" data-i18n-zh="线上反馈有偏差：">线上反馈有偏差：</span></strong><span class="i18n-text" data-i18n-en="A like ≠ necessarily correct; no complaint ≠ necessarily successful; human takeover ≠ necessarily Agent failure → combine with verifiable outcomes, human review, and business data." data-i18n-zh="点赞 ≠ 一定正确；不投诉 ≠ 一定成功；人工接管 ≠ 一定是 Agent 失败 → 与可验证结果、人工审查、业务数据组合使用。">点赞 ≠ 一定正确；不投诉 ≠ 一定成功；人工接管 ≠ 一定是 Agent 失败 → 与可验证结果、人工审查、业务数据组合使用。</span></small></div>
+</div>
+<div class="grid g2 rv">
+<pre class="code" data-l="RELEASE GATE · YAML" style="margin:0"> <span class="k">release_gate</span>:
+   <span class="k">task_success_rate</span>:
+     minimum: <span class="n">0.86</span>
+     regression_tolerance: <span class="n">-0.01</span>
+   <span class="k">high_risk_policy_violation</span>:
+     maximum: <span class="n">0</span>
+   <span class="k">citation_support_rate</span>:
+     minimum: <span class="n">0.95</span>
+   <span class="k">p95_latency_ms</span>:
+     maximum: <span class="n">4500</span>
+   <span class="k">cost_per_success</span>:
+     maximum: <span class="n">0.08</span></pre>
+<div class="co warn interp-callout interp-failure" style="margin:0"><span class="co-t">Release Gate</span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Evaluation closes the loop only when connected to release decisions. Decisions are more than Pass/Fail:" data-i18n-zh="Evaluation 只有连接到发布决策才形成闭环。决策不止 Pass/Fail：">Evaluation 只有连接到发布决策才形成闭环。决策不止 Pass/Fail：</span><strong>Ship · Canary · Hold · Request Human Review · Rollback</strong><span class="i18n-text" data-i18n-en=". For high-risk Slices:" data-i18n-zh="。对高风险 Slice：">。对高风险 Slice：</span></p><p class="say" style="font-size:14.5px;margin-top:6px">Overall score improvement cannot compensate for a critical safety regression.</p>
+<p style="font-size:13px;color:var(--mut);margin-top:8px"><strong>Dashboard ≠ Gate：</strong><span class="i18n-text" data-i18n-en="Dashboard explains what changed (Release Comparison · Slice Breakdown · Cost/Latency · Safety · Judge Agreement · Failure Clusters · Regression Cases · Online Drift); Release Gate turns metrics into explicit release decisions." data-i18n-zh="Dashboard 解释发生了什么变化（Release Comparison · Slice Breakdown · Cost/Latency · Safety · Judge Agreement · Failure Clusters · Regression Cases · Online Drift）；Release Gate 把指标变成显式发布决策。">Dashboard 解释发生了什么变化（Release Comparison · Slice Breakdown · Cost/Latency · Safety · Judge Agreement · Failure Clusters · Regression Cases · Online Drift）；Release Gate 把指标变成显式发布决策。</span></p></div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Error Analysis and Failure Taxonomy" data-i18n-zh="Error Analysis 与 Failure Taxonomy">Error Analysis 与 Failure Taxonomy</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span></div>
+<div class="chips rv">
+<span class="chip" style="--c:var(--red)">Input Understanding</span><span class="chip" style="--c:var(--red)">Routing</span><span class="chip" style="--c:var(--org)">Retrieval</span><span class="chip" style="--c:var(--org)">Memory</span><span class="chip" style="--c:var(--amb)">Planning</span><span class="chip" style="--c:var(--amb)">Tool Selection</span><span class="chip" style="--c:var(--amb)">Tool Argument</span><span class="chip" style="--c:var(--amb)">Tool Execution</span><span class="chip" style="--c:var(--blu)">Evidence</span><span class="chip" style="--c:var(--blu)">Generation</span><span class="chip" style="--c:var(--blu)">Citation</span><span class="chip" style="--c:var(--pur)">Policy</span><span class="chip" style="--c:var(--pur)">Recovery</span><span class="chip" style="--c:var(--tea)">Evaluation</span>
+</div>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">Fix the earliest incorrect decision, not the final symptom.</p><p style="font-size:13.5px;color:var(--mut);margin-top:6px"><span class="i18n-text" data-i18n-en="Root Cause should identify: the earliest incorrect decision · downstream affected steps · whether it is deterministically reproducible · whether retry helps · whether the fix belongs to prompt / data / tool / policy / workflow." data-i18n-zh="Root Cause 应定位：最早出错的决策 · 下游受影响步骤 · 是否确定性可复现 · retry 是否有用 · 修复属于 prompt / data / tool / policy / workflow 哪一类。">Root Cause 应定位：最早出错的决策 · 下游受影响步骤 · 是否确定性可复现 · retry 是否有用 · 修复属于 prompt / data / tool / policy / workflow 哪一类。</span></p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Evaluation Data Flywheel" data-i18n-zh="评估数据飞轮">评估数据飞轮</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span></div>
+<div class="wheel-wrap rv">
+<div class="wheel">
+<div class="ring"></div>
+<div class="hub"><span class="i18n-text" data-i18n-en="Data Flywheel" data-i18n-zh="数据飞轮">数据飞轮</span><br><span style="font-size:10.5px;font-family:'JetBrains Mono',monospace;color:var(--mut)">FLYWHEEL</span></div>
+<div class="wn" style="left:50%;top:6%"><i>01</i>Production Trace</div>
+<div class="wn" style="left:81%;top:19%"><i>02</i><span class="i18n-text" data-i18n-en="Bad-case Detection" data-i18n-zh="坏例检测">坏例检测</span></div>
+<div class="wn" style="left:94%;top:50%"><i>03</i><span class="i18n-text" data-i18n-en="Root-cause Analysis" data-i18n-zh="根因分析">根因分析</span></div>
+<div class="wn" style="left:81%;top:81%"><i>04</i><span class="i18n-text" data-i18n-en="Deduplicate · Label · Store" data-i18n-zh="去重·标注·入库">去重·标注·入库</span></div>
+<div class="wn" style="left:50%;top:94%"><i>05</i><span class="i18n-text" data-i18n-en="Fix the Agent" data-i18n-zh="修复 Agent">修复 Agent</span></div>
+<div class="wn" style="left:19%;top:81%"><i>06</i><span class="i18n-text" data-i18n-en="Offline Regression" data-i18n-zh="离线回归">离线回归</span></div>
+<div class="wn" style="left:6%;top:50%"><i>07</i>Shadow / Canary</div>
+<div class="wn" style="left:19%;top:19%"><i>08</i><span class="i18n-text" data-i18n-en="Release → New Trace" data-i18n-zh="发布 → 新 Trace">发布 → 新 Trace</span></div>
+</div>
+<div>
+<div class="co warn"><span class="co-t"><span class="i18n-text" data-i18n-en="Before entering the dataset, each case must go through" data-i18n-zh="入库前必须经过">入库前必须经过</span></span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Privacy review · Deduplication · Severity classification · Root-cause label · Expected behavior · Reference evidence · Adjudication · Dataset split assignment. Do not dump every bad case into one Golden Set; that causes duplicated data · overfitting to recent events · distorted distribution · inconsistent labels · test-set contamination." data-i18n-zh="Privacy review · Deduplication · Severity classification · Root-cause label · Expected behavior · Reference evidence · Adjudication · Dataset split assignment。不能把每个坏案例直接塞进同一个 Golden Set，否则：数据重复 · 对近期事件过拟合 · 分布扭曲 · 标签不一致 · 测试集污染。">Privacy review · Deduplication · Severity classification · Root-cause label · Expected behavior · Reference evidence · Adjudication · Dataset split assignment。不能把每个坏案例直接塞进同一个 Golden Set，否则：数据重复 · 对近期事件过拟合 · 分布扭曲 · 标签不一致 · 测试集污染。</span></p></div>
+<div class="co note"><span class="co-t"><span class="i18n-text" data-i18n-en="Version Governance" data-i18n-zh="版本治理">版本治理</span></span><p style="font-size:13px"><span class="i18n-text" data-i18n-en="Every release must answer: which dataset, Judge, and Agent version produced this result? Metadata: dataset_version · annotation_guideline_version · judge_version · model_version · prompt_version · tool_registry_version · workflow_version · knowledge_snapshot · policy_version. Dataset changes need a Changelog (Added / Removed / Relabeled / Deduplicated / Moved / Risk changed)." data-i18n-zh="每次发布都能回答：这个结果由哪套数据、哪个 Judge、哪个 Agent 版本得到？元数据：dataset_version · annotation_guideline_version · judge_version · model_version · prompt_version · tool_registry_version · workflow_version · knowledge_snapshot · policy_version。Dataset 变更要有 Changelog（Added / Removed / Relabeled / Deduplicated / Moved / Risk changed）。">每次发布都能回答：这个结果由哪套数据、哪个 Judge、哪个 Agent 版本得到？元数据：dataset_version · annotation_guideline_version · judge_version · model_version · prompt_version · tool_registry_version · workflow_version · knowledge_snapshot · policy_version。Dataset 变更要有 Changelog（Added / Removed / Relabeled / Deduplicated / Moved / Risk changed）。</span></p></div>
+</div>
+</div>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--pur)"><div class="cd-h"><span class="ic">JUDGE?</span><span class="i18n-text" data-i18n-en="How to Evaluate the LLM Judge Itself" data-i18n-zh="如何评估 LLM Judge 本身">如何评估 LLM Judge 本身</span></div><small><span class="i18n-text" data-i18n-en="The Judge can fail too. Measure: Human Agreement · Pairwise Consistency · Self-consistency · Position Bias · Verbosity Bias · Reference Leakage · Prompt Sensitivity · Model-version Drift." data-i18n-zh="Judge 也会失败，需要：Human Agreement · Pairwise Consistency · Self-consistency · Position Bias · Verbosity Bias · Reference Leakage · Prompt Sensitivity · Model-version Drift。">Judge 也会失败，需要：Human Agreement · Pairwise Consistency · Self-consistency · Position Bias · Verbosity Bias · Reference Leakage · Prompt Sensitivity · Model-version Drift。</span><br><strong><span class="i18n-text" data-i18n-en="Calibration Process:" data-i18n-zh="校准流程：">校准流程：</span></strong><span class="i18n-text" data-i18n-en="Human-adjudicated calibration set → run Judge → compare confusion matrix → analyze disagreements → update Rubric and examples → freeze Judge version → recalibrate periodically." data-i18n-zh="人工裁决校准集 → 跑 Judge → 混淆矩阵对比 → 分析分歧 → 更新 Rubric 与例子 → 冻结 Judge 版本 → 周期重校准。">人工裁决校准集 → 跑 Judge → 混淆矩阵对比 → 分析分歧 → 更新 Rubric 与例子 → 冻结 Judge 版本 → 周期重校准。</span><mark><span class="i18n-text" data-i18n-en="Critical release gates should not depend on one uncalibrated LLM Judge." data-i18n-zh="关键发布门禁不应依赖未校准的单一 LLM Judge。">关键发布门禁不应依赖未校准的单一 LLM Judge。</span></mark></small></div>
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">ROADMAP</span><span class="i18n-text" data-i18n-en="Implementation Roadmap from 0 to 1" data-i18n-zh="从 0 到 1 实施路线">从 0 到 1 实施路线</span></div>
+<div class="evs" style="grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 0"><div class="ev" style="text-align:left;padding:0"><i style="margin:0 8px 0 0;display:inline-grid">1</i><b style="display:inline"><span class="i18n-text" data-i18n-en="Small Manual Loop" data-i18n-zh="手工小闭环">手工小闭环</span></b><small><span class="i18n-text" data-i18n-en="20–50 stratified cases · Rule Checks · human scoring sheet · version comparison · manual error analysis" data-i18n-zh="20–50 分层案例 · Rule Checks · 人工评分表 · 版本对比 · 手工错误分析">20–50 分层案例 · Rule Checks · 人工评分表 · 版本对比 · 手工错误分析</span></small></div><div class="ev" style="text-align:left;padding:0"><i style="margin:0 8px 0 0;display:inline-grid">2</i><b style="display:inline"><span class="i18n-text" data-i18n-en="Repeatable Offline Evaluation" data-i18n-zh="可重复离线评估">可重复离线评估</span></b><small><span class="i18n-text" data-i18n-en="Versioned Dataset · Trace Schema · automated Runner · LLM Judge · Slice metrics · regression report" data-i18n-zh="Dataset 版本化 · Trace Schema · 自动 Runner · LLM Judge · Slice 指标 · 回归报告">Dataset 版本化 · Trace Schema · 自动 Runner · LLM Judge · Slice 指标 · 回归报告</span></small></div><div class="ev" style="text-align:left;padding:0"><i style="margin:0 8px 0 0;display:inline-grid">3</i><b style="display:inline"><span class="i18n-text" data-i18n-en="Integrate into CI/CD" data-i18n-zh="接入 CI/CD">接入 CI/CD</span></b><small><span class="i18n-text" data-i18n-en="PR Eval · Release Gate · Prompt/Model/Tool regression · Artifact retention · Failure Diff" data-i18n-zh="PR Eval · Release Gate · Prompt/Model/Tool 回归 · Artifact 保留 · Failure Diff">PR Eval · Release Gate · Prompt/Model/Tool 回归 · Artifact 保留 · Failure Diff</span></small></div><div class="ev" style="text-align:left;padding:0"><i style="margin:0 8px 0 0;display:inline-grid">4</i><b style="display:inline"><span class="i18n-text" data-i18n-en="Online Loop" data-i18n-zh="线上闭环">线上闭环</span></b><small><span class="i18n-text" data-i18n-en="Trace sampling · bad-case mining · Shadow/Canary · online Dashboard · alerts · human escalation · data flywheel" data-i18n-zh="Trace 抽样 · 坏例挖掘 · Shadow/Canary · 在线 Dashboard · 告警 · 人工升级 · 数据飞轮">Trace 抽样 · 坏例挖掘 · Shadow/Canary · 在线 Dashboard · 告警 · 人工升级 · 数据飞轮</span></small></div></div>
+<p class="say" style="font-size:13.5px;margin-top:10px">Automate stable judgments first; keep ambiguous and high-risk judgments under human governance.</p></div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Seven Common Pitfalls" data-i18n-zh="常见踩坑 ×7">常见踩坑 ×7</span></h2>
+<div class="grid g3 rv">
+<div class="cd" style="--c:var(--red);padding:13px"><small><strong><span class="i18n-text" data-i18n-en="① Waiting until you have 1,000 examples before starting" data-i18n-zh="① 等到 1,000 条数据才开始">① 等到 1,000 条数据才开始</span></strong><br><span class="i18n-text" data-i18n-en="→ Start the loop with a small stratified dataset, then expand by failure mode." data-i18n-zh="→ 用少量分层数据先建闭环，再按失败模式扩展。">→ 用少量分层数据先建闭环，再按失败模式扩展。</span></small></div>
+<div class="cd" style="--c:var(--red);padding:13px"><small><strong><span class="i18n-text" data-i18n-en="② Looking only at the overall average" data-i18n-zh="② 只看总体平均分">② 只看总体平均分</span></strong><br><span class="i18n-text" data-i18n-en="→ Inspect slices, severity, and regressions so averages do not hide high-risk failures." data-i18n-zh="→ 看切片、严重程度和回归，不让平均分掩盖高风险失败。">→ 看切片、严重程度和回归，不让平均分掩盖高风险失败。</span></small></div>
+<div class="cd" style="--c:var(--red);padding:13px"><small><strong><span class="i18n-text" data-i18n-en="③ Treating the LLM Judge as ground truth" data-i18n-zh="③ 把 LLM Judge 当真值">③ 把 LLM Judge 当真值</span></strong><br><span class="i18n-text" data-i18n-en="→ Calibrate the Judge with humans and monitor agreement, bias, and version drift." data-i18n-zh="→ 用人工校准 Judge，监控一致性、偏差和版本漂移。">→ 用人工校准 Judge，监控一致性、偏差和版本漂移。</span></small></div>
+<div class="cd" style="--c:var(--red);padding:13px"><small><strong><span class="i18n-text" data-i18n-en="④ Adding every Bad Case to the test set" data-i18n-zh="④ 所有 Bad Case 都加入测试集">④ 所有 Bad Case 都加入测试集</span></strong><br><span class="i18n-text" data-i18n-en="→ Deduplicate, attribute root cause, label, and route cases into Dev / Regression / Holdout." data-i18n-zh="→ 去重、归因、标注，分流到 Dev / Regression / Holdout。">→ 去重、归因、标注，分流到 Dev / Regression / Holdout。</span></small></div>
+<div class="cd" style="--c:var(--red);padding:13px"><small><strong><span class="i18n-text" data-i18n-en="⑤ Evaluating only the final answer" data-i18n-zh="⑤ 只评最终答案">⑤ 只评最终答案</span></strong><br><span class="i18n-text" data-i18n-en="→ Evaluate both Outcome and Trajectory to localize tool, planning, and recovery problems." data-i18n-zh="→ 同时评 Outcome 和 Trajectory，才能定位工具、规划和恢复问题。">→ 同时评 Outcome 和 Trajectory，才能定位工具、规划和恢复问题。</span></small></div>
+<div class="cd" style="--c:var(--red);padding:13px"><small><strong><span class="i18n-text" data-i18n-en="⑥ Building a Dashboard without a Gate" data-i18n-zh="⑥ 只做 Dashboard 不做 Gate">⑥ 只做 Dashboard 不做 Gate</span></strong><br><span class="i18n-text" data-i18n-en="→ Metrics must connect to Ship / Canary / Hold / Rollback." data-i18n-zh="→ 指标必须连接到 Ship / Canary / Hold / Rollback。">→ 指标必须连接到 Ship / Canary / Hold / Rollback。</span></small></div>
+</div>
+<div class="co note rv interp-callout interp-failure"><span class="co-t">⑦ Evaluation ≠ QA</span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="QA verifies whether deterministic software meets specifications; Agent Evaluation measures how a" data-i18n-zh="QA 验证确定性软件是否满足规格；Agent Evaluation 测量">QA 验证确定性软件是否满足规格；Agent Evaluation 测量</span><strong><span class="i18n-text" data-i18n-en="probabilistic system" data-i18n-zh="概率系统">概率系统</span></strong><span class="i18n-text" data-i18n-en="performs across data distributions, trajectories, risks, and business outcomes—and must also handle Stochastic outputs · Judge uncertainty · Dataset evolution · Distribution shift · Model/Prompt drift." data-i18n-zh="在数据分布、轨迹、风险和业务结果上的表现——还需处理 Stochastic outputs · Judge uncertainty · Dataset evolution · Distribution shift · Model/Prompt drift。">在数据分布、轨迹、风险和业务结果上的表现——还需处理 Stochastic outputs · Judge uncertainty · Dataset evolution · Distribution shift · Model/Prompt drift。</span></p></div>
+<div class="co en rv interp-callout interp-pitfall"><span class="co-t"><span class="i18n-text" data-i18n-en="Project Mapping · Honest Positioning" data-i18n-zh="项目映射 · 诚信表达">项目映射 · 诚信表达</span></span><p class="say">In AutodidactAgent, evaluation was tightly connected to the development loop because each case had an objective numeric target and a case-level score. That gave us a clear signal for whether a synthesized skill actually improved performance and whether the extra development cost was justified.</p><p style="font-size:13px;color:var(--mut);margin-top:6px"><span class="i18n-text" data-i18n-en="Do not claim that you built a complete enterprise Evaluation Dashboard / large-scale production CI/CD / company-wide LLM Judge platform. More accurately: I have implemented important evaluation components and objective case-level scoring. For a production platform, I would extend this into versioned datasets, trace storage, calibrated judges, release gates, and an online bad-case flywheel." data-i18n-zh="不要说搭建过完整企业 Evaluation Dashboard / 大规模生产 CI/CD / 全公司 LLM Judge 平台。更准确：I have implemented important evaluation components and objective case-level scoring. For a production platform, I would extend this into versioned datasets, trace storage, calibrated judges, release gates, and an online bad-case flywheel.">不要说搭建过完整企业 Evaluation Dashboard / 大规模生产 CI/CD / 全公司 LLM Judge 平台。更准确：I have implemented important evaluation components and objective case-level scoring. For a production platform, I would extend this into versioned datasets, trace storage, calibrated judges, release gates, and an online bad-case flywheel.</span></p></div>
+<div class="co en rv"><span class="co-t"><span class="i18n-text" data-i18n-en="90-second English Answer (full version in Chapter 11 · Answer 08)" data-i18n-zh="90 秒英文答案（完整版见第 11 章 · 答案 08）">90 秒英文答案（完整版见第 11 章 · 答案 08）</span></span><p class="say">I would treat evaluation as lifecycle infrastructure rather than a one-time test before release… The core idea is a data flywheel: every meaningful failure becomes a future regression test.</p></div>
+<div class="bfs-canvas rv" id="dg2-rag-eval">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.3 · RAG EVAL MATRIX</span>
+<h2 class="bfs-title"><span class="i18n-text" data-i18n-en="Layered RAG Evaluation Matrix: Locate the Layer Failure First" data-i18n-zh="分层 RAG 评测矩阵：先定位失败层，再看最终答案">分层 RAG 评测矩阵：先定位失败层，再看最终答案</span></h2>
+<p class="bfs-subtitle"><span class="i18n-text" data-i18n-en="An end-to-end score cannot explain root causes. Measure Retrieval, Context, Generation, and System layers separately." data-i18n-zh="一个端到端分数解释不了错误来源；必须从召回层、上下文层、生成层到系统层逐级归因与针对性修复。">一个端到端分数解释不了错误来源；必须从召回层、上下文层、生成层到系统层逐级归因与针对性修复。</span></p>
+</div>
+<div class="bfs-meta"><div class="bfs-meta-item"><div class="bfs-meta-lbl">MATRIX</div><div class="bfs-meta-val">4x4 LAYERS</div></div><div class="bfs-meta-item"><div class="bfs-meta-lbl">METHOD</div><div class="bfs-meta-val">LAYERED EVAL</div></div></div>
+</div>
+<div class="bfs-grid bfs-g4">
+<div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">LAYER 1</span><span class="bfs-type-pill">RETRIEVAL</span></div>
+<div class="bfs-card-title">1. Retrieval Layer</div>
+<p class="bfs-card-desc"><strong>核心问题：</strong>是否召回了包含答案的文档？<br><strong>核心指标：</strong>Recall@K · MRR · nDCG<br><strong>典型失败：</strong>关键词不匹配 / 向量语义丢失<br><strong>修复手段：</strong>Query Rewrite · Hybrid · Index Tuning</p>
+</div>
+<div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">LAYER 2</span><span class="bfs-type-pill">CONTEXT</span></div>
+<div class="bfs-card-title">2. Context Layer</div>
+<p class="bfs-card-desc"><strong>核心问题：</strong>上下文中是否有噪声或冗余？<br><strong>核心指标：</strong>Precision · Coverage · Redundancy<br><strong>典型失败：</strong>填入无关段落挤占预算<br><strong>修复手段：</strong>Rerank · Dedup · Dynamic Chunking</p>
+</div>
+<div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">LAYER 3</span><span class="bfs-type-pill">GENERATION</span></div>
+<div class="bfs-card-title">3. Generation Layer</div>
+<p class="bfs-card-desc"><strong>核心问题：</strong>答案是否忠实于检索证据？<br><strong>核心指标：</strong>Correctness · Groundedness · Citation<br><strong>典型失败：</strong>幻觉 / 未对齐证据 / 过度推断<br><strong>修复手段：</strong>Verification Gate · Rubric Tuning</p>
+</div>
+<div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">LAYER 4</span><span class="bfs-type-pill">SYSTEM</span></div>
+<div class="bfs-card-title">4. System Layer</div>
+<p class="bfs-card-desc"><strong>核心问题：</strong>延迟与成本是否在 SLA 内？<br><strong>核心指标：</strong>P50/P95 · Cost / Task · Safe Pass Rate<br><strong>典型失败：</strong>超时 / 超预算 / 死循环<br><strong>修复手段：</strong>Caching · Fallback · Timeout Guard</p>
+</div>
+</div>
+<div class="bfs-card-box" style="margin-top:14px; border-left:3px solid var(--grn)">
+<strong>GATE</strong>: 先判断失败层，再选择修复手段；端到端准确率只作终态结果，分层指标才是工程抓手。
+  </div>
+</div><div class="interp-focus" data-interpret-lenses="failure metric pitfall" id="local-rag-latency-runbook">
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Local LLM + RAG Latency Diagnosis: Trace Before Attribution" data-i18n-zh="本地 LLM + RAG 延迟诊断：先 Trace，再归因">本地 LLM + RAG 延迟诊断：先 Trace，再归因</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens pitfall" data-tip-en="Common mistake" data-tip-zh="容易答错或做错的地方"><i>P</i><span>PITFALL</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="When “hello” takes 50 seconds and a knowledge question takes 80 seconds, do not immediately blame slow Embeddings. Greetings usually do not depend on the knowledge base, so" data-i18n-zh="“你好”50 秒、知识问答 80 秒时，不能第一反应就说 Embedding 慢。问候通常不依赖知识库，所以">“你好”50 秒、知识问答 80 秒时，不能第一反应就说 Embedding 慢。问候通常不依赖知识库，所以</span><strong><span class="i18n-text" data-i18n-en="the base LLM / service path" data-i18n-zh="基础 LLM / 服务链路">基础 LLM / 服务链路</span></strong><span class="i18n-text" data-i18n-en="itself should be investigated first." data-i18n-zh="本身就值得优先排查。">本身就值得优先排查。</span></p>
+<div class="bfs-canvas rv" id="fig-9-4">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.4</span>
+<h2 class="bfs-title">End-to-end Latency Budget</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g6"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Queue</h2></div><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Route</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Embed</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Retrieve / Rerank</h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Prompt / Prefill</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title">TTFT / Decode</h2></div></div>
+</div>
+</div>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--blu)"><div class="cd-h"><span class="ic">COLD</span><span class="i18n-text" data-i18n-en="Slow on the first request, fast afterward" data-i18n-zh="第一次慢，后面快">第一次慢，后面快</span></div><small><span class="i18n-text" data-i18n-en="Model loading · GPU runtime init · index load · first cache miss. Online services should follow Load → Warm-up → Ready → Traffic." data-i18n-zh="Model loading · GPU runtime init · index load · first cache miss。在线服务应 Load → Warm-up → Ready → Traffic。">Model loading · GPU runtime init · index load · first cache miss。在线服务应 Load → Warm-up → Ready → Traffic。</span></small></div>
+<div class="cd" style="--c:var(--red)"><div class="cd-h"><span class="ic">WARM</span><span class="i18n-text" data-i18n-en="Slow on every request" data-i18n-zh="每次都慢">每次都慢</span></div><small><span class="i18n-text" data-i18n-en="repeated loading · GPU not actually used · CPU/Disk Offload · long context · overly long output · queueing · unconditional full RAG execution." data-i18n-zh="重复加载 · GPU 未生效 · CPU/Disk Offload · 长上下文 · 输出过长 · 排队 · 无条件执行完整 RAG。">重复加载 · GPU 未生效 · CPU/Disk Offload · 长上下文 · 输出过长 · 排队 · 无条件执行完整 RAG。</span></small></div>
+</div>
+<pre class="code" data-i18n-pre-en="1. Disable RAG and test “hello”
+2. Call 3–5 times to compare Cold / Warm
+3. Record Queue / TTFT / Decode / Total
+4. Confirm LLM, Embedding, and Index load only once
+5. Check GPU / VRAM / Offload / quantization
+6. Benchmark Query Embedding alone
+7. Benchmark Retrieval / Document Fetch alone
+8. Benchmark Reranker alone
+9. Compare empty Context with real RAG Context
+10. Build P50 / P95 performance regression tests" data-i18n-pre-zh="1. 禁用 RAG 单测“你好”
+2. 连续调用 3–5 次比较 Cold / Warm
+3. 记录 Queue / TTFT / Decode / Total
+4. 确认 LLM、Embedding、Index 只加载一次
+5. 检查 GPU / 显存 / Offload / 量化
+6. 单测 Query Embedding
+7. 单测 Retrieval / Document Fetch
+8. 单测 Reranker
+9. 比较空 Context 与真实 RAG Context
+10. 建立 P50 / P95 性能回归" data-l="RUNBOOK">1. 禁用 RAG 单测“你好”
+2. 连续调用 3–5 次比较 Cold / Warm
+3. 记录 Queue / TTFT / Decode / Total
+4. 确认 LLM、Embedding、Index 只加载一次
+5. 检查 GPU / 显存 / Offload / 量化
+6. 单测 Query Embedding
+7. 单测 Retrieval / Document Fetch
+8. 单测 Reranker
+9. 比较空 Context 与真实 RAG Context
+10. 建立 P50 / P95 性能回归</pre>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">Measure before attribution; preload before traffic; route trivial requests away from RAG.</p></div>
+</div>
+<div class="bfs-canvas rv" id="dg2-harness">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.6 · PRODUCTION HARNESS</span>
+<h2 class="bfs-title"><span class="i18n-text" data-i18n-en="Production Agent Harness: The model proposes; the system controls and proves" data-i18n-zh="Production Agent Harness：模型提议，系统控制并证明">Production Agent Harness：模型提议，系统控制并证明</span></h2>
+<p class="bfs-subtitle"><span class="i18n-text" data-i18n-en="Permission, validation, recovery, budgets, and observability belong outside the model." data-i18n-zh="权限、验证、恢复、预算和可观测性应该在模型之外。">权限、验证、恢复、预算和可观测性应该在模型之外。</span></p>
+</div>
+<div class="bfs-meta">
+<div class="bfs-meta-item"><div class="bfs-meta-lbl">CONTROL</div><div class="bfs-meta-val">HOST WRAPPER</div></div>
+<div class="bfs-meta-item"><div class="bfs-meta-lbl">AUTHORITY</div><div class="bfs-meta-val">PROPOSAL ONLY</div></div>
+</div>
+</div>
+<!-- 3-Column Harness Control Wrapper -->
+<div style="display:grid; grid-template-columns: 1fr 1.3fr 1fr; gap:16px; align-items:stretch; margin-top:14px">
+<!-- Left Column: Input Boundary -->
+<div style="display:flex; flex-direction:column; gap:10px; background:rgba(36,86,214,0.03); border:1.5px dashed rgba(36,86,214,0.25); border-radius:14px; padding:14px">
+<div style="font:700 11px/1.2 'JetBrains Mono',monospace; color:var(--blu); letter-spacing:0.5px; text-transform:uppercase">INPUT BOUNDARY · 输入边界</div>
+<div class="bfs-card bfs-teal" style="padding:12px">
+<div class="bfs-card-head"><span class="bfs-stage-pill">STATE</span><span class="bfs-type-pill">PERSIST</span></div>
+<div class="bfs-card-title" style="font-size:13.5px; margin-bottom:2px">State / Memory</div>
+<p class="bfs-card-desc" style="font-size:12px">保存任务状态与关键事实</p>
+</div>
+<div class="bfs-card bfs-blue" style="padding:12px">
+<div class="bfs-card-head"><span class="bfs-stage-pill">TOOLS</span><span class="bfs-type-pill">REGISTRY</span></div>
+<div class="bfs-card-title" style="font-size:13.5px; margin-bottom:2px">Tool Registry</div>
+<p class="bfs-card-desc" style="font-size:12px">只暴露当前可用能力与权限</p>
+</div>
+<div class="bfs-card bfs-purple" style="padding:12px">
+<div class="bfs-card-head"><span class="bfs-stage-pill">CONTEXT</span><span class="bfs-type-pill">BUDGET</span></div>
+<div class="bfs-card-title" style="font-size:13.5px; margin-bottom:2px">Context Builder</div>
+<p class="bfs-card-desc" style="font-size:12px">按任务预算组装证据与指令</p>
+</div>
+</div>
+<!-- Center Column: Model Core (Controlled & Isolated) -->
+<div style="display:flex; flex-direction:column; justify-content:center; align-items:center; background:rgba(112,72,200,0.04); border:2px solid rgba(112,72,200,0.3); border-radius:16px; padding:20px; position:relative">
+<div style="position:absolute; top:12px; left:16px; right:16px; background:rgba(112,72,200,0.08); border-left:3px solid var(--pur); padding:6px 10px; border-radius:4px; font-size:11.5px; color:var(--pur); font-weight:600">
+        POLICY: 模型输出 structured proposal，不直接拥有执行权
+      </div>
+<div style="text-align:center; margin-top:32px; margin-bottom:12px">
+<div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:16px; background:var(--pur); color:#fff; font-size:24px; box-shadow:0 8px 20px rgba(112,72,200,0.25); margin-bottom:10px">
+          🧠
+        </div>
+<div style="font:800 16px/1.3 var(--sans); color:var(--ink)">LLM / Agent Policy</div>
+<div style="font:500 12px/1.4 var(--sans); color:var(--mut); margin-top:4px">Pure Reasoning &amp; Decision Proposal</div>
+</div>
+<div style="background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:8px 12px; width:100%; text-align:center; font-size:11.5px; color:var(--mut); font-family:'JetBrains Mono',monospace">
+        Inputs ➔ [ Reasoning Step ] ➔ Output Proposal
+      </div>
+</div>
+<!-- Right Column: Validation & Execution Boundary -->
+<div style="display:flex; flex-direction:column; gap:10px; background:rgba(14,159,110,0.03); border:1.5px dashed rgba(14,159,110,0.25); border-radius:14px; padding:14px">
+<div style="font:700 11px/1.2 'JetBrains Mono',monospace; color:var(--grn); letter-spacing:0.5px; text-transform:uppercase">VALIDATION &amp; CONTROL · 校验门禁</div>
+<div class="bfs-card bfs-emerald" style="padding:12px">
+<div class="bfs-card-head"><span class="bfs-stage-pill">SCHEMA</span><span class="bfs-type-pill">VALIDATE</span></div>
+<div class="bfs-card-title" style="font-size:13.5px; margin-bottom:2px">Schema + Validation</div>
+<p class="bfs-card-desc" style="font-size:12px">参数、格式、业务规则必须通过</p>
+</div>
+<div class="bfs-card bfs-amber" style="padding:12px">
+<div class="bfs-card-head"><span class="bfs-stage-pill">AUTH</span><span class="bfs-type-pill">GATE</span></div>
+<div class="bfs-card-title" style="font-size:13.5px; margin-bottom:2px">Permission &amp; Risk Gate</div>
+<p class="bfs-card-desc" style="font-size:12px">高风险 / 不可逆动作需要批准 (HITL)</p>
+</div>
+<div class="bfs-card bfs-rose" style="padding:12px">
+<div class="bfs-card-head"><span class="bfs-stage-pill">RECOVERY</span><span class="bfs-type-pill">BOUNDED</span></div>
+<div class="bfs-card-title" style="font-size:13.5px; margin-bottom:2px">Retry / Fallback / HITL</div>
+<p class="bfs-card-desc" style="font-size:12px">按错误类型恢复，不无限重试</p>
+</div>
+</div>
+</div>
+<!-- Bottom 4 Metric Pillars -->
+<div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-top:14px">
+<div style="background:var(--paper2); border:1px solid var(--line); border-left:3px solid var(--blu); border-radius:8px; padding:8px 12px; font-size:12px">
+<span style="font-weight:700; color:var(--blu); font-family:'JetBrains Mono',monospace">METRIC · TRACE</span><br>全链路可观测
+    </div>
+<div style="background:var(--paper2); border:1px solid var(--line); border-left:3px solid var(--grn); border-radius:8px; padding:8px 12px; font-size:12px">
+<span style="font-weight:700; color:var(--grn); font-family:'JetBrains Mono',monospace">METRIC · EVAL</span><br>任务成功率 / Groundedness
+    </div>
+<div style="background:var(--paper2); border:1px solid var(--line); border-left:3px solid var(--amb); border-radius:8px; padding:8px 12px; font-size:12px">
+<span style="font-weight:700; color:var(--amb); font-family:'JetBrains Mono',monospace">METRIC · BUDGET</span><br>Latency / Tokens / Cost
+    </div>
+<div style="background:var(--paper2); border:1px solid var(--line); border-left:3px solid var(--pur); border-radius:8px; padding:8px 12px; font-size:12px">
+<span style="font-weight:700; color:var(--pur); font-family:'JetBrains Mono',monospace">METRIC · AUDIT</span><br>权限与副作用审计
+    </div>
+</div>
+</div>
+<div class="bfs-canvas rv" id="dg2-badcase-flywheel">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.7 · BAD CASE FLYWHEEL</span>
+<h2 class="bfs-title"><span class="i18n-text" data-i18n-en="Bad Case ➜ Regression ➜ Canary: Production Agent Improvement Flywheel" data-i18n-zh="Bad Case → Regression → Canary：生产 Agent 改进飞轮">Bad Case → Regression → Canary：生产 Agent 改进飞轮</span></h2>
+<p class="bfs-subtitle"><span class="i18n-text" data-i18n-en="Online failures must be transformed into reproducible regression test assets." data-i18n-zh="线上失败必须进入可复现的回归资产。从 Trace 捕获、根因诊断到回归集固化与 Canary 验证闭环。">线上失败必须进入可复现的回归资产。从 Trace 捕获、根因诊断到回归集固化与 Canary 验证闭环。</span></p>
+</div>
+<div class="bfs-meta"><div class="bfs-meta-item"><div class="bfs-meta-lbl">FLYWHEEL</div><div class="bfs-meta-val">6 STEPS</div></div><div class="bfs-meta-item"><div class="bfs-meta-lbl">RULE</div><div class="bfs-meta-val">REGRESSION ASSET</div></div></div>
+</div>
+<div class="bfs-grid bfs-g6">
+<div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">01</span><span class="bfs-type-pill">TRACE</span></div>
+<div class="bfs-card-title">Online Trace</div>
+<p class="bfs-card-desc">完整执行轨迹捕获</p>
+</div>
+<div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">02</span><span class="bfs-type-pill">DETECT</span></div>
+<div class="bfs-card-title">Detect Failure</div>
+<p class="bfs-card-desc">发现失败/低质量请求</p>
+</div>
+<div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">03</span><span class="bfs-type-pill">ROOT CAUSE</span></div>
+<div class="bfs-card-title">Root Cause</div>
+<p class="bfs-card-desc">定位 Retrieval / Tool / Prompt / Policy</p>
+</div>
+<div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">04</span><span class="bfs-type-pill">LABEL</span></div>
+<div class="bfs-card-title">Label &amp; Structure</div>
+<p class="bfs-card-desc">结构化失败类型与期望行为</p>
+</div>
+<div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">05</span><span class="bfs-type-pill">REGRESSION</span></div>
+<div class="bfs-card-title">Regression Set</div>
+<p class="bfs-card-desc">固化为发布前必测样本</p>
+</div>
+<div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">06</span><span class="bfs-type-pill">CANARY</span></div>
+<div class="bfs-card-title">Fix + Canary</div>
+<p class="bfs-card-desc">受控修改并小流量验证无回归</p>
+</div>
+</div>
+<div class="bfs-card-box" style="margin-top:14px; border-left:3px solid var(--red)">
+<strong>WHY</strong>: Bad case 不进入 regression set，就会反复出现。<strong>METRIC</strong>: 记录 fix rate、regression pass rate、online recurrence rate。<strong>FAILURE</strong>: 只修 Prompt 而不分类根因，会制造新回归。
+  </div>
+</div><div class="interp-focus" data-interpret-lenses="metric gate tradeoff" id="agent-prd-roi">
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Agent PRD: From Technical Demo to Business Delivery" data-i18n-zh="Agent PRD：从技术 Demo 到商业化闭环">Agent PRD：从技术 Demo 到商业化闭环</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span></div>
+<div class="bfs-canvas rv" id="fig-9-5">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.5</span>
+<h2 class="bfs-title">Business Agent PRD</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g6"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Goal</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Metrics</h2></div><div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Bad Cases</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Human Fallback</h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Rollout / A-B</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title">ROI</h2></div></div>
+</div>
+</div>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">METRIC</span><span class="i18n-text" data-i18n-en="Agent Engineering Metrics" data-i18n-zh="Agent 工程指标">Agent 工程指标</span></div><small><strong>Outcome：</strong>Task Success Rate。<br><strong>Quality：</strong>Correctness / groundedness / CSAT。<br><strong>Tooling：</strong>tool-selection / argument / execution accuracy。<br><strong>Efficiency：</strong>latency / tokens / cost。<br><strong>Reliability：</strong>retry / fallback / escalation / unsafe action。</small><p class="say" style="font-size:13px;margin-top:7px">Prefer cost per successful task over raw token cost.</p></div>
+<div class="cd" style="--c:var(--org)"><div class="cd-h"><span class="ic">HITL</span><span class="i18n-text" data-i18n-en="Human Fallback Is a Control Path" data-i18n-zh="人工兜底是控制路径">人工兜底是控制路径</span></div><small><span class="i18n-text" data-i18n-en="Low confidence · High risk · Policy conflict · Tool failure · Irreversible action → Human Escalation. Human involvement should not be a patch added after failure; it should be explicitly modeled in the PRD and state machine." data-i18n-zh="Low confidence · High risk · Policy conflict · Tool failure · Irreversible action → Human Escalation。人工不是失败后临时加，而应在 PRD 与状态机中正式建模。">Low confidence · High risk · Policy conflict · Tool failure · Irreversible action → Human Escalation。人工不是失败后临时加，而应在 PRD 与状态机中正式建模。</span></small></div>
+</div>
+<h2 class="sub">ROI / Unit Economics</h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span></div>
+<pre class="code" data-l="ROI">Benefit =
+Saved Human Time
++ Increased Throughput
++ Revenue Lift
++ Risk Reduction
+
+Cost =
+Model Inference
++ Tool / Infrastructure
++ Human Review
++ Maintenance</pre>
+<p class="rv"><span class="i18n-text" data-i18n-en="When reporting outcomes, quantify the complete chain: Before → After → Volume → Unit Cost → Payback." data-i18n-zh="评估效果时，应给出 Before → After → Volume → Unit Cost → Payback 的量化链路。">评估效果时，应给出 Before → After → Volume → Unit Cost → Payback 的量化链路。</span></p>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Key Line" data-i18n-zh="核心句">核心句</span></span><p class="say">A production agent is successful only when quality, reliability, unit economics, and human fallback form one measurable loop.</p></div>
+<div class="bfs-canvas rv" id="dg2-agent-metrics">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.8 · METRIC PYRAMID</span>
+<h2 class="bfs-title"><span class="i18n-text" data-i18n-en="Agent Metrics: Optimize for Cost per Successful Task" data-i18n-zh="Agent Metrics：最终关注 Cost per Successful Task（5 维指标金字塔）">Agent Metrics：最终关注 Cost per Successful Task（5 维指标金字塔）</span></h2>
+<p class="bfs-subtitle"><span class="i18n-text" data-i18n-en="Low token usage does not mean a good system. Measure outcomes, quality, tooling, efficiency, and reliability together." data-i18n-zh="Token 少不等于系统好；必须同时看结果、质量、工具、效率和可靠性五层联动衡量。">Token 少不等于系统好；必须同时看结果、质量、工具、效率和可靠性五层联动衡量。</span></p>
+</div>
+<div class="bfs-meta"><div class="bfs-meta-item"><div class="bfs-meta-lbl">NORTH STAR</div><div class="bfs-meta-val">COST / SUCCESS</div></div><div class="bfs-meta-item"><div class="bfs-meta-lbl">STRUCTURE</div><div class="bfs-meta-val">5-TIER PYRAMID</div></div></div>
+</div>
+<div class="bfs-pyramid">
+<div class="bfs-pyramid-tier bfs-tier-1">
+<div class="bfs-tier-left">
+<span class="bfs-tier-badge">TIER 1 · NORTH STAR</span>
+<span class="bfs-tier-name">Outcome</span>
+</div>
+<div class="bfs-tier-metrics">Task Success Rate · 业务 SLA 达成率</div>
+</div>
+<div class="bfs-pyramid-tier bfs-tier-2">
+<div class="bfs-tier-left">
+<span class="bfs-tier-badge">TIER 2 · QUALITY</span>
+<span class="bfs-tier-name">Quality</span>
+</div>
+<div class="bfs-tier-metrics">Correctness · Groundedness · CSAT 满意度</div>
+</div>
+<div class="bfs-pyramid-tier bfs-tier-3">
+<div class="bfs-tier-left">
+<span class="bfs-tier-badge">TIER 3 · TOOLING</span>
+<span class="bfs-tier-name">Tooling</span>
+</div>
+<div class="bfs-tier-metrics">Selection Accuracy · Parameter Precision · Tool Success</div>
+</div>
+<div class="bfs-pyramid-tier bfs-tier-4">
+<div class="bfs-tier-left">
+<span class="bfs-tier-badge">TIER 4 · EFFICIENCY</span>
+<span class="bfs-tier-name">Efficiency</span>
+</div>
+<div class="bfs-tier-metrics">TTFT / P95 Latency · Tokens / Task · Cost per Task</div>
+</div>
+<div class="bfs-pyramid-tier bfs-tier-5">
+<div class="bfs-tier-left">
+<span class="bfs-tier-badge">TIER 5 · ROBUSTNESS</span>
+<span class="bfs-tier-name">Reliability</span>
+</div>
+<div class="bfs-tier-metrics">Bounded Retry Rate · Fallback Rate · Escalation · Safety Passes</div>
+</div>
+</div>
+<div class="bfs-card-box" style="margin-top:14px; border-left:3px solid var(--blu)">
+<strong>RECOMMENDED NORTH STAR</strong>: 推荐总指标：Cost per Successful Task，而不是 Cost per Query。
+  </div>
+</div></div>
+</section>
+<!-- ======================= CH10 ======================= -->
+<nav class="page-nav" aria-label="章节翻页"><a href="/chapters/08-agent-orchestration/">← 08 <span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/">目录 / Contents →</a></nav></main>
+<script src="/assets/app.js?v=02126beec081" defer></script>
+</body></html>

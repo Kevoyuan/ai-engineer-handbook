@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-title-zh="Memory 与上下文工程 · AI 工程手册" data-i18n-title-en="Memory and Context Engineering · AI Engineering Handbook">Memory 与上下文工程 · AI 工程手册</title>
+<meta name="description" content="Memory 与上下文工程：AI 工程手册技术章节，包含架构、权衡、失败模式、指标与生产实践。">
+<link rel="canonical" href="https://kevoyuan-ai-handbook.vercel.app/chapters/07-memory-context-engineering/">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/app.css?v=0bb27ad415ab"><link rel="stylesheet" href="/assets/home.css?v=32688d430c9d"><link rel="stylesheet" href="/assets/reader.css?v=18312fc8bcfe"></head>
+<body class="chapter-page"><a class="skip-link" href="#main-content">跳到正文</a>
+<header><button type="button" aria-label="打开章节导航" aria-controls="side" aria-expanded="false" id="menuBtn">☰</button><a class="brand" href="/">AI 工程手册</a><span id="curCh"><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></span><div class="tools"><a class="tbtn" href="/search/" aria-label="搜索手册">⌕</a><button type="button" class="tbtn" id="themeBtn" aria-label="切换深浅主题">☾</button><button class="lang-toggle" id="langToggle" type="button" aria-label="中 / EN：切换到英文">中 / EN</button></div></header>
+<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节"><a href="/chapters/02-enterprise-retrieval/"><i>02</i><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/03-hybrid-retrieval-query-routing/"><i>03</i><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></a><a href="/chapters/04-rag-reliability-selective-answering/"><i>04</i><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/05-document-pdf-rag/"><i>05</i><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></a><a href="/chapters/06-skills-routing/"><i>06</i><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/07-memory-context-engineering/" aria-current="page"><i>07</i><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/08-agent-orchestration/"><i>08</i><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/chapters/09-reliability-evaluation-observability/"><i>09</i><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></a></nav><div class="sd-f"><span class="i18n-text" data-i18n-zh="原章号 02–09" data-i18n-en="Original chapters 02–09">原章号 02–09</span></div></aside>
+<button aria-label="关闭章节导航" id="sideOverlay" type="button"></button>
+<main id="main-content" tabindex="-1"><section class="ch" id="ch7" style="--acc:var(--amb)">
+<div class="ch-head rv"><div class="ch-no"><small>CHAPTER</small>07</div><h1 class="ch-t"><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></h1><span class="ch-tag">SIX LAYERS · LEDGER · VIEWS · POLICY</span></div><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span></div>
+<div class="bfs-canvas rv" id="fig-7-1">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.1 · MEMORY STRUCTURE</span>
+<h2 class="bfs-title"><span class="i18n-text" data-i18n-en="Six-layer Memory Structure" data-i18n-zh="六层记忆结构">六层记忆结构</span></h2>
+<p class="bfs-subtitle"><span class="i18n-text" data-i18n-en="From ephemeral request context to persistent cross-session knowledge, clearly defining lifecycle and governance boundaries." data-i18n-zh="从单次请求瞬时状态到跨会话长期沉淀，清晰定义生命周期、存储载体与治理边界。">从单次请求瞬时状态到跨会话长期沉淀，清晰定义生命周期、存储载体与治理边界。</span></p>
+</div>
+<div class="bfs-meta">
+<div class="bfs-meta-item"><div class="bfs-meta-lbl">TIERS</div><div class="bfs-meta-val">6 LAYERS</div></div>
+<div class="bfs-meta-item"><div class="bfs-meta-lbl">GOVERNANCE</div><div class="bfs-meta-val">CQRS ISOLATED</div></div>
+</div>
+</div>
+<!-- 3x2 High-Density Bento Grid -->
+<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin-bottom:16px;">
+<!-- 1. Session Metadata -->
+<div class="bfs-card" style="border-top:3.5px solid var(--blu); padding:16px 18px; display:flex; flex-direction:column;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font:700 11px/1 'JetBrains Mono',monospace; color:var(--mut); background:#f1f5f9; padding:2px 7px; border-radius:4px;">01</span>
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace; background:rgba(37,99,235,0.1); color:var(--blu); padding:3px 7px; border-radius:4px;">EPHEMERAL</span>
+</div>
+<div style="font:700 15px/1.3 var(--sans); color:var(--ink); margin-bottom:6px;">① Session Metadata</div>
+<div style="font:500 12px/1.5 'JetBrains Mono',monospace; color:var(--mut); background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; padding:8px 10px; margin-bottom:10px; word-break:break-word;">conversation_id · user_id · tenant_id · locale · current task · permissions</div>
+<div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; font:600 11px/1 var(--sans); color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+<span>作用域: 单次会话 / 请求</span>
+<span style="color:var(--blu)">瞬时上下文</span>
+</div>
+</div>
+<!-- 2. Working Memory -->
+<div class="bfs-card" style="border-top:3.5px solid var(--amb); padding:16px 18px; display:flex; flex-direction:column;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font:700 11px/1 'JetBrains Mono',monospace; color:var(--mut); background:#f1f5f9; padding:2px 7px; border-radius:4px;">02</span>
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace; background:rgba(217,119,6,0.1); color:var(--amb); padding:3px 7px; border-radius:4px;">SHORT-TERM</span>
+</div>
+<div style="font:700 15px/1.3 var(--sans); color:var(--ink); margin-bottom:6px;"><span class="i18n-text" data-i18n-en="② Working Memory (may expire after the task)" data-i18n-zh="② Working Memory（任务结束可过期）">② Working Memory（任务结束可过期）</span></div>
+<div style="font:500 12px/1.5 'JetBrains Mono',monospace; color:var(--mut); background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; padding:8px 10px; margin-bottom:10px; word-break:break-word;">current plan · intermediate results · open questions · tool outputs</div>
+<div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; font:600 11px/1 var(--sans); color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+<span>任务结束可过期</span>
+<span style="color:var(--amb)">执行中间态</span>
+</div>
+</div>
+<!-- 3. Structured Profile -->
+<div class="bfs-card" style="border-top:3.5px solid var(--grn); padding:16px 18px; display:flex; flex-direction:column;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font:700 11px/1 'JetBrains Mono',monospace; color:var(--mut); background:#f1f5f9; padding:2px 7px; border-radius:4px;">03</span>
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace; background:rgba(5,150,105,0.1); color:var(--grn); padding:3px 7px; border-radius:4px;">USER PROFILE</span>
+</div>
+<div style="font:700 15px/1.3 var(--sans); color:var(--ink); margin-bottom:6px;"><span class="i18n-text" data-i18n-en="③ Structured Profile (stable preferences)" data-i18n-zh="③ Structured Profile（稳定偏好）">③ Structured Profile（稳定偏好）</span></div>
+<div style="font:500 12px/1.5 'JetBrains Mono',monospace; color:var(--mut); background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; padding:8px 10px; margin-bottom:10px; word-break:break-word;">language preference · role · approved tools · report format</div>
+<div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; font:600 11px/1 var(--sans); color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+<span>稳定偏好 · 显式维护</span>
+<span style="color:var(--grn)">静态画像</span>
+</div>
+</div>
+<!-- 4. Episodic Memory -->
+<div class="bfs-card" style="border-top:3.5px solid var(--tea); padding:16px 18px; display:flex; flex-direction:column;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font:700 11px/1 'JetBrains Mono',monospace; color:var(--mut); background:#f1f5f9; padding:2px 7px; border-radius:4px;">04</span>
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace; background:rgba(13,148,136,0.1); color:var(--tea); padding:3px 7px; border-radius:4px;">EVENT LOG</span>
+</div>
+<div style="font:700 15px/1.3 var(--sans); color:var(--ink); margin-bottom:6px;"><span class="i18n-text" data-i18n-en="④ Episodic Memory (what happened)" data-i18n-zh="④ Episodic Memory（发生过什么）">④ Episodic Memory（发生过什么）</span></div>
+<div style="font:500 12px/1.5 'JetBrains Mono',monospace; color:var(--mut); background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; padding:8px 10px; margin-bottom:10px; word-break:break-word;">user asked X · system did Y · result was Z · feedback ±</div>
+<div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; font:600 11px/1 var(--sans); color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+<span>发生过什么 · 交互溯源</span>
+<span style="color:var(--tea)">情景事件流</span>
+</div>
+</div>
+<!-- 5. Semantic Memory -->
+<div class="bfs-card" style="border-top:3.5px solid var(--pur); padding:16px 18px; display:flex; flex-direction:column;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font:700 11px/1 'JetBrains Mono',monospace; color:var(--mut); background:#f1f5f9; padding:2px 7px; border-radius:4px;">05</span>
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace; background:rgba(124,58,237,0.1); color:var(--pur); padding:3px 7px; border-radius:4px;">KNOWLEDGE</span>
+</div>
+<div style="font:700 15px/1.3 var(--sans); color:var(--ink); margin-bottom:6px;"><span class="i18n-text" data-i18n-en="⑤ Semantic Memory (stable facts)" data-i18n-zh="⑤ Semantic Memory（稳定事实）">⑤ Semantic Memory（稳定事实）</span></div>
+<div style="font:500 12px/1.5 'JetBrains Mono',monospace; color:var(--mut); background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; padding:8px 10px; margin-bottom:10px; word-break:break-word;">organization / project facts · definitions · policies</div>
+<div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; font:600 11px/1 var(--sans); color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+<span>稳定事实 · 知识图谱</span>
+<span style="color:var(--pur)">企业级事实</span>
+</div>
+</div>
+<!-- 6. Procedural Memory -->
+<div class="bfs-card" style="border-top:3.5px solid var(--red); padding:16px 18px; display:flex; flex-direction:column;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font:700 11px/1 'JetBrains Mono',monospace; color:var(--mut); background:#f1f5f9; padding:2px 7px; border-radius:4px;">06</span>
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace; background:rgba(220,38,38,0.1); color:var(--red); padding:3px 7px; border-radius:4px;">SKILL / PATTERN</span>
+</div>
+<div style="font:700 15px/1.3 var(--sans); color:var(--ink); margin-bottom:6px;"><span class="i18n-text" data-i18n-en="⑥ Procedural Memory (reusable procedures)" data-i18n-zh="⑥ Procedural Memory（可复用流程）">⑥ Procedural Memory（可复用流程）</span></div>
+<div style="font:500 12px/1.5 'JetBrains Mono',monospace; color:var(--mut); background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; padding:8px 10px; margin-bottom:10px; word-break:break-word;">how to perform task X · validated workflow · repair strategy</div>
+<div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; font:600 11px/1 var(--sans); color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+<span>可复用流程 · 求解范式</span>
+<span style="color:var(--red)">程序性技能</span>
+</div>
+</div>
+</div>
+<!-- Bottom Insight -->
+<div style="background:#f8fafc; border:1px solid var(--line); border-left:4px solid var(--blu); border-radius:12px; padding:12px 16px; display:flex; align-items:flex-start; gap:10px;">
+<div style="font-size:16px; line-height:1;">💡</div>
+<p style="font:400 12.5px/1.5 var(--sans); color:var(--ink); margin:0;">
+<strong>架构分层原则：</strong>短期记忆（①/②）在内存/Redis 中随会话生命周期快速流动；长期记忆（③/④/⑤/⑥）绝不随模型自由写入，必须经过 <strong>Write Pipeline（FIG.7.2）</strong> 的结构化抽取、权限校验、去重与版本消解后方可持久化。
+    </p>
+</div>
+</div>
+<div class="grid g3 rv" style="margin-top:14px">
+<div class="cd" style="--c:var(--blu)"><div class="cd-h"><span class="ic">LEDGER</span>Append-only</div><small><span class="i18n-text" data-i18n-en="Facts and events are append-only; do not overwrite them in place." data-i18n-zh="事实与事件只追加，不原地改写。">事实与事件只追加，不原地改写。</span></small></div>
+<div class="cd" style="--c:var(--org)"><div class="cd-h"><span class="ic">VIEWS</span><span class="i18n-text" data-i18n-en="Current View" data-i18n-zh="当前视图">当前视图</span></div><small><span class="i18n-text" data-i18n-en="current user profile / current state, derived from the event log." data-i18n-zh="current user profile / current state，从事件日志派生。">current user profile / current state，从事件日志派生。</span></small></div>
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">POLICY</span><span class="i18n-text" data-i18n-en="Governance Policy" data-i18n-zh="治理策略">治理策略</span></div><small><span class="i18n-text" data-i18n-en="What can be written, read, expired, or shared. Each Memory record has two times: Valid Time and Transaction Time." data-i18n-zh="什么能写、能读、会过期、能共享。每条 Memory 记录 Valid Time 与 Transaction Time。">什么能写、能读、会过期、能共享。每条 Memory 记录 Valid Time 与 Transaction Time。</span></small></div>
+</div>
+<div class="two" style="gap:16px; margin: 16px 0;"><div class="bfs-canvas bfs-density-compact bfs-compact-list rv" id="fig-7-2" style="margin:0">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.2</span>
+<h2 class="bfs-title">Write Pipeline（不让模型自由写）</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Conversation / Event</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Candidate Extraction → Normalize → Deduplicate</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Conflict Check → Permission / Policy Check</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Store（source · confidence · owner · scope · validity · sensitivity · version）→ Update Views</h2></div></div></div>
+</div>
+</div><div class="bfs-canvas bfs-density-compact bfs-compact-list rv" id="fig-7-3" style="margin:0">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.3</span>
+<h2 class="bfs-title">Read Pipeline（不每次读全部）</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Current Query</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Query Classification → Access Filter</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Retrieve Relevant Memory</h2></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Rank by Relevance + Recency + Quality → Assemble Context</h2></div></div></div>
+</div>
+</div></div>
+<div class="co warn rv" style="margin-top:16px"><span class="co-t"><span class="i18n-text" data-i18n-en="Multi-user and Permission Isolation" data-i18n-zh="多用户与权限隔离">多用户与权限隔离</span></span><p><span class="i18n-text" data-i18n-en="tenant_id · user_id · resource ACL · memory scope. Unauthorized Memory:" data-i18n-zh="tenant_id · user_id · resource ACL · memory scope。未经授权的 Memory：">tenant_id · user_id · resource ACL · memory scope。未经授权的 Memory：</span><strong><span class="i18n-text" data-i18n-en="must not enter retrieval candidates, must not enter model context, and must not have its existence leaked in a refusal." data-i18n-zh="不应进入检索候选、不应进入模型上下文、不应在拒答中泄漏其存在。">不应进入检索候选、不应进入模型上下文、不应在拒答中泄漏其存在。</span></strong></p></div>
+<div class="co en rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Honest Positioning of AutodidactAgent" data-i18n-zh="AutodidactAgent 的诚实定位">AutodidactAgent 的诚实定位</span></span><p class="say">AutodidactAgent mainly implements episodic and procedural memory through solved cases and reusable skills. It is not a general-purpose user-profile memory system.</p><p style="font-size:13px;color:var(--mut);margin-top:6px"><span class="i18n-text" data-i18n-en="It is closer to Solved Case + Best Skill + Score + Provenance than to general-purpose long-term user memory." data-i18n-zh="它更接近 Solved Case + Best Skill + Score + Provenance，而不是通用长期用户记忆。">它更接近 Solved Case + Best Skill + Score + Provenance，而不是通用长期用户记忆。</span></p></div>
+<div class="interp-focus" data-interpret-lenses="gate failure metric" id="memory-promotion-compaction">
+<h2 class="sub">Short-term → Long-term Memory Promotion</h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span></div>
+<div class="bfs-canvas rv" id="fig-7-4">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.4</span>
+<h2 class="bfs-title">Memory Promotion Pipeline</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g5"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Working State</h2></div><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Candidate Extraction</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Importance + Stability</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Dedup + Conflict Check</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Long-term Store + Provenance</h2></div></div>
+</div>
+</div>
+<p class="rv" style="margin-top:14px"><span class="i18n-text" data-i18n-en="Short-term memory should not automatically “become” long-term memory. Promote only information that is stable, reusable, user-authorized, and low-conflict; temporary tool outputs, unverified inferences, and sensitive information should not be promoted by default." data-i18n-zh="短期记忆不是自动“变成”长期记忆。只有满足稳定性、复用价值、用户授权和低冲突风险的信息才应 Promotion；临时工具输出、未验证推断和敏感信息默认不晋升。">短期记忆不是自动“变成”长期记忆。只有满足稳定性、复用价值、用户授权和低冲突风险的信息才应 Promotion；临时工具输出、未验证推断和敏感信息默认不晋升。</span></p>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Context Compression Triggers" data-i18n-zh="Context Compression 的触发机制">Context Compression 的触发机制</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span></div>
+<pre class="code" data-l="TRIGGERS">Token budget approaching threshold
+Topic / task phase changes
+Stable decision reached
+Repeated transcript with low new information
+Tool result is large but only a small evidence subset is needed
+Long-running session checkpoint</pre>
+<p class="rv"><span class="i18n-text" data-i18n-en="A reliable approach is not endless “summary of summaries,” but retaining the event log and key provenance and regenerating a compact view from verifiable raw records." data-i18n-zh="可靠做法不是无限“摘要的摘要”，而是保留事件日志和关键 provenance，从可验证原始记录重新生成 compact view。">可靠做法不是无限“摘要的摘要”，而是保留事件日志和关键 provenance，从可验证原始记录重新生成 compact view。</span></p>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">I do not treat the transcript as the state. I maintain structured state and compress views while preserving provenance.</p></div>
+</div>
+</section>
+<!-- ======================= CH8 ======================= -->
+<nav class="page-nav" aria-label="章节翻页"><a href="/chapters/06-skills-routing/">← 06 <span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/08-agent-orchestration/">08 <span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span> →</a></nav></main>
+<script src="/assets/app.js?v=02126beec081" defer></script>
+</body></html>

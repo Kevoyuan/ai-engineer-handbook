@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-title-zh="生产级 PDF RAG · AI 工程手册" data-i18n-title-en="Production-grade PDF RAG · AI Engineering Handbook">生产级 PDF RAG · AI 工程手册</title>
+<meta name="description" content="生产级 PDF RAG：AI 工程手册技术章节，包含架构、权衡、失败模式、指标与生产实践。">
+<link rel="canonical" href="https://kevoyuan-ai-handbook.vercel.app/chapters/05-document-pdf-rag/">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/app.css?v=0bb27ad415ab"><link rel="stylesheet" href="/assets/home.css?v=32688d430c9d"><link rel="stylesheet" href="/assets/reader.css?v=18312fc8bcfe"></head>
+<body class="chapter-page"><a class="skip-link" href="#main-content">跳到正文</a>
+<header><button type="button" aria-label="打开章节导航" aria-controls="side" aria-expanded="false" id="menuBtn">☰</button><a class="brand" href="/">AI 工程手册</a><span id="curCh"><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></span><div class="tools"><a class="tbtn" href="/search/" aria-label="搜索手册">⌕</a><button type="button" class="tbtn" id="themeBtn" aria-label="切换深浅主题">☾</button><button class="lang-toggle" id="langToggle" type="button" aria-label="中 / EN：切换到英文">中 / EN</button></div></header>
+<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节"><a href="/chapters/02-enterprise-retrieval/"><i>02</i><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/03-hybrid-retrieval-query-routing/"><i>03</i><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></a><a href="/chapters/04-rag-reliability-selective-answering/"><i>04</i><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/05-document-pdf-rag/" aria-current="page"><i>05</i><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></a><a href="/chapters/06-skills-routing/"><i>06</i><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/07-memory-context-engineering/"><i>07</i><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/08-agent-orchestration/"><i>08</i><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/chapters/09-reliability-evaluation-observability/"><i>09</i><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></a></nav><div class="sd-f"><span class="i18n-text" data-i18n-zh="原章号 02–09" data-i18n-en="Original chapters 02–09">原章号 02–09</span></div></aside>
+<button aria-label="关闭章节导航" id="sideOverlay" type="button"></button>
+<main id="main-content" tabindex="-1"><section class="ch" id="ch5" style="--acc:var(--pur)">
+<div class="ch-head rv"><div class="ch-no"><small>CHAPTER</small>05</div><h1 class="ch-t"><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></h1><span class="ch-tag">P·R·I·T + C·E</span></div><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens failure" data-tip-en="Common failure mode" data-tip-zh="最常见的失败模式"><i>F</i><span>FAILURE</span></span><span class="lens gate" data-tip-en="Where validation or decisions happen" data-tip-zh="哪里必须验证或决策"><i>G</i><span>GATE</span></span><span class="lens metric" data-tip-en="How to prove it works" data-tip-zh="怎么证明有效"><i>M</i><span>METRIC</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="“PDF → extract text → fixed-length chunking → vector database” fails on real enterprise documents: multi-column tables of contents, headers/footers, complex tables, flowcharts, scanned pages, stamps/signatures, and cross-page references. The result is" data-i18n-zh="“PDF → 抽文本 → 固定长度切分 → 向量库”在真实企业文档上会失败：目录多栏、页眉页脚、复杂表格、流程图、扫描页、盖章签名、跨页引用。结果是">“PDF → 抽文本 → 固定长度切分 → 向量库”在真实企业文档上会失败：目录多栏、页眉页脚、复杂表格、流程图、扫描页、盖章签名、跨页引用。结果是</span><mark><span class="i18n-text" data-i18n-en="wrong reading order, lost table rows/columns, broken title–body structure, header/footer contamination in retrieval, and missing chart information" data-i18n-zh="阅读顺序错乱、表格行列丢失、标题正文割裂、页眉污染召回、图表信息消失">阅读顺序错乱、表格行列丢失、标题正文割裂、页眉污染召回、图表信息消失</span></mark><span class="i18n-text" data-i18n-en=". A production-grade solution = " data-i18n-zh="。生产级方案 = ">。生产级方案 = </span><strong><span class="i18n-text" data-i18n-en="four processing layers + two hard requirements" data-i18n-zh="四层处理 + 两条底线">四层处理 + 两条底线</span></strong>。</p>
+<div class="bfs-canvas bfs-density-compact rv" id="fig-5-1">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.5.1</span>
+<h2 class="bfs-title">总览：Parse → Reconstruct → Index → Tool ＋ Citation ＋ Evaluation</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="two" style="align-items:stretch">
+<div class="bfs-flow-container"><div style="margin-bottom:10px"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="① Parse" data-i18n-zh="① Parse 解析">① Parse 解析</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="First identify the document/page type, then choose the parsing path" data-i18n-zh="先识别文档 / 页面类型，再选择解析路径">先识别文档 / 页面类型，再选择解析路径</span></div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="② Reconstruct Structure" data-i18n-zh="② Reconstruct 结构重建">② Reconstruct 结构重建</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Recover hierarchy, reading order, and positioning metadata" data-i18n-zh="恢复层级、阅读顺序与定位基因">恢复层级、阅读顺序与定位基因</span></div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="③ Index: Semantic Chunking + Hybrid Index" data-i18n-zh="③ Index 语义切片 + 混合索引">③ Index 语义切片 + 混合索引</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Route different information types into different indexing paths" data-i18n-zh="按信息类型进入不同索引路径">按信息类型进入不同索引路径</span></div></div></div><div style="margin-bottom:10px"><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="④ Tool Chain: Controlled Document Tools" data-i18n-zh="④ Tool Chain 受控文档工具">④ Tool Chain 受控文档工具</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="Read on demand instead of brute-force reading everything" data-i18n-zh="按需翻阅，而不是暴力通读">按需翻阅，而不是暴力通读</span></div></div></div></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div class="co must" style="flex:1;margin:0"><span class="co-t"><span class="i18n-text" data-i18n-en="Hard Requirement 1" data-i18n-zh="底线一">底线一</span></span><p><strong>Page-level Citations + Claim Verification</strong><br><span class="i18n-text" data-i18n-en="Bind key claims to document · page · section/table · excerpt." data-i18n-zh="关键论断绑定 document · page · section/table · excerpt。">关键论断绑定 document · page · section/table · excerpt。</span></p></div>
+<div class="co must interp-callout interp-failure" style="flex:1;margin:0"><span class="co-t"><span class="i18n-text" data-i18n-en="Hard Requirement 2" data-i18n-zh="底线二">底线二</span></span><p><strong><span class="i18n-text" data-i18n-en="Layered Evaluation Loop" data-i18n-zh="分层评测闭环">分层评测闭环</span></strong><br><span class="i18n-text" data-i18n-en="Evaluation must answer “which layer failed,” not merely “the final answer was wrong.”" data-i18n-zh="评测要能回答“哪一层失败了”，而不只是“最终答案错了”。">评测要能回答“哪一层失败了”，而不只是“最终答案错了”。</span></p></div>
+</div>
+</div>
+</div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Layer 1 · Parsing: Classify First, Then Choose the Parsing Path" data-i18n-zh="第一层 · Parsing：先分类，再选解析路径">第一层 · Parsing：先分类，再选解析路径</span></h2>
+<div class="grid g3 rv">
+<div class="cd" style="--c:var(--blu)"><div class="cd-h"><span class="ic">NATIVE</span><span class="i18n-text" data-i18n-en="Native-text PDF" data-i18n-zh="原生文本 PDF">原生文本 PDF</span></div><small><span class="i18n-text" data-i18n-en="Directly extract text span · font · bounding box · page coordinate · reading-order candidates." data-i18n-zh="直接读取 text span · font · bounding box · page coordinate · reading order candidate。">直接读取 text span · font · bounding box · page coordinate · reading order candidate。</span><strong><span class="i18n-text" data-i18n-en="Focus: preserve positional and layout information" data-i18n-zh="重点：保留位置和版式信息">重点：保留位置和版式信息</span></strong><span class="i18n-text" data-i18n-en="to support structure reconstruction." data-i18n-zh="，为结构恢复提供依据。">，为结构恢复提供依据。</span></small></div>
+<div class="cd" style="--c:var(--org)"><div class="cd-h"><span class="ic">SCAN</span><span class="i18n-text" data-i18n-en="Scanned PDF" data-i18n-zh="扫描件 PDF">扫描件 PDF</span></div><small><span class="i18n-text" data-i18n-en="Essentially an image container; OCR should output recognized text · bbox · " data-i18n-zh="本质是图片容器，需 OCR 输出：识别文本 · bbox · ">本质是图片容器，需 OCR 输出：识别文本 · bbox · </span><strong>confidence</strong><span class="i18n-text" data-i18n-en=" · page rotation · language. Low-confidence regions must not silently enter the index: re-recognize / switch models / mark as low-quality evidence / send for human review." data-i18n-zh=" · 页旋转 · 语言。低置信区域不能悄悄入库：重新识别 / 换模型 / 标低质量证据 / 人工复核。"> · 页旋转 · 语言。低置信区域不能悄悄入库：重新识别 / 换模型 / 标低质量证据 / 人工复核。</span></small></div>
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">MIXED</span><span class="i18n-text" data-i18n-en="Mixed text-and-image PDF" data-i18n-zh="图文混排 PDF">图文混排 PDF</span></div><small><span class="i18n-text" data-i18n-en="Use a layout parser + image/chart extraction + vision-language understanding. The output should not merely say “this is an image”; it should produce retrievable semantics:" data-i18n-zh="Layout parser + 图/图表抽取 + Vision-language 理解。输出不应只是“这是一张图”，而应形成可检索语义：">Layout parser + 图/图表抽取 + Vision-language 理解。输出不应只是“这是一张图”，而应形成可检索语义：</span><em>“Figure 4 shows an approval workflow: request → manager review → finance review → payment release.”</em></small></div>
+</div>
+<div class="co en rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Core Principle" data-i18n-zh="核心原则">核心原则</span></span><p class="say">Choose the extraction method by document and page type; do not force every PDF through one parser.</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Layer 2 · Structure Reconstruction: Recover Document Semantics" data-i18n-zh="第二层 · Structure Reconstruction：恢复文档语义">第二层 · Structure Reconstruction：恢复文档语义</span></h2>
+<div class="two">
+<div class="bfs-canvas rv" id="fig-5-2">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.5.2</span>
+<h2 class="bfs-title">结构树 + 定位基因</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<pre class="code" data-i18n-pre-en=" Document
+ ├── Chapter
+ │    ├── Section
+ │    │    ├── Paragraph
+ │    │    ├── Table
+ │    │    └── Figure
+ │    └── Footnote
+ └── Appendix
+
+ Every information unit carries positioning metadata:
+ document_id · page · section_path
+ paragraph_id · table_id · figure_id
+ bounding_box" data-i18n-pre-zh=" Document
+ ├── Chapter
+ │    ├── Section
+ │    │    ├── Paragraph
+ │    │    ├── Table
+ │    │    └── Figure
+ │    └── Footnote
+ └── Appendix
+
+ 每个信息点携带“定位基因”：
+ document_id · page · section_path
+ paragraph_id · table_id · figure_id
+ bounding_box" data-l="DOCUMENT TREE" style="margin:0"> Document
+ ├── Chapter
+ │    ├── Section
+ │    │    ├── Paragraph
+ │    │    ├── Table
+ │    │    └── Figure
+ │    └── Footnote
+ └── Appendix
+
+ 每个信息点携带“定位基因”：
+ document_id · page · section_path
+ paragraph_id · table_id · figure_id
+ bounding_box</pre>
+</div>
+</div>
+<div>
+<ul class="rv">
+<li><strong><span class="i18n-text" data-i18n-en="Multi-column Reading Order:" data-i18n-zh="多栏阅读顺序：">多栏阅读顺序：</span></strong><span class="i18n-text" data-i18n-en="Extracting by raw page-object order can interleave “left-column paragraph → right-column paragraph.” Recover columns, blocks, and correct reading order, and attach title hierarchy to body text." data-i18n-zh="按页面对象顺序抽取会出现“左栏一段 → 右栏一段”交错，必须恢复列、块与正确阅读顺序，并把标题层级附着到正文。">按页面对象顺序抽取会出现“左栏一段 → 右栏一段”交错，必须恢复列、块与正确阅读顺序，并把标题层级附着到正文。</span></li>
+<li><strong><span class="i18n-text" data-i18n-en="Headers and Footers:" data-i18n-zh="页眉页脚：">页眉页脚：</span></strong><span class="i18n-text" data-i18n-en="Detect repeated cross-page patterns and remove their body-text duplicates, or retain them only as dedicated metadata so they do not repeatedly enter embeddings." data-i18n-zh="跨页重复模式识别后删除正文副本，或保留为专门 metadata，避免反复进入 Embedding。">跨页重复模式识别后删除正文副本，或保留为专门 metadata，避免反复进入 Embedding。</span></li>
+<li><strong><span class="i18n-text" data-i18n-en="Tables:" data-i18n-zh="表格：">表格：</span></strong><span class="i18n-text" data-i18n-en="Recover row / column / header / merged cell / unit / caption / cross-page continuation relationships. Store as Markdown / CSV / JSON / DB rows to support exact queries, range filters, numerical comparisons, and aggregation." data-i18n-zh="恢复 row / column / header / merged cell / unit / caption / 跨页续表关系，存为 Markdown / CSV / JSON / DB 行，支持精确查询、范围过滤、数值比较、聚合。">恢复 row / column / header / merged cell / unit / caption / 跨页续表关系，存为 Markdown / CSV / JSON / DB 行，支持精确查询、范围过滤、数值比较、聚合。</span></li>
+<li><strong><span class="i18n-text" data-i18n-en="Images:" data-i18n-zh="图像：">图像：</span></strong><span class="i18n-text" data-i18n-en="Bind figure number · caption · surrounding paragraphs · page · section · vision description." data-i18n-zh="绑定 figure number · caption · 周围段落 · page · section · vision 描述。">绑定 figure number · caption · 周围段落 · page · section · vision 描述。</span></li>
+</ul>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">Structure reconstruction turns page objects into traceable document semantics.</p></div>
+</div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Layer 3 · Semantic Chunking and Hybrid Index" data-i18n-zh="第三层 · Semantic Chunking 与 Hybrid Index">第三层 · Semantic Chunking 与 Hybrid Index</span></h2>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--tea)"><div class="cd-h"><span class="ic">CHUNK</span><span class="i18n-text" data-i18n-en="Structure-aware Chunking Rules" data-i18n-zh="结构感知切片规则">结构感知切片规则</span></div><small><span class="i18n-text" data-i18n-en="Continuous paragraphs under the same heading → one or more semantic chunks · keep complete clauses together when possible · store complete tables separately in structured form · bind image + caption + description as a figure chunk · split very long sections again at subheading/paragraph boundaries." data-i18n-zh="同一标题下连续段落 → 一个或多个语义 chunk · 完整条款尽量保持完整 · 完整表格单独结构化 · 图 + caption + 描述绑定为 figure chunk · 超长章节在子标题/段落边界继续切。">同一标题下连续段落 → 一个或多个语义 chunk · 完整条款尽量保持完整 · 完整表格单独结构化 · 图 + caption + 描述绑定为 figure chunk · 超长章节在子标题/段落边界继续切。</span><br><strong><span class="i18n-text" data-i18n-en="Trade-off:" data-i18n-zh="权衡：">权衡：</span></strong><span class="i18n-text" data-i18n-en="Too small → missing context and fragmented retrieval; too large → imprecise recall and higher context cost." data-i18n-zh="过小 → 缺上下文、检索碎片化；过大 → 召回不精确、上下文成本高。">过小 → 缺上下文、检索碎片化；过大 → 召回不精确、上下文成本高。</span></small>
+<div class="lb">Contextual Enrichment</div><small><span class="i18n-text" data-i18n-en="For an isolated chunk “Revenue decreased by 12%.” → add a short context prefix (from Chapter 3 Currency Risk, describing the FX impact in fiscal year 2025)." data-i18n-zh="孤立 chunk “Revenue decreased by 12%.” → 补充短上下文（来自第 3 章 Currency Risk，描述 2025 财年汇率影响）。">孤立 chunk “Revenue decreased by 12%.” → 补充短上下文（来自第 3 章 Currency Risk，描述 2025 财年汇率影响）。</span><mark><span class="i18n-text" data-i18n-en="Store source text separately from model-generated context" data-i18n-zh="原文与模型生成的上下文必须分开存储">原文与模型生成的上下文必须分开存储</span></mark><span class="i18n-text" data-i18n-en="to avoid treating generated summaries as original evidence." data-i18n-zh="，避免把生成摘要误当原始证据。">，避免把生成摘要误当原始证据。</span></small></div>
+<div class="tsc" style="margin:0"><table>
+<thead><tr><th><span class="i18n-text" data-i18n-en="Information Type" data-i18n-zh="信息类型">信息类型</span></th><th><span class="i18n-text" data-i18n-en="Indexing Path" data-i18n-zh="索引路径">索引路径</span></th></tr></thead>
+<tbody>
+<tr><td><span class="i18n-text" data-i18n-en="Natural-language paragraphs" data-i18n-zh="自然语言段落">自然语言段落</span></td><td><b>Dense + BM25</b></td></tr>
+<tr><td><span class="i18n-text" data-i18n-en="Contract clauses and terminology" data-i18n-zh="合同条款与术语">合同条款与术语</span></td><td><b>BM25 + Dense</b></td></tr>
+<tr><td><span class="i18n-text" data-i18n-en="Identifiers, dates, versions" data-i18n-zh="编号、日期、版本">编号、日期、版本</span></td><td><b>Exact / Keyword fields</b></td></tr>
+<tr><td><span class="i18n-text" data-i18n-en="Structured tables" data-i18n-zh="结构化表格">结构化表格</span></td><td><b><span class="i18n-text" data-i18n-en="SQL / structured storage + lexical retrieval" data-i18n-zh="SQL / 结构化存储 + lexical">SQL / 结构化存储 + lexical</span></b></td></tr>
+<tr><td><span class="i18n-text" data-i18n-en="Sections, pages, permissions" data-i18n-zh="章节、页码、权限">章节、页码、权限</span></td><td><b>Metadata filter</b></td></tr>
+<tr><td><span class="i18n-text" data-i18n-en="Cross-entity relationships" data-i18n-zh="跨实体关系">跨实体关系</span></td><td><b>Optional graph index</b></td></tr>
+</tbody>
+</table></div>
+</div>
+<pre class="code rv" data-l="CHUNK METADATA"> { <span class="k">"document_id"</span>: <span class="s">"policy-2026-de"</span>, <span class="k">"page"</span>: <span class="n">17</span>,
+   <span class="k">"section_path"</span>: [<span class="s">"3 Risk Factors"</span>, <span class="s">"3.2 Currency Risk"</span>],
+   <span class="k">"content_type"</span>: <span class="s">"paragraph"</span>, <span class="k">"language"</span>: <span class="s">"en"</span>, <span class="k">"version"</span>: <span class="s">"2026"</span>,
+   <span class="k">"valid_from"</span>: <span class="s">"2026-01-01"</span>, <span class="k">"access_scope"</span>: <span class="s">"finance-eu"</span> }</pre>
+<div class="co en rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Core Principle" data-i18n-zh="核心原则">核心原则</span></span><p class="say">Do not embed everything in the same way. Index according to the information type and the expected query operation.</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Layer 4 · Agent Tool Chain: Read on Demand" data-i18n-zh="第四层 · Agent Tool Chain：按需翻阅">第四层 · Agent Tool Chain：按需翻阅</span></h2>
+<div class="bfs-canvas rv" id="fig-5-3">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.5.3</span>
+<h2 class="bfs-title">受控工具执行过程</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g6"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Analyze what evidence the question requires" data-i18n-zh="分析问题需要哪些证据">分析问题需要哪些证据</span></h2></div><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">search_pdf(query, filters)</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">read_page / read_section</h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">extract_table / analyze_chart</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">quote_source(chunk_id)</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Generate Answer → Claim Verification" data-i18n-zh="生成答案 → Claim Verification">生成答案 → Claim Verification</span></h2></div></div>
+<p style="font-size:13px;color:var(--mut);margin-top:12px"><strong><span class="i18n-text" data-i18n-en="Benefits:" data-i18n-zh="好处：">好处：</span></strong><span class="i18n-text" data-i18n-en="Smaller context and lower cost · tool calls are logged and replayable · tables/charts use specialized tools · when evidence is insufficient, the agent can continue reading · each step exposes the failure point." data-i18n-zh="上下文更小成本更低 · 工具调用可记录可重放 · 表格图表由专门工具处理 · 证据不足时可继续翻页 · 每步可定位失败原因。">上下文更小成本更低 · 工具调用可记录可重放 · 表格图表由专门工具处理 · 证据不足时可继续翻页 · 每步可定位失败原因。</span><strong><span class="i18n-text" data-i18n-en="Constraints:" data-i18n-zh="约束：">约束：</span></strong>input schema · permission checks · maximum calls · allowed scope · timeout · logging · idempotency。</p>
+</div>
+</div>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">The agent decides what evidence it needs; deterministic document tools control how that evidence is retrieved.</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Hard Requirement 1 · Page-level Citations and Claim Verification" data-i18n-zh="底线一 · Page-level Citations 与 Claim Verification">底线一 · Page-level Citations 与 Claim Verification</span></h2>
+<div class="bfs-canvas rv" id="fig-5-4">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.5.4</span>
+<h2 class="bfs-title">引用校验流程</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g5"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Draft answer</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Extract claims</h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Match each claim to evidence</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Check entailment &amp; scope</h2></div><div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Remove / qualify / refuse unsupported claims" data-i18n-zh="Remove / qualify / refuse 无支持 claim">Remove / qualify / refuse 无支持 claim</span></h2></div></div>
+<p style="font-size:13px;color:var(--mut);margin-top:12px"><span class="i18n-text" data-i18n-en="Example: if the document only says " data-i18n-zh="例：文档只说 ">例：文档只说 </span><em>“The policy may be reviewed annually.”</em><span class="i18n-text" data-i18n-en=", the system must not expand it into " data-i18n-zh="，系统不能扩写为 ">，系统不能扩写为 </span><em>“The policy is updated every year.”</em>。<strong>Citation correctness</strong><span class="i18n-text" data-i18n-en="(does the citation actually entail the Claim?) +" data-i18n-zh="（引用是否真的支持 Claim）＋">（引用是否真的支持 Claim）＋</span><strong>Citation completeness</strong><span class="i18n-text" data-i18n-en="(do all key Claims have citations?). In contracts, financial reports, risk control, and compliance, an answer without page numbers and source evidence should not be considered complete." data-i18n-zh="（所有关键 Claim 是否都有引用）。合同、财报、风控、合规场景，缺页码和原文证据的答案不应视为完成。">（所有关键 Claim 是否都有引用）。合同、财报、风控、合规场景，缺页码和原文证据的答案不应视为完成。</span></p>
+</div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Hard Requirement 2 · Layered Evaluation Loop" data-i18n-zh="底线二 · 分层评测闭环">底线二 · 分层评测闭环</span></h2>
+<div class="tsc rv interp-metrics"><table>
+<thead><tr><th><span class="i18n-text" data-i18n-en="Layer" data-i18n-zh="层">层</span></th><th><span class="i18n-text" data-i18n-en="Metric" data-i18n-zh="指标">指标</span></th></tr></thead>
+<tbody>
+<tr><td><b>Parsing</b></td><td>OCR Character / Word Error Rate · OCR confidence coverage · Reading-order accuracy · Page classification accuracy</td></tr>
+<tr><td><b>Structure</b></td><td>Heading hierarchy accuracy · Table cell accuracy · Header/footer removal accuracy · Figure-caption association accuracy</td></tr>
+<tr><td><b>Retrieval</b></td><td>Page Recall@K · Chunk Recall@K · Table Retrieval Recall · MRR / NDCG · Metadata-filter correctness</td></tr>
+<tr><td><b>Evidence &amp; Answer</b></td><td>Evidence sufficiency accuracy · Citation correctness / completeness · Answer correctness · False refusal rate · Unsafe answer rate</td></tr>
+</tbody>
+</table></div>
+<div class="bfs-canvas rv" id="fig-5-5">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.5.5</span>
+<h2 class="bfs-title">错误诊断树：答案错误 → 失败在哪一层？</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="grid g5" style="margin:0">
+<div class="cd" style="--c:var(--blu);padding:12px"><small><strong><span class="i18n-text" data-i18n-en="The correct page never entered the index" data-i18n-zh="正确页面没进索引">正确页面没进索引</span></strong><br>→ Parsing / ingestion failure</small></div>
+<div class="cd" style="--c:var(--org);padding:12px"><small><strong><span class="i18n-text" data-i18n-en="The page exists but was not retrieved" data-i18n-zh="页面存在但没被召回">页面存在但没被召回</span></strong><br>→ Retrieval failure</small></div>
+<div class="cd" style="--c:var(--grn);padding:12px"><small><strong><span class="i18n-text" data-i18n-en="The correct evidence was retrieved but the table was parsed incorrectly" data-i18n-zh="召回正确但表格解析错">召回正确但表格解析错</span></strong><br>→ Structure / table failure</small></div>
+<div class="cd" style="--c:var(--pur);padding:12px"><small><strong><span class="i18n-text" data-i18n-en="The evidence is correct but the conclusion exceeds the source text" data-i18n-zh="证据正确但结论超原文">证据正确但结论超原文</span></strong><br>→ Generation / verification failure</small></div>
+<div class="cd" style="--c:var(--red);padding:12px"><small><strong><span class="i18n-text" data-i18n-en="The system answered despite insufficient evidence" data-i18n-zh="证据不足仍回答">证据不足仍回答</span></strong><br>→ Decision-policy failure</small></div>
+</div>
+</div>
+</div>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Must Remember" data-i18n-zh="必背">必背</span></span><p class="say">A production evaluation should tell us which stage failed, not only that the final answer was wrong.</p></div>
+<div class="co note rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Permissions, Versions, and Lifecycle" data-i18n-zh="权限、版本与生命周期">权限、版本与生命周期</span></span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Tenant isolation · Document-level ACL · Page/section restrictions · Version validity · Superseded documents · Retention/deletion · Index refresh · Audit trail. Permission filtering should happen as early as possible, ideally" data-i18n-zh="Tenant isolation · Document-level ACL · Page/section 限制 · Version validity · Superseded 文档 · Retention/deletion · Index refresh · Audit trail。权限过滤尽量发生在">Tenant isolation · Document-level ACL · Page/section 限制 · Version validity · Superseded 文档 · Retention/deletion · Index refresh · Audit trail。权限过滤尽量发生在</span><strong><span class="i18n-text" data-i18n-en="before retrieval" data-i18n-zh="检索前">检索前</span></strong><span class="i18n-text" data-i18n-en=", with another validation before returning the result. Resolve version conflicts using valid_from/valid_to · supersedes · region · BU · source authority; if the valid version still cannot be determined → explicitly refuse or escalate instead of randomly choosing a related document." data-i18n-zh="，返回前再校验一次。版本冲突结合 valid_from/valid_to · supersedes · region · BU · source authority；仍无法确认有效版本 → 明确拒答或升级，而不是随机选一篇相关文档。">，返回前再校验一次。版本冲突结合 valid_from/valid_to · supersedes · region · BU · source authority；仍无法确认有效版本 → 明确拒答或升级，而不是随机选一篇相关文档。</span></p></div>
+<div class="co en rv"><span class="co-t"><span class="i18n-text" data-i18n-en="90-second English Answer (see Chapter 11 · copyable)" data-i18n-zh="90 秒英文答案（见第 11 章 · 可复制）">90 秒英文答案（见第 11 章 · 可复制）</span></span><p class="say">A production PDF RAG system is more than text extraction followed by embeddings. I would design it as a four-layer document-intelligence pipeline… Every important claim must be supported by a page-level citation.</p><p style="font-size:13px;color:var(--mut)"><span class="i18n-text" data-i18n-en="Full version in " data-i18n-zh="完整版在 ">完整版在 </span>。</p></div>
+<div class="co warn rv"><span class="co-t"><span class="i18n-text" data-i18n-en="Honest Project Mapping" data-i18n-zh="诚信映射">诚信映射</span></span><p style="font-size:13.5px"><span class="i18n-text" data-i18n-en="Do not claim that you have already deployed a complete production-grade PDF RAG system. You can say:" data-i18n-zh="不应声称已完整上线生产级 PDF RAG。可说：">不应声称已完整上线生产级 PDF RAG。可说：</span><em>“My direct experience is stronger in retrieval workflows, case-based reasoning, validation, fallback logic, structured artifacts, and tool-oriented agent systems. I understand how those principles extend to PDF RAG: parsing and structure recovery must be separated from retrieval, evidence must preserve provenance, and the agent should use controlled tools rather than treating the whole document as one prompt.”</em></p></div>
+</section>
+<!-- ======================= CH6 ======================= -->
+<nav class="page-nav" aria-label="章节翻页"><a href="/chapters/04-rag-reliability-selective-answering/">← 04 <span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/06-skills-routing/">06 <span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span> →</a></nav></main>
+<script src="/assets/app.js?v=02126beec081" defer></script>
+</body></html>

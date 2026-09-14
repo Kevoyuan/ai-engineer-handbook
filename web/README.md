@@ -6,18 +6,22 @@ This directory contains the interactive handbook web assets.
 
 The handbook is deployed on **Vercel**:
 
-https://ai-engineer-handbook-kevoyuans-projects.vercel.app
+https://kevoyuan-ai-handbook.vercel.app
 
-GitHub remains the source repository. GitHub Pages is no longer used for production deployment, and the temporary `.pages-payload` transport files have been removed.
+GitHub `main` is the source of truth. Vercel watches this repository and publishes this `web/` directory to production after each push.
 
-## Target artifact
+## Site structure
 
 ```text
-web/AI_Engineer_Handbook.html
+web/
+├── index.html
+├── chapters/       # one independent page per technical chapter
+├── search/
+├── assets/
+├── search-index.json
+└── vercel.json
 ```
 
-The current local study product originated as `AI_Engineer_Interview_Handbook_Master.html`. During migration, preserve its technical content, diagrams, bilingual support, theme switching, search, navigation, and responsive behavior, while changing the product framing from interview-first to engineering-reference-first.
+The current web edition contains chapters 02–09. Preserve their technical content, diagrams, bilingual support, theme switching, search, navigation, and responsive behavior.
 
-Mobile behavior is maintained through the reader rules in `mobile-reader.css` and `mobile-reader.js`. Responsive work must not change the established palette unless a palette redesign is explicitly requested.
-
-The source of truth for visual decisions is the repository root `DESIGN.md`.
+The source of truth for visual decisions is `web/DESIGN.md`, derived from the repository design system for the current Quiet Editorial edition.

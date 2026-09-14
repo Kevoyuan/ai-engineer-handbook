@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-title-zh="Agent 编排与内容生成 · AI 工程手册" data-i18n-title-en="Agent Orchestration and Content Generation · AI Engineering Handbook">Agent 编排与内容生成 · AI 工程手册</title>
+<meta name="description" content="Agent 编排与内容生成：AI 工程手册技术章节，包含架构、权衡、失败模式、指标与生产实践。">
+<link rel="canonical" href="https://kevoyuan-ai-handbook.vercel.app/chapters/08-agent-orchestration/">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/app.css?v=0bb27ad415ab"><link rel="stylesheet" href="/assets/home.css?v=32688d430c9d"><link rel="stylesheet" href="/assets/reader.css?v=18312fc8bcfe"></head>
+<body class="chapter-page"><a class="skip-link" href="#main-content">跳到正文</a>
+<header><button type="button" aria-label="打开章节导航" aria-controls="side" aria-expanded="false" id="menuBtn">☰</button><a class="brand" href="/">AI 工程手册</a><span id="curCh"><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></span><div class="tools"><a class="tbtn" href="/search/" aria-label="搜索手册">⌕</a><button type="button" class="tbtn" id="themeBtn" aria-label="切换深浅主题">☾</button><button class="lang-toggle" id="langToggle" type="button" aria-label="中 / EN：切换到英文">中 / EN</button></div></header>
+<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节"><a href="/chapters/02-enterprise-retrieval/"><i>02</i><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/03-hybrid-retrieval-query-routing/"><i>03</i><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></a><a href="/chapters/04-rag-reliability-selective-answering/"><i>04</i><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/05-document-pdf-rag/"><i>05</i><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></a><a href="/chapters/06-skills-routing/"><i>06</i><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/07-memory-context-engineering/"><i>07</i><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/08-agent-orchestration/" aria-current="page"><i>08</i><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/chapters/09-reliability-evaluation-observability/"><i>09</i><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></a></nav><div class="sd-f"><span class="i18n-text" data-i18n-zh="原章号 02–09" data-i18n-en="Original chapters 02–09">原章号 02–09</span></div></aside>
+<button aria-label="关闭章节导航" id="sideOverlay" type="button"></button>
+<main id="main-content" tabindex="-1"><section class="ch" id="ch8" style="--acc:var(--pur)">
+<div class="ch-head rv"><div class="ch-no"><small>CHAPTER</small>08</div><h1 class="ch-t"><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></h1><span class="ch-tag">ARTIFACT-DRIVEN · B·A·G·V·R·P</span></div><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens when" data-tip-en="When to use" data-tip-zh="什么时候使用"><i>W</i><span>WHEN</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span></div>
+<p class="lead rv"><span class="i18n-text" data-i18n-en="Using a “fully automated comic / short-drama / video generation Agent” as an example: the correct design is not " data-i18n-zh="以“全自动漫画/短剧/视频生成 Agent”为例：正确设计不是 ">以“全自动漫画/短剧/视频生成 Agent”为例：正确设计不是 </span><code>User Prompt → Image API → Video API</code><span class="i18n-text" data-i18n-en=", but rather a" data-i18n-zh="，而是">，而是</span><strong><span class="i18n-text" data-i18n-en="versioned, Artifact-driven production workflow" data-i18n-zh="版本化、Artifact 驱动的生产工作流">版本化、Artifact 驱动的生产工作流</span></strong>。</p>
+<div class="bfs-canvas rv" id="fig-8-1">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.1</span>
+<h2 class="bfs-title">Artifact Graph：Creative Brief 是版本化生产契约（source of truth，v1 → v2 通过依赖传播）</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g6"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Creative Brief</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-en="narrative / visual / audio / production / safety constraints + acceptance criteria" data-i18n-zh="叙事/视觉/音频/生产/安全约束 + 验收标准">叙事/视觉/音频/生产/安全约束 + 验收标准</span></div></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Story Outline → Script</h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Character Cards → Scene Cards</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">Shot List → Shot Prompts</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">Images / Clips → Audio</h2></div><div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title">Final Timeline</h2></div></div>
+<p style="font-size:13px;color:var(--mut);margin-top:12px"><span class="i18n-text" data-i18n-en="Each Artifact stores: artifact_id · type · version · dependencies · validation status · model · prompt version · cost · timestamp." data-i18n-zh="每个 Artifact 保存：artifact_id · type · version · dependencies · validation status · model · prompt version · cost · timestamp。">每个 Artifact 保存：artifact_id · type · version · dependencies · validation status · model · prompt version · cost · timestamp。</span><span class="say" style="font-size:14px">Every artifact needs an ID, version, lineage, and validation status.</span></p>
+</div>
+</div>
+<div class="grid g2 rv" style="margin-top:16px">
+<div class="cd" style="--c:var(--pur)"><div class="cd-h"><span class="ic">AGENT</span><span class="i18n-text" data-i18n-en="Suitable for Agents:" data-i18n-zh="适合 Agent 的">适合 Agent 的</span></div><small>clarification · planning · creative revision · diagnosis · replanning —— <strong><span class="i18n-text" data-i18n-en="uncertain decisions" data-i18n-zh="不确定的决策">不确定的决策</span></strong>。</small></div>
+<div class="cd" style="--c:var(--tea)"><div class="cd-h"><span class="ic">DETERMINISTIC</span><span class="i18n-text" data-i18n-en="Suitable for deterministic services:" data-i18n-zh="适合确定性服务的">适合确定性服务的</span></div><small>schema validation · prompt assembly · rendering · subtitle generation · permission checks · file conversion —— <strong><span class="i18n-text" data-i18n-en="repeatable transformations" data-i18n-zh="可重复的转换">可重复的转换</span></strong>。</small><p class="say" style="font-size:13.5px;margin-top:8px">Use agents for uncertain decisions and deterministic services for repeatable transformations.</p></div>
+</div>
+<div class="grid g3 rv">
+<div class="cd" style="--c:var(--org)"><div class="cd-h"><span class="ic">ID</span>Character Consistency</div><small><span class="i18n-text" data-i18n-en="Do not merely repeat the Character Prompt: Canonical Character Card · Reference Asset Library · Identity Conditioning · Shot-level Consistency Check · Continuity State (Identity · Costume · Object · Spatial · Temporal · Emotion)." data-i18n-zh="不能只重复 Character Prompt：Canonical Character Card · Reference Asset Library · Identity Conditioning · Shot-level Consistency Check · Continuity State（Identity · Costume · Object · Spatial · Temporal · Emotion）。">不能只重复 Character Prompt：Canonical Character Card · Reference Asset Library · Identity Conditioning · Shot-level Consistency Check · Continuity State（Identity · Costume · Object · Spatial · Temporal · Emotion）。</span></small></div>
+<div class="cd" style="--c:var(--blu)"><div class="cd-h"><span class="ic">SHOT</span>Storyboard / Shot Spec</div><small><span class="i18n-text" data-i18n-en="Structured fields: duration · purpose · camera · motion · characters · continuity · transition · constraints." data-i18n-zh="结构化：duration · purpose · camera · motion · characters · continuity · transition · constraints。">结构化：duration · purpose · camera · motion · characters · continuity · transition · constraints。</span></small><p class="say" style="font-size:13px;margin-top:6px">A good shot is the smallest independently generatable and independently verifiable visual unit.</p></div>
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">EVAL</span>Evaluator</div><small><span class="i18n-text" data-i18n-en="Layered validation: Script / Storyboard / Visual / Audio / Final Render Validator; combine Deterministic Rules + Specialized Models + Multimodal Judge + Human Review. Output: status · failure type · evidence · suspected root cause · repair scope · recommended action." data-i18n-zh="分层：Script / Storyboard / Visual / Audio / Final Render Validator；组合 Deterministic Rules + Specialized Models + Multimodal Judge + Human Review。输出：status · failure type · evidence · suspected root cause · repair scope · recommended action。">分层：Script / Storyboard / Visual / Audio / Final Render Validator；组合 Deterministic Rules + Specialized Models + Multimodal Judge + Human Review。输出：status · failure type · evidence · suspected root cause · repair scope · recommended action。</span></small><p class="say" style="font-size:13px;margin-top:6px">Evaluation should produce repair instructions, not only scores.</p></div>
+</div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Root Cause and Minimum-scope Repair (D-I-R)" data-i18n-zh="Root Cause 与最小范围修复（D-I-R）">Root Cause 与最小范围修复（D-I-R）</span></h2>
+<div class="bfs-canvas rv" id="fig-8-2">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.2</span>
+<h2 class="bfs-title">Dependency-aware Invalidation</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g4"><div class="bfs-card bfs-rose">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">Failure</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Diagnose: locate the earliest incorrect Artifact" data-i18n-zh="Diagnose：定位最早出错的 Artifact">Diagnose：定位最早出错的 Artifact</span></h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Invalidate: invalidate downstream dependencies only" data-i18n-zh="Invalidate：只失效下游依赖">Invalidate：只失效下游依赖</span></h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title"><span class="i18n-text" data-i18n-en="Regenerate: keep valid Artifacts and regenerate the minimum scope" data-i18n-zh="Regenerate：保留有效 Artifact，重生成最小范围">Regenerate：保留有效 Artifact，重生成最小范围</span></h2></div></div>
+<p style="font-size:13px;color:var(--mut);margin-top:12px"><span class="i18n-text" data-i18n-en="Example: changing only clothing → Character Costume v2 → invalidate only affected shots." data-i18n-zh="例：只修改服装 → Character Costume v2 → 只失效受影响的 shots。">例：只修改服装 → Character Costume v2 → 只失效受影响的 shots。</span><span class="say" style="font-size:14px">Regenerate from the earliest incorrect artifact, not from the beginning.</span></p>
+</div>
+</div>
+<div class="grid g2 rv" style="margin-top:16px">
+<div class="cd" style="--c:var(--tea)"><div class="cd-h"><span class="ic">ASYNC</span><span class="i18n-text" data-i18n-en="Asynchronous Generation and Task State" data-i18n-zh="异步生成与任务状态">异步生成与任务状态</span></div><small><span class="i18n-text" data-i18n-en="Orchestrator → Queue → Worker → Artifact → Event → Resume. States: QUEUED · RUNNING · SUCCEEDED · FAILED · CANCELLED; the frontend receives progress via SSE / WebSocket / Polling." data-i18n-zh="Orchestrator → Queue → Worker → Artifact → Event → Resume。状态：QUEUED · RUNNING · SUCCEEDED · FAILED · CANCELLED；前端经 SSE / WebSocket / Polling 接收进度。">Orchestrator → Queue → Worker → Artifact → Event → Resume。状态：QUEUED · RUNNING · SUCCEEDED · FAILED · CANCELLED；前端经 SSE / WebSocket / Polling 接收进度。</span><br><strong>Idempotency：</strong><span class="i18n-text" data-i18n-en="Generation jobs need an idempotency_key—a request timeout does not mean generation never started. Reconcile before retrying to avoid duplicate charges and duplicate Artifacts." data-i18n-zh="生成任务需 idempotency_key——请求超时不代表生成没有开始，重试前先 reconciliation，避免重复计费和重复 Artifact。">生成任务需 idempotency_key——请求超时不代表生成没有开始，重试前先 reconciliation，避免重复计费和重复 Artifact。</span></small></div>
+<div class="cd" style="--c:var(--amb)"><div class="cd-h"><span class="ic">COST</span><span class="i18n-text" data-i18n-en="Parallelization and Cost Control" data-i18n-zh="并行化与成本控制">并行化与成本控制</span></div><small><strong><span class="i18n-text" data-i18n-en="Can Run in Parallel:" data-i18n-zh="可并行：">可并行：</span></strong>independent shots · audio variants · preview。<strong><span class="i18n-text" data-i18n-en="Must Run Sequentially:" data-i18n-zh="必须串行：">必须串行：</span></strong><span class="i18n-text" data-i18n-en="continuity-dependent shots · upstream work not yet locked." data-i18n-zh="continuity-dependent shots · 上游未 lock。">continuity-dependent shots · 上游未 lock。</span></small><p class="say" style="font-size:13px;margin-top:6px">Parallelize independent shots; serialize continuity-dependent shots.</p><small style="display:block;margin-top:6px"><span class="i18n-text" data-i18n-en="Cost control: Preview → Validate → Final Render; use low-cost models until decisions stabilize; reuse Character/Scene Assets; animate images instead of generating full video when possible; cap retries; set a project budget." data-i18n-zh="成本：Preview → Validate → Final Render；决策稳定前用低成本模型；复用 Character/Scene Asset；图片动画替代全视频；Retry 上限；项目预算。">成本：Preview → Validate → Final Render；决策稳定前用低成本模型；复用 Character/Scene Asset；图片动画替代全视频；Retry 上限；项目预算。</span></small><p class="say" style="font-size:13px;margin-top:6px">Generate cheaply until creative decisions stabilize.</p></div>
+</div>
+<div class="bfs-canvas rv" id="fig-8-3">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.3</span>
+<h2 class="bfs-title">Workflow State Machine（状态属于数据库 / Workflow Engine，不属于 LLM）</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="stm">
+<span class="stt">DRAFT</span><div class="fh"></div><span class="stt">BRIEF_VALIDATED</span><div class="fh"></div><span class="stt">STORY_APPROVED</span><div class="fh"></div><span class="stt">ASSETS_LOCKED</span><div class="fh"></div><span class="stt">STORYBOARD_APPROVED</span><div class="fh"></div><span class="stt hl">GENERATION</span><div class="fh"></div><span class="stt hl">VALIDATION</span><div class="fh"></div><span class="stt hl">TARGETED_REPAIR</span><div class="fh"></div><span class="stt">POST</span><div class="fh"></div><span class="stt">REVIEW</span><div class="fh"></div><span class="stt">PUBLISH</span>
+</div>
+<p style="font-size:13px;color:var(--mut);margin-top:12px"><strong>Human-in-the-loop Gate：</strong><span class="i18n-text" data-i18n-en="Brief approval · Character approval · high-risk content · Final publish; can provide Fast Mode / Professional Mode." data-i18n-zh="Brief approval · Character approval · 高风险内容 · Final publish；可提供 Fast Mode / Professional Mode。">Brief approval · Character approval · 高风险内容 · Final publish；可提供 Fast Mode / Professional Mode。</span></p>
+</div>
+</div>
+<div class="interp-focus" data-interpret-lenses="when tradeoff engineering" id="multi-agent-boundary-system-design">
+<h2 class="sub"><span class="i18n-text" data-i18n-en="Multi-Agent: Split at Operational Boundaries, Not Persona Boundaries" data-i18n-zh="Multi-Agent：拆在 Operational Boundary，而不是 Persona Boundary">Multi-Agent：拆在 Operational Boundary，而不是 Persona Boundary</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens when" data-tip-en="When to use" data-tip-zh="什么时候使用"><i>W</i><span>WHEN</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span></div>
+<div class="grid g2 rv">
+<div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">USE</span><span class="i18n-text" data-i18n-en="Worth Splitting" data-i18n-zh="值得拆">值得拆</span></div><small><span class="i18n-text" data-i18n-en="Different permission boundaries · different tools/runtime environments · independently evaluable subtasks · real parallelism benefits · need independent Critique · different model/cost strategies · high-risk isolation." data-i18n-zh="权限边界不同 · 工具/运行环境不同 · 子任务可独立评估 · 有真实并行收益 · 需要独立 Critique · 不同模型/成本策略 · 高风险隔离。">权限边界不同 · 工具/运行环境不同 · 子任务可独立评估 · 有真实并行收益 · 需要独立 Critique · 不同模型/成本策略 · 高风险隔离。</span></small></div>
+<div class="cd" style="--c:var(--red)"><div class="cd-h"><span class="ic">AVOID</span><span class="i18n-text" data-i18n-en="Not Worth Splitting" data-i18n-zh="不值得拆">不值得拆</span></div><small><span class="i18n-text" data-i18n-en="Only because “researcher / manager / critic” sounds sophisticated; all Agents share the same state and tools; no independent acceptance criteria; communication overhead exceeds specialization benefits." data-i18n-zh="仅因为“研究员/经理/评论家”听起来高级；所有 Agent 共享同一状态和工具；没有独立验收；通信开销高于专业化收益。">仅因为“研究员/经理/评论家”听起来高级；所有 Agent 共享同一状态和工具；没有独立验收；通信开销高于专业化收益。</span></small></div>
+</div>
+<div class="co must rv interp-callout interp-engineering"><span class="co-t"><span class="i18n-text" data-i18n-en="Principle" data-i18n-zh="原则">原则</span></span><p class="say">I split agents at operational boundaries, not personality boundaries.</p></div>
+<h2 class="sub"><span class="i18n-text" data-i18n-en="15-minute Agent System Design Structure" data-i18n-zh="15 分钟 Agent System Design 节奏">15 分钟 Agent System Design 节奏</span></h2><div role="group" aria-label="Interpretation lenses" class="interp-strip rv"><span class="lens when" data-tip-en="When to use" data-tip-zh="什么时候使用"><i>W</i><span>WHEN</span></span><span class="lens tradeoff" data-tip-en="What you gain and give up" data-tip-zh="得到什么、牺牲什么"><i>T</i><span>TRADE-OFF</span></span></div>
+<pre class="code" data-l="15 MIN">0–2 min   Clarify user / task / SLA / risk / data
+2–4 min   Define success metrics
+4–8 min   Draw architecture
+8–11 min  Failure modes + recovery
+11–13 min Latency / cost / quality trade-offs
+13–15 min Evaluation + rollout + observability</pre>
+<div class="bfs-canvas rv" id="fig-8-6">
+<div class="bfs-head">
+<div>
+<span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.6</span>
+<h2 class="bfs-title">Generic Agent System Skeleton</h2>
+</div>
+</div>
+<div class="bfs-body" style="margin-top:12px">
+<div class="bfs-grid bfs-g6"><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div>
+<h2 class="bfs-card-title">User</h2></div><div class="bfs-card bfs-blue">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div>
+<h2 class="bfs-card-title">Router</h2></div><div class="bfs-card bfs-amber">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 3</span></div>
+<h2 class="bfs-card-title">Agent / Workflow</h2></div><div class="bfs-card bfs-purple">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 4</span></div>
+<h2 class="bfs-card-title">RAG + MCP / Tools</h2></div><div class="bfs-card bfs-teal">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 5</span></div>
+<h2 class="bfs-card-title">State / Memory</h2></div><div class="bfs-card bfs-emerald">
+<div class="bfs-strip"></div>
+<div class="bfs-card-head"><span class="bfs-stage-pill">STEP 6</span></div>
+<h2 class="bfs-card-title">Validation / Guardrails</h2></div></div>
+<p style="font-size:13px;color:var(--mut);margin-top:10px"><span class="i18n-text" data-i18n-en="Side path: Trace → Eval → Dashboard → Human Escalation." data-i18n-zh="旁路：Trace → Eval → Dashboard → Human Escalation。">旁路：Trace → Eval → Dashboard → Human Escalation。</span></p>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================= CH9 ======================= -->
+<nav class="page-nav" aria-label="章节翻页"><a href="/chapters/07-memory-context-engineering/">← 07 <span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/09-reliability-evaluation-observability/">09 <span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span> →</a></nav></main>
+<script src="/assets/app.js?v=02126beec081" defer></script>
+</body></html>

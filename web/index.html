@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-i18n-title-zh="AI 工程手册" data-i18n-title-en="AI Engineering Handbook">AI 工程手册</title>
+<meta name="description" content="AI 工程手册：系统梳理企业检索、RAG、Skills、Memory、Agent 编排、评估与生产可靠性。">
+<link rel="canonical" href="https://kevoyuan-ai-handbook.vercel.app/">
+<meta name="theme-color" content="#f6f5f0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/home.css?v=32688d430c9d"><link rel="stylesheet" href="/assets/reader.css?v=18312fc8bcfe"></head>
+<body class="home-page"><a class="skip-link" href="#main-content">跳到正文</a>
+<header><button type="button" aria-label="打开章节导航" aria-controls="side" aria-expanded="false" id="menuBtn">☰</button><a class="brand" href="/">AI 工程手册</a><span id="curCh"><span class="i18n-text" data-i18n-zh="AI 工程手册" data-i18n-en="AI Engineering Handbook">AI 工程手册</span></span><div class="tools"><a class="tbtn" href="/search/" aria-label="搜索手册">⌕</a><button type="button" class="tbtn" id="themeBtn" aria-label="切换深浅主题">☾</button><button class="lang-toggle" id="langToggle" type="button" aria-label="中 / EN：切换到英文">中 / EN</button></div></header>
+<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节"><a href="/chapters/02-enterprise-retrieval/"><i>02</i><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></a><a href="/chapters/03-hybrid-retrieval-query-routing/"><i>03</i><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></a><a href="/chapters/04-rag-reliability-selective-answering/"><i>04</i><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></a><a href="/chapters/05-document-pdf-rag/"><i>05</i><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></a><a href="/chapters/06-skills-routing/"><i>06</i><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></a><a href="/chapters/07-memory-context-engineering/"><i>07</i><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></a><a href="/chapters/08-agent-orchestration/"><i>08</i><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></a><a href="/chapters/09-reliability-evaluation-observability/"><i>09</i><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></a></nav><div class="sd-f"><span class="i18n-text" data-i18n-zh="原章号 02–09" data-i18n-en="Original chapters 02–09">原章号 02–09</span></div></aside>
+<button aria-label="关闭章节导航" id="sideOverlay" type="button"></button>
+<main id="main-content" tabindex="-1"><section class="cover" id="cover">
+<div>
+<div class="cv-k"><span class="i18n-text" data-i18n-en="FIELD MANUAL · Applied AI Engineering" data-i18n-zh="FIELD MANUAL · AI 工程实践体系">FIELD MANUAL · AI 工程实践体系</span></div>
+<h1 class="cv-t"><em>AI Engineer</em><br><span class="i18n-text" data-i18n-en="Engineering Handbook" data-i18n-zh="工程手册">工程手册</span></h1>
+<p class="cv-sub"><span class="i18n-text" data-i18n-en="For Applied AI · LLM Application · Agentic AI · RAG · AI Platform · AI Automation and Solution Engineering roles. It now covers " data-i18n-zh="面向 Applied AI · LLM Application · Agentic AI · RAG · AI Platform · AI Automation 与 Solution Engineering 岗位。现在覆盖 ">面向 Applied AI · LLM Application · Agentic AI · RAG · AI Platform · AI Automation 与 Solution Engineering 岗位。现在覆盖 </span><strong><span class="i18n-text" data-i18n-en="RAG / Agent / Evaluation / AI Application Engineering / Business Delivery" data-i18n-zh="RAG / Agent / Evaluation / AI Application Engineering / 商业化闭环">RAG / Agent / Evaluation / AI Application Engineering / 商业化闭环</span></strong><span class="i18n-text" data-i18n-en=", with the goal of explaining not buzzwords but: what the problem is, how the architecture is designed, why it is designed that way, how it is evaluated, and how cost and business outcomes close the loop." data-i18n-zh="，重点不是堆术语，而是说清：问题是什么、架构怎么设计、为什么这么设计、如何评估、成本和业务结果如何闭环。">，重点不是堆术语，而是说清：问题是什么、架构怎么设计、为什么这么设计、如何评估、成本和业务结果如何闭环。</span></p>
+<div class="cv-meta">
+<span class="mchip"><span class="i18n-text" data-i18n-en="System Design" data-i18n-zh="系统设计">系统设计</span></span><span class="mchip"><span class="i18n-text" data-i18n-en="Retrieval and RAG" data-i18n-zh="检索与 RAG">检索与 RAG</span></span><span class="mchip"><span class="i18n-text" data-i18n-en="Agent Workflows" data-i18n-zh="Agent 工作流">Agent 工作流</span></span><span class="mchip">Evaluation</span><span class="mchip"><span class="i18n-text" data-i18n-en="Reliability" data-i18n-zh="可靠性">可靠性</span></span>
+</div>
+<div class="cv-stats">
+<div class="st"><b>8</b><span><span class="i18n-text" data-i18n-en="Chapters" data-i18n-zh="章节">章节</span></span></div>
+
+
+<div class="st"><b>50+</b><span><span class="i18n-text" data-i18n-en="Diagrams / Flows" data-i18n-zh="图解 / 流程">图解 / 流程</span></span></div>
+</div>
+</div>
+<div class="cv-fig">
+<svg viewbox="0 0 440 320">
+<text class="svt2" x="20" y="26">QUERY ROUTING · HYBRID RETRIEVAL</text>
+<rect class="svn" height="40" rx="7" width="86" x="16" y="140"></rect><text class="svt" text-anchor="middle" x="59" y="164">Query</text>
+<rect class="svo" height="40" rx="7" width="86" x="138" y="140"></rect><text class="svt" text-anchor="middle" x="181" y="164">Router</text>
+<rect class="svn" height="36" rx="7" width="86" x="262" y="52"></rect><text class="svt" text-anchor="middle" x="305" y="74">Exact</text>
+<rect class="svo" height="36" rx="7" width="86" x="262" y="142"></rect><text class="svt" text-anchor="middle" x="305" y="164">BM25</text>
+<rect class="svg" height="36" rx="7" width="86" x="262" y="232"></rect><text class="svt" text-anchor="middle" x="305" y="254">Dense</text>
+<path class="wire" d="M102 160 H138"></path>
+<path class="wire" d="M224 160 C245 160 240 70 262 70"></path>
+<path class="wire" d="M224 160 H262"></path>
+<path class="wire" d="M224 160 C245 160 240 250 262 250"></path>
+<path class="wire" d="M348 70 C380 70 380 150 402 158"></path>
+<path class="wire" d="M348 160 H402"></path>
+<path class="wire" d="M348 250 C380 250 380 170 402 162"></path>
+<circle class="svg" cx="414" cy="160" r="17"></circle>
+<text class="svt" style="font-size:10px" text-anchor="middle" x="414" y="164">ANS</text>
+<text class="svt2" text-anchor="middle" x="404" y="200">RRF + RERANK</text>
+<circle class="pulse" r="3.5"><animatemotion dur="2.4s" path="M102 160 H138 M224 160 H262" repeatcount="indefinite"></animatemotion></circle>
+<circle class="pulse" r="3.5"><animatemotion dur="2.8s" path="M224 160 C245 160 240 70 262 70 M348 70 C380 70 380 150 402 158" repeatcount="indefinite"></animatemotion></circle>
+<circle class="pulse" r="3.5"><animatemotion dur="3.2s" path="M224 160 C245 160 240 250 262 250 M348 250 C380 250 380 170 402 162" repeatcount="indefinite"></animatemotion></circle>
+<text class="svt2" x="20" y="300">ROUTE SELECTIVELY BY DEFAULT · EXPAND WHEN UNCERTAIN</text>
+</svg>
+</div>
+</section><section class="chapter-index"><div class="index-head"><small>CONTENTS</small><h2>AI 工程知识体系</h2><p>每章独立成页，围绕检索、RAG、Skills、Memory、Agent 与生产可靠性展开。</p></div><div class="chapter-grid"><a class="chapter-card" href="/chapters/02-enterprise-retrieval/"><span>02</span><h2><span class="i18n-text" data-i18n-zh="企业检索基础" data-i18n-en="Enterprise Retrieval Foundations">企业检索基础</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/03-hybrid-retrieval-query-routing/"><span>03</span><h2><span class="i18n-text" data-i18n-zh="混合检索与 Query Routing" data-i18n-en="Hybrid Retrieval and Query Routing">混合检索与 Query Routing</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/04-rag-reliability-selective-answering/"><span>04</span><h2><span class="i18n-text" data-i18n-zh="RAG 可靠性与选择性回答" data-i18n-en="RAG Reliability and Selective Answering">RAG 可靠性与选择性回答</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/05-document-pdf-rag/"><span>05</span><h2><span class="i18n-text" data-i18n-zh="生产级 PDF RAG" data-i18n-en="Production-grade PDF RAG">生产级 PDF RAG</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/06-skills-routing/"><span>06</span><h2><span class="i18n-text" data-i18n-zh="Skills 与路由" data-i18n-en="Skills and Routing">Skills 与路由</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/07-memory-context-engineering/"><span>07</span><h2><span class="i18n-text" data-i18n-zh="Memory 与上下文工程" data-i18n-en="Memory and Context Engineering">Memory 与上下文工程</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/08-agent-orchestration/"><span>08</span><h2><span class="i18n-text" data-i18n-zh="Agent 编排与内容生成" data-i18n-en="Agent Orchestration and Content Generation">Agent 编排与内容生成</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a><a class="chapter-card" href="/chapters/09-reliability-evaluation-observability/"><span>09</span><h2><span class="i18n-text" data-i18n-zh="可靠性、评估与可观测性" data-i18n-en="Reliability, Evaluation, and Observability">可靠性、评估与可观测性</span></h2><b><span class="i18n-text" data-i18n-zh="阅读本章 →" data-i18n-en="Read chapter →">阅读本章 →</span></b></a></div></section></main>
+<script src="/assets/app.js?v=02126beec081" defer></script>
+</body></html>

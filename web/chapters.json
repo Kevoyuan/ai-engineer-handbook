@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "02-enterprise-retrieval",
+    "number": "02",
+    "zh": "企业检索基础",
+    "en": "Enterprise Retrieval Foundations"
+  },
+  {
+    "slug": "03-hybrid-retrieval-query-routing",
+    "number": "03",
+    "zh": "混合检索与 Query Routing",
+    "en": "Hybrid Retrieval and Query Routing"
+  },
+  {
+    "slug": "04-rag-reliability-selective-answering",
+    "number": "04",
+    "zh": "RAG 可靠性与选择性回答",
+    "en": "RAG Reliability and Selective Answering"
+  },
+  {
+    "slug": "05-document-pdf-rag",
+    "number": "05",
+    "zh": "生产级 PDF RAG",
+    "en": "Production-grade PDF RAG"
+  },
+  {
+    "slug": "06-skills-routing",
+    "number": "06",
+    "zh": "Skills 与路由",
+    "en": "Skills and Routing"
+  },
+  {
+    "slug": "07-memory-context-engineering",
+    "number": "07",
+    "zh": "Memory 与上下文工程",
+    "en": "Memory and Context Engineering"
+  },
+  {
+    "slug": "08-agent-orchestration",
+    "number": "08",
+    "zh": "Agent 编排与内容生成",
+    "en": "Agent Orchestration and Content Generation"
+  },
+  {
+    "slug": "09-reliability-evaluation-observability",
+    "number": "09",
+    "zh": "可靠性、评估与可观测性",
+    "en": "Reliability, Evaluation, and Observability"
+  }
+]

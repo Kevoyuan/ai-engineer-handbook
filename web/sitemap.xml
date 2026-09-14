@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/02-enterprise-retrieval/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/03-hybrid-retrieval-query-routing/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/04-rag-reliability-selective-answering/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/05-document-pdf-rag/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/06-skills-routing/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/07-memory-context-engineering/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/08-agent-orchestration/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/chapters/09-reliability-evaluation-observability/</loc></url>
+  <url><loc>https://kevoyuan-ai-handbook.vercel.app/search/</loc></url>
+</urlset>
