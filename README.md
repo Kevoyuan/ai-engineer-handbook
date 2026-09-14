@@ -2,6 +2,8 @@
 
 A practical, engineering-first handbook for building production AI systems.
 
+**Live handbook:** https://ai-engineer-handbook-kevoyuans-projects.vercel.app
+
 This repository focuses on reusable AI engineering knowledge rather than interview-specific memorization. The core handbook is organized around system design, retrieval, RAG, agent orchestration, context engineering, reliability, evaluation, observability, and semantic systems.
 
 ## Core handbook
@@ -23,9 +25,20 @@ This repository focuses on reusable AI engineering knowledge rather than intervi
 ai-engineer-handbook/
 ├── README.md
 ├── handbook/                  # Core 1–10 knowledge map and future modular chapters
-├── web/                       # Current interactive handbook HTML
-├── design/                    # Design system / visualization contract
+├── web/                       # Interactive handbook web assets
+├── DESIGN.md                  # Design system / visualization contract
 └── archive/interview/         # Interview-specific material kept as secondary reference
+```
+
+## Deployment
+
+The public web handbook is deployed on **Vercel**. GitHub remains the source repository; GitHub Pages is no longer the deployment target.
+
+```text
+Handbook update
+→ validate HTML / mobile / JS
+→ deploy production build to Vercel
+→ stable public URL
 ```
 
 ## Maintenance principle
