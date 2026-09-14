@@ -114,6 +114,26 @@ The reading product may support:
 
 Interaction must never hide core content by default or require animation to reveal it.
 
+## Mobile Reader
+
+Phone layouts are a distinct reading mode rather than a scaled-down desktop page.
+
+- At ≤900px the header prioritizes **table of contents, current chapter, theme, and language**. The current chapter is single-line and truncates safely.
+- A bottom reading dock provides **Previous / Search / Focus / Next** for one-handed navigation. It respects `safe-area-inset-bottom`.
+- Full-text search becomes a bottom sheet up to `88dvh`; the search field stays at 16px to avoid iOS auto-zoom.
+- Reading controls become a 2×2 grid and interactive targets remain at least 44px tall.
+- Wide tables scroll inside their own `.mobile-table-scroll` container rather than widening the document.
+- At ≤560px the cover statistics become 2×2 and content spacing tightens without deleting information.
+- The standalone back-to-top floating button is hidden on phones so it does not compete with the reading dock.
+- Drawer layering must be: content < backdrop < drawer < topbar. The bottom dock sits below the backdrop while the drawer is open.
+
+Current reusable implementation assets:
+
+```text
+web/mobile-reader.css
+web/mobile-reader.js
+```
+
 ## Responsive requirements
 
 Validate at least:
@@ -123,6 +143,8 @@ Validate at least:
 1024
 768
 430
+390
+375
 320
 ```
 
