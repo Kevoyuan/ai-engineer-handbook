@@ -6,7 +6,9 @@ Last synchronized: 2026-09-14.
 
 AI Engineer Handbook is a long-lived technical reference for production AI engineering. The primary use cases are deep reading, concept retrieval, architecture review, and engineering decision support. Interview preparation is a secondary downstream use case and should not determine the organization of the core knowledge.
 
-The visual direction is **Quiet Editorial + Industrial-Editorial technical diagrams**: warm paper surfaces, restrained green emphasis, strong typography, hairline borders, generous reading space, and dense but interpretable technical diagrams.
+The visual direction is **Industrial-Editorial + Quiet Reader**: cool gray page background, white paper surfaces, blue primary emphasis, orange secondary emphasis, strong typography, hairline borders, generous reading space, and dense but interpretable technical diagrams.
+
+Responsive/mobile work must preserve the existing visual identity. It may change layout, sizing, hierarchy, touch targets, scrolling, and navigation ergonomics, but it must not change the palette unless the user explicitly requests a visual redesign.
 
 Avoid decorative gradients, generic SaaS card walls, meaningless animation, large glowing shapes, and visual simplification that removes technical content.
 
@@ -29,32 +31,40 @@ The current interactive HTML still contains the historical 19-section study prod
 Light:
 
 ```text
---bg:     #f6f5f0
---paper:  #fffefa
---paper2: #eeeee7
---ink:    #263b35
---mut:    #63716b
---line:   #dedfd5
---line2:  #b7c2b8
---blu:    #22634f
---org:    #ad6038
+--bg:     #edf0f4
+--paper:  #ffffff
+--paper2: #f7f9fb
+--ink:    #1a2434
+--mut:    #5d6a7c
+--line:   #d8dee7
+--line2:  #b9c3d0
+--blu:    #2456d6
+--org:    #e8590c
+--grn:    #0e9f6e
+--pur:    #7048c8
+--red:    #d64545
 ```
 
 Dark:
 
 ```text
---bg:     #141c19
---paper:  #1b2621
---paper2: #24312a
---ink:    #e4ebe3
---mut:    #a8b7ac
---line:   #34433a
---line2:  #586c5e
---blu:    #91c9ac
---org:    #e3aa80
+--bg:     #0d1220
+--paper:  #151c2c
+--paper2: #1a2234
+--ink:    #e7ecf5
+--mut:    #93a1b6
+--line:   #28334b
+--line2:  #3a4a6b
+--blu:    #7398ff
+--org:    #ff8f4d
+--grn:    #3fd69a
+--pur:    #b39aff
+--red:    #ff7d72
 ```
 
-Historical variable `--blu` now represents the primary green emphasis color.
+`--blu` is the primary blue emphasis token. Semantic diagram colors keep their existing meaning.
+
+**Palette freeze rule:** mobile/tablet adaptations may not alter these tokens or introduce hard-coded colors that change the overall product appearance unless the user explicitly asks for a redesign.
 
 ## Typography
 
@@ -126,6 +136,7 @@ Phone layouts are a distinct reading mode rather than a scaled-down desktop page
 - At ≤560px the cover statistics become 2×2 and content spacing tightens without deleting information.
 - The standalone back-to-top floating button is hidden on phones so it does not compete with the reading dock.
 - Drawer layering must be: content < backdrop < drawer < topbar. The bottom dock sits below the backdrop while the drawer is open.
+- Mobile controls inherit the global palette tokens; no mobile-only recoloring is allowed by default.
 
 Current reusable implementation assets:
 
