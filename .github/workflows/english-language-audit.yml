@@ -82,24 +82,17 @@ jobs:
           for (const file of files.sort()) {
             const source = fs.readFileSync(file, 'utf8');
 
-            // English i18n strings must be clean after the same punctuation normalization
-            // used by the browser runtime.
             for (const m of source.matchAll(/data-i18n-en="([^"]*)"/g)) {
               checkEnglish(file, 'data-i18n-en', normalizePunctuation(decode(m[1])));
             }
 
-            // Accessibility, placeholders, and SEO metadata are translated at runtime
-            // through i18n-residuals.json. A Chinese source value must have a clean mapping.
             for (const attr of ['aria-label', 'placeholder']) {
               const re = new RegExp(`${attr}="([^"]*)"`, 'g');
               for (const m of source.matchAll(re)) {
                 const original = decode(m[1]);
                 if (HAN.test(original) || CJK_PUNCT.test(original)) {
-                  if (!residual[original.trim()]) {
-                    issues.push({file, kind: `${attr}-missing-map`, value: original});
-                  } else {
-                    checkEnglish(file, attr, translate(original));
-                  }
+                  if (!residual[original.trim()]) issues.push({file, kind: `${attr}-missing-map`, value: original});
+                  else checkEnglish(file, attr, translate(original));
                 }
               }
             }
@@ -107,18 +100,13 @@ jobs:
             for (const m of source.matchAll(/<meta\s+name="description"\s+content="([^"]*)"/g)) {
               const original = decode(m[1]);
               if (HAN.test(original) || CJK_PUNCT.test(original)) {
-                if (!residual[original.trim()]) {
-                  issues.push({file, kind: 'meta-description-missing-map', value: original});
-                } else {
-                  checkEnglish(file, 'meta-description', translate(original));
-                }
+                if (!residual[original.trim()]) issues.push({file, kind: 'meta-description-missing-map', value: original});
+                else checkEnglish(file, 'meta-description', translate(original));
               }
             }
 
-            // Simulate English mode for visible BODY text. data-i18n-en replaces bilingual
-            // spans first; every remaining raw text fragment is then passed through the
-            // residual dictionary and English punctuation normalizer exactly like app.js.
-            let body = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i)?.[1] || '';
+            // Full pages use BODY; standalone chapter fragments fall back to the entire source.
+            let body = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i)?.[1] || source;
             body = body
               .replace(/<script[\s\S]*?<\/script>/gi, ' ')
               .replace(/<style[\s\S]*?<\/style>/gi, ' ')
@@ -135,7 +123,7 @@ jobs:
             }
           }
 
-          console.log(`Audited ${files.length} HTML pages.`);
+          console.log(`Audited ${files.length} HTML pages/fragments.`);
           if (issues.length) {
             console.error(`Found ${issues.length} English-mode leakage issue(s):`);
             for (const x of issues) console.error(`${x.file}\t${x.kind}\t${x.value}`);
