@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check web/assets/app.js
+          node --check web/rebuild.mjs
+
       - name: Check every web page for Chinese leakage in English mode
         shell: bash
         run: |
@@ -19,8 +25,12 @@ jobs:
           const path = require('path');
 
           const HAN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
+          const CJK_PUNCT = /[。，：；、（）？！“”‘’＋]/u;
+          const residual = JSON.parse(fs.readFileSync('web/assets/i18n-residuals.json', 'utf8'));
+          const residualKeys = Object.keys(residual).sort((a, b) => b.length - a.length);
           const root = 'web';
           const files = [];
+
           function walk(dir) {
             for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
               const p = path.join(dir, entry.name);
@@ -35,44 +45,93 @@ jobs:
             .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
             .replace(/&nbsp;/g, ' ');
 
+          const normalizePunctuation = value => value
+            .replace(/。/g, '.')
+            .replace(/，/g, ', ')
+            .replace(/：/g, ': ')
+            .replace(/；/g, '; ')
+            .replace(/、/g, ' · ')
+            .replace(/（/g, '(')
+            .replace(/）/g, ')')
+            .replace(/？/g, '?')
+            .replace(/！/g, '!')
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'")
+            .replace(/＋/g, '+')
+            .replace(/\s+([,.;:!?])/g, '$1')
+            .replace(/([,.;:!?])(?=[A-Za-z0-9])/g, '$1 ')
+            .replace(/[ \t]{2,}/g, ' ');
+
+          const translate = value => {
+            let core = decode(value).replace(/\s+/g, ' ').trim();
+            if (!core) return '';
+            if (residual[core]) core = residual[core];
+            else {
+              for (const key of residualKeys) {
+                if (core.includes(key)) core = core.split(key).join(residual[key]);
+              }
+            }
+            return normalizePunctuation(core);
+          };
+
           const issues = [];
+          const checkEnglish = (file, kind, value) => {
+            if (HAN.test(value) || CJK_PUNCT.test(value)) issues.push({file, kind, value});
+          };
+
           for (const file of files.sort()) {
             const source = fs.readFileSync(file, 'utf8');
 
-            // English translations themselves must not contain Han characters.
+            // English i18n strings must be clean after the same punctuation normalization
+            // used by the browser runtime.
             for (const m of source.matchAll(/data-i18n-en="([^"]*)"/g)) {
-              const value = decode(m[1]);
-              if (HAN.test(value)) issues.push({file, kind: 'data-i18n-en', value});
+              checkEnglish(file, 'data-i18n-en', normalizePunctuation(decode(m[1])));
             }
 
-            // Accessibility / SEO strings need an English-mode replacement if they contain Chinese.
+            // Accessibility, placeholders, and SEO metadata are translated at runtime
+            // through i18n-residuals.json. A Chinese source value must have a clean mapping.
             for (const attr of ['aria-label', 'placeholder']) {
               const re = new RegExp(`${attr}="([^"]*)"`, 'g');
               for (const m of source.matchAll(re)) {
-                const value = decode(m[1]);
-                if (HAN.test(value)) issues.push({file, kind: attr, value});
+                const original = decode(m[1]);
+                if (HAN.test(original) || CJK_PUNCT.test(original)) {
+                  if (!residual[original.trim()]) {
+                    issues.push({file, kind: `${attr}-missing-map`, value: original});
+                  } else {
+                    checkEnglish(file, attr, translate(original));
+                  }
+                }
               }
             }
+
             for (const m of source.matchAll(/<meta\s+name="description"\s+content="([^"]*)"/g)) {
-              const value = decode(m[1]);
-              if (HAN.test(value)) issues.push({file, kind: 'meta-description', value});
+              const original = decode(m[1]);
+              if (HAN.test(original) || CJK_PUNCT.test(original)) {
+                if (!residual[original.trim()]) {
+                  issues.push({file, kind: 'meta-description-missing-map', value: original});
+                } else {
+                  checkEnglish(file, 'meta-description', translate(original));
+                }
+              }
             }
 
-            // Simulate the text shown after switching to English: replace every i18n span
-            // with data-i18n-en, then strip tags and inspect remaining visible text.
-            let rendered = source
+            // Simulate English mode for visible BODY text. data-i18n-en replaces bilingual
+            // spans first; every remaining raw text fragment is then passed through the
+            // residual dictionary and English punctuation normalizer exactly like app.js.
+            let body = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i)?.[1] || '';
+            body = body
               .replace(/<script[\s\S]*?<\/script>/gi, ' ')
               .replace(/<style[\s\S]*?<\/style>/gi, ' ')
               .replace(/<span\b([^>]*\bclass="[^"]*\bi18n-text\b[^"]*"[^>]*)>([\s\S]*?)<\/span>/gi,
                 (all, attrs) => {
                   const m = attrs.match(/data-i18n-en="([^"]*)"/i);
-                  return m ? decode(m[1]) : all;
+                  return m ? normalizePunctuation(decode(m[1])) : all;
                 })
               .replace(/<[^>]+>/g, '\n');
-            rendered = decode(rendered);
-            for (const raw of rendered.split(/\n+/)) {
-              const value = raw.replace(/\s+/g, ' ').trim();
-              if (value && HAN.test(value)) issues.push({file, kind: 'visible-text', value});
+
+            for (const raw of body.split(/\n+/)) {
+              const value = translate(raw);
+              if (value) checkEnglish(file, 'visible-text', value);
             }
           }
 
@@ -82,5 +141,5 @@ jobs:
             for (const x of issues) console.error(`${x.file}\t${x.kind}\t${x.value}`);
             process.exit(1);
           }
-          console.log('PASS: no Han characters remain in English-visible text, English i18n values, aria labels, placeholders, or meta descriptions.');
+          console.log('PASS: English mode contains no Han characters or Chinese punctuation in visible text, English i18n values, aria labels, placeholders, or meta descriptions.');
           NODE
