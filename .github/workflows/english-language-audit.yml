@@ -15,6 +15,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check web/assets/app.js
+          node --check web/assets/handbook-interactions.js
           node --check web/rebuild.mjs
 
       - name: Check every web page for Chinese leakage in English mode
