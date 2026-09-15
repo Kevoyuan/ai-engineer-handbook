@@ -58,7 +58,9 @@ Trace Batch
 → Engineering action
 ```
 
-LangSmith 的 Insights Agent 示例最多批量处理约 1,000 条 Trace，并采用三步：逐 Trace 摘要、摘要聚类、基于 Cluster 生成报告。这里应把它理解为一种 **production-scale trace analysis pattern**，而不是必须绑定某个产品。
+LangSmith 的 Insights Agent 示例采用三步：逐 Trace 摘要、摘要聚类、基于 Cluster 生成报告。课程当前示例说明其一次可处理最多约 1,000 条 Trace；这个数字是**来源课程中的产品/实现能力说明**，不是 Production Monitoring 架构本身的通用上限。
+
+这里应把它理解为一种 **production-scale trace analysis pattern**，而不是必须绑定某个产品。
 
 批量分析适合回答：
 
@@ -69,6 +71,8 @@ LangSmith 的 Insights Agent 示例最多批量处理约 1,000 条 Trace，并�
 - 哪些 Cluster 值得进入 Dataset 或单独建立 Eval？
 
 > **Do not read every production trace; build a system that surfaces representative patterns and failures.**
+
+Cluster 只是一条调查线索，不应直接等价为 Root Cause。工程上仍要抽取代表 Trace、回到原始 Tool / State / Evidence，验证最早错误决策。
 
 ## 3. Online Eval：把生产行为变成连续质量信号
 
@@ -94,7 +98,15 @@ Online Eval 可以针对全部流量，也可以只针对满足条件的子集�
 
 Thread-based Eval 很重要，因为有些质量只能跨多轮判断。例如用户情绪、重复澄清、上下文漂移、最终是否真正解决问题。
 
-但 Online Eval 只是 **signal generation**。如果分数没有连接到告警、Review、Dataset 或 Release / Build 决策，它仍然只是 Dashboard 数据。
+### 为什么课程用 User Sentiment 作为例子
+
+传统 NPS、问卷、点赞/点踩依赖用户主动反馈，会产生明显的 voluntary-response bias：愿意反馈的人往往不是全部用户的代表。对真实 Conversation 运行 LLM-as-Judge，可以让更多会话获得统一的 Sentiment 信号，因此覆盖面更广。
+
+但这并不意味着 LLM Judge 就是真值。生产使用仍要管理 Judge Version、Human Agreement、Sampling、Privacy、Prompt / Model Drift，并对高风险或 Judge disagreement 做人工复核。
+
+> **Broader coverage reduces feedback-selection bias, but judge uncertainty still needs calibration.**
+
+Online Eval 只是 **signal generation**。如果分数没有连接到告警、Review、Dataset 或 Release / Build 决策，它仍然只是 Dashboard 数据。
 
 > **Online evals create signals; monitoring becomes operational only when signals route work.**
 
@@ -132,6 +144,14 @@ Filter
 - Trigger webhook / external workflow；
 - Extend retention；
 - Alert / escalation。
+
+来源课程给出的典型模式可以抽象为：
+
+| Pattern | Filter / Sampling | Action | Handbook interpretation |
+|---|---|---|---|
+| Catch unhappy users | Negative user sentiment | Annotation queue | 低质量信号进入人工 Review，而不是直接当 Ground Truth |
+| Build dataset candidates | Positive user sentiment | Add to dataset | 先成为 candidate，再做隐私、去重、代表性与预期行为裁决 |
+| Spot-check normal traffic | No filter, sample 10% | Annotation queue | 保留随机样本，避免系统只看到“已知坏例” |
 
 典型生产模式：
 
