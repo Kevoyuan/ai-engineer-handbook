@@ -34,6 +34,10 @@
     ],
     '09-reliability-evaluation-observability': [
       {
+        path: '/assets/ch09-observability-evals.html',
+        id: 'observability-durable-evals'
+      },
+      {
         path: '/assets/ch09-cost-per-successful-task.html',
         id: 'cost-per-successful-task'
       }
