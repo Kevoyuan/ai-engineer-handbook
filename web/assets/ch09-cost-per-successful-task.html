@@ -33,6 +33,54 @@
     </div>
   </div>
 
+  <div class="lab" data-cost-simulator>
+    <div class="lab-head">
+      <div class="lab-kicker">INTERACTIVE · TASK ECONOMICS</div>
+      <h3 class="lab-title"><span class="i18n-text" data-i18n-zh="为什么“更便宜的模型”可能产生更贵的任务？" data-i18n-en="Why can a cheaper model produce a more expensive task?">为什么“更便宜的模型”可能产生更贵的任务？</span></h3>
+      <p class="lab-sub"><span class="i18n-text" data-i18n-zh="调节 Token、混合单价、平均尝试次数与成功率，观察 Cost / attempt、Cost / task 与 Cost / successful task 如何分离。该模型只用于解释工程关系，不包含工具、GPU、人工审核等非 Token 成本。" data-i18n-en="Adjust token volume, blended token price, average attempts, and success rate to see how cost per attempt, cost per task, and cost per successful task diverge. This is an explanatory model and excludes non-token costs such as tools, GPUs, and human review.">调节 Token、混合单价、平均尝试次数与成功率，观察 Cost / attempt、Cost / task 与 Cost / successful task 如何分离。该模型只用于解释工程关系，不包含工具、GPU、人工审核等非 Token 成本。</span></p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="lab-controls">
+        <div class="lab-presets" aria-label="Cost simulator presets">
+          <button type="button" class="lab-preset" data-cost-preset="efficient" aria-pressed="false">高效路由</button>
+          <button type="button" class="lab-preset" data-cost-preset="retryTrap" aria-pressed="false">低价模型重试陷阱</button>
+          <button type="button" class="lab-preset" data-cost-preset="balanced" aria-pressed="false">平衡方案</button>
+        </div>
+        <div class="lab-sliders">
+          <label class="lab-slider"><span class="lab-slider-head"><span><span class="i18n-text" data-i18n-zh="每次尝试 Token" data-i18n-en="Tokens per attempt">每次尝试 Token</span></span><output data-out-tokens>45k</output></span><input data-cost-tokens type="range" min="10000" max="200000" step="5000" value="45000"><small><span class="i18n-text" data-i18n-zh="包含检索、上下文、推理与输出" data-i18n-en="Includes retrieval, context, reasoning, and output">包含检索、上下文、推理与输出</span></small></label>
+          <label class="lab-slider"><span class="lab-slider-head"><span><span class="i18n-text" data-i18n-zh="混合 Token 单价" data-i18n-en="Blended token price">混合 Token 单价</span></span><output data-out-price>$1.80/1M</output></span><input data-cost-price type="range" min="0.2" max="10" step="0.1" value="1.8"><small><span class="i18n-text" data-i18n-zh="路由后的平均价格，不等于某一个模型的标价" data-i18n-en="Average price after routing, not the sticker price of one model">路由后的平均价格，不等于某一个模型的标价</span></small></label>
+          <label class="lab-slider"><span class="lab-slider-head"><span><span class="i18n-text" data-i18n-zh="平均尝试次数" data-i18n-en="Average attempts per task">平均尝试次数</span></span><output data-out-attempts>1.4×</output></span><input data-cost-attempts type="range" min="1" max="6" step="0.1" value="1.4"><small><span class="i18n-text" data-i18n-zh="包含重试、修复和重新规划" data-i18n-en="Includes retries, repairs, and replanning">包含重试、修复和重新规划</span></small></label>
+          <label class="lab-slider"><span class="lab-slider-head"><span><span class="i18n-text" data-i18n-zh="任务成功率" data-i18n-en="Task success rate">任务成功率</span></span><output data-out-success>88%</output></span><input data-cost-success type="range" min="30" max="99" step="1" value="88"><small><span class="i18n-text" data-i18n-zh="必须用实际成功标准，而不是模型自评" data-i18n-en="Measure against real success criteria, not model self-report">必须用实际成功标准，而不是模型自评</span></small></label>
+        </div>
+      </div>
+
+      <div class="lab-result" aria-live="polite">
+        <div class="lab-metrics">
+          <div class="lab-metric"><span data-label-attempt>单次尝试成本</span><b data-cost-per-attempt>$0.081</b></div>
+          <div class="lab-metric"><span data-label-task>单任务成本</span><b data-cost-per-task>$0.113</b></div>
+          <div class="lab-metric primary"><span data-label-success>成功任务成本</span><b data-cost-per-success>$0.129</b></div>
+        </div>
+        <div class="lab-equation">
+          <div class="lab-topology-label">LIVE COST PATH</div>
+          <div class="lab-equation-row">
+            <div class="lab-node"><span class="i18n-text" data-i18n-zh="Token 量 × 尝试次数" data-i18n-en="Token volume × attempts">Token 量 × 尝试次数</span><span class="lab-live" data-live-tokens>45k tokens × 1.4 attempts</span></div>
+            <span class="lab-arrow">×</span>
+            <div class="lab-node"><span class="i18n-text" data-i18n-zh="混合单价" data-i18n-en="Blended rate">混合单价</span><span class="lab-live" data-live-rate>$1.80 / 1M tokens</span></div>
+            <span class="lab-arrow">÷</span>
+            <div class="lab-node is-success"><span class="i18n-text" data-i18n-zh="成功率修正" data-i18n-en="Success-rate correction">成功率修正</span><span class="lab-live" data-live-outcome>88% success → $0.129</span></div>
+          </div>
+        </div>
+        <div class="lab-cost-bars">
+          <div class="lab-cost-row"><span><span class="i18n-text" data-i18n-zh="Cost / attempt" data-i18n-en="Cost / attempt">Cost / attempt</span></span><div class="lab-cost-track"><div class="lab-cost-fill" data-bar-attempt></div></div><b data-bar-label-attempt>$0.081</b></div>
+          <div class="lab-cost-row"><span><span class="i18n-text" data-i18n-zh="Cost / task" data-i18n-en="Cost / task">Cost / task</span></span><div class="lab-cost-track"><div class="lab-cost-fill" data-bar-task></div></div><b data-bar-label-task>$0.113</b></div>
+          <div class="lab-cost-row primary"><span><span class="i18n-text" data-i18n-zh="Cost / successful task" data-i18n-en="Cost / successful task">Cost / successful task</span></span><div class="lab-cost-track"><div class="lab-cost-fill" data-bar-success></div></div><b data-bar-label-success>$0.129</b></div>
+        </div>
+        <p class="lab-footnote"><span class="i18n-text" data-i18n-zh="读法：降低模型单价只有在不显著增加 Token、重试或失败率时才真正降低任务经济成本。生产系统应同时追踪成功率、总 Token、重试率、延迟与非 Token 成本。" data-i18n-en="Interpretation: lowering model price reduces task economics only when it does not materially increase tokens, retries, or failure rate. Production systems should track success rate, total tokens, retry rate, latency, and non-token costs together.">读法：降低模型单价只有在不显著增加 Token、重试或失败率时才真正降低任务经济成本。生产系统应同时追踪成功率、总 Token、重试率、延迟与非 Token 成本。</span></p>
+      </div>
+    </div>
+  </div>
+
   <div class="co must interp-callout"><span class="co-t">CANONICAL RULE</span><p><strong>Optimize cost per successful task, not price per model call.</strong></p></div>
   <div class="co note interp-callout"><span class="co-t">SOURCE EXAMPLE</span><p><span class="i18n-text" data-i18n-zh="该文章来源转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。" data-i18n-en="In the Glean comparison reported by the source, the article cites roughly $0.45/task versus $1.84/task and about 29.8M versus 88.8M tokens. Treat this as a source-specific example showing how routing plus better context can reduce both blended price and token volume, not as a universal benchmark transferable to other systems.">该文章来源转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。</span></p></div>
   <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="来源：" data-i18n-en="Source:">来源：</span> <a href="https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-explained" target="_blank" rel="noopener noreferrer">AI Engineering · Loop vs Graph Engineering Clearly Explained</a></p>
