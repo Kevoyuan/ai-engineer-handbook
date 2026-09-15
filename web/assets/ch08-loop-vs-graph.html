@@ -1,0 +1,51 @@
+<section id="loop-vs-graph" aria-labelledby="loop-vs-graph-title">
+  <h2 class="sub" id="loop-vs-graph-title"><span class="i18n-text" data-i18n-zh="Loop vs Graph：局部自治循环 vs 显式编排拓扑" data-i18n-en="Loop vs Graph: Local Autonomy vs Explicit Orchestration Topology">Loop vs Graph：局部自治循环 vs 显式编排拓扑</span> <small>§8.X</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="不要把 Loop 和 Graph 当成两代互相替代的技术。Loop 是一个 Agent 在局部任务中的自治控制模式；Graph 是把多个工作单元、决策边界和恢复路径组织成显式拓扑。" data-i18n-en="Do not treat loops and graphs as two generations of competing technology. A loop is a local autonomous control pattern for an agent; a graph is an explicit topology for organizing work units, decision boundaries, and recovery paths.">不要把 Loop 和 Graph 当成两代互相替代的技术。Loop 是一个 Agent 在局部任务中的自治控制模式；Graph 是把多个工作单元、决策边界和恢复路径组织成显式拓扑。</span></p>
+
+  <div class="bfs-canvas" id="fig-8-loop-vs-graph">
+    <div class="bfs-head">
+      <div>
+        <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.X</span>
+        <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="先把单个 Loop 做到可控，再在结构边界出现时拆成 Graph" data-i18n-en="Make the single loop controllable first; split into a graph only when structural boundaries appear">先把单个 Loop 做到可控，再在结构边界出现时拆成 Graph</span></h2>
+        <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="默认从最小可控循环开始。只有当协调复杂度要求显式拓扑时，才增加 Graph 的控制流复杂度。" data-i18n-en="Start with the smallest controllable loop. Add graph-level control-flow complexity only when coordination complexity requires explicit topology.">默认从最小可控循环开始。只有当协调复杂度要求显式拓扑时，才增加 Graph 的控制流复杂度。</span></p>
+      </div>
+    </div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-card bfs-blue">
+          <div class="bfs-strip"></div>
+          <div class="bfs-card-head"><span class="bfs-stage-pill">LOOP</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="一个连贯目标内的局部自治" data-i18n-en="Local autonomy around one coherent goal">一个连贯目标内的局部自治</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Goal → Observe → Reason / Plan → Act → Verify → Stop or iterate。适合共享上下文、单一权限边界、明确验证方式与显式停止条件。" data-i18n-en="Goal → Observe → Reason / Plan → Act → Verify → Stop or iterate. Best when context is shared, the permission boundary is unified, verification is clear, and the stopping condition is explicit.">Goal → Observe → Reason / Plan → Act → Verify → Stop or iterate。适合共享上下文、单一权限边界、明确验证方式与显式停止条件。</span></div>
+        </div>
+        <div class="bfs-card bfs-purple">
+          <div class="bfs-strip"></div>
+          <div class="bfs-card-head"><span class="bfs-stage-pill">GRAPH</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="跨边界工作的显式协调" data-i18n-en="Explicit coordination across structural boundaries">跨边界工作的显式协调</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Router → bounded work units → branch / join → checkpoint → validation → recovery。适合并行分支、不同上下文或权限域、可审计决策点与独立恢复。" data-i18n-en="Router → bounded work units → branch / join → checkpoint → validation → recovery. Best for parallel branches, different context or permission domains, auditable decision points, and independent recovery.">Router → bounded work units → branch / join → checkpoint → validation → recovery。适合并行分支、不同上下文或权限域、可审计决策点与独立恢复。</span></div>
+        </div>
+      </div>
+      <div class="bfs-flow-container" style="margin-top:14px">
+        <div><div class="bfs-card bfs-emerald"><div class="bfs-card-head"><span class="bfs-stage-pill">START</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Bounded Agent Loop" data-i18n-en="Bounded Agent Loop">Bounded Agent Loop</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先让状态、停止条件、验证和失败恢复可控。" data-i18n-en="First make state, stopping conditions, verification, and failure recovery controllable.">先让状态、停止条件、验证和失败恢复可控。</span></div></div></div>
+        <div><div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">BOUNDARY</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="结构性边界出现" data-i18n-en="A structural boundary appears">结构性边界出现</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="并行 · 不同权限 · 不同上下文 · branch / join · checkpoint / resume · failure isolation · human approval" data-i18n-en="parallelism · different permissions · different contexts · branch / join · checkpoint / resume · failure isolation · human approval">并行 · 不同权限 · 不同上下文 · branch / join · checkpoint / resume · failure isolation · human approval</span></div></div></div>
+        <div><div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">SPLIT</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="把边界拆成显式 Graph 节点与边" data-i18n-en="Split the boundary into explicit graph nodes and edges">把边界拆成显式 Graph 节点与边</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="只增加解决真实协调问题所需的控制流复杂度。" data-i18n-en="Add only the control-flow complexity needed to solve a real coordination problem.">只增加解决真实协调问题所需的控制流复杂度。</span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="cd" style="--c:var(--org)">
+      <div class="cd-h"><span class="ic">UPGRADE</span><span class="i18n-text" data-i18n-zh="什么时候从 Loop 升级为 Graph" data-i18n-en="When to upgrade from a loop to a graph">什么时候从 Loop 升级为 Graph</span></div>
+      <small><span class="i18n-text" data-i18n-zh="看结构信号，而不是看流行词：并行轨道；不同 context / memory / permission；显式 branch / join；checkpoint / resume；failure isolation；需要审计的控制点；高风险动作的人审边界。" data-i18n-en="Look for structural signals, not trend vocabulary: parallel tracks; different context, memory, or permission domains; explicit branch / join; checkpoint / resume; failure isolation; auditable control points; and human approval boundaries for high-risk actions.">看结构信号，而不是看流行词：并行轨道；不同 context / memory / permission；显式 branch / join；checkpoint / resume；failure isolation；需要审计的控制点；高风险动作的人审边界。</span></small>
+    </div>
+    <div class="cd" style="--c:var(--tea)">
+      <div class="cd-h"><span class="ic">NODE</span><span class="i18n-text" data-i18n-zh="Graph Node 不等于 Agent Loop" data-i18n-en="A graph node is not necessarily an agent loop">Graph Node 不等于 Agent Loop</span></div>
+      <small><span class="i18n-text" data-i18n-zh="节点可以是 deterministic function、retrieval step、tool execution、policy gate、human approval、sub-workflow，也可以是 agent loop。Graph 定义的是拓扑，不要求每个节点都自治。" data-i18n-en="A node can be a deterministic function, retrieval step, tool execution, policy gate, human approval, sub-workflow, or an agent loop. A graph defines topology; it does not require every node to be autonomous.">节点可以是 deterministic function、retrieval step、tool execution、policy gate、human approval、sub-workflow，也可以是 agent loop。Graph 定义的是拓扑，不要求每个节点都自治。</span></small>
+    </div>
+  </div>
+
+  <div class="co must interp-callout"><span class="co-t">CANONICAL RULE</span><p><strong><span class="i18n-text" data-i18n-zh="Use the least control-flow complexity that still makes state, stopping conditions, permissions, and recovery explicit." data-i18n-en="Use the least control-flow complexity that still makes state, stopping conditions, permissions, and recovery explicit.">Use the least control-flow complexity that still makes state, stopping conditions, permissions, and recovery explicit.</span></strong></p></div>
+  <div class="co warn interp-callout interp-pitfall"><span class="co-t">PITFALL</span><p><strong><span class="i18n-text" data-i18n-zh="A graph does not repair a broken loop." data-i18n-en="A graph does not repair a broken loop.">A graph does not repair a broken loop.</span></strong> <span class="i18n-text" data-i18n-zh="如果单个循环的状态、验证、停止条件或工具策略本身有问题，套上一层 Graph 只会得到更复杂、同样不可靠的系统。" data-i18n-en="If the loop itself has broken state handling, verification, stopping conditions, or tool policy, wrapping it in a graph only creates a more complex system with the same underlying failure.">如果单个循环的状态、验证、停止条件或工具策略本身有问题，套上一层 Graph 只会得到更复杂、同样不可靠的系统。</span></p></div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="来源说明：本节吸收并工程化重写了 AI Engineering 于 2026-08-13 发布的 Loop vs Graph 文章；其中“Graph 是更高一层组织方式”的直觉被保留，但这里进一步明确：Graph node 可以是确定性步骤、Gate、Tool、子工作流或 Agent Loop，而不必都是 Loop。" data-i18n-en="Source note: this section incorporates and engineering-reframes the Loop vs Graph article published by AI Engineering on 2026-08-13. It preserves the intuition that graphs organize work at a higher level, while making the stricter distinction that a graph node may be deterministic work, a gate, a tool call, a sub-workflow, or an agent loop.">来源说明：本节吸收并工程化重写了 AI Engineering 于 2026-08-13 发布的 Loop vs Graph 文章；其中“Graph 是更高一层组织方式”的直觉被保留，但这里进一步明确：Graph node 可以是确定性步骤、Gate、Tool、子工作流或 Agent Loop，而不必都是 Loop。</span> <a href="https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-explained" target="_blank" rel="noopener noreferrer">AI Engineering · Loop vs Graph Engineering Clearly Explained</a></p>
+</section>
