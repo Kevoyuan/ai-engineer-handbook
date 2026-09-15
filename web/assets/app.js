@@ -22,6 +22,13 @@
         id: 'grounded-document-agent'
       }
     ],
+    '06-skills-routing': [
+      {
+        path: '/assets/ch06-capability-architecture.html',
+        id: 'capability-architecture',
+        position: 'afterLead'
+      }
+    ],
     '08-agent-orchestration': [
       {
         path: '/assets/ch08-loop-vs-graph.html',
@@ -33,6 +40,11 @@
       }
     ],
     '09-reliability-evaluation-observability': [
+      {
+        path: '/assets/ch09-reliability-control-plane.html',
+        id: 'reliability-control-plane',
+        position: 'afterLead'
+      },
       {
         path: '/assets/ch09-observability-evals.html',
         id: 'observability-durable-evals'
@@ -213,8 +225,10 @@
       const doc = await fetchAdditionDocument(addition);
       const fragment = document.createDocumentFragment();
       [...doc.body.children].forEach(node => fragment.append(node));
+      const lead = addition.position === 'afterLead' ? document.querySelector('main .ch > .lead') : null;
       const pageNav = document.querySelector('main .page-nav');
-      if (pageNav) pageNav.before(fragment);
+      if (lead) lead.after(fragment);
+      else if (pageNav) pageNav.before(fragment);
       else document.querySelector('main')?.append(fragment);
     }
     await loadInteractionAssets();
