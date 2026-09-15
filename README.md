@@ -24,6 +24,7 @@ This repository focuses on reusable AI engineering knowledge rather than intervi
 ```text
 ai-engineer-handbook/
 ├── README.md
+├── MAINTENANCE.md             # Canonical repository maintenance SOP
 ├── handbook/                  # Core 1–10 knowledge map and future modular chapters
 ├── web/                       # Interactive handbook web assets
 ├── DESIGN.md                  # Design system / visualization contract
@@ -32,27 +33,40 @@ ai-engineer-handbook/
 
 ## Deployment
 
-The public web handbook is deployed on **Vercel**. GitHub `main` is the source of truth, and Vercel publishes the `web/` directory automatically after each push.
+The public web handbook is deployed on **Vercel**. GitHub `main` is the repository source of truth, and Vercel publishes the `web/` directory automatically after accepted changes reach `main`.
+
+Default delivery path:
 
 ```text
 Handbook update
-→ validate HTML / mobile / JS
-→ commit and push to GitHub main
+→ feature branch
+→ pull request
+→ CI + Vercel Preview
+→ merge to main
 → Vercel production deployment
 → verify the stable public URL
 ```
 
 The current interactive edition contains the eight completed technical chapters numbered 02–09. Chapters 01 and 10 remain in the core knowledge map until their standalone web chapters are authored.
 
-## Maintenance principle
+## Maintenance
+
+The canonical maintenance workflow lives in **[MAINTENANCE.md](./MAINTENANCE.md)**.
+
+In short:
 
 ```text
 New material
-→ verify / research
-→ extract reusable engineering knowledge
-→ merge into the core handbook
-→ update the interactive HTML
-→ validate navigation, JS, responsive layout, and diagrams
+→ inspect latest main
+→ research / verify
+→ semantic merge into handbook/
+→ choose diagram / table / interaction using DESIGN.md
+→ update web/
+→ validate i18n / search / responsive / JS / HTML
+→ feature branch + pull request
+→ CI + Vercel Preview
+→ merge main
+→ verify production deployment
 
 Interview-only material
 → archive/interview
