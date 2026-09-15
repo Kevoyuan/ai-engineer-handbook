@@ -1,0 +1,27 @@
+<section id="reliability-control-plane" aria-labelledby="reliability-control-plane-title">
+  <h2 class="sub" id="reliability-control-plane-title"><span class="i18n-text" data-i18n-zh="Reliability Control Plane：把 Runtime、Eval、Release 与 Monitoring 放进同一张图" data-i18n-en="Reliability Control Plane: place runtime, eval, release, and monitoring in one architecture">Reliability Control Plane：把 Runtime、Eval、Release 与 Monitoring 放进同一张图</span> <small>§9.A</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="本章的 Dataset、Evaluator、Trace、Release Gate、Monitoring 和 Cost 不是六套独立机制。它们共同构成 Runtime 外围的控制面：在执行前约束，在执行中观测，在执行后判定，并把生产证据送回下一轮 Build/Test。" data-i18n-en="Datasets, evaluators, traces, release gates, monitoring, and cost are not six independent mechanisms. Together they form the control plane around runtime: constrain before execution, observe during execution, judge after execution, and return production evidence to the next Build/Test cycle.">本章的 Dataset、Evaluator、Trace、Release Gate、Monitoring 和 Cost 不是六套独立机制。它们共同构成 Runtime 外围的控制面：在执行前约束，在执行中观测，在执行后判定，并把生产证据送回下一轮 Build/Test。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-9-a1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.A1 · RELIABILITY CONTROL PLANE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Runtime 是数据面；Reliability / Eval / Observability 是控制面" data-i18n-en="Runtime is the data plane; reliability, eval, and observability form the control plane">Runtime 是数据面；Reliability / Eval / Observability 是控制面</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="不要把“跑 Agent”和“证明 Agent 可以安全上线”混成同一条流水线。" data-i18n-en="Do not collapse running the agent and proving that it is safe to ship into one pipeline.">不要把“跑 Agent”和“证明 Agent 可以安全上线”混成同一条流水线。</span></p>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-card bfs-blue" style="margin-bottom:12px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">DATA PLANE · RUNTIME</span></div><h2 class="bfs-card-title">Request → Agent / Workflow → Model / Tool → Validation → Response / Action</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="这里发生真实用户请求、工具调用、状态变化和副作用。" data-i18n-en="This is where real user requests, tool calls, state transitions, and side effects occur.">这里发生真实用户请求、工具调用、状态变化和副作用。</span></div></div>
+
+      <div class="bfs-grid bfs-g3" style="margin-bottom:12px">
+        <div class="bfs-card bfs-teal"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">BEFORE / DURING</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Policy + Validation" data-i18n-en="Policy + Validation">Policy + Validation</span></h2><div class="bfs-card-desc">schema · permission · safety · HITL · retry/fallback boundary</div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">DURING</span></div><h2 class="bfs-card-title">Observability</h2><div class="bfs-card-desc">trace · thread · state · tool · token · latency · cost · version metadata</div></div>
+        <div class="bfs-card bfs-amber"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">AFTER</span></div><h2 class="bfs-card-title">Evaluation</h2><div class="bfs-card-desc">dataset · code evaluator · LLM judge · pairwise · human · trajectory / E2E</div></div>
+      </div>
+
+      <div class="bfs-card bfs-rose" style="margin-bottom:12px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">RELEASE CONTROL</span></div><h2 class="bfs-card-title">Experiment / Regression → Release Gate → Shadow / Canary → Promote or Rollback</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="发布决策同时看 Task Success、风险违规、P95、Cost / Success 与关键 Slice；不是只看一个平均分。" data-i18n-en="Release decisions combine task success, high-risk violations, P95 latency, cost per success, and critical slices rather than one average score.">发布决策同时看 Task Success、风险违规、P95、Cost / Success 与关键 Slice；不是只看一个平均分。</span></div></div>
+
+      <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">PRODUCTION LEARNING LOOP</span></div><h2 class="bfs-card-title">Monitor → Detect Signal → Inspect Trace → Root Cause → Curate Dataset / Evaluator → Fix → Re-evaluate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Monitoring 只有把生产行为变成可复现的测试证据，才真正闭环。" data-i18n-en="Monitoring closes the loop only when production behavior becomes reproducible test evidence.">Monitoring 只有把生产行为变成可复现的测试证据，才真正闭环。</span></div></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="架构原则" data-i18n-en="Architecture rule">架构原则</span></span><p class="say">Runtime produces behavior. The control plane constrains, measures, judges, releases, and learns from that behavior.</p></div>
+    </div>
+  </div>
+</section>
