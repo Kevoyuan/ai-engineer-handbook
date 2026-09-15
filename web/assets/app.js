@@ -38,6 +38,10 @@
         id: 'observability-durable-evals'
       },
       {
+        path: '/assets/ch09-production-monitoring.html',
+        id: 'production-monitoring-loop'
+      },
+      {
         path: '/assets/ch09-cost-per-successful-task.html',
         id: 'cost-per-successful-task'
       }
