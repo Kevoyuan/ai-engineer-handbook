@@ -78,25 +78,52 @@ Desktop reading baseline:
 - Code/data: JetBrains Mono / system monospace fallback
 - Long prose should use balanced/polite wrapping and stay near 70–80ch when practical.
 
-Compact mobile baseline at ≤768px:
+### Audited mobile scale
 
-- Body: **15px / 1.74**
-- Lead paragraph: **15px / 1.72**
-- Chapter title: **21px / 1.28**
-- Subsection title: **17px / 1.40**
-- Dense card / diagram explanatory copy: about **12px / 1.58**
-- Chapter and subsection headings use a reliable system CJK sans stack on phones so mixed Latin/CJK text does not depend on `Georgia` plus an unavailable serif fallback
-- Mobile browser text auto-adjustment is normalized with `text-size-adjust: 100%`
+The mobile reader uses a deliberately compact technical-reference scale. Do not only reduce `body`; every explicit component font must be checked because later-loaded component CSS can otherwise restore larger desktop values.
 
-Compact phone baseline at ≤480px:
+At ≤768px:
 
-- Body: **14px / 1.70**
-- Lead paragraph: **14px / 1.68**
-- Chapter title: **19px / 1.26**
-- Subsection title: **16px / 1.36**
-- Dense card / diagram explanatory copy: about **11.5px / 1.55**
+- Body / lead: **14px** with about **1.66–1.68** line height
+- Chapter title: **19px**
+- Subsection title: **15.5px**
+- Chapter number: **24px**
+- Cover title: **30px**
+- Index / Search page heading: **24px**
+- Chapter-card title: **15px**
+- BFS / diagram title: about **15–17px**
+- Card title: about **13px**
+- Dense explanatory copy: about **11.5px**
+- Table text: about **12px**
+- Code: about **11.5px**
+- Navigation text: about **12–12.5px**
+- Interactive Lab title: about **16px**; Lab body / controls mostly **9.5–11.5px**
 
-The mobile goal is a compact technical-reader density: materially smaller than desktop, but with enough line height to preserve scanability for Chinese, English technical terms, and mixed-code content.
+At ≤480px:
+
+- Body / lead: **13px** with about **1.62** line height
+- Chapter title: **18px**
+- Subsection title: **14.5px**
+- Chapter number: **22px**
+- Cover title: **26px**
+- Index / Search page heading: **21px**
+- Chapter-card title: **14px**
+- BFS / diagram title: about **14–15.5px**
+- Card title: about **12px**
+- Dense explanatory copy: about **10.5px**
+- Table text: about **11px**
+- Code: about **10.5px**
+- Interactive Lab title: about **14.5px**
+
+Exceptions:
+
+- Search / text inputs stay at **16px** where needed to avoid iOS auto-zoom.
+- Tap targets stay ≥44px even when their labels are visually smaller.
+- Large numbers used as quantitative emphasis may remain larger than body copy, but they should not dominate the reading hierarchy on phones.
+
+Chapter and subsection headings use a reliable system CJK sans stack on phones so mixed Latin/CJK text does not depend on `Georgia` plus an unavailable serif fallback. Mobile browser text auto-adjustment is normalized with `text-size-adjust: 100%`.
+
+The mobile goal is a dense engineering-reader rhythm: no isolated component should jump back to desktop-scale typography simply because it defines its own `font-size`.
 
 ## Diagram grammar
 
@@ -159,15 +186,19 @@ Phone layouts are a distinct reading mode rather than a scaled-down desktop page
 - The standalone back-to-top floating button should not compete with phone reading controls.
 - Drawer layering must preserve content < backdrop < drawer < topbar.
 - Mobile controls inherit the global palette tokens; no mobile-only recoloring is allowed by default.
-- Typography follows the compact mobile baseline defined above; do not let late desktop overrides silently restore desktop body sizing on phones.
+- Typography follows the audited mobile hierarchy above across prose, navigation, diagrams, tables, code, search, and dynamically loaded labs.
 
 Current effective implementation assets:
 
 ```text
-web/assets/app.css      # base responsive primitives
-web/assets/reader.css   # late reading-layer overrides, including mobile typography
-web/assets/app.js       # navigation, i18n, search, runtime chapter additions
+web/assets/app.css                    # base responsive primitives
+web/assets/home.css                   # cover / index / search primitives
+web/assets/reader.css                 # late reading layer + authoritative mobile type overrides
+web/assets/handbook-interactions.css  # dynamically loaded interactive labs
+web/assets/app.js                     # navigation, i18n, search, runtime chapter additions
 ```
+
+`handbook-interactions.css` is appended dynamically after runtime chapter additions. If its mobile typography conflicts with the reader scale, the mobile reader layer must use sufficiently specific / important rules or the interaction stylesheet must define matching mobile values.
 
 Do not rely on unlinked legacy responsive assets as the source of truth; verify which stylesheets are actually loaded by the current pages.
 
