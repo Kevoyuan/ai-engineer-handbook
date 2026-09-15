@@ -1,6 +1,6 @@
 # Design System — AI Engineer Handbook
 
-Last synchronized: 2026-09-14.
+Last synchronized: 2026-09-15.
 
 ## Product direction
 
@@ -68,13 +68,27 @@ Dark:
 
 ## Typography
 
-Current implementation uses Noto Sans SC, Noto Serif SC, Space Grotesk, and JetBrains Mono.
+Current implementation uses system UI fallbacks together with Noto Sans SC, Noto Serif SC, Space Grotesk, and JetBrains Mono where available.
+
+Desktop reading baseline:
 
 - Body: about 17px / 1.95
 - Chapter title: 24–32px
 - Subsection title: about 21px
-- Code/data: JetBrains Mono
+- Code/data: JetBrains Mono / system monospace fallback
 - Long prose should use balanced/polite wrapping and stay near 70–80ch when practical.
+
+Mobile reading baseline at ≤768px:
+
+- Body: **16px / 1.82**
+- Lead paragraph: **16px / 1.78**
+- Chapter title: **24px / 1.32**, reduced to **22px** at ≤480px
+- Subsection title: **19px / 1.45**, reduced to **18px** at ≤480px
+- Dense card / diagram explanatory copy should normally remain at least **13px** with generous line height
+- Chapter and subsection headings use a reliable system CJK sans stack on phones so mixed Latin/CJK text does not depend on `Georgia` plus an unavailable serif fallback
+- Mobile browser text auto-adjustment is normalized with `text-size-adjust: 100%`
+
+The mobile goal is not “make everything smaller.” It is a more consistent reading rhythm with stable CJK glyph rendering and less typographic contrast between Chinese and embedded English terms.
 
 ## Diagram grammar
 
@@ -129,21 +143,25 @@ Interaction must never hide core content by default or require animation to reve
 Phone layouts are a distinct reading mode rather than a scaled-down desktop page.
 
 - At ≤900px the header prioritizes **table of contents, current chapter, theme, and language**. The current chapter is single-line and truncates safely.
-- A bottom reading dock provides **Previous / Search / Focus / Next** for one-handed navigation. It respects `safe-area-inset-bottom`.
-- Full-text search becomes a bottom sheet up to `88dvh`; the search field stays at 16px to avoid iOS auto-zoom.
-- Reading controls become a 2×2 grid and interactive targets remain at least 44px tall.
-- Wide tables scroll inside their own `.mobile-table-scroll` container rather than widening the document.
+- A bottom reading dock may provide **Previous / Search / Focus / Next** for one-handed navigation when present. It must respect `safe-area-inset-bottom`.
+- Full-text search should use at least a 16px input size to avoid iOS auto-zoom.
+- Reading controls should preserve ≥44px touch targets.
+- Wide tables scroll inside their own container rather than widening the document.
 - At ≤560px the cover statistics become 2×2 and content spacing tightens without deleting information.
-- The standalone back-to-top floating button is hidden on phones so it does not compete with the reading dock.
-- Drawer layering must be: content < backdrop < drawer < topbar. The bottom dock sits below the backdrop while the drawer is open.
+- The standalone back-to-top floating button should not compete with phone reading controls.
+- Drawer layering must preserve content < backdrop < drawer < topbar.
 - Mobile controls inherit the global palette tokens; no mobile-only recoloring is allowed by default.
+- Typography follows the mobile baseline defined above; do not let late desktop overrides silently restore desktop body sizing on phones.
 
-Current reusable implementation assets:
+Current effective implementation assets:
 
 ```text
-web/mobile-reader.css
-web/mobile-reader.js
+web/assets/app.css      # base responsive primitives
+web/assets/reader.css   # late reading-layer overrides, including mobile typography
+web/assets/app.js       # navigation, i18n, search, runtime chapter additions
 ```
+
+Do not rely on unlinked legacy responsive assets as the source of truth; verify which stylesheets are actually loaded by the current pages.
 
 ## Responsive requirements
 
@@ -167,14 +185,16 @@ Visual redesign must preserve technical meaning, node order, state transitions, 
 
 ## Maintenance rule
 
-When new material arrives:
+`MAINTENANCE.md` is the canonical repository maintenance SOP. Presentation changes still follow this local design sequence:
 
 ```text
-research / verify
-→ extract reusable engineering principle
-→ merge into core handbook
-→ update interactive HTML
-→ validate navigation / IDs / JS / responsive layout
+inspect current implementation
+→ preserve semantic meaning
+→ apply DESIGN.md contract
+→ validate responsive + i18n + interactions
+→ feature branch / PR
+→ CI + Preview
+→ main / production verification
 ```
 
 Interview-only material should be stored under `archive/interview` rather than expanding the core handbook.
