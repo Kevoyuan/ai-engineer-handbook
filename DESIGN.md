@@ -78,17 +78,25 @@ Desktop reading baseline:
 - Code/data: JetBrains Mono / system monospace fallback
 - Long prose should use balanced/polite wrapping and stay near 70–80ch when practical.
 
-Mobile reading baseline at ≤768px:
+Compact mobile baseline at ≤768px:
 
-- Body: **16px / 1.82**
-- Lead paragraph: **16px / 1.78**
-- Chapter title: **24px / 1.32**, reduced to **22px** at ≤480px
-- Subsection title: **19px / 1.45**, reduced to **18px** at ≤480px
-- Dense card / diagram explanatory copy should normally remain at least **13px** with generous line height
+- Body: **15px / 1.74**
+- Lead paragraph: **15px / 1.72**
+- Chapter title: **21px / 1.28**
+- Subsection title: **17px / 1.40**
+- Dense card / diagram explanatory copy: about **12px / 1.58**
 - Chapter and subsection headings use a reliable system CJK sans stack on phones so mixed Latin/CJK text does not depend on `Georgia` plus an unavailable serif fallback
 - Mobile browser text auto-adjustment is normalized with `text-size-adjust: 100%`
 
-The mobile goal is not “make everything smaller.” It is a more consistent reading rhythm with stable CJK glyph rendering and less typographic contrast between Chinese and embedded English terms.
+Compact phone baseline at ≤480px:
+
+- Body: **14px / 1.70**
+- Lead paragraph: **14px / 1.68**
+- Chapter title: **19px / 1.26**
+- Subsection title: **16px / 1.36**
+- Dense card / diagram explanatory copy: about **11.5px / 1.55**
+
+The mobile goal is a compact technical-reader density: materially smaller than desktop, but with enough line height to preserve scanability for Chinese, English technical terms, and mixed-code content.
 
 ## Diagram grammar
 
@@ -151,7 +159,7 @@ Phone layouts are a distinct reading mode rather than a scaled-down desktop page
 - The standalone back-to-top floating button should not compete with phone reading controls.
 - Drawer layering must preserve content < backdrop < drawer < topbar.
 - Mobile controls inherit the global palette tokens; no mobile-only recoloring is allowed by default.
-- Typography follows the mobile baseline defined above; do not let late desktop overrides silently restore desktop body sizing on phones.
+- Typography follows the compact mobile baseline defined above; do not let late desktop overrides silently restore desktop body sizing on phones.
 
 Current effective implementation assets:
 
