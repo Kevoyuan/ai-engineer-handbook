@@ -13,6 +13,7 @@
   let residual = {};
   let residualKeys = [];
   let searchCorpusPromise = null;
+  let interactionAssetsPromise = null;
 
   const chapterAdditions = {
     '08-agent-orchestration': {
@@ -150,15 +151,51 @@
     return new DOMParser().parseFromString(source, 'text/html');
   };
 
+  const loadInteractionAssets = () => {
+    if (!document.getElementById('handbook-interactions-css')) {
+      const link = document.createElement('link');
+      link.id = 'handbook-interactions-css';
+      link.rel = 'stylesheet';
+      link.href = '/assets/handbook-interactions.css';
+      document.head.append(link);
+    }
+
+    if (interactionAssetsPromise) return interactionAssetsPromise;
+    interactionAssetsPromise = new Promise((resolve, reject) => {
+      if (window.initHandbookInteractions) {
+        resolve();
+        return;
+      }
+      const existing = document.getElementById('handbook-interactions-js');
+      if (existing) {
+        existing.addEventListener('load', resolve, {once:true});
+        existing.addEventListener('error', reject, {once:true});
+        return;
+      }
+      const script = document.createElement('script');
+      script.id = 'handbook-interactions-js';
+      script.src = '/assets/handbook-interactions.js';
+      script.defer = true;
+      script.addEventListener('load', resolve, {once:true});
+      script.addEventListener('error', reject, {once:true});
+      document.head.append(script);
+    });
+    return interactionAssetsPromise;
+  };
+
   const injectCurrentChapterAddition = async () => {
     const addition = chapterAdditions[currentChapterSlug()];
-    if (!addition || document.getElementById(addition.id)) return;
-    const doc = await fetchAdditionDocument(addition);
-    const fragment = document.createDocumentFragment();
-    [...doc.body.children].forEach(node => fragment.append(node));
-    const pageNav = document.querySelector('main .page-nav');
-    if (pageNav) pageNav.before(fragment);
-    else document.querySelector('main')?.append(fragment);
+    if (!addition) return;
+    if (!document.getElementById(addition.id)) {
+      const doc = await fetchAdditionDocument(addition);
+      const fragment = document.createDocumentFragment();
+      [...doc.body.children].forEach(node => fragment.append(node));
+      const pageNav = document.querySelector('main .page-nav');
+      if (pageNav) pageNav.before(fragment);
+      else document.querySelector('main')?.append(fragment);
+    }
+    await loadInteractionAssets();
+    window.initHandbookInteractions?.();
   };
 
   const setLanguage = lang => {
@@ -185,6 +222,7 @@
     }
 
     localStorage.setItem('ai-handbook-lang', toEnglish ? 'en' : 'zh');
+    document.dispatchEvent(new CustomEvent('handbook:languagechange', {detail:{lang:toEnglish ? 'en' : 'zh'}}));
     if (searchInput && searchResults) runSearch();
   };
 
