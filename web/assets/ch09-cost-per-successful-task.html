@@ -1,12 +1,12 @@
 <section id="cost-per-successful-task" aria-labelledby="cost-per-successful-task-title">
-  <h2 class="sub" id="cost-per-successful-task-title"><span class="i18n-text" data-i18n-zh="Cost per Successful Task：优化任务成本，而不是单次模型价格" data-i18n-en="Cost per Successful Task: Optimize task economics, not model-call price">Cost per Successful Task：优化任务成本，而不是单次模型价格</span> <small>§9.X</small></h2>
-  <p class="lead"><span class="i18n-text" data-i18n-zh="模型更便宜，不代表任务更便宜。弱模型如果带来更多重试、更多轮次、更多检索和更长上下文，总 Token 消耗可能上升，最终把单任务成本推高。" data-i18n-en="A cheaper model does not necessarily produce a cheaper task. If a weaker model causes more retries, more turns, more retrieval, or larger contexts, total token consumption can rise and increase the final cost per task.">模型更便宜，不代表任务更便宜。弱模型如果带来更多重试、更多轮次、更多检索和更长上下文，总 Token 消耗可能上升，最终把单任务成本推高。</span></p>
+  <h2 class="sub" id="cost-per-successful-task-title"><span class="i18n-text" data-i18n-zh="Cost per Successful Task：优化任务成本，而不是单次模型价格" data-i18n-en="Cost per Successful Task: Optimize task economics, not model-call price">Cost per Successful Task：优化任务成本，而不是单次模型价格</span> <small>§9.13</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="模型更便宜，不代表任务更便宜。弱模型如果带来更多重试、更多轮次、更多检索和更长上下文，总 Token 消耗可能上升，最终把单任务成本推高。新的 Production Monitoring 课程进一步补上成本记账层：Usage 必须先被正确采集和定价，才能可靠地进入 Cost / Task 与 Cost / Successful Task。" data-i18n-en="A cheaper model does not necessarily produce a cheaper task. If a weaker model causes more retries, more turns, more retrieval, or larger contexts, total token consumption can rise and increase the final cost per task. The Production Monitoring lessons add the accounting layer: usage must be captured and priced correctly before it can reliably feed cost per task and cost per successful task.">模型更便宜，不代表任务更便宜。弱模型如果带来更多重试、更多轮次、更多检索和更长上下文，总 Token 消耗可能上升，最终把单任务成本推高。新的 Production Monitoring 课程进一步补上成本记账层：Usage 必须先被正确采集和定价，才能可靠地进入 Cost / Task 与 Cost / Successful Task。</span></p>
 
   <div class="bfs-canvas" id="fig-9-task-cost">
     <div class="bfs-head">
       <div>
-        <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.X</span>
-        <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="任务成本由 Token 量和混合单价共同决定" data-i18n-en="Task cost is driven by both token volume and blended token price">任务成本由 Token 量和混合单价共同决定</span></h2>
+        <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.C1</span>
+        <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="任务经济性由 Token 量、混合单价与成功率共同决定" data-i18n-en="Task economics are driven by token volume, blended price, and success rate">任务经济性由 Token 量、混合单价与成功率共同决定</span></h2>
       </div>
     </div>
     <div class="bfs-body">
@@ -81,7 +81,60 @@
     </div>
   </div>
 
+  <div class="bfs-canvas rv" id="fig-9-cost-accounting">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.C2 · COST ACCOUNTING</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Usage 不是 Cost：必须经过价格解析，再与 Task Outcome 连接" data-i18n-en="Usage is not cost: resolve pricing first, then join task outcome">Usage 不是 Cost：必须经过价格解析，再与 Task Outcome 连接</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="成本观测的关键是把“用了多少”与“按什么价格计费”分开保存，否则价格变更、Cache Read、Custom Model 和非 LLM 组件都会让历史分析失真。" data-i18n-en="Cost observability should keep how much was used separate from how that usage was priced; otherwise pricing changes, cache reads, custom models, and non-LLM components distort historical analysis.">成本观测的关键是把“用了多少”与“按什么价格计费”分开保存，否则价格变更、Cache Read、Custom Model 和非 LLM 组件都会让历史分析失真。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">1 · CAPTURE</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Usage Capture" data-i18n-en="Usage capture">Usage Capture</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="记录 Input / Output / Other，以及 cache_read、reasoning 等 subtype；Tool、Search API、Retrieval 等需要自己的计量或 literal cost。" data-i18n-en="Record input, output, and other usage plus subtypes such as cache_read and reasoning; tools, search APIs, and retrieval need their own metering or literal cost.">记录 Input / Output / Other，以及 cache_read、reasoning 等 subtype；Tool、Search API、Retrieval 等需要自己的计量或 literal cost。</span></div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">2 · PRICE</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Pricing Resolution" data-i18n-en="Pricing resolution">Pricing Resolution</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="用 Model / Provider / Token Type / Effective Date 匹配价格。具体 subtype 先计价，剩余 Usage 再按默认价格计算，避免重复计费。" data-i18n-en="Resolve price by model, provider, token type, and effective date. Price specific subtypes first, then price only residual usage at the default rate to avoid double charging.">用 Model / Provider / Token Type / Effective Date 匹配价格。具体 subtype 先计价，剩余 Usage 再按默认价格计算，避免重复计费。</span></div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">3 · JOIN</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Aggregate + Outcome" data-i18n-en="Aggregate + outcome">Aggregate + Outcome</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Run Cost 汇总成 Trace / Task Cost，再按 Model、Tool、Customer、Version 等切片，最后与 Task Success 连接得到真正可优化的 Cost / Successful Task。" data-i18n-en="Aggregate run cost into trace and task cost, slice by model, tool, customer, version, and other metadata, then join task success to obtain actionable cost per successful task.">Run Cost 汇总成 Trace / Task Cost，再按 Model、Tool、Customer、Version 等切片，最后与 Task Success 连接得到真正可优化的 Cost / Successful Task。</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-table-scroll">
+    <table>
+      <thead><tr><th><span class="i18n-text" data-i18n-zh="成本类别" data-i18n-en="Cost category">成本类别</span></th><th><span class="i18n-text" data-i18n-zh="来源课程的 Breakdown" data-i18n-en="Breakdown in the source lesson">来源课程的 Breakdown</span></th><th><span class="i18n-text" data-i18n-zh="工程读法" data-i18n-en="Engineering interpretation">工程读法</span></th></tr></thead>
+      <tbody>
+        <tr><td>Input</td><td>Prompt · text/image input · cache reads</td><td><span class="i18n-text" data-i18n-zh="定位 Context、Prompt Prefix、Tool Schema 与 Prefill 成本。" data-i18n-en="Attribute context, prompt-prefix, tool-schema, and prefill cost.">定位 Context、Prompt Prefix、Tool Schema 与 Prefill 成本。</span></td></tr>
+        <tr><td>Output</td><td>Generated text/image · reasoning tokens</td><td><span class="i18n-text" data-i18n-zh="定位输出长度、Reasoning 与 Decode 成本。" data-i18n-en="Attribute output length, reasoning, and decode cost.">定位输出长度、Reasoning 与 Decode 成本。</span></td></tr>
+        <tr><td>Other</td><td>Tool · retrieval · custom run</td><td><span class="i18n-text" data-i18n-zh="补齐 Search API、Database、Retrieval 等非 LLM 成本，避免把 Token Cost 误当总任务成本。" data-i18n-en="Include search APIs, databases, retrieval, and other non-LLM spend so token cost is not mistaken for total task cost.">补齐 Search API、Database、Retrieval 等非 LLM 成本，避免把 Token Cost 误当总任务成本。</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="co note rv interp-callout"><span class="co-t">CACHE READ ≠ COST HOTSPOT</span><p><span class="i18n-text" data-i18n-zh="课程强调 Cache Read Token 通常比普通 Input Token 更便宜，因此 Cache Read 即使占 Input Token 的大头，也不代表它占 Input Cost 的大头。正确分析单位是 Token Type × Effective Price，而不是只看 Token Share。" data-i18n-en="The lesson emphasizes that cache-read tokens are typically cheaper than regular input tokens, so a large cache-read share of input tokens does not imply a large share of input cost. Analyze token type × effective price rather than token share alone.">课程强调 Cache Read Token 通常比普通 Input Token 更便宜，因此 Cache Read 即使占 Input Token 的大头，也不代表它占 Input Cost 的大头。正确分析单位是 Token Type × Effective Price，而不是只看 Token Share。</span></p></div>
+
+  <div class="mobile-table-scroll">
+    <table>
+      <thead><tr><th><span class="i18n-text" data-i18n-zh="Run 类型" data-i18n-en="Run type">Run 类型</span></th><th><span class="i18n-text" data-i18n-zh="LangSmith 来源机制" data-i18n-en="LangSmith source mechanism">LangSmith 来源机制</span></th><th><span class="i18n-text" data-i18n-zh="可复用工程原则" data-i18n-en="Reusable engineering principle">可复用工程原则</span></th></tr></thead>
+      <tbody>
+        <tr><td>LLM</td><td>Token counts + <code>ls_model_name</code> + <code>ls_provider</code> + pricing table</td><td><span class="i18n-text" data-i18n-zh="Usage 与 Pricing 分离；自动采集失败时可以手工上报 Usage。" data-i18n-en="Separate usage from pricing; manually report usage when automatic extraction is unavailable.">Usage 与 Pricing 分离；自动采集失败时可以手工上报 Usage。</span></td></tr>
+        <tr><td>Custom / self-hosted LLM</td><td><code>usage_metadata</code> + custom pricing entry</td><td><span class="i18n-text" data-i18n-zh="有 Token Count 但没有匹配价格规则时，只能知道 Usage，不能可靠得到 Cost。" data-i18n-en="Token counts without a matching pricing rule provide usage but not reliable cost.">有 Token Count 但没有匹配价格规则时，只能知道 Usage，不能可靠得到 Cost。</span></td></tr>
+        <tr><td>Tool / API / Retrieval</td><td><code>usage_metadata.total_cost</code></td><td><span class="i18n-text" data-i18n-zh="没有 Token Unit Price 的组件，应上报实际计量或账单成本，再参与 Trace / Task 聚合。" data-i18n-en="Components without token-based unit pricing should report metered or billed literal cost before trace/task aggregation.">没有 Token Unit Price 的组件，应上报实际计量或账单成本，再参与 Trace / Task 聚合。</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="co warn rv interp-callout"><span class="co-t">PRICING VERSION BOUNDARY</span><p><span class="i18n-text" data-i18n-zh="来源课程说明 LangSmith Model Pricing 更新不是 retroactive，只影响更新后记录的 Trace。跨时间比较成本时，应明确保存 Pricing Effective Date / Version，并区分“当时实际计价”与“按统一价格表重算”的分析口径。" data-i18n-en="The source lesson states that LangSmith model-pricing updates are not retroactive and affect only traces logged after the change. Historical cost analysis should preserve pricing effective date/version and distinguish actual-at-the-time pricing from normalized repricing.">来源课程说明 LangSmith Model Pricing 更新不是 retroactive，只影响更新后记录的 Trace。跨时间比较成本时，应明确保存 Pricing Effective Date / Version，并区分“当时实际计价”与“按统一价格表重算”的分析口径。</span></p></div>
+
+  <div class="mobile-table-scroll">
+    <table>
+      <thead><tr><th><span class="i18n-text" data-i18n-zh="观察尺度" data-i18n-en="Observation scope">观察尺度</span></th><th>LangSmith</th><th><span class="i18n-text" data-i18n-zh="适合回答" data-i18n-en="Best for answering">适合回答</span></th></tr></thead>
+      <tbody>
+        <tr><td>Micro</td><td>Trace Tree</td><td><span class="i18n-text" data-i18n-zh="这一次 Trace / Child Run 的钱花在哪里？" data-i18n-en="Where did this trace or child run spend money?">这一次 Trace / Child Run 的钱花在哪里？</span></td></tr>
+        <tr><td>Aggregate</td><td>Project Stats</td><td><span class="i18n-text" data-i18n-zh="整个项目当前用了多少 Token、花了多少钱？" data-i18n-en="How many tokens and how much total spend does the project have?">整个项目当前用了多少 Token、花了多少钱？</span></td></tr>
+        <tr><td>Slice / Trend</td><td>Dashboard + Group by metadata</td><td><span class="i18n-text" data-i18n-zh="哪个 Tool、Model、Customer、App Version 或 Environment 推动了成本变化？" data-i18n-en="Which tool, model, customer, app version, or environment drove the cost movement?">哪个 Tool、Model、Customer、App Version 或 Environment 推动了成本变化？</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="co must interp-callout"><span class="co-t">ACCOUNTING RULE</span><p><strong>Measure usage separately from pricing, then join cost with task outcome.</strong></p></div>
   <div class="co must interp-callout"><span class="co-t">CANONICAL RULE</span><p><strong>Optimize cost per successful task, not price per model call.</strong></p></div>
-  <div class="co note interp-callout"><span class="co-t">SOURCE EXAMPLE</span><p><span class="i18n-text" data-i18n-zh="该文章来源转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。" data-i18n-en="In the Glean comparison reported by the source, the article cites roughly $0.45/task versus $1.84/task and about 29.8M versus 88.8M tokens. Treat this as a source-specific example showing how routing plus better context can reduce both blended price and token volume, not as a universal benchmark transferable to other systems.">该文章来源转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。</span></p></div>
-  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="来源：" data-i18n-en="Source:">来源：</span> <a href="https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-explained" target="_blank" rel="noopener noreferrer">AI Engineering · Loop vs Graph Engineering Clearly Explained</a></p>
+  <div class="co note interp-callout"><span class="co-t">SOURCE EXAMPLE</span><p><span class="i18n-text" data-i18n-zh="此前来源文章转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里仍把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。" data-i18n-en="In the previously cited Glean comparison, the source reports roughly $0.45/task versus $1.84/task and about 29.8M versus 88.8M tokens. Treat it as a source-specific example showing how routing plus better context can reduce both blended price and token volume, not as a universal benchmark transferable to other systems.">此前来源文章转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里仍把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。</span></p></div>
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="来源：" data-i18n-en="Sources:">来源：</span> <a href="https://langchain-ai.github.io/lca-lessons/production-monitoring/module-1/token-and-cost-breakdowns" target="_blank" rel="noopener noreferrer">LangChain Academy · Token and Cost Breakdowns</a> · <a href="https://langchain-ai.github.io/lca-lessons/production-monitoring/module-1/setting-up-cost-tracking" target="_blank" rel="noopener noreferrer">Setting Up Cost Tracking</a> · <a href="https://langchain-ai.github.io/lca-lessons/production-monitoring/module-1/viewing-costs-in-the-ui" target="_blank" rel="noopener noreferrer">Viewing Costs in the UI</a> · <a href="https://docs.langchain.com/langsmith/cost-tracking" target="_blank" rel="noopener noreferrer">LangSmith Cost Tracking Docs</a> · <a href="https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-explained" target="_blank" rel="noopener noreferrer">AI Engineering · Loop vs Graph Engineering Clearly Explained</a></p>
 </section>
