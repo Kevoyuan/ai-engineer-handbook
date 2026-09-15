@@ -16,14 +16,22 @@
   let interactionAssetsPromise = null;
 
   const chapterAdditions = {
-    '08-agent-orchestration': {
-      path: '/assets/ch08-loop-vs-graph.html',
-      id: 'loop-vs-graph'
-    },
-    '09-reliability-evaluation-observability': {
-      path: '/assets/ch09-cost-per-successful-task.html',
-      id: 'cost-per-successful-task'
-    }
+    '08-agent-orchestration': [
+      {
+        path: '/assets/ch08-loop-vs-graph.html',
+        id: 'loop-vs-graph'
+      },
+      {
+        path: '/assets/ch08-coding-agent-engineering.html',
+        id: 'coding-agent-engineering'
+      }
+    ],
+    '09-reliability-evaluation-observability': [
+      {
+        path: '/assets/ch09-cost-per-successful-task.html',
+        id: 'cost-per-successful-task'
+      }
+    ]
   };
 
   const normalizeEnglishPunctuation = value => value
@@ -184,9 +192,10 @@
   };
 
   const injectCurrentChapterAddition = async () => {
-    const addition = chapterAdditions[currentChapterSlug()];
-    if (!addition) return;
-    if (!document.getElementById(addition.id)) {
+    const additions = chapterAdditions[currentChapterSlug()] || [];
+    if (!additions.length) return;
+    for (const addition of additions) {
+      if (document.getElementById(addition.id)) continue;
       const doc = await fetchAdditionDocument(addition);
       const fragment = document.createDocumentFragment();
       [...doc.body.children].forEach(node => fragment.append(node));
@@ -247,8 +256,8 @@
         applyLanguageToRoot(section, 'en');
         const enParts = [normalizeEnglishPunctuation(section.textContent.replace(/\s+/g, ' ').trim())];
 
-        const addition = chapterAdditions[item.slug];
-        if (addition) {
+        const additions = chapterAdditions[item.slug] || [];
+        for (const addition of additions) {
           try {
             const additionDoc = await fetchAdditionDocument(addition);
             const additionRoot = additionDoc.body;
