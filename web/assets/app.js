@@ -16,6 +16,12 @@
   let interactionAssetsPromise = null;
 
   const chapterAdditions = {
+    '05-document-pdf-rag': [
+      {
+        path: '/assets/ch05-grounded-document-agent.html',
+        id: 'grounded-document-agent'
+      }
+    ],
     '08-agent-orchestration': [
       {
         path: '/assets/ch08-loop-vs-graph.html',
