@@ -44,6 +44,47 @@
     </div>
   </div>
 
+  <div class="lab" data-architecture-explorer data-mode="loop">
+    <div class="lab-head">
+      <div class="lab-kicker">INTERACTIVE · ARCHITECTURE EXPLORER</div>
+      <h3 class="lab-title"><span class="i18n-text" data-i18n-zh="你的任务真的需要 Graph 吗？" data-i18n-en="Does your task actually need a graph?">你的任务真的需要 Graph 吗？</span></h3>
+      <p class="lab-sub"><span class="i18n-text" data-i18n-zh="勾选真实存在的协调边界。右侧会实时给出最小足够架构，并高亮 Loop 或外层 Graph 拓扑。" data-i18n-en="Select only the coordination boundaries that actually exist. The recommendation updates live and highlights the smallest sufficient architecture: a loop, a gated loop, or an outer graph.">勾选真实存在的协调边界。右侧会实时给出最小足够架构，并高亮 Loop 或外层 Graph 拓扑。</span></p>
+    </div>
+    <div class="lab-grid">
+      <fieldset class="lab-controls">
+        <legend><span class="i18n-text" data-i18n-zh="结构信号" data-i18n-en="Structural signals">结构信号</span></legend>
+        <div class="lab-checks">
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="2"><span><strong><span class="i18n-text" data-i18n-zh="需要并行分支" data-i18n-en="Parallel branches are required">需要并行分支</span></strong><small><span class="i18n-text" data-i18n-zh="多个工作单元可以或必须同时推进" data-i18n-en="Multiple work units can or must progress concurrently">多个工作单元可以或必须同时推进</span></small></span></label>
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="1"><span><strong><span class="i18n-text" data-i18n-zh="上下文 / Memory 需要隔离" data-i18n-en="Context or memory must be isolated">上下文 / Memory 需要隔离</span></strong><small><span class="i18n-text" data-i18n-zh="不同工作单元不应共享完整上下文" data-i18n-en="Different work units should not share the full context">不同工作单元不应共享完整上下文</span></small></span></label>
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="2"><span><strong><span class="i18n-text" data-i18n-zh="存在不同权限域" data-i18n-en="Different permission domains exist">存在不同权限域</span></strong><small><span class="i18n-text" data-i18n-zh="工具、数据或动作必须由边界隔开" data-i18n-en="Tools, data, or actions must be separated by explicit boundaries">工具、数据或动作必须由边界隔开</span></small></span></label>
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="2"><span><strong>Branch / Join</strong><small><span class="i18n-text" data-i18n-zh="控制流需要显式分支后再汇合" data-i18n-en="Control flow must explicitly branch and later join">控制流需要显式分支后再汇合</span></small></span></label>
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="2"><span><strong>Checkpoint / Resume</strong><small><span class="i18n-text" data-i18n-zh="执行需要持久化并从中间状态恢复" data-i18n-en="Execution must persist and resume from intermediate state">执行需要持久化并从中间状态恢复</span></small></span></label>
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="1"><span><strong>Failure Isolation</strong><small><span class="i18n-text" data-i18n-zh="局部失败需要独立恢复而不是整体重跑" data-i18n-en="Local failures need independent recovery instead of rerunning everything">局部失败需要独立恢复而不是整体重跑</span></small></span></label>
+          <label class="lab-check"><input type="checkbox" data-arch-signal data-weight="2"><span><strong>Human Approval</strong><small><span class="i18n-text" data-i18n-zh="高风险动作需要显式人审边界" data-i18n-en="High-risk actions require an explicit human approval boundary">高风险动作需要显式人审边界</span></small></span></label>
+        </div>
+        <div class="lab-actions"><button type="button" class="lab-btn" data-arch-reset><span class="i18n-text" data-i18n-zh="重置" data-i18n-en="Reset">重置</span></button></div>
+      </fieldset>
+
+      <div class="lab-result" aria-live="polite">
+        <div class="lab-result-head">
+          <div><div class="lab-result-label"><span class="i18n-text" data-i18n-zh="推荐架构" data-i18n-en="Recommended architecture">推荐架构</span></div><div class="lab-result-title" data-arch-title>Bounded Agent Loop</div><div class="lab-result-desc" data-arch-desc></div></div>
+          <div class="lab-score" data-arch-score>0 structural signals</div>
+        </div>
+        <div class="lab-topologies">
+          <div class="lab-topology lab-topology-loop">
+            <div class="lab-topology-label">LOCAL BOUNDED LOOP</div>
+            <div class="lab-seq"><span class="lab-node">Goal</span><span class="lab-arrow">→</span><span class="lab-node">Plan</span><span class="lab-arrow">→</span><span class="lab-node">Act</span><span class="lab-arrow">→</span><span class="lab-node is-gate">Verify</span><span class="lab-arrow">→</span><span class="lab-node is-success">Done</span></div>
+            <div class="lab-loopback">↺ <span class="i18n-text" data-i18n-zh="未通过验证时，在显式预算与停止条件内迭代" data-i18n-en="If verification fails, iterate within an explicit budget and stopping condition">未通过验证时，在显式预算与停止条件内迭代</span></div>
+          </div>
+          <div class="lab-topology lab-topology-graph">
+            <div class="lab-topology-label">OUTER EXPLICIT GRAPH</div>
+            <div class="lab-graph-grid"><span class="lab-node">Router</span><span class="lab-arrow">→</span><div class="lab-branches"><span class="lab-node">Work A</span><span class="lab-node">Work B</span></div><span class="lab-arrow">→</span><span class="lab-node">Join</span><span class="lab-arrow">→</span><div class="lab-branches"><span class="lab-node is-checkpoint">Checkpoint</span><span class="lab-node is-gate">Policy Gate</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="co must interp-callout"><span class="co-t">CANONICAL RULE</span><p><strong><span class="i18n-text" data-i18n-zh="Use the least control-flow complexity that still makes state, stopping conditions, permissions, and recovery explicit." data-i18n-en="Use the least control-flow complexity that still makes state, stopping conditions, permissions, and recovery explicit.">Use the least control-flow complexity that still makes state, stopping conditions, permissions, and recovery explicit.</span></strong></p></div>
   <div class="co warn interp-callout interp-pitfall"><span class="co-t">PITFALL</span><p><strong><span class="i18n-text" data-i18n-zh="A graph does not repair a broken loop." data-i18n-en="A graph does not repair a broken loop.">A graph does not repair a broken loop.</span></strong> <span class="i18n-text" data-i18n-zh="如果单个循环的状态、验证、停止条件或工具策略本身有问题，套上一层 Graph 只会得到更复杂、同样不可靠的系统。" data-i18n-en="If the loop itself has broken state handling, verification, stopping conditions, or tool policy, wrapping it in a graph only creates a more complex system with the same underlying failure.">如果单个循环的状态、验证、停止条件或工具策略本身有问题，套上一层 Graph 只会得到更复杂、同样不可靠的系统。</span></p></div>
 
