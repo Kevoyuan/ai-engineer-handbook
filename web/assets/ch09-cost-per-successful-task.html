@@ -1,0 +1,39 @@
+<section id="cost-per-successful-task" aria-labelledby="cost-per-successful-task-title">
+  <h2 class="sub" id="cost-per-successful-task-title"><span class="i18n-text" data-i18n-zh="Cost per Successful Task：优化任务成本，而不是单次模型价格" data-i18n-en="Cost per Successful Task: Optimize task economics, not model-call price">Cost per Successful Task：优化任务成本，而不是单次模型价格</span> <small>§9.X</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="模型更便宜，不代表任务更便宜。弱模型如果带来更多重试、更多轮次、更多检索和更长上下文，总 Token 消耗可能上升，最终把单任务成本推高。" data-i18n-en="A cheaper model does not necessarily produce a cheaper task. If a weaker model causes more retries, more turns, more retrieval, or larger contexts, total token consumption can rise and increase the final cost per task.">模型更便宜，不代表任务更便宜。弱模型如果带来更多重试、更多轮次、更多检索和更长上下文，总 Token 消耗可能上升，最终把单任务成本推高。</span></p>
+
+  <div class="bfs-canvas" id="fig-9-task-cost">
+    <div class="bfs-head">
+      <div>
+        <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.X</span>
+        <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="任务成本由 Token 量和混合单价共同决定" data-i18n-en="Task cost is driven by both token volume and blended token price">任务成本由 Token 量和混合单价共同决定</span></h2>
+      </div>
+    </div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue">
+          <div class="bfs-strip"></div>
+          <div class="bfs-card-head"><span class="bfs-stage-pill">VOLUME</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Total tokens consumed" data-i18n-en="Total tokens consumed">Total tokens consumed</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="检索、读文件、推理、重试、长上下文和额外轮次都会增加 Token 量。" data-i18n-en="Retrieval, file reading, reasoning, retries, larger contexts, and extra turns all increase token volume.">检索、读文件、推理、重试、长上下文和额外轮次都会增加 Token 量。</span></div>
+        </div>
+        <div class="bfs-card bfs-purple">
+          <div class="bfs-strip"></div>
+          <div class="bfs-card-head"><span class="bfs-stage-pill">RATE</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Blended price per token" data-i18n-en="Blended price per token">Blended price per token</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="通过 model-family routing 与 model-tier routing，让常规步骤使用便宜模型，把强模型留给真正困难的少数步骤。" data-i18n-en="Use model-family routing and model-tier routing so routine steps use cheaper models while stronger models are reserved for the small fraction of genuinely difficult steps.">通过 model-family routing 与 model-tier routing，让常规步骤使用便宜模型，把强模型留给真正困难的少数步骤。</span></div>
+        </div>
+        <div class="bfs-card bfs-emerald">
+          <div class="bfs-strip"></div>
+          <div class="bfs-card-head"><span class="bfs-stage-pill">OUTCOME</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Cost per successful task" data-i18n-en="Cost per successful task">Cost per successful task</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="最终指标应把成本与任务成功率放在一起看，而不是只看 Cost/query 或某个模型的标价。" data-i18n-en="The final metric should combine cost with task success rather than looking only at cost per query or a model's sticker price.">最终指标应把成本与任务成功率放在一起看，而不是只看 Cost/query 或某个模型的标价。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="co must interp-callout"><span class="co-t">CANONICAL RULE</span><p><strong>Optimize cost per successful task, not price per model call.</strong></p></div>
+  <div class="co note interp-callout"><span class="co-t">SOURCE EXAMPLE</span><p><span class="i18n-text" data-i18n-zh="该文章来源转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。" data-i18n-en="In the Glean comparison reported by the source, the article cites roughly $0.45/task versus $1.84/task and about 29.8M versus 88.8M tokens. Treat this as a source-specific example showing how routing plus better context can reduce both blended price and token volume, not as a universal benchmark transferable to other systems.">该文章来源转述的 Glean 对比中，报告了约 $0.45/task vs $1.84/task，以及约 29.8M vs 88.8M tokens。这里把它当作“路由 + 更好上下文可能同时降低混合单价与 Token 量”的来源案例，而不是可直接迁移到其他系统的通用 Benchmark。</span></p></div>
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="来源：" data-i18n-en="Source:">来源：</span> <a href="https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-explained" target="_blank" rel="noopener noreferrer">AI Engineering · Loop vs Graph Engineering Clearly Explained</a></p>
+</section>
