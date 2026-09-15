@@ -43,9 +43,9 @@
     <div class="lab-grid">
       <div class="lab-controls">
         <div class="lab-presets" aria-label="Cost simulator presets">
-          <button type="button" class="lab-preset" data-cost-preset="efficient" aria-pressed="false">高效路由</button>
-          <button type="button" class="lab-preset" data-cost-preset="retryTrap" aria-pressed="false">低价模型重试陷阱</button>
-          <button type="button" class="lab-preset" data-cost-preset="balanced" aria-pressed="false">平衡方案</button>
+          <button type="button" class="lab-preset" data-cost-preset="efficient" aria-pressed="false"><span class="i18n-text" data-i18n-zh="高效路由" data-i18n-en="Efficient routing">高效路由</span></button>
+          <button type="button" class="lab-preset" data-cost-preset="retryTrap" aria-pressed="false"><span class="i18n-text" data-i18n-zh="低价模型重试陷阱" data-i18n-en="Cheap-model retry trap">低价模型重试陷阱</span></button>
+          <button type="button" class="lab-preset" data-cost-preset="balanced" aria-pressed="false"><span class="i18n-text" data-i18n-zh="平衡方案" data-i18n-en="Balanced">平衡方案</span></button>
         </div>
         <div class="lab-sliders">
           <label class="lab-slider"><span class="lab-slider-head"><span><span class="i18n-text" data-i18n-zh="每次尝试 Token" data-i18n-en="Tokens per attempt">每次尝试 Token</span></span><output data-out-tokens>45k</output></span><input data-cost-tokens type="range" min="10000" max="200000" step="5000" value="45000"><small><span class="i18n-text" data-i18n-zh="包含检索、上下文、推理与输出" data-i18n-en="Includes retrieval, context, reasoning, and output">包含检索、上下文、推理与输出</span></small></label>
@@ -57,9 +57,9 @@
 
       <div class="lab-result" aria-live="polite">
         <div class="lab-metrics">
-          <div class="lab-metric"><span data-label-attempt>单次尝试成本</span><b data-cost-per-attempt>$0.081</b></div>
-          <div class="lab-metric"><span data-label-task>单任务成本</span><b data-cost-per-task>$0.113</b></div>
-          <div class="lab-metric primary"><span data-label-success>成功任务成本</span><b data-cost-per-success>$0.129</b></div>
+          <div class="lab-metric"><span data-label-attempt><span class="i18n-text" data-i18n-zh="单次尝试成本" data-i18n-en="Cost / attempt">单次尝试成本</span></span><b data-cost-per-attempt>$0.081</b></div>
+          <div class="lab-metric"><span data-label-task><span class="i18n-text" data-i18n-zh="单任务成本" data-i18n-en="Cost / task">单任务成本</span></span><b data-cost-per-task>$0.113</b></div>
+          <div class="lab-metric primary"><span data-label-success><span class="i18n-text" data-i18n-zh="成功任务成本" data-i18n-en="Cost / successful task">成功任务成本</span></span><b data-cost-per-success>$0.129</b></div>
         </div>
         <div class="lab-equation">
           <div class="lab-topology-label">LIVE COST PATH</div>
