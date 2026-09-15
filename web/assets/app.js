@@ -1,1 +1,259 @@
-(()=>{const a=document.documentElement,i=document.getElementById("menuBtn"),E=document.getElementById("sideOverlay"),y=document.getElementById("themeBtn"),h=document.getElementById("langToggle"),o=e=>{document.body.classList.toggle("sidebar-open",e),i?.setAttribute("aria-expanded",String(e))},u=e=>{const t=e==="en";a.dataset.lang=t?"en":"zh",a.lang=t?"en":"zh-CN",document.querySelectorAll(".i18n-text").forEach(l=>{l.textContent=t?l.dataset.i18nEn:l.dataset.i18nZh});const c=document.querySelector("title");c?.dataset.i18nTitleZh&&(document.title=t?c.dataset.i18nTitleEn:c.dataset.i18nTitleZh),h?.setAttribute("aria-label",t?"中 / EN：切换到中文":"中 / EN：切换到英文"),localStorage.setItem("ai-handbook-lang",t?"en":"zh")};a.dataset.theme=localStorage.getItem("hb-theme")||"light",y?.addEventListener("click",()=>{a.dataset.theme=a.dataset.theme==="dark"?"light":"dark",localStorage.setItem("hb-theme",a.dataset.theme)}),u(localStorage.getItem("ai-handbook-lang")||"zh"),h?.addEventListener("click",()=>u(a.dataset.lang==="en"?"zh":"en")),i?.addEventListener("click",()=>o(!document.body.classList.contains("sidebar-open"))),E?.addEventListener("click",()=>o(!1)),document.addEventListener("keydown",e=>{e.key==="Escape"&&o(!1)}),document.querySelectorAll("#side a").forEach(e=>e.addEventListener("click",()=>o(!1))),document.querySelectorAll(".acc-h").forEach(e=>e.addEventListener("click",()=>e.parentElement?.classList.toggle("open")));const r=document.getElementById("siteSearch"),s=document.getElementById("searchResults");r&&s&&fetch("/search-index.json").then(e=>e.json()).then(e=>{const t=()=>{const c=r.value.trim().toLowerCase(),l=c?e.filter(n=>`${n.titleZh} ${n.titleEn} ${n.text}`.toLowerCase().includes(c)).slice(0,30):e;s.replaceChildren(...l.map(n=>{const d=document.createElement("a");d.className="search-result",d.href=n.href;const m=document.createElement("b");m.textContent=`${n.titleZh} \xB7 ${n.titleEn}`;const g=document.createElement("small");return g.textContent=`${n.text.slice(0,180)}\u2026`,d.append(m,g),d})),l.length||(s.textContent="\u6CA1\u6709\u627E\u5230\u5339\u914D\u5185\u5BB9\u3002")};r.addEventListener("input",t),t()}).catch(()=>{s.textContent="\u641C\u7D22\u7D22\u5F15\u6682\u65F6\u4E0D\u53EF\u7528\u3002"})})();
+(() => {
+  const html = document.documentElement;
+  const menuBtn = document.getElementById('menuBtn');
+  const sideOverlay = document.getElementById('sideOverlay');
+  const themeBtn = document.getElementById('themeBtn');
+  const langToggle = document.getElementById('langToggle');
+  const searchInput = document.getElementById('siteSearch');
+  const searchResults = document.getElementById('searchResults');
+
+  const HAN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
+  const textOriginal = new WeakMap();
+  const attrOriginal = new WeakMap();
+  let residual = {};
+  let residualKeys = [];
+  let searchCorpusPromise = null;
+
+  const normalizeEnglishPunctuation = value => value
+    .replace(/。/g, '.')
+    .replace(/，/g, ', ')
+    .replace(/：/g, ': ')
+    .replace(/；/g, '; ')
+    .replace(/、/g, ' · ')
+    .replace(/（/g, '(')
+    .replace(/）/g, ')')
+    .replace(/？/g, '?')
+    .replace(/！/g, '!')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/＋/g, '+')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/([,.;:!?])(?=[A-Za-z0-9])/g, '$1 ')
+    .replace(/[ \t]{2,}/g, ' ');
+
+  const translateResidual = value => {
+    if (!value) return value;
+    const leading = value.match(/^\s*/)?.[0] || '';
+    const trailing = value.match(/\s*$/)?.[0] || '';
+    let core = value.trim();
+    if (!core) return value;
+    if (residual[core]) core = residual[core];
+    else {
+      for (const key of residualKeys) {
+        if (core.includes(key)) core = core.split(key).join(residual[key]);
+      }
+    }
+    return leading + normalizeEnglishPunctuation(core) + trailing;
+  };
+
+  const closeSidebar = open => {
+    document.body.classList.toggle('sidebar-open', open);
+    menuBtn?.setAttribute('aria-expanded', String(open));
+  };
+
+  menuBtn?.addEventListener('click', () => closeSidebar(!document.body.classList.contains('sidebar-open')));
+  sideOverlay?.addEventListener('click', () => closeSidebar(false));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeSidebar(false);
+  });
+  document.querySelectorAll('#side a').forEach(link => link.addEventListener('click', () => closeSidebar(false)));
+  document.querySelectorAll('.acc-h').forEach(button => button.addEventListener('click', () => button.parentElement?.classList.toggle('open')));
+
+  html.dataset.theme = localStorage.getItem('hb-theme') || 'light';
+  themeBtn?.addEventListener('click', () => {
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('hb-theme', html.dataset.theme);
+  });
+
+  const rememberAttribute = (element, name) => {
+    let record = attrOriginal.get(element);
+    if (!record) {
+      record = {};
+      attrOriginal.set(element, record);
+    }
+    if (!(name in record)) record[name] = element.getAttribute(name);
+    return record[name];
+  };
+
+  const translateAttributes = toEnglish => {
+    document.querySelectorAll('[aria-label], [placeholder]').forEach(element => {
+      for (const name of ['aria-label', 'placeholder']) {
+        if (!element.hasAttribute(name)) continue;
+        const original = rememberAttribute(element, name);
+        if (toEnglish) element.setAttribute(name, translateResidual(original));
+        else element.setAttribute(name, original);
+      }
+    });
+
+    const description = document.querySelector('meta[name="description"]');
+    if (description) {
+      const original = rememberAttribute(description, 'content');
+      description.setAttribute('content', toEnglish ? translateResidual(original) : original);
+    }
+  };
+
+  const translateRawTextNodes = toEnglish => {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || parent.closest('.i18n-text, script, style')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+      if (!textOriginal.has(node)) textOriginal.set(node, node.nodeValue);
+      const original = textOriginal.get(node);
+      node.nodeValue = toEnglish ? translateResidual(original) : original;
+    }
+  };
+
+  const applyLanguageToRoot = (root, lang) => {
+    const toEnglish = lang === 'en';
+    root.querySelectorAll?.('.i18n-text').forEach(element => {
+      const value = toEnglish ? element.dataset.i18nEn : element.dataset.i18nZh;
+      if (value != null) element.textContent = toEnglish ? normalizeEnglishPunctuation(value) : value;
+    });
+
+    if (toEnglish) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent || parent.closest('.i18n-text, script, style')) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(node => { node.nodeValue = translateResidual(node.nodeValue); });
+    }
+  };
+
+  const setLanguage = lang => {
+    const toEnglish = lang === 'en';
+    html.dataset.lang = toEnglish ? 'en' : 'zh';
+    html.lang = toEnglish ? 'en' : 'zh-CN';
+
+    document.querySelectorAll('.i18n-text').forEach(element => {
+      const value = toEnglish ? element.dataset.i18nEn : element.dataset.i18nZh;
+      if (value != null) element.textContent = toEnglish ? normalizeEnglishPunctuation(value) : value;
+    });
+
+    const title = document.querySelector('title');
+    if (title?.dataset.i18nTitleZh) {
+      document.title = toEnglish ? title.dataset.i18nTitleEn : title.dataset.i18nTitleZh;
+    }
+
+    translateRawTextNodes(toEnglish);
+    translateAttributes(toEnglish);
+
+    if (langToggle) {
+      langToggle.textContent = toEnglish ? 'ZH / EN' : '中 / EN';
+      langToggle.setAttribute('aria-label', toEnglish ? 'Switch to Chinese' : '中 / EN：切换到英文');
+    }
+
+    localStorage.setItem('ai-handbook-lang', toEnglish ? 'en' : 'zh');
+    if (searchInput && searchResults) runSearch();
+  };
+
+  langToggle?.addEventListener('click', () => setLanguage(html.dataset.lang === 'en' ? 'zh' : 'en'));
+
+  const chapterUrl = item => `/chapters/${item.slug}/`;
+
+  const loadSearchCorpus = () => {
+    if (searchCorpusPromise) return searchCorpusPromise;
+    searchCorpusPromise = fetch('/chapters.json')
+      .then(response => {
+        if (!response.ok) throw new Error(`chapters.json: ${response.status}`);
+        return response.json();
+      })
+      .then(async chapters => Promise.all(chapters.map(async item => {
+        const response = await fetch(chapterUrl(item));
+        if (!response.ok) throw new Error(`${item.slug}: ${response.status}`);
+        const source = await response.text();
+        const doc = new DOMParser().parseFromString(source, 'text/html');
+        const section = doc.querySelector('.ch') || doc.querySelector('main') || doc.body;
+        const zh = section.textContent.replace(/\s+/g, ' ').trim();
+        applyLanguageToRoot(section, 'en');
+        const en = normalizeEnglishPunctuation(section.textContent.replace(/\s+/g, ' ').trim());
+        return {
+          href: chapterUrl(item),
+          titleZh: `${item.number} ${item.zh}`,
+          titleEn: `${item.number} ${item.en}`,
+          textZh: zh,
+          textEn: en
+        };
+      })));
+    return searchCorpusPromise;
+  };
+
+  const currentSearchLanguage = () => html.dataset.lang === 'en' ? 'en' : 'zh';
+
+  const makeSnippet = (text, query) => {
+    const clean = text.replace(/\s+/g, ' ').trim();
+    if (!query) return clean.slice(0, 210) + (clean.length > 210 ? '…' : '');
+    const lower = clean.toLowerCase();
+    const index = lower.indexOf(query.toLowerCase());
+    const start = Math.max(0, index >= 0 ? index - 70 : 0);
+    const snippet = clean.slice(start, start + 230);
+    return `${start > 0 ? '…' : ''}${snippet}${start + 230 < clean.length ? '…' : ''}`;
+  };
+
+  const renderSearch = (corpus, query) => {
+    const lang = currentSearchLanguage();
+    const q = query.trim().toLowerCase();
+    const titleKey = lang === 'en' ? 'titleEn' : 'titleZh';
+    const textKey = lang === 'en' ? 'textEn' : 'textZh';
+    const matches = corpus.filter(item => {
+      if (!q) return true;
+      return `${item[titleKey]} ${item[textKey]}`.toLowerCase().includes(q);
+    }).slice(0, 30);
+
+    searchResults.replaceChildren(...matches.map(item => {
+      const link = document.createElement('a');
+      link.className = 'search-result';
+      link.href = item.href;
+      const title = document.createElement('b');
+      title.textContent = item[titleKey];
+      const snippet = document.createElement('small');
+      snippet.textContent = makeSnippet(item[textKey], q);
+      link.append(title, snippet);
+      return link;
+    }));
+
+    if (!matches.length) {
+      searchResults.textContent = lang === 'en' ? 'No matching content found.' : '没有找到匹配内容。';
+    }
+  };
+
+  const runSearch = () => {
+    if (!searchInput || !searchResults) return;
+    const lang = currentSearchLanguage();
+    searchResults.textContent = lang === 'en' ? 'Loading search index…' : '正在加载搜索索引…';
+    loadSearchCorpus()
+      .then(corpus => renderSearch(corpus, searchInput.value))
+      .catch(() => {
+        searchResults.textContent = lang === 'en' ? 'Search is temporarily unavailable.' : '搜索索引暂时不可用。';
+      });
+  };
+
+  searchInput?.addEventListener('input', runSearch);
+
+  fetch('/assets/i18n-residuals.json')
+    .then(response => {
+      if (!response.ok) throw new Error(`i18n-residuals.json: ${response.status}`);
+      return response.json();
+    })
+    .then(map => {
+      residual = map;
+      residualKeys = Object.keys(residual).sort((a, b) => b.length - a.length);
+      setLanguage(localStorage.getItem('ai-handbook-lang') || 'zh');
+      if (searchInput && searchResults) runSearch();
+    })
+    .catch(() => {
+      // Existing data-i18n attributes still work even if the residual dictionary cannot load.
+      setLanguage(localStorage.getItem('ai-handbook-lang') || 'zh');
+      if (searchInput && searchResults) runSearch();
+    });
+})();
