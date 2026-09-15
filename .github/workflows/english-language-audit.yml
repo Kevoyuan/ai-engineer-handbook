@@ -1,0 +1,86 @@
+name: English language audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check every web page for Chinese leakage in English mode
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const HAN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
+          const root = 'web';
+          const files = [];
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
+              const p = path.join(dir, entry.name);
+              if (entry.isDirectory()) walk(p);
+              else if (entry.isFile() && p.endsWith('.html')) files.push(p);
+            }
+          }
+          walk(root);
+
+          const decode = s => s
+            .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+            .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+            .replace(/&nbsp;/g, ' ');
+
+          const issues = [];
+          for (const file of files.sort()) {
+            const source = fs.readFileSync(file, 'utf8');
+
+            // English translations themselves must not contain Han characters.
+            for (const m of source.matchAll(/data-i18n-en="([^"]*)"/g)) {
+              const value = decode(m[1]);
+              if (HAN.test(value)) issues.push({file, kind: 'data-i18n-en', value});
+            }
+
+            // Accessibility / SEO strings need an English-mode replacement if they contain Chinese.
+            for (const attr of ['aria-label', 'placeholder']) {
+              const re = new RegExp(`${attr}="([^"]*)"`, 'g');
+              for (const m of source.matchAll(re)) {
+                const value = decode(m[1]);
+                if (HAN.test(value)) issues.push({file, kind: attr, value});
+              }
+            }
+            for (const m of source.matchAll(/<meta\s+name="description"\s+content="([^"]*)"/g)) {
+              const value = decode(m[1]);
+              if (HAN.test(value)) issues.push({file, kind: 'meta-description', value});
+            }
+
+            // Simulate the text shown after switching to English: replace every i18n span
+            // with data-i18n-en, then strip tags and inspect remaining visible text.
+            let rendered = source
+              .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+              .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+              .replace(/<span\b([^>]*\bclass="[^"]*\bi18n-text\b[^"]*"[^>]*)>([\s\S]*?)<\/span>/gi,
+                (all, attrs) => {
+                  const m = attrs.match(/data-i18n-en="([^"]*)"/i);
+                  return m ? decode(m[1]) : all;
+                })
+              .replace(/<[^>]+>/g, '\n');
+            rendered = decode(rendered);
+            for (const raw of rendered.split(/\n+/)) {
+              const value = raw.replace(/\s+/g, ' ').trim();
+              if (value && HAN.test(value)) issues.push({file, kind: 'visible-text', value});
+            }
+          }
+
+          console.log(`Audited ${files.length} HTML pages.`);
+          if (issues.length) {
+            console.error(`Found ${issues.length} English-mode leakage issue(s):`);
+            for (const x of issues) console.error(`${x.file}\t${x.kind}\t${x.value}`);
+            process.exit(1);
+          }
+          console.log('PASS: no Han characters remain in English-visible text, English i18n values, aria labels, placeholders, or meta descriptions.');
+          NODE
