@@ -14,6 +14,17 @@
   let residualKeys = [];
   let searchCorpusPromise = null;
 
+  const chapterAdditions = {
+    '08-agent-orchestration': {
+      path: '/assets/ch08-loop-vs-graph.html',
+      id: 'loop-vs-graph'
+    },
+    '09-reliability-evaluation-observability': {
+      path: '/assets/ch09-cost-per-successful-task.html',
+      id: 'cost-per-successful-task'
+    }
+  };
+
   const normalizeEnglishPunctuation = value => value
     .replace(/。/g, '.')
     .replace(/，/g, ', ')
@@ -130,6 +141,26 @@
     }
   };
 
+  const currentChapterSlug = () => location.pathname.match(/\/chapters\/([^/]+)/)?.[1] || '';
+
+  const fetchAdditionDocument = async addition => {
+    const response = await fetch(addition.path);
+    if (!response.ok) throw new Error(`${addition.path}: ${response.status}`);
+    const source = await response.text();
+    return new DOMParser().parseFromString(source, 'text/html');
+  };
+
+  const injectCurrentChapterAddition = async () => {
+    const addition = chapterAdditions[currentChapterSlug()];
+    if (!addition || document.getElementById(addition.id)) return;
+    const doc = await fetchAdditionDocument(addition);
+    const fragment = document.createDocumentFragment();
+    [...doc.body.children].forEach(node => fragment.append(node));
+    const pageNav = document.querySelector('main .page-nav');
+    if (pageNav) pageNav.before(fragment);
+    else document.querySelector('main')?.append(fragment);
+  };
+
   const setLanguage = lang => {
     const toEnglish = lang === 'en';
     html.dataset.lang = toEnglish ? 'en' : 'zh';
@@ -174,15 +205,29 @@
         const source = await response.text();
         const doc = new DOMParser().parseFromString(source, 'text/html');
         const section = doc.querySelector('.ch') || doc.querySelector('main') || doc.body;
-        const zh = section.textContent.replace(/\s+/g, ' ').trim();
+        const zhParts = [section.textContent.replace(/\s+/g, ' ').trim()];
         applyLanguageToRoot(section, 'en');
-        const en = normalizeEnglishPunctuation(section.textContent.replace(/\s+/g, ' ').trim());
+        const enParts = [normalizeEnglishPunctuation(section.textContent.replace(/\s+/g, ' ').trim())];
+
+        const addition = chapterAdditions[item.slug];
+        if (addition) {
+          try {
+            const additionDoc = await fetchAdditionDocument(addition);
+            const additionRoot = additionDoc.body;
+            zhParts.push(additionRoot.textContent.replace(/\s+/g, ' ').trim());
+            applyLanguageToRoot(additionRoot, 'en');
+            enParts.push(normalizeEnglishPunctuation(additionRoot.textContent.replace(/\s+/g, ' ').trim()));
+          } catch {
+            // Search still works for the base chapter if a supplemental fragment cannot load.
+          }
+        }
+
         return {
           href: chapterUrl(item),
           titleZh: `${item.number} ${item.zh}`,
           titleEn: `${item.number} ${item.en}`,
-          textZh: zh,
-          textEn: en
+          textZh: zhParts.filter(Boolean).join(' '),
+          textEn: enParts.filter(Boolean).join(' ')
         };
       })));
     return searchCorpusPromise;
@@ -248,12 +293,18 @@
     .then(map => {
       residual = map;
       residualKeys = Object.keys(residual).sort((a, b) => b.length - a.length);
-      setLanguage(localStorage.getItem('ai-handbook-lang') || 'zh');
-      if (searchInput && searchResults) runSearch();
     })
     .catch(() => {
       // Existing data-i18n attributes still work even if the residual dictionary cannot load.
-      setLanguage(localStorage.getItem('ai-handbook-lang') || 'zh');
-      if (searchInput && searchResults) runSearch();
+    })
+    .finally(() => {
+      injectCurrentChapterAddition()
+        .catch(() => {
+          // Base chapter remains usable if a supplemental fragment cannot load.
+        })
+        .finally(() => {
+          setLanguage(localStorage.getItem('ai-handbook-lang') || 'zh');
+          if (searchInput && searchResults) runSearch();
+        });
     });
 })();
