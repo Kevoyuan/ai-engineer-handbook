@@ -1114,6 +1114,45 @@ Evaluation ≠ 一个 Judge Prompt ≠ 一张离线准确率表 ≠ 一次 QA。
 2. 哪些 Slice 发生 Regression，为什么？
 3. 证据是否足以支持 Ship / Canary / Hold / Rollback / 继续实验？
 
+从开发节奏看，Observability 与 Evaluation 是连续的 Build ↔ Test 内环：
+
+```text
+Run Agent
+→ Read Trace
+→ Locate Failure
+→ Fix
+→ Rerun
+```
+
+手工 Trace Debug 适合少量场景；当模型、Prompt、Tool 或 Workflow 高频变化时，失败必须进一步固化为可重复测试资产：
+
+```text
+Observed Failure
+→ Dataset Case
+→ Evaluator
+→ Experiment
+→ Regression Protection
+```
+
+Eval 至少有三个 Scope：
+
+| Scope | 核心问题 | 典型对象 |
+|---|---|---|
+| Step / Unit | 某个决策或组件是否正确？ | tool call · retrieval query · parsing · SQL/schema check |
+| Final Response / E2E | 从输入到最终输出是否完成用户目标？ | correctness · relevance · groundedness · safety · task success |
+| Trajectory | 即使最终答案正确，执行路径是否低效、重复或违规？ | step count · tool order · redundant calls · planning · recovery |
+
+> **A correct final answer does not prove a reliable trajectory.**
+
+创建 Eval 可以固定成四步：
+
+```text
+1. Decide what matters
+2. Create / curate a dataset
+3. Create an evaluator
+4. Run an experiment and compare versions
+```
+
 业务结果应优先于代理指标。例如：
 
 | Agent | Primary Outcome | Supporting Metrics |
@@ -1126,6 +1165,30 @@ Evaluation ≠ 一个 Judge Prompt ≠ 一张离线准确率表 ≠ 一次 QA。
 ## 9.3 Dataset Manager
 
 数据来源可以包括 Synthetic、Human-authored、Historical Production、Online Bad Cases、Boundary、Safety/Permission、Adversarial、No-answer/Clarification。
+
+一个通用 Example 由三部分组成：
+
+```text
+inputs                required
+reference_outputs     optional; only for evaluators that need them
+metadata              optional; slice / version / environment / risk / source
+```
+
+Reference Output 是评估依据，不应作为被测 Agent 的输入泄漏进去。
+
+Dataset 的构建逻辑优先从 PRD 与真实 Failure Mode 出发：
+
+```text
+PRD / desired behavior
+→ derive scenarios
+→ write several questions per scenario
+→ add reference answers only when the evaluator needs them
+→ attach metadata for slicing and provenance
+```
+
+场景至少考虑 Happy Path、Edge Case、Out-of-Scope、Adversarial Input 与历史失败。开始阶段优先少量高质量案例，而不是一开始堆大量样本导致分析迟滞。
+
+Dataset 应随真实使用增长：线上 Eval 低分案例、用户负反馈、PRD 未覆盖的 Unexpected Input 都可以经过隐私检查、去重、归因与裁决后回流。
 
 至少区分：
 
@@ -1154,25 +1217,66 @@ Evaluation ≠ 一个 Judge Prompt ≠ 一张离线准确率表 ≠ 一次 QA。
 }
 ```
 
-## 9.4 Trace：记录可回放执行，不记录隐藏思维链
+## 9.4 Observability：Trace 解释一次运行，Thread 解释跨轮行为
 
-Trace 应包含 request / agent / model / prompt / workflow / tool-registry / memory snapshot 的版本，逐步记录 workflow state、tool、arguments、observation/result status、latency，以及 final output、validation result、cost、total latency。
+传统应用的大量决策写在显式代码中；Agent 的部分决策由模型在运行时产生。因此失败时不能只扫描异常栈，还需要重建“这一次运行实际做了什么”。
 
-不要把隐藏 Chain-of-Thought 当必须存储的 Evaluation Trace。应记录 model-visible messages、structured decisions、tool calls & args、tool observations、workflow states、validation outcomes 和 compact decision summaries。
+### Trace
 
-## 9.5 Judge Routing：Rule / LLM / Human
+Trace 是**单次 Agent Run** 的完整可观测序列。应包含 request / agent / model / prompt / workflow / tool-registry / memory snapshot 的版本，逐步记录 workflow state、model-visible messages、structured decisions、tool、arguments、tool observation / result status、validation result、latency、token usage、cost 与 final output。
 
-先问：能否用确定性规则判定？Schema、精确数值、unit tests、SQL results、citation existence、prohibited tool、permission violation、latency/cost budget 优先 Rule Judge。
+如果 Agent Output 只返回最终一句话，很多 Tool Call 和中间 Message 会从应用层输出里消失；调试接口应保留足够完整的结构化消息或 Trace 数据，以支持回放与错误归因。
 
-语义标准如 Helpfulness、Completeness、Policy Explanation、Semantic Support、Tone、Trajectory Quality 可以交给**经过校准**的 LLM Judge。
+不要把隐藏 Chain-of-Thought 当必须存储的 Evaluation Trace。系统可以观测模型**做了什么**以及模型显式输出的 reasoning summary / structured decision，但不能把内部不可见推理当成可靠遥测。
 
-高风险、不确定或 Judge 分歧进入 Human Review + Adjudication。
+### Thread
 
-LLM Judge 必须有 Rubric、reference examples、output schema、temperature control、judge version、calibration set 与 human-agreement measurement。
+多轮 Agent 每一轮可以产生自己的 Trace；多个 Trace 通过 `session_id`、`thread_id` 或 `conversation_id` 关联成 Thread。Thread 让我们观察早期 Context 如何影响后续决策，以及问题从哪一轮开始积累。
 
-高质量 Rubric 要拆成可观察标准：Correctness、Completeness、Grounding、Policy、Actionability。Judge 输出最好包含 `score / pass / failed_criteria / evidence / repair_hint`。
+必须区分：
+
+```text
+Thread metadata = observability grouping
+Conversation / state storage = application persistence
+```
+
+把多个 Trace 归进同一个 Thread **不会自动让 Agent 拥有跨轮记忆**。Stateful Conversation 仍需要自己的 Message Store / Database / Checkpointer 保存历史与状态。
+
+> **Trace makes one run explainable; Thread makes cross-turn behavior inspectable. Neither one replaces application state.**
+
+## 9.5 Evaluator Routing：Code / LLM / Pairwise / Human
+
+先问最重要的问题：**Can I write a function that reliably determines what I want to evaluate?** 如果可以，优先 Code-based Evaluator。
+
+### Code-based Evaluator
+
+适合 Schema、Output Shape、Action / Tool Type、Keyword / Filter、精确数值、SQL、Unit Test、Latency、Cost、Semantic Retrieval Quality 等可稳定程序化判断的问题。
+
+它像 Agent 的 Unit Test：确定性、快速、便宜、失败时容易 Debug。典型例子是检查“执行数据查询前是否先做 schema inspection”。
+
+### LLM-as-Judge
+
+适合很难写成规则、但人类能够相对清楚判断的语义标准，例如是否回答了原问题、是否正确 Handoff、是否泄漏敏感信息、语气是否专业。
+
+可靠 Judge 至少遵循三条：
+
+1. **Narrow scope**：每个 Judge 只评一个清晰 Criterion，不问“这个回答总体好不好”；
+2. **Binary / categorical output**：优先 Yes/No、Pass/Fail 或有限类别，而不是含义模糊的 1–5 连续分；
+3. **Human alignment**：让人工与 Judge 标注同一批样本，分析分歧，再迭代 Rubric / Prompt / Examples。
+
+高质量 Rubric 仍可拆成 Correctness、Completeness、Grounding、Policy、Actionability 等**独立可观察维度**。Judge 输出最好包含 `pass / category / failed_criteria / evidence / repair_hint`，而不是只返回一个漂亮的分数。
 
 > **Evaluators should produce repair instructions, not only scores.**
+
+### Pairwise Evaluation
+
+有些指标绝对评分很模糊，但相对比较容易。例如 Conciseness、Professionalism、Helpfulness。此时让同一输入得到 Response A / Response B，再问“哪一个更符合目标”通常比单独给每个答案打 1–5 分更稳定。
+
+Pairwise 比较要尽量随机化 A/B 顺序，降低 Position Bias；同时要明确“更短”不等于“更简洁”，不能为了赢 Conciseness 而丢失 Crucial Information。
+
+### Human Review
+
+高风险、Judge 分歧、标准不稳定或需要 Subject Matter Expert 的任务进入 Human Review + Adjudication。Human 不是无限扩容方案；人工裁决应该继续沉淀成 Calibration Set、Rubric 与 Regression Asset。
 
 Judge 本身也要评估：Human Agreement、Pairwise Consistency、Self-consistency、Position Bias、Verbosity Bias、Reference Leakage、Prompt Sensitivity、Model-version Drift。关键 Release Gate 不应依赖一个未校准的单一 LLM Judge。
 
@@ -1202,6 +1306,18 @@ Business
 ## 9.7 Offline + Online Evaluation
 
 离线对比 Prompt / Model / Tool / Memory / Workflow 时，固定 dataset version、judge version、model settings、tool mocks / data snapshot、random seed，确保版本比较可复现。
+
+一次标准 Experiment 可以抽象为：
+
+```text
+Target Agent
+× Dataset
+× Evaluators
+→ per-example results
+→ aggregate + slice comparison
+```
+
+大规模 Evaluation Job 要控制并发，避免把 Eval Harness 自己变成限流、成本或状态污染来源；可重复的测试应进入 CI/CD。框架层面可以使用异步批量执行或 pytest 集成，但真正需要版本治理的是 Agent / Dataset / Evaluator / Environment，而不是某一个 SDK 调用名字。
 
 线上关注 Distribution Shift、Tool Reliability、Latency、User Corrections、Fallback、Human Escalation 与 Business Outcomes。常见路径：
 
@@ -1356,6 +1472,30 @@ cost_per_successful_task
 
 Source: https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-explained
 
+## 9.14 LangChain Academy Reliable Agents：来源映射
+
+本章关于 Observability 与 Durable Evals 的新增内容来自用户提供的 LangChain Academy Reliable Agents 课程材料，并做了工程化抽象：
+
+- Observability：Trace 是单次运行的可观测序列；Thread 将多轮 Trace 归组；Thread metadata 与真正的 Conversation Persistence 分离；
+- Evaluating Agents：Eval Scope 分为 Step/Unit、Final/E2E、Trajectory，并同时关注 Operational / Output Quality / Trajectory Metrics；
+- Datasets：PRD → Scenarios → Questions → Optional References / Metadata，从少量高质量案例开始，再用真实 Bad Cases 扩展；
+- Running Experiments：Target × Dataset × Evaluators 形成 Experiment；批量执行需要并发控制并最终接入可重复 Test/CI 流程；
+- Code-based Eval：能稳定写函数判定的 Criteria 优先确定性 Evaluator；
+- LLM-as-Judge：Narrow Scope、Binary/Categorical、Human Alignment；
+- Pairwise Evaluation：当绝对评分模糊而相对比较容易时比较 A/B，并随机化顺序减少 Position Bias。
+
+LangSmith 在课程中作为具体实现：可通过框架 Integration 或 manual wrapper + `traceable` instrumentation 收集 Trace，用 `session_id / thread_id / conversation_id` 关联 Thread；离线 Experiment 可通过 `evaluate / aevaluate` 或 pytest 工作流执行。这里把这些 API 视为实现样例，而不是跨框架的架构定义。
+
+Sources:
+
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-1/observability
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/evaluating-agents
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/datasets
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/running-experiments
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/code-based-eval
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/llm-as-judge
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/pairwise-evaluation
+
 ---
 
 # Cross-chapter Canonical Rules
@@ -1375,6 +1515,7 @@ Source: https://aiengineering.beehiiv.com/p/loop-vs-graph-engineering-clearly-ex
 11. **Evaluators should produce repair instructions, not only scores.**
 12. **Optimize cost per successful task.** 不只看模型单价或 Cost/query。
 13. **Book first, interaction second.** Interaction 服务理解，不把 Handbook 变成 Dashboard。
+14. **Traces make failures visible; evals make them durable.** Trace 用于解释一次运行，Dataset + Evaluator + Experiment 用于防止未来回归。
 
 ---
 
