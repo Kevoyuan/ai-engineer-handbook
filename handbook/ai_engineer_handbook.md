@@ -1496,6 +1496,117 @@ Sources:
 - https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/llm-as-judge
 - https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/pairwise-evaluation
 
+## 9.15 Production Monitoring：把真实流量变成下一轮 Build / Test 输入
+
+进入真实流量后，Monitoring 不是“把更多图表放到 Dashboard”，而是把大量 Trace 中值得关注的行为系统性地发现、评分、路由，并最终沉淀成下一轮可重复的测试证据。
+
+ADLC 可以看成两个嵌套循环：
+
+```text
+Inner loop
+Build ↔ Test
+
+Outer loop
+Deploy → Monitor → Build → Test → Deploy
+```
+
+测试阶段的 Trace、Dataset、Evaluator 不会在上线后失效；相反，它们会成为 Production Monitoring 的基础设施。
+
+### Batch Trace Mining：从逐条 Debug 到批量发现模式
+
+当 Trace 从几十条增长到几百、几千条，人工逐条阅读不再可扩展。一个通用的批量分析流程是：
+
+```text
+Production Traces
+→ summarize each run
+→ cluster similar behavior / failures
+→ generate findings and candidate actions
+```
+
+它适合发现 Usage Pattern、常见 Tool Path、重复 Failure Mode、异常长 Trajectory、集中发生的 Policy / Retrieval / Handoff 问题。
+
+LangSmith 课程中的 **Insights Agent** 是这个模式的一个实现例：先对 Trace 做摘要，再聚类，再生成报告。这里应把“批量 Trace Mining”视为通用能力，而不是把某个 Insights 产品名写成架构依赖。
+
+批量分析本身也需要治理：限制敏感字段暴露、记录分析模型与 Prompt 版本、对大流量采用 Sampling / Stratification，并把“发现一个 Cluster”视为调查线索，而不是自动判定 Root Cause。
+
+### Online Evaluation：把 Evaluator 放到真实流量上
+
+Offline Eval 是主动把固定 Dataset 跑过 Candidate Agent；Online Eval 是在 Production Trace 产生时，对全部或选定子集持续打分。
+
+```text
+Offline
+Dataset → Candidate Version → Evaluators → Release Evidence
+
+Online
+Production Trace / Thread → Evaluator → Score / Category → Trend / Routing Signal
+```
+
+Online Eval 可以覆盖单 Trace，也可以覆盖 Thread 级行为。例如 User Sentiment、Handoff Quality、Policy Compliance、Groundedness、Task Success Proxy 等跨轮指标，往往需要 Thread 上下文才能判断。
+
+但 Online Eval 的输出仍然只是**信号**，不是事实真值。需要继续管理：Evaluator Version、Human Alignment、Sampling Bias、Cost、Latency、Privacy、Model Drift，以及高风险场景的人审边界。
+
+> **Online evaluation scales judgment; it does not eliminate evaluator uncertainty.**
+
+### Automation：Score 必须能触发下一步
+
+分数如果只进入 Dashboard，而没有连接到处理动作，Monitoring 仍然没有闭环。一个 Automation 可以抽象成三部分：
+
+| Component | 作用 |
+|---|---|
+| Filter | 哪些 Trace / Thread 值得处理：eval score、error、metadata、risk、feedback |
+| Sampling Rate | 对命中对象处理多少比例，控制成本、人工负荷与覆盖度 |
+| Action | Annotation Queue · Dataset Candidate · Webhook / Incident · Retention / Investigation |
+
+典型路由：
+
+```text
+low quality / negative signal
+→ human review / incident investigation
+
+interesting failure
+→ annotation + root-cause label
+→ regression candidate
+
+high-quality representative case
+→ dataset candidate after curation
+
+sampled normal traffic
+→ spot-check / drift monitoring
+```
+
+不要把“Positive sentiment”自动等价为 Golden Example，也不要把每个负反馈都直接写进 Regression Set。Production Data 进入 Dataset 前仍需 Privacy Review、Deduplication、Expected Behavior、Root Cause、Adjudication 与 Split Assignment。
+
+### Production Learning Loop
+
+完整的外环应该把 Monitor 结果重新变成可验证的 Build / Test 输入：
+
+```text
+Real Traffic
+→ Trace / Thread
+→ Online Eval + Batch Insights
+→ Filter / Sample / Route
+→ Human Review / Root Cause
+→ Curated Dataset / Regression Asset
+→ Build Fix
+→ Offline Experiment
+→ Release Gate / Canary
+→ Production
+→ New Traffic
+```
+
+> **Monitoring without routing is telemetry; monitoring with curated feedback becomes learning infrastructure.**
+
+> **The production loop closes only when monitored behavior becomes reproducible test evidence.**
+
+来源：LangChain Academy · Reliable Agents Module 3。课程以 LangSmith 的 Insights Agent、Online Evals 与 Automations 作为具体实现；本手册将其抽象为 Batch Trace Mining、Continuous Evaluation 与 Signal-to-Action Routing 三层生产监控模式。
+
+Sources:
+
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-3/scaling
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-3/insights-agents
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-3/online-evals
+- https://langchain-ai.github.io/lca-lessons/reliable-agents/module-3/automations
+
 ---
 
 # Cross-chapter Canonical Rules
@@ -1516,6 +1627,7 @@ Sources:
 12. **Optimize cost per successful task.** 不只看模型单价或 Cost/query。
 13. **Book first, interaction second.** Interaction 服务理解，不把 Handbook 变成 Dashboard。
 14. **Traces make failures visible; evals make them durable.** Trace 用于解释一次运行，Dataset + Evaluator + Experiment 用于防止未来回归。
+15. **Monitoring must produce learning assets.** Production Signal 只有经过路由、裁决和数据集治理，才能成为下一轮 Build / Test 的可靠输入。
 
 ---
 
