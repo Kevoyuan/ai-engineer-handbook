@@ -6,6 +6,18 @@
 
   let corpusPromise = null;
 
+  const supplementalAssets = [
+    ['/chapters/05-document-pdf-rag/', '/assets/ch05-grounded-document-agent.html'],
+    ['/chapters/06-skills-routing/', '/assets/ch06-capability-architecture.html'],
+    ['/chapters/08-agent-orchestration/', '/assets/ch08-loop-vs-graph.html'],
+    ['/chapters/08-agent-orchestration/', '/assets/ch08-coding-agent-engineering.html'],
+    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-reliability-control-plane.html'],
+    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-observability-evals.html'],
+    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-production-monitoring.html'],
+    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-sentiment-ab.html'],
+    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-cost-per-successful-task.html']
+  ];
+
   const currentLanguage = () => html.dataset.lang === 'en' ? 'en' : 'zh';
 
   const normalizeItem = item => ({
@@ -16,17 +28,52 @@
     textEn: item.textEn || item.text || ''
   });
 
+  const cleanText = root => root.textContent.replace(/\s+/g, ' ').trim();
+
+  const extractSupplementText = source => {
+    const zhDoc = new DOMParser().parseFromString(source, 'text/html');
+    const enDoc = new DOMParser().parseFromString(source, 'text/html');
+    enDoc.querySelectorAll('.i18n-text').forEach(element => {
+      if (element.dataset.i18nEn != null) element.textContent = element.dataset.i18nEn;
+    });
+    return {
+      textZh: cleanText(zhDoc.body),
+      textEn: cleanText(enDoc.body)
+    };
+  };
+
+  const loadSupplements = () => Promise.allSettled(supplementalAssets.map(async ([href, path]) => {
+    const response = await fetch(path, {cache: 'no-cache'});
+    if (!response.ok) throw new Error(`${path}: ${response.status}`);
+    return {href, ...extractSupplementText(await response.text())};
+  })).then(results => results
+    .filter(result => result.status === 'fulfilled')
+    .map(result => result.value));
+
+  const mergeSupplements = (items, supplements) => {
+    const normalized = items.map(normalizeItem);
+    const byHref = new Map(normalized.map(item => [item.href, item]));
+    supplements.forEach(supplement => {
+      const item = byHref.get(supplement.href);
+      if (!item) return;
+      item.textZh = `${item.textZh} ${supplement.textZh}`.trim();
+      item.textEn = `${item.textEn} ${supplement.textEn}`.trim();
+    });
+    return normalized;
+  };
+
   const loadCorpus = () => {
     if (corpusPromise) return corpusPromise;
-    corpusPromise = fetch('/search-index.json', {cache: 'no-cache'})
-      .then(response => {
+    corpusPromise = Promise.all([
+      fetch('/search-index.json', {cache: 'no-cache'}).then(response => {
         if (!response.ok) throw new Error(`search-index.json: ${response.status}`);
         return response.json();
-      })
-      .then(items => {
-        if (!Array.isArray(items)) throw new Error('search-index.json: invalid payload');
-        return items.map(normalizeItem);
-      });
+      }),
+      loadSupplements()
+    ]).then(([items, supplements]) => {
+      if (!Array.isArray(items)) throw new Error('search-index.json: invalid payload');
+      return mergeSupplements(items, supplements);
+    });
     return corpusPromise;
   };
 
