@@ -15,6 +15,7 @@
     ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-observability-evals.html'],
     ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-production-monitoring.html'],
     ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-sentiment-ab.html'],
+    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-monitoring-capstone.html'],
     ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-cost-per-successful-task.html']
   ];
 

@@ -58,6 +58,10 @@
         id: 'sentiment-ab-monitoring'
       },
       {
+        path: '/assets/ch09-monitoring-capstone.html',
+        id: 'monitoring-capstone'
+      },
+      {
         path: '/assets/ch09-cost-per-successful-task.html',
         id: 'cost-per-successful-task'
       }
