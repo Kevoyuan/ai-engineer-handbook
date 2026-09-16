@@ -1,0 +1,51 @@
+<section id="sentiment-ab-monitoring" aria-labelledby="sentiment-ab-monitoring-title">
+  <h2 class="sub" id="sentiment-ab-monitoring-title"><span class="i18n-text" data-i18n-zh="User Sentiment 与 A/B Testing：从体验信号到版本证据" data-i18n-en="User sentiment and A/B testing: From experience signals to version evidence">User Sentiment 与 A/B Testing：从体验信号到版本证据</span> <small>§9.M+</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="Latency 与 Error Rate 能告诉你系统是否“运行正常”，却不能证明用户是否满意。课程补充了两条生产闭环：用显式反馈 + Thread-level inferred sentiment 捕获体验问题，再用 prompt_version metadata 把修复版本和 Control 放在真实流量中比较。" data-i18n-en="Latency and error rate can show whether a system is operating normally, but they do not prove user satisfaction. The course adds two production loops: capture experience problems with explicit feedback plus thread-level inferred sentiment, then compare a fix against the control on real traffic using prompt_version metadata.">Latency 与 Error Rate 能告诉你系统是否“运行正常”，却不能证明用户是否满意。课程补充了两条生产闭环：用显式反馈 + Thread-level inferred sentiment 捕获体验问题，再用 prompt_version metadata 把修复版本和 Control 放在真实流量中比较。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-9-sentiment-signals">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.M4 · EXPERIENCE SIGNALS</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="User Sentiment 需要两条信号：用户主动说什么，以及完整对话暗示了什么体验" data-i18n-en="User sentiment needs two signals: what users explicitly report and what the full conversation implies about their experience">User Sentiment 需要两条信号：用户主动说什么，以及完整对话暗示了什么体验</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-card bfs-blue"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">EXPLICIT</span></div><h2 class="bfs-card-title">Thumbs up / down → trace feedback</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="LangSmith 示例用 create_feedback，把 user_sentiment=1/0 绑定到 trace_id。Root trace 通常足够；若需要阶段归因，也可以绑定到 child run。" data-i18n-en="The LangSmith example uses create_feedback to attach user_sentiment=1/0 to a trace_id. Root-trace feedback is usually enough; child runs can be used for phase attribution when needed.">LangSmith 示例用 create_feedback，把 user_sentiment=1/0 绑定到 trace_id。Root trace 通常足够；若需要阶段归因，也可以绑定到 child run。</span></div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">INFERRED</span></div><h2 class="bfs-card-title">Thread → LLM judge → sentiment</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="显式反馈覆盖稀疏，因此课程用 Thread-based Online Eval 在整段对话 idle 后判断总体满意度。它适合用户满意度、主题和多轮体验，而不是只看单个 Trace。" data-i18n-en="Explicit feedback is sparse, so the course uses a thread-based online eval to judge overall satisfaction after the conversation goes idle. This is appropriate for satisfaction, topic, and multi-turn experience rather than a single trace.">显式反馈覆盖稀疏，因此课程用 Thread-based Online Eval 在整段对话 idle 后判断总体满意度。它适合用户满意度、主题和多轮体验，而不是只看单个 Trace。</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tsc rv"><table>
+    <thead><tr><th><span class="i18n-text" data-i18n-zh="维度" data-i18n-en="Dimension">维度</span></th><th>Single-turn evaluator</th><th>Thread-based evaluator</th></tr></thead>
+    <tbody>
+      <tr><td><b>Input</b></td><td>Single trace</td><td>Full conversation thread</td></tr>
+      <tr><td><b>Trigger</b></td><td><span class="i18n-text" data-i18n-zh="新 Trace 到达" data-i18n-en="When a new trace arrives">新 Trace 到达</span></td><td><span class="i18n-text" data-i18n-zh="Thread idle 后" data-i18n-en="After the thread goes idle">Thread idle 后</span></td></tr>
+      <tr><td><b><span class="i18n-text" data-i18n-zh="适合" data-i18n-en="Good for">适合</span></b></td><td>safety · format · per-run checks</td><td>topic · user satisfaction · multi-turn experience</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="co note rv interp-callout"><span class="co-t">EVALUATOR DESIGN</span><p><span class="i18n-text" data-i18n-zh="课程重申三个 LLM-as-Judge 规则：一次只问一个窄问题；输出 Binary / Categorical，而不是模糊的 1–5 分；定期和 Human Labels 对齐。Sentiment 示例把 Neutral 归到 Positive，并提高最终 Human Message 的权重。" data-i18n-en="The course repeats three LLM-as-judge rules: ask one narrow question at a time; return binary or categorical outputs rather than fuzzy 1–5 scores; and regularly align the judge with human labels. The sentiment example maps neutral to positive and gives extra weight to the final human message.">课程重申三个 LLM-as-Judge 规则：一次只问一个窄问题；输出 Binary / Categorical，而不是模糊的 1–5 分；定期和 Human Labels 对齐。Sentiment 示例把 Neutral 归到 Positive，并提高最终 Human Message 的权重。</span></p></div>
+
+  <div class="co warn rv interp-callout"><span class="co-t">SOURCE-SPECIFIC SETTINGS</span><p><span class="i18n-text" data-i18n-zh="课程把 30–50% sampling、Gemini 2.5 Flash / GPT-4.1 nano、Human-and-AI-pairs message format 作为 LangSmith Sentiment Evaluator 的起始配置示例。这些是产品/课程建议，不是跨平台通用阈值。LangSmith Online Evaluator 命中的 Trace 还会进入 extended data retention，因此会影响 Trace pricing。" data-i18n-en="The course presents 30–50% sampling, Gemini 2.5 Flash / GPT-4.1 nano, and Human-and-AI-pairs message format as starting settings for a LangSmith sentiment evaluator. These are product/course recommendations, not universal thresholds. Traces evaluated online in LangSmith are also upgraded to extended data retention, which affects trace pricing.">课程把 30–50% sampling、Gemini 2.5 Flash / GPT-4.1 nano、Human-and-AI-pairs message format 作为 LangSmith Sentiment Evaluator 的起始配置示例。这些是产品/课程建议，不是跨平台通用阈值。LangSmith Online Evaluator 命中的 Trace 还会进入 extended data retention，因此会影响 Trace pricing。</span></p></div>
+
+  <h2 class="sub"><span class="i18n-text" data-i18n-zh="A/B Testing：修复只有和当前版本在真实流量里比较，才成为版本证据" data-i18n-en="A/B testing: A fix becomes version evidence only when it is compared with the current version on real traffic">A/B Testing：修复只有和当前版本在真实流量里比较，才成为版本证据</span></h2>
+  <div class="bfs-canvas rv" id="fig-9-ab-loop">
+    <div class="bfs-head"><div><span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.M5 · VERSION EXPERIMENT</span></div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g6">
+        <div class="bfs-card bfs-blue"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">1</span></div><h2 class="bfs-card-title">Real Traffic</h2></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">2</span></div><h2 class="bfs-card-title">Control / Variant</h2></div>
+        <div class="bfs-card bfs-amber"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">3</span></div><h2 class="bfs-card-title">metadata.prompt_version</h2></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">4</span></div><h2 class="bfs-card-title">Online Evals</h2></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">5</span></div><h2 class="bfs-card-title">Group by Version</h2></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">6</span></div><h2 class="bfs-card-title">Quality · latency · errors</h2></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="co must rv interp-callout"><span class="co-t">HANDBOOK GENERALIZATION</span><p><strong><span class="i18n-text" data-i18n-zh="Monitoring finds the problem; versioned experiments test the fix." data-i18n-en="Monitoring finds the problem; versioned experiments test the fix.">Monitoring finds the problem; versioned experiments test the fix.</span></strong> <span class="i18n-text" data-i18n-zh="把 experiment / prompt / agent / workflow version 作为一等 Metadata，才能让 Feedback、Eval、Latency、Error、Cost 与 Release Decision 对齐到同一个版本切片。" data-i18n-en="Treat experiment, prompt, agent, or workflow version as first-class metadata so feedback, evals, latency, errors, cost, and release decisions can be aligned to the same version slice.">把 experiment / prompt / agent / workflow version 作为一等 Metadata，才能让 Feedback、Eval、Latency、Error、Cost 与 Release Decision 对齐到同一个版本切片。</span></p></div>
+
+  <div class="co must rv interp-callout"><span class="co-t">CLOSED LOOP</span><p><strong><span class="i18n-text" data-i18n-zh="Experience signal → Root cause → Fix → A/B experiment → Release decision → Monitor." data-i18n-en="Experience signal → Root cause → Fix → A/B experiment → Release decision → Monitor.">Experience signal → Root cause → Fix → A/B experiment → Release decision → Monitor.</span></strong></p></div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="来源说明：本节依据 LangChain Academy Production Monitoring Module 3 的 Tracking User Sentiment 与 A/B Testing Prompt Versions 两课工程化整理。LangSmith-specific API、UI 与 Retention 行为保留为实现示例；本手册将其抽象为 Experience Signal、Thread-level Evaluation、Signal Routing 与 Versioned Production Experiment。" data-i18n-en="Source note: this section engineering-reframes the Tracking User Sentiment and A/B Testing Prompt Versions lessons from LangChain Academy Production Monitoring Module 3. LangSmith-specific APIs, UI, and retention behavior are kept as implementation examples; the handbook abstracts them into experience signals, thread-level evaluation, signal routing, and versioned production experiments.">来源说明：本节依据 LangChain Academy Production Monitoring Module 3 的 Tracking User Sentiment 与 A/B Testing Prompt Versions 两课工程化整理。LangSmith-specific API、UI 与 Retention 行为保留为实现示例；本手册将其抽象为 Experience Signal、Thread-level Evaluation、Signal Routing 与 Versioned Production Experiment。</span></p>
+</section>
