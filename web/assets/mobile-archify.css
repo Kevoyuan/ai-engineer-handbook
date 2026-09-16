@@ -1,0 +1,138 @@
+/* Mobile architecture mode — diagrams reflow as vertical topology, not compressed desktop grids. */
+@media (width<=900px){
+  .home-page .system-framework .ae-map,
+  .home-page .agent-reference .agent-shell{overflow:visible!important;padding:18px 14px 20px!important}
+
+  .home-page .system-framework .ae-map:before,
+  .home-page .agent-reference .agent-shell:before{font-size:7.5px!important;letter-spacing:.14em!important;margin-bottom:16px!important}
+
+  .home-page .system-framework .ae-map:after,
+  .home-page .agent-reference .agent-shell:after{right:14px!important;top:18px!important;font-size:8px!important}
+
+  /* 00.1: mobile reading order is dependency → runtime → action/control. */
+  .home-page .system-framework .ae-outcome{width:100%!important;max-width:none!important;margin:0 0 28px!important;text-align:left!important}
+  .home-page .system-framework .ae-outcome:before,
+  .home-page .system-framework .ae-outcome:after{display:none!important}
+  .home-page .system-framework .ae-core-grid{display:grid!important;grid-template-columns:1fr!important;gap:28px!important}
+  .home-page .system-framework .ae-left{order:1!important}
+  .home-page .system-framework .ae-runtime{order:2!important}
+  .home-page .system-framework .ae-right{order:3!important}
+  .home-page .system-framework .ae-side{grid-template-columns:1fr 1fr!important;gap:10px!important;padding:28px 10px 10px!important;min-width:0!important}
+  .home-page .system-framework .ae-side:after{position:absolute!important;left:50%!important;bottom:-22px!important;transform:translateX(-50%)!important;padding:2px 7px!important;background:var(--paper)!important;color:var(--blu)!important;white-space:nowrap!important;letter-spacing:.1em!important;font:800 7.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important}
+  .home-page .system-framework .ae-left:after{content:"↓  CONTEXT / STATE → RUNTIME"!important}
+  .home-page .system-framework .ae-right:after{content:"↓  ACTION / CONTROL → GOVERNANCE"!important}
+  .home-page .system-framework .ae-domain{min-height:auto!important;min-width:0!important}
+  .home-page .system-framework .ae-domain h3{font-size:12px!important}
+  .home-page .system-framework .ae-domain ul{font-size:10.5px!important;overflow-wrap:anywhere!important}
+  .home-page .system-framework .ae-left .ae-domain:after,
+  .home-page .system-framework .ae-right .ae-domain:before{display:none!important}
+  .home-page .system-framework .ae-domain .ae-edge{display:block!important;position:static!important;transform:none!important;margin-top:9px!important;padding:5px 0 0!important;border-top:1px dashed var(--line)!important;background:transparent!important;font-size:7.5px!important;white-space:normal!important}
+  .home-page .system-framework .ae-runtime{min-height:auto!important;padding:14px!important}
+  .home-page .system-framework .ae-runtime:before{position:static!important;display:block!important;margin-bottom:9px!important}
+  .home-page .system-framework .ae-runtime-head strong{font-size:14px!important}
+  .home-page .system-framework .ae-runtime-path{padding-top:2px!important}
+  .home-page .system-framework .ae-stage{grid-template-columns:34px minmax(0,1fr)!important;gap:8px!important;min-height:54px!important}
+  .home-page .system-framework .ae-stage i{width:32px!important;height:23px!important}
+  .home-page .system-framework .ae-runtime-path:before{left:16px!important}
+  .home-page .system-framework .ae-stage:not(:last-child):after{left:13px!important}
+  .home-page .system-framework .ae-stage div{min-width:0!important;padding:8px 9px!important}
+  .home-page .system-framework .ae-stage b{font-size:10.5px!important}
+  .home-page .system-framework .ae-stage span{font-size:9.5px!important;overflow-wrap:anywhere!important}
+  .home-page .system-framework .ae-control-plane{grid-template-columns:1fr!important;margin-top:30px!important}
+  .home-page .system-framework .ae-control-plane:before{content:"↑  CONTROL / FEEDBACK  ↑"!important;top:-21px!important;font-size:7px!important}
+  .home-page .system-framework .ae-plane-label{border-right:0!important;border-bottom:1px dashed var(--line2)!important}
+  .home-page .system-framework .ae-plane-items{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .home-page .system-framework .ae-plane-items span{min-width:0!important;font-size:9px!important;overflow-wrap:anywhere!important}
+  .home-page .system-framework .ae-plane-items span:nth-child(4){border-left:0!important}
+  .home-page .system-framework .ae-plane-items span:nth-child(n+4){border-top:1px solid var(--line)!important}
+  .home-page .system-framework .ae-feedback{margin:12px 0!important;min-width:0!important}
+  .home-page .system-framework .ae-platform b,
+  .home-page .system-framework .ae-platform span{overflow-wrap:anywhere!important}
+
+  /* 00.2: a separate mobile topology rather than a collapsed three-column desktop diagram. */
+  .home-page .agent-reference .agent-entry{width:100%!important;max-width:none!important;margin:0 0 28px!important;text-align:left!important}
+  .home-page .agent-reference .agent-entry:before,
+  .home-page .agent-reference .agent-entry:after{display:none!important}
+  .home-page .agent-reference .agent-runtime{display:grid!important;grid-template-columns:1fr!important;gap:28px!important}
+  .home-page .agent-reference .agent-zone,
+  .home-page .agent-reference .agent-core{min-height:auto!important;min-width:0!important;padding:29px 13px 13px!important}
+  .home-page .agent-reference .agent-zone:before,
+  .home-page .agent-reference .agent-core:before{font-size:7px!important}
+  .home-page .agent-reference .agent-zone b,
+  .home-page .agent-reference .agent-core b{font-size:12px!important}
+  .home-page .agent-reference .agent-zone>span,
+  .home-page .agent-reference .agent-core>span{font-size:10.5px!important;line-height:1.55!important;overflow-wrap:anywhere!important}
+  .home-page .agent-reference .agent-zone:first-child:after,
+  .home-page .agent-reference .agent-core:after,
+  .home-page .agent-reference .agent-zone:last-child:after{position:absolute!important;left:50%!important;bottom:-22px!important;transform:translateX(-50%)!important;padding:2px 7px!important;background:var(--paper)!important;color:var(--blu)!important;white-space:nowrap!important;letter-spacing:.1em!important;font:800 7.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace!important}
+  .home-page .agent-reference .agent-zone:first-child:after{content:"↓  CONTEXT PACK"!important}
+  .home-page .agent-reference .agent-core:after{content:"↓  RESPONSE / ACTION REQUEST"!important}
+  .home-page .agent-reference .agent-zone:last-child:after{content:"↓  HOST RESULT / COMPLETION"!important}
+  .home-page .agent-reference .agent-mini{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+  .home-page .agent-reference .agent-mini i{min-width:0!important;padding:7px 4px!important;font-size:8px!important;overflow-wrap:anywhere!important}
+  .home-page .agent-reference .agent-branch{grid-template-columns:1fr 1fr!important;gap:6px!important}
+  .home-page .agent-reference .agent-branch i{font-size:8px!important;padding:8px 5px!important}
+  .home-page .agent-reference .agent-loopline{font-size:8px!important;overflow-wrap:anywhere!important}
+  .home-page .agent-reference .agent-validation,
+  .home-page .agent-reference .agent-control,
+  .home-page .agent-reference .agent-learning{position:relative!important;margin:28px 0 0!important;padding:13px!important;min-width:0!important}
+  .home-page .agent-reference .agent-validation:after,
+  .home-page .agent-reference .agent-control:after{content:"↓"!important;position:absolute!important;left:50%!important;bottom:-22px!important;transform:translateX(-50%)!important;background:var(--paper)!important;color:var(--blu)!important;padding:0 5px!important;font:800 9px/1 ui-monospace,monospace!important}
+  .home-page .agent-reference .agent-validation b,
+  .home-page .agent-reference .agent-control b,
+  .home-page .agent-reference .agent-learning b{font-size:10.5px!important;overflow-wrap:anywhere!important}
+  .home-page .agent-reference .agent-validation span,
+  .home-page .agent-reference .agent-control span,
+  .home-page .agent-reference .agent-learning span{font-size:10px!important;line-height:1.55!important;overflow-wrap:anywhere!important}
+  .home-page .agent-reference .agent-equation{padding:13px!important}
+  .home-page .agent-reference .agent-equation code{font-size:10px!important;line-height:1.55!important;overflow-wrap:anywhere!important}
+  .home-page .agent-reference .agent-map{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .home-page .agent-reference .agent-map span{min-width:0!important;font-size:10px!important;overflow-wrap:anywhere!important}
+}
+
+@media (width<=560px){
+  .home-page .system-framework .ae-map,
+  .home-page .agent-reference .agent-shell{padding:16px 10px 18px!important}
+  .home-page .system-framework .ae-side{grid-template-columns:1fr!important}
+  .home-page .system-framework .ae-plane-items{grid-template-columns:1fr 1fr!important}
+  .home-page .system-framework .ae-plane-items span:nth-child(3),
+  .home-page .system-framework .ae-plane-items span:nth-child(5){border-left:0!important}
+  .home-page .system-framework .ae-plane-items span:nth-child(n+3){border-top:1px solid var(--line)!important}
+  .home-page .system-framework .ae-feedback{display:grid!important;grid-template-columns:1fr!important;gap:4px!important;text-align:center!important;padding:10px!important}
+  .home-page .system-framework .ae-feedback>b:not(.ae-return){font-size:0!important}
+  .home-page .system-framework .ae-feedback>b:not(.ae-return):after{content:"↓";font:800 9px/1 ui-monospace,monospace!important;color:var(--org)!important}
+  .home-page .system-framework .ae-feedback .ae-return{justify-self:center!important;margin-top:3px!important}
+  .home-page .system-framework .ae-platform:before{position:static!important;display:block!important;margin-bottom:6px!important}
+  .home-page .system-framework .ae-platform b{padding-right:0!important}
+
+  .home-page .agent-reference .agent-mini{grid-template-columns:1fr!important}
+  .home-page .agent-reference .agent-zone:first-child:after,
+  .home-page .agent-reference .agent-core:after,
+  .home-page .agent-reference .agent-zone:last-child:after{max-width:calc(100% - 20px)!important;white-space:normal!important;text-align:center!important;line-height:1.35!important}
+  .home-page .agent-reference .agent-map{grid-template-columns:1fr 1fr!important}
+}
+
+@media (width<=390px){
+  .home-page .system-framework .ae-map:before,
+  .home-page .agent-reference .agent-shell:before{padding-right:44px!important;line-height:1.45!important}
+  .home-page .system-framework .ae-domain h3,
+  .home-page .agent-reference .agent-zone b,
+  .home-page .agent-reference .agent-core b{font-size:11.5px!important}
+  .home-page .system-framework .ae-runtime-head strong{font-size:13px!important}
+  .home-page .system-framework .ae-stage{grid-template-columns:30px minmax(0,1fr)!important;gap:7px!important}
+  .home-page .system-framework .ae-stage i{width:28px!important;font-size:7.5px!important}
+  .home-page .system-framework .ae-runtime-path:before{left:14px!important}
+  .home-page .system-framework .ae-stage:not(:last-child):after{left:11px!important}
+  .home-page .agent-reference .agent-equation b{font-size:12px!important}
+}
+
+@media (width<=360px){
+  .home-page .system-framework .ae-map,
+  .home-page .agent-reference .agent-shell{padding-left:8px!important;padding-right:8px!important}
+  .home-page .agent-reference .agent-branch,
+  .home-page .agent-reference .agent-map{grid-template-columns:1fr!important}
+  .home-page .system-framework .ae-plane-items{grid-template-columns:1fr!important}
+  .home-page .system-framework .ae-plane-items span{border-left:0!important;border-top:1px solid var(--line)!important}
+  .home-page .system-framework .ae-plane-items span:first-child{border-top:0!important}
+  .home-page .system-framework .ae-side:after{max-width:calc(100% - 12px)!important;white-space:normal!important;text-align:center!important;line-height:1.35!important}
+}
