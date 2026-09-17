@@ -1,0 +1,24 @@
+name: Repository structural audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check maintained JavaScript syntax
+        run: |
+          node --check web/assets/app.js
+          node --check web/assets/search.js
+          node --check web/assets/handbook-interactions.js
+          node --check web/rebuild.mjs
+          node --check web/validate.mjs
+
+      - name: Run structural audit
+        run: node web/validate.mjs
