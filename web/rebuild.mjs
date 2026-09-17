@@ -1,9 +1,19 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import crypto from 'node:crypto';
+import {fileURLToPath} from 'node:url';
 
-const residual = JSON.parse(fs.readFileSync('assets/i18n-residuals.json', 'utf8'));
+const webRoot = path.dirname(fileURLToPath(import.meta.url));
+const fromWeb = (...parts) => path.join(webRoot, ...parts);
+const read = (...parts) => fs.readFileSync(fromWeb(...parts), 'utf8');
+const write = (relativePath, content) => fs.writeFileSync(fromWeb(relativePath), content);
+
+const residual = JSON.parse(read('assets', 'i18n-residuals.json'));
 const residualKeys = Object.keys(residual).sort((a, b) => b.length - a.length);
-const slugs = fs.readdirSync('chapters').sort();
+const chapterAdditions = JSON.parse(read('assets', 'chapter-additions.json'));
+const slugs = fs.readdirSync(fromWeb('chapters'))
+  .filter(slug => fs.existsSync(fromWeb('chapters', slug, 'index.html')))
+  .sort();
 
 const decode = value => value
   .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -49,14 +59,23 @@ const englishTextFromHtml = source => {
         return match ? normalizeEnglishPunctuation(decode(match[1])) : all;
       })
     .replace(/<[^>]+>/g, '\n');
-  return content.split(/\n+/).map(translateResidual).filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+
+  return content
+    .split(/\n+/)
+    .map(translateResidual)
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 };
 
 const strip = value => value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
 const items = slugs.map(slug => {
-  const html = fs.readFileSync(`chapters/${slug}/index.html`, 'utf8');
+  const html = read('chapters', slug, 'index.html');
   const title = html.match(/<title[^>]*data-i18n-title-zh="([^"]+)" data-i18n-title-en="([^"]+)"/);
+  if (!title) throw new Error(`Missing bilingual title metadata in chapters/${slug}/index.html`);
+
   return {
     slug,
     number: slug.slice(0, 2),
@@ -66,51 +85,81 @@ const items = slugs.map(slug => {
   };
 });
 
-fs.writeFileSync('chapters.json', JSON.stringify(items.map(({html, ...item}) => item), null, 2));
+write('chapters.json', JSON.stringify(items.map(({html, ...item}) => item), null, 2));
 
 const span = (zh, en) => `<span class="i18n-text" data-i18n-zh="${zh}" data-i18n-en="${en}">${zh}</span>`;
-const asset = name => `/assets/${name}?v=${crypto.createHash('sha256').update(fs.readFileSync('assets/' + name)).digest('hex').slice(0, 12)}`;
-const nav = current => `<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>8 CHAPTERS</span></div><nav aria-label="手册章节">${items.map(c => `<a href="/chapters/${c.slug}/"${current === c.slug ? ' aria-current="page"' : ''}><i>${c.number}</i>${span(c.zh, c.en)}</a>`).join('')}</nav><div class="sd-f">${span('原章号 02–09', 'Original chapters 02–09')}</div></aside>`;
+const asset = name => {
+  const content = fs.readFileSync(fromWeb('assets', name));
+  const version = crypto.createHash('sha256').update(content).digest('hex').slice(0, 12);
+  return `/assets/${name}?v=${version}`;
+};
 
-const files = ['index.html', 'search/index.html', '404.html', ...items.map(c => `chapters/${c.slug}/index.html`)];
-for (const file of files) {
-  const c = items.find(x => file === `chapters/${x.slug}/index.html`);
-  let html = fs.readFileSync(file, 'utf8');
+const nav = current => `<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>${items.length} CHAPTERS</span></div><nav aria-label="手册章节">${items.map(c => `<a href="/chapters/${c.slug}/"${current === c.slug ? ' aria-current="page"' : ''}><i>${c.number}</i>${span(c.zh, c.en)}</a>`).join('')}</nav><div class="sd-f">${span('当前技术章节 02–09', 'Current technical chapters 02–09')}</div></aside>`;
+
+const pageFiles = [
+  'index.html',
+  'search/index.html',
+  '404.html',
+  ...items.map(c => `chapters/${c.slug}/index.html`)
+];
+
+for (const file of pageFiles) {
+  const c = items.find(item => file === `chapters/${item.slug}/index.html`);
+  let html = read(...file.split('/'));
+
   html = html.replace(/<aside[\s\S]*?<\/aside>/, nav(c?.slug));
   html = html.replace(/<link rel="stylesheet"[^>]+>\s*/g, '');
   html = html.replace('</head>', `${c ? `<link rel="stylesheet" href="${asset('app.css')}">` : ''}<link rel="stylesheet" href="${asset('home.css')}"><link rel="stylesheet" href="${asset('reader.css')}"></head>`);
-  html = html.replace(/<script src="\/assets\/app.js[^\"]*" defer>/, `<script src="${asset('app.js')}" defer>`);
+  html = html.replace(/<script src="\/assets\/app\.js[^\"]*" defer><\/script>/, `<script src="${asset('app.js')}" defer></script>`);
+  html = html.replace(/<script src="\/assets\/search\.js[^\"]*" defer><\/script>/, `<script src="${asset('search.js')}" defer></script>`);
   html = html.replace(/<span id="curCh">[\s\S]*?<\/span>(?=<div class="tools">)/, `<span id="curCh">${c ? span(c.zh, c.en) : span('AI 工程手册', 'AI Engineering Handbook')}</span>`);
 
   if (c) {
     html = html.replace(/<h1 class="ch-t">[\s\S]*?<\/h1>/, `<h1 class="ch-t">${span(c.zh, c.en)}</h1>`);
     html = html.replace(/(<div class="ch-no"><small>CHAPTER<\/small>)\d+/, `$1${c.number}`);
-    const i = items.indexOf(c), prev = items[i - 1], next = items[i + 1];
+
+    const i = items.indexOf(c);
+    const prev = items[i - 1];
+    const next = items[i + 1];
     const previousLink = prev
       ? `<a href="/chapters/${prev.slug}/">← ${prev.number} ${span(prev.zh, prev.en)}</a>`
       : `<a href="/">${span('← 目录', '← Contents')}</a>`;
     const nextLink = next
       ? `<a href="/chapters/${next.slug}/">${next.number} ${span(next.zh, next.en)} →</a>`
       : `<a href="/">${span('目录 →', 'Contents →')}</a>`;
+
     html = html.replace(/<nav class="page-nav"[\s\S]*?<\/nav>/, `<nav class="page-nav" aria-label="章节翻页">${previousLink}${nextLink}</nav>`);
   } else if (file === 'index.html') {
     html = html.replace(/<div class="chapter-grid">[\s\S]*?<\/div><\/section>/, `<div class="chapter-grid">${items.map(c => `<a class="chapter-card" href="/chapters/${c.slug}/"><span>${c.number}</span><h2>${span(c.zh, c.en)}</h2><b>${span('阅读本章 →', 'Read chapter →')}</b></a>`).join('')}</div></section>`);
     html = html.replace(/大厂题库 \/ /g, '').replace(/Big-tech Question Banks \/ /g, '').replace(/工程化答题体系/g, 'AI 工程实践体系');
   }
 
-  fs.writeFileSync(file, html);
+  write(file, html);
 }
+
+const fragmentSourcesFor = slug => {
+  const additions = Array.isArray(chapterAdditions[slug]) ? chapterAdditions[slug] : [];
+  return additions.map(addition => {
+    if (!addition?.path?.startsWith('/assets/')) return '';
+    const relative = addition.path.replace(/^\//, '');
+    const absolute = fromWeb(...relative.split('/'));
+    if (!fs.existsSync(absolute)) throw new Error(`Missing chapter fragment declared in manifest: ${addition.path}`);
+    return fs.readFileSync(absolute, 'utf8');
+  }).filter(Boolean);
+};
 
 const searchIndex = items.map(c => {
   const section = c.html.match(/<section class="ch"[\s\S]*?<\/main>/)?.[0] || c.html;
+  const supplements = fragmentSourcesFor(c.slug);
   return {
     titleZh: `${c.number} ${c.zh}`,
     titleEn: `${c.number} ${c.en}`,
     href: `/chapters/${c.slug}/`,
-    textZh: strip(section),
-    textEn: englishTextFromHtml(section)
+    textZh: [strip(section), ...supplements.map(strip)].filter(Boolean).join(' '),
+    textEn: [englishTextFromHtml(section), ...supplements.map(englishTextFromHtml)].filter(Boolean).join(' ')
   };
 });
-fs.writeFileSync('search-index.json', JSON.stringify(searchIndex));
 
-console.log('Unified 11 pages, eight chapter identities, bilingual search text, shared navigation, and reading design.');
+write('search-index.json', JSON.stringify(searchIndex));
+
+console.log(`Rebuilt ${pageFiles.length} pages, ${items.length} chapter identities, shared fragment search, navigation, and versioned assets.`);
