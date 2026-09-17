@@ -16,6 +16,12 @@
   let interactionAssetsPromise = null;
 
   const chapterAdditions = {
+    '03-hybrid-retrieval-query-routing': [
+      {
+        path: '/assets/ch03-conversational-rag.html',
+        id: 'conversational-rag'
+      }
+    ],
     '05-document-pdf-rag': [
       {
         path: '/assets/ch05-grounded-document-agent.html',
