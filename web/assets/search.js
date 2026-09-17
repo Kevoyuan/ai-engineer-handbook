@@ -11,6 +11,7 @@
     ['/chapters/05-document-pdf-rag/', '/assets/ch05-grounded-document-agent.html'],
     ['/chapters/06-skills-routing/', '/assets/ch06-capability-architecture.html'],
     ['/chapters/08-agent-orchestration/', '/assets/ch08-loop-vs-graph.html'],
+    ['/chapters/08-agent-orchestration/', '/assets/ch08-langchain-vs-langgraph.html'],
     ['/chapters/08-agent-orchestration/', '/assets/ch08-coding-agent-engineering.html'],
     ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-reliability-control-plane.html'],
     ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-observability-evals.html'],
