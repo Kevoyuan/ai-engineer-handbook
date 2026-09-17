@@ -2,19 +2,19 @@
 
 This document is the canonical operating procedure for maintaining this repository.
 
-The goal is to keep durable engineering knowledge, presentation, validation, version control, and deployment in one reproducible workflow so handbook maintenance does not depend on chat history or a particular maintainer's memory.
+The goal is to keep durable engineering knowledge, presentation, validation, version control, and deployment in one reproducible workflow so maintenance does not depend on chat history or a particular maintainer's memory.
 
 ## Source-of-truth hierarchy
 
 Use this order when deciding what to trust:
 
 1. **GitHub `main`** — current repository state and version history.
-2. **`handbook/`** — canonical semantic knowledge and reusable engineering principles.
+2. **`handbook/chapters/*.md`** — canonical semantic knowledge, one module per chapter.
 3. **`DESIGN.md`** — presentation, diagram, responsive, and interaction contract.
 4. **`web/`** — derived interactive presentation of handbook knowledge.
 5. **Vercel** — delivery layer for preview and production deployment.
 
-A local HTML file, exported artifact, chat attachment, or old conversation is never the primary source of truth.
+`handbook/ai_engineer_handbook.md` is a compatibility index only. A local HTML export, old conversation, standalone supplement, or generated artifact is never the primary source of truth.
 
 ## Canonical workflow
 
@@ -23,9 +23,11 @@ new article / paper / engineering lesson
         ↓
 inspect latest GitHub main
         ↓
+identify the owning canonical chapter
+        ↓
 research + verify
         ↓
-handbook/
+handbook/chapters/<chapter>.md
 semantic merge first
         ↓
 decide text / diagram / table / interaction
@@ -34,7 +36,7 @@ DESIGN.md contract
         ↓
 web/ implementation
         ↓
-i18n + search + responsive + JS / HTML QA
+i18n + search + structural + responsive QA
         ↓
 feature branch
         ↓
@@ -53,22 +55,22 @@ production smoke check
 
 Before editing:
 
-- read the latest relevant files from `main`;
-- check whether the concept already exists in the canonical handbook;
-- inspect related source-derived supplements before creating new material;
+- read the latest relevant canonical chapter;
+- inspect related web fragments and source notes already represented in the chapter;
+- check whether the concept already exists under different terminology;
 - read `DESIGN.md` before changing presentation or interaction;
-- do not start from a stale local HTML export.
+- do not start from a stale local HTML export or legacy aggregate manuscript.
 
-The first question is not “where should this new text be appended?” It is:
+The first question is not “where should this text be appended?” It is:
 
-> What knowledge already exists, and what semantic gap does this source actually fill?
+> What knowledge already exists, which chapter owns it, and what semantic gap does this source actually fill?
 
 ## 2. Research and verify
 
 For each new source, distinguish explicitly between:
 
 - **source fact** — directly supported by the article, paper, course, repository, or documentation;
-- **handbook synthesis** — a reusable engineering abstraction derived from the source;
+- **handbook synthesis** — reusable engineering abstraction derived from the source;
 - **implementation example** — framework- or vendor-specific behavior that should not be mistaken for a universal architecture rule;
 - **uncertain / time-sensitive claim** — something that should be verified against current primary documentation before inclusion.
 
@@ -76,36 +78,35 @@ When a source gives a product-specific limit, API name, workflow, or benchmark, 
 
 ## 3. Semantic merge before presentation
 
-`handbook/` owns meaning.
+`handbook/chapters/*.md` owns meaning.
 
-Do not append a new section merely because a new source uses new terminology. First decide whether the material:
+Do not create a new peer supplement merely because a source introduces a new label. First decide whether the material:
 
 - adds a genuinely new concept;
 - deepens an existing concept;
 - corrects an existing claim;
 - provides a better implementation example;
-- belongs only in a source-derived supplement;
+- belongs as a source note inside the owning chapter;
 - is interview-only material that belongs under `archive/interview/`.
 
 Prefer the smallest appropriate semantic home.
 
 ### Merge rules
 
-- Avoid duplicate explanations across chapters.
+- One active chapter has one canonical semantic file.
+- Avoid duplicate explanations across chapter files.
 - Preserve cross-chapter canonical rules.
 - Keep framework-specific details under general engineering principles.
 - Separate architecture from product implementation.
 - Preserve trade-offs, failure modes, metrics, control boundaries, and production implications.
 - A production bad case is not automatically a regression test; curation and reproducibility are required.
-- If the canonical handbook already expresses the reusable principle, deepen the relevant supplement instead of duplicating the core section.
+- If a framework-specific source is useful, preserve its provenance in a source note inside the canonical chapter instead of creating a second semantic owner.
 
 ## 4. Decide the right presentation form
 
 Only after the semantic merge, decide how the concept should be presented.
 
-Use `DESIGN.md` as the contract.
-
-Typical mapping:
+Use the **root `DESIGN.md`** as the only design contract. Do not create a second `web/DESIGN.md` shadow specification.
 
 | Knowledge structure | Preferred presentation |
 |---|---|
@@ -133,7 +134,17 @@ Requirements:
 - preserve technical node order, control boundaries, and failure semantics;
 - keep vendor names clearly labeled as examples when appropriate.
 
-When supplemental fragments are used, ensure they are actually loaded by the chapter runtime and included in search behavior.
+### Dynamic chapter fragments
+
+Runtime chapter fragments are registered once in:
+
+```text
+web/assets/chapter-additions.json
+```
+
+`app.js`, `search.js`, and `rebuild.mjs` consume the same manifest. Do not add a fragment path independently to multiple JavaScript files.
+
+The fragment manifest is a **presentation registry**, not a semantic source. Every fragment must map back to meaning already owned by the corresponding canonical chapter.
 
 ## 6. QA before merge
 
@@ -141,9 +152,9 @@ At minimum validate:
 
 ### Content
 
-- canonical meaning matches `handbook/`;
+- canonical meaning lives in the owning `handbook/chapters/*.md` file;
 - source facts remain distinguishable from handbook synthesis;
-- no accidental duplicate section;
+- no accidental duplicate semantic owner;
 - no broken chapter numbering or navigation.
 
 ### i18n
@@ -155,22 +166,28 @@ At minimum validate:
 ### Search
 
 - new content is discoverable by handbook search;
-- supplemental fragments are included in the runtime search corpus or rebuilt static index as applicable.
+- dynamic fragments are registered in `chapter-additions.json`;
+- build-time and runtime search use the same fragment registry.
 
-### HTML / JS
+### Structural QA
 
-- JavaScript syntax checks pass;
-- no duplicate IDs;
-- no broken anchors or asset references;
-- existing interactions still initialize correctly.
+Run:
+
+```text
+node web/validate.mjs
+```
+
+The structural audit checks canonical chapter coverage, manifest integrity, duplicate IDs across base pages + injected fragments, and broken local asset/page references.
+
+### JavaScript
+
+Run syntax checks for maintained scripts (`app.js`, `search.js`, `rebuild.mjs`, `validate.mjs`, interaction scripts).
 
 ### Responsive
 
 Validate the breakpoints defined in `DESIGN.md`, especially narrow mobile widths. There must be no page-level horizontal overflow. Wide tables may scroll inside their own container.
 
 ## 7. Git workflow
-
-Default maintenance path:
 
 ```text
 main
@@ -196,60 +213,29 @@ Use a focused branch name such as:
 content/<topic>
 docs/<topic>
 fix/<topic>
+refactor/<topic>
 web/<topic>
 ```
 
-Before merging, confirm that the diff contains only intended files and that automated checks pass.
+Before merging, confirm that the diff contains only intended files and automated checks pass.
 
 ## 8. CI and preview gates
 
-A pull request should be considered ready only when applicable checks are green, including the repository's English-language audit and Vercel Preview deployment.
+A pull request is ready only when applicable checks are green, including:
 
-A green preview proves that deployment completed; it does not replace semantic review. Inspect the diff and confirm that the intended handbook knowledge is represented correctly.
+- English-language audit;
+- repository structural audit;
+- Vercel Preview deployment.
+
+A green preview proves deployment completed; it does not replace semantic review or visual inspection.
 
 ## 9. Merge and production verification
 
 After merge:
 
 1. confirm `main` points to the expected merge commit;
-2. confirm the Vercel production deployment succeeds;
+2. confirm Vercel production deployment succeeds;
 3. verify the stable handbook URL loads;
-4. smoke-check the changed chapter, language toggle, search, and responsive presentation when the change affects them.
+4. smoke-check the changed chapter, language toggle, search, and responsive presentation when affected.
 
 The maintenance task is complete only after production delivery is verified.
-
-## Repository responsibilities
-
-```text
-README.md
-  project entry point
-
-MAINTENANCE.md
-  canonical maintenance SOP
-
-handbook/
-  semantic source of truth
-
-DESIGN.md
-  presentation contract
-
-web/
-  interactive derived presentation
-
-archive/interview/
-  interview-specific secondary material
-
-.github/workflows/
-  automated validation
-
-Vercel
-  preview + production delivery
-```
-
-## Canonical rule
-
-> **Markdown owns meaning. DESIGN.md owns presentation rules. Web owns rendering. GitHub owns version history. Vercel owns delivery.**
-
-And operationally:
-
-> **Semantic merge first; presentation second; validation before merge; production verification last.**
