@@ -1,0 +1,51 @@
+<section id="langchain-vs-langgraph" aria-labelledby="langchain-vs-langgraph-title">
+  <h2 class="sub" id="langchain-vs-langgraph-title"><span class="i18n-text" data-i18n-zh="LangChain vs LangGraph：抽象层，而不是二选一" data-i18n-en="LangChain vs LangGraph: Abstraction layers, not mutually exclusive choices">LangChain vs LangGraph：抽象层，而不是二选一</span> <small>§8.Y</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="“LangChain 做链，LangGraph 做复杂 Agent”只能算历史直觉。当前 LangChain 更偏高层 Agent / Application Framework 与组件生态；LangGraph 更偏低层 Stateful Orchestration Runtime。更关键的是，LangChain 的 create_agent() 本身建立在 LangGraph 上。" data-i18n-en="“LangChain is for chains and LangGraph is for complex agents” is only a historical intuition. Today LangChain is the higher-level agent/application framework and component ecosystem, while LangGraph is the lower-level stateful orchestration runtime. Crucially, LangChain's create_agent() itself is built on LangGraph.">“LangChain 做链，LangGraph 做复杂 Agent”只能算历史直觉。当前 LangChain 更偏高层 Agent / Application Framework 与组件生态；LangGraph 更偏低层 Stateful Orchestration Runtime。更关键的是，LangChain 的 create_agent() 本身建立在 LangGraph 上。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-langchain-langgraph-stack">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.Y1 · ABSTRACTION STACK</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="先选最高层、但仍能显式表达关键控制边界的抽象" data-i18n-en="Choose the highest-level abstraction that still keeps important control boundaries explicit">先选最高层、但仍能显式表达关键控制边界的抽象</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div><div class="bfs-card bfs-blue"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">LANGCHAIN</span></div><h2 class="bfs-card-title">Models · Tools · Retrievers · Runnables · Middleware · create_agent()</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="标准接口、第三方集成、可组合组件和预构建 Agent 架构。适合快速获得常见能力，而不是重复造基础组件。" data-i18n-en="Standard interfaces, integrations, composable components, and prebuilt agent architecture. Use it to avoid rebuilding common capabilities.">标准接口、第三方集成、可组合组件和预构建 Agent 架构。适合快速获得常见能力，而不是重复造基础组件。</span></div></div></div>
+        <div><div class="bfs-card bfs-purple"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">LANGGRAPH</span></div><h2 class="bfs-card-title">State · Nodes · Reducers · Edges · Scheduler · Checkpoints</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="当 orchestration 本身成为业务逻辑：自定义 State、branch/join、循环、恢复、持久化、HITL、长期运行任务。" data-i18n-en="Use it when orchestration itself becomes application logic: custom state, branch/join, loops, recovery, persistence, HITL, and long-running execution.">当 orchestration 本身成为业务逻辑：自定义 State、branch/join、循环、恢复、持久化、HITL、长期运行任务。</span></div></div></div>
+        <div><div class="bfs-card bfs-teal"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">COMMON PATTERN</span></div><h2 class="bfs-card-title">LangChain components inside LangGraph nodes</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="生产里最常见的不是二选一，而是用 LangChain 提供能力，用 LangGraph 显式组织控制流。" data-i18n-en="In production the common pattern is not either/or: LangChain supplies capabilities while LangGraph makes control flow explicit.">生产里最常见的不是二选一，而是用 LangChain 提供能力，用 LangGraph 显式组织控制流。</span></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tsc rv"><table>
+    <thead><tr><th><span class="i18n-text" data-i18n-zh="需求" data-i18n-en="Requirement">需求</span></th><th><span class="i18n-text" data-i18n-zh="优先选择" data-i18n-en="Prefer">优先选择</span></th><th><span class="i18n-text" data-i18n-zh="原因" data-i18n-en="Why">原因</span></th></tr></thead>
+    <tbody>
+      <tr><td>Prompt → Model → Parser / RAG</td><td>LangChain Runnable / LCEL</td><td><span class="i18n-text" data-i18n-zh="标准组件组合" data-i18n-en="Standard component composition">标准组件组合</span></td></tr>
+      <tr><td>Standard tool-calling agent</td><td>LangChain create_agent()</td><td><span class="i18n-text" data-i18n-zh="使用预构建 Agent Graph" data-i18n-en="Use the prebuilt agent graph">使用预构建 Agent Graph</span></td></tr>
+      <tr><td>Custom State / branch / join / recovery</td><td>LangGraph</td><td><span class="i18n-text" data-i18n-zh="控制流就是业务逻辑" data-i18n-en="Control flow is application logic">控制流就是业务逻辑</span></td></tr>
+      <tr><td>Checkpoint / resume / complex HITL</td><td>LangGraph</td><td><span class="i18n-text" data-i18n-zh="需要显式持久化执行状态" data-i18n-en="Explicit execution-state persistence is required">需要显式持久化执行状态</span></td></tr>
+      <tr><td>Custom workflow + standard tools/models</td><td>LangChain + LangGraph</td><td><span class="i18n-text" data-i18n-zh="能力与编排分层" data-i18n-en="Separate capabilities from orchestration">能力与编排分层</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="bfs-canvas rv" id="fig-8-langgraph-runtime">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.Y2 · EXECUTION MODEL</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="真正理解 LangGraph，要能解释 State Patch、Reducer、调度和 Checkpoint" data-i18n-en="To understand LangGraph, explain state patches, reducers, scheduling, and checkpoints">真正理解 LangGraph，要能解释 State Patch、Reducer、调度和 Checkpoint</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g6">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">1</span></div><h2 class="bfs-card-title">State</h2><div class="bfs-card-desc">schema · current values</div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">2</span></div><h2 class="bfs-card-title">Node</h2><div class="bfs-card-desc">State → Partial&lt;State&gt;</div></div>
+        <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">3</span></div><h2 class="bfs-card-title">Reducer</h2><div class="bfs-card-desc">merge state patches</div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">4</span></div><h2 class="bfs-card-title">Route</h2><div class="bfs-card-desc">edge · condition · command</div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-card-head"><span class="bfs-stage-pill">5</span></div><h2 class="bfs-card-title">Scheduler</h2><div class="bfs-card-desc">next tasks · super-step</div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-card-head"><span class="bfs-stage-pill">6</span></div><h2 class="bfs-card-title">Checkpoint</h2><div class="bfs-card-desc">thread · snapshot · resume</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="co must rv interp-callout"><span class="co-t">CANONICAL</span><p><strong>LangChain and LangGraph are abstraction layers, not mutually exclusive competitors.</strong> <span class="i18n-text" data-i18n-zh="当前 LangChain Agent 建立在 LangGraph 上；标准架构优先用 LangChain，当 orchestration 本身成为应用逻辑时再下沉到 LangGraph。" data-i18n-en="Current LangChain agents are built on LangGraph. Prefer LangChain for the standard architecture, then drop down to LangGraph when orchestration itself becomes application logic.">当前 LangChain Agent 建立在 LangGraph 上；标准架构优先用 LangChain，当 orchestration 本身成为应用逻辑时再下沉到 LangGraph。</span></p></div>
+  <div class="co warn rv interp-callout"><span class="co-t">CHECKPOINT BOUNDARY</span><p><span class="i18n-text" data-i18n-zh="Checkpoint 保存的是执行 State Snapshot，不是自动事务。外部数据库、支付、邮件等 Side Effect 仍需要 idempotency / reconciliation；恢复语义发生在 checkpoint / super-step 边界，而不是任意程序指令位置。" data-i18n-en="A checkpoint persists execution state; it is not an automatic transaction. External database, payment, email, or other side effects still require idempotency and reconciliation. Resume semantics are checkpoint/super-step semantics, not arbitrary instruction-pointer semantics.">Checkpoint 保存的是执行 State Snapshot，不是自动事务。外部数据库、支付、邮件等 Side Effect 仍需要 idempotency / reconciliation；恢复语义发生在 checkpoint / super-step 边界，而不是任意程序指令位置。</span></p></div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="核验来源：LangChain / LangGraph 官方 README、LangChain Core Runnable Reference、create_agent Reference、StateGraph Reference 与 Checkpointer 文档。文章按 2026-09-17 当前官方语义整理。" data-i18n-en="Verified against the official LangChain and LangGraph READMEs, LangChain Core Runnable reference, create_agent reference, StateGraph reference, and checkpointer documentation, using the current semantics as of 2026-09-17.">核验来源：LangChain / LangGraph 官方 README、LangChain Core Runnable Reference、create_agent Reference、StateGraph Reference 与 Checkpointer 文档。文章按 2026-09-17 当前官方语义整理。</span></p>
+</section>

@@ -41,6 +41,10 @@
         id: 'loop-vs-graph'
       },
       {
+        path: '/assets/ch08-langchain-vs-langgraph.html',
+        id: 'langchain-vs-langgraph'
+      },
+      {
         path: '/assets/ch08-coding-agent-engineering.html',
         id: 'coding-agent-engineering'
       }
