@@ -7,6 +7,7 @@
   let corpusPromise = null;
 
   const supplementalAssets = [
+    ['/chapters/03-hybrid-retrieval-query-routing/', '/assets/ch03-conversational-rag.html'],
     ['/chapters/05-document-pdf-rag/', '/assets/ch05-grounded-document-agent.html'],
     ['/chapters/06-skills-routing/', '/assets/ch06-capability-architecture.html'],
     ['/chapters/08-agent-orchestration/', '/assets/ch08-loop-vs-graph.html'],
