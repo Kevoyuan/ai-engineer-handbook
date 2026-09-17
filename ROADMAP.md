@@ -7,36 +7,40 @@
 - [x] Move interview-specific material to a secondary archive model
 - [x] Add a general design contract
 
-## Phase 2 — Migrate the current handbook
+## Phase 2 — Stabilize the current web edition
 
-- [ ] Publish the latest interactive handbook as `web/AI_Engineer_Handbook.html`
-- [ ] Rename interview-first product copy to AI Engineer Handbook
-- [ ] Preserve the existing technical content, diagrams, bilingual mode, theme, search and responsive behavior
-- [ ] Reclassify historical sections 11–19 as study/reference/archive material
+- [x] Publish the handbook as a multipage `web/` site rather than a single exported HTML artifact
+- [x] Rename interview-first product copy to AI Engineer Handbook
+- [x] Preserve the technical content, diagrams, bilingual mode, theme, search and responsive behavior
+- [x] Keep historical interview/reference material outside the core 02–09 technical chapter navigation
 
 ## Phase 3 — Build the complete core knowledge spine
 
-- [x] Add a system-level `00 AI Engineering System Framework` so local chapters share one architecture map
+- [x] Add system-level `00 AI Engineering System Framework`
 - [ ] Add Chapter 01: Model / API / Context Foundations
   - model selection by capability, modality, latency, cost, privacy and hosting constraints
   - prompting / structured outputs / tool-use baseline
   - adaptation decision path: prompt/context/retrieval vs fine-tuning / PEFT / LoRA
   - model/version evaluation before and after adaptation
-- [ ] Keep Chapters 02–09 as the current Applied AI / RAG / Agent production spine
+- [x] Keep Chapters 02–09 as the current Applied AI / RAG / Agent production spine
 - [ ] Add Chapter 10: Serving / Deployment / Security / AI Platform
   - inference serving: queueing, batching, KV/prefix cache, streaming, concurrency, rate limits, warm-up, capacity
   - deployment: registry, artifact lineage, environments, shadow/canary, rollback, config/version governance
   - security operations: identity, tenant isolation, secrets, prompt injection, sandbox/approval, exfiltration, audit
-- [ ] Split Chapters 01–10 into maintainable Markdown modules
-- [ ] Keep framework-specific details as implementation examples under general engineering principles
-- [ ] Add sources / verification notes for claims that depend on current framework behavior
+- [x] Split active Chapters 02–09 into maintainable canonical Markdown modules
+- [x] Retire the manually maintained aggregate semantic manuscript as a compatibility index
+- [x] Keep framework-specific details as implementation examples under general engineering principles
+- [x] Add source / verification notes for claims that depend on current framework behavior
 
 ## Phase 4 — Engineering quality
 
-- [ ] Add validation for duplicate IDs and broken anchors
-- [ ] Add HTML/JS checks
-- [ ] Add responsive regression checks
-- [ ] Add a lightweight contribution/update workflow
+- [x] Add automated validation for canonical chapter coverage, fragment-manifest integrity, duplicate IDs and broken local references
+- [x] Add maintained JavaScript syntax checks to CI
+- [x] Use one shared dynamic-fragment manifest across runtime injection, search and rebuild logic
+- [x] Remove the stale shadow `web/DESIGN.md`; root `DESIGN.md` is the only design contract
+- [ ] Add browser-based responsive regression checks at the DESIGN.md validation widths
+- [ ] Add lightweight visual regression coverage for the architecture diagrams
+- [ ] Add a generated aggregate/export pipeline if a single-file manuscript is needed again
 
 ## Coverage rule
 
