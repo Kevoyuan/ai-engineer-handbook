@@ -5,21 +5,7 @@
   if (!searchInput || !searchResults) return;
 
   let corpusPromise = null;
-
-  const supplementalAssets = [
-    ['/chapters/03-hybrid-retrieval-query-routing/', '/assets/ch03-conversational-rag.html'],
-    ['/chapters/05-document-pdf-rag/', '/assets/ch05-grounded-document-agent.html'],
-    ['/chapters/06-skills-routing/', '/assets/ch06-capability-architecture.html'],
-    ['/chapters/08-agent-orchestration/', '/assets/ch08-loop-vs-graph.html'],
-    ['/chapters/08-agent-orchestration/', '/assets/ch08-langchain-vs-langgraph.html'],
-    ['/chapters/08-agent-orchestration/', '/assets/ch08-coding-agent-engineering.html'],
-    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-reliability-control-plane.html'],
-    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-observability-evals.html'],
-    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-production-monitoring.html'],
-    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-sentiment-ab.html'],
-    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-monitoring-capstone.html'],
-    ['/chapters/09-reliability-evaluation-observability/', '/assets/ch09-cost-per-successful-task.html']
-  ];
+  let additionsPromise = null;
 
   const currentLanguage = () => html.dataset.lang === 'en' ? 'en' : 'zh';
 
@@ -45,13 +31,44 @@
     };
   };
 
-  const loadSupplements = () => Promise.allSettled(supplementalAssets.map(async ([href, path]) => {
-    const response = await fetch(path, {cache: 'no-cache'});
-    if (!response.ok) throw new Error(`${path}: ${response.status}`);
-    return {href, ...extractSupplementText(await response.text())};
-  })).then(results => results
-    .filter(result => result.status === 'fulfilled')
-    .map(result => result.value));
+  const loadAdditions = () => {
+    if (additionsPromise) return additionsPromise;
+    additionsPromise = fetch('/assets/chapter-additions.json', {cache: 'no-cache'})
+      .then(response => {
+        if (!response.ok) throw new Error(`chapter-additions.json: ${response.status}`);
+        return response.json();
+      })
+      .then(value => value && typeof value === 'object' ? value : {})
+      .catch(error => {
+        console.warn('Supplement manifest unavailable; base search remains active.', error);
+        return {};
+      });
+    return additionsPromise;
+  };
+
+  const flattenAdditions = manifest => Object.entries(manifest).flatMap(([slug, additions]) => {
+    if (!Array.isArray(additions)) return [];
+    return additions
+      .filter(addition => addition?.path)
+      .map(addition => ({
+        href: `/chapters/${slug}/`,
+        path: addition.path
+      }));
+  });
+
+  const loadSupplements = async () => {
+    const manifest = await loadAdditions();
+    const assets = flattenAdditions(manifest);
+    const results = await Promise.allSettled(assets.map(async ({href, path}) => {
+      const response = await fetch(path, {cache: 'no-cache'});
+      if (!response.ok) throw new Error(`${path}: ${response.status}`);
+      return {href, ...extractSupplementText(await response.text())};
+    }));
+
+    return results
+      .filter(result => result.status === 'fulfilled')
+      .map(result => result.value);
+  };
 
   const mergeSupplements = (items, supplements) => {
     const normalized = items.map(normalizeItem);
@@ -67,16 +84,18 @@
 
   const loadCorpus = () => {
     if (corpusPromise) return corpusPromise;
-    corpusPromise = Promise.all([
-      fetch('/search-index.json', {cache: 'no-cache'}).then(response => {
+
+    corpusPromise = fetch('/search-index.json', {cache: 'no-cache'})
+      .then(response => {
         if (!response.ok) throw new Error(`search-index.json: ${response.status}`);
         return response.json();
-      }),
-      loadSupplements()
-    ]).then(([items, supplements]) => {
-      if (!Array.isArray(items)) throw new Error('search-index.json: invalid payload');
-      return mergeSupplements(items, supplements);
-    });
+      })
+      .then(async items => {
+        if (!Array.isArray(items)) throw new Error('search-index.json: invalid payload');
+        const supplements = await loadSupplements();
+        return mergeSupplements(items, supplements);
+      });
+
     return corpusPromise;
   };
 

@@ -1,0 +1,62 @@
+{
+  "03-hybrid-retrieval-query-routing": [
+    {
+      "path": "/assets/ch03-conversational-rag.html",
+      "id": "conversational-rag"
+    }
+  ],
+  "05-document-pdf-rag": [
+    {
+      "path": "/assets/ch05-grounded-document-agent.html",
+      "id": "grounded-document-agent"
+    }
+  ],
+  "06-skills-routing": [
+    {
+      "path": "/assets/ch06-capability-architecture.html",
+      "id": "capability-architecture",
+      "position": "afterLead"
+    }
+  ],
+  "08-agent-orchestration": [
+    {
+      "path": "/assets/ch08-loop-vs-graph.html",
+      "id": "loop-vs-graph"
+    },
+    {
+      "path": "/assets/ch08-langchain-vs-langgraph.html",
+      "id": "langchain-vs-langgraph"
+    },
+    {
+      "path": "/assets/ch08-coding-agent-engineering.html",
+      "id": "coding-agent-engineering"
+    }
+  ],
+  "09-reliability-evaluation-observability": [
+    {
+      "path": "/assets/ch09-reliability-control-plane.html",
+      "id": "reliability-control-plane",
+      "position": "afterLead"
+    },
+    {
+      "path": "/assets/ch09-observability-evals.html",
+      "id": "observability-durable-evals"
+    },
+    {
+      "path": "/assets/ch09-production-monitoring.html",
+      "id": "production-monitoring-loop"
+    },
+    {
+      "path": "/assets/ch09-sentiment-ab.html",
+      "id": "sentiment-ab-monitoring"
+    },
+    {
+      "path": "/assets/ch09-monitoring-capstone.html",
+      "id": "monitoring-capstone"
+    },
+    {
+      "path": "/assets/ch09-cost-per-successful-task.html",
+      "id": "cost-per-successful-task"
+    }
+  ]
+}

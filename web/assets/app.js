@@ -4,79 +4,13 @@
   const sideOverlay = document.getElementById('sideOverlay');
   const themeBtn = document.getElementById('themeBtn');
   const langToggle = document.getElementById('langToggle');
-  const searchInput = document.getElementById('siteSearch');
-  const searchResults = document.getElementById('searchResults');
 
-  const HAN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
   const textOriginal = new WeakMap();
   const attrOriginal = new WeakMap();
   let residual = {};
   let residualKeys = [];
-  let searchCorpusPromise = null;
   let interactionAssetsPromise = null;
-
-  const chapterAdditions = {
-    '03-hybrid-retrieval-query-routing': [
-      {
-        path: '/assets/ch03-conversational-rag.html',
-        id: 'conversational-rag'
-      }
-    ],
-    '05-document-pdf-rag': [
-      {
-        path: '/assets/ch05-grounded-document-agent.html',
-        id: 'grounded-document-agent'
-      }
-    ],
-    '06-skills-routing': [
-      {
-        path: '/assets/ch06-capability-architecture.html',
-        id: 'capability-architecture',
-        position: 'afterLead'
-      }
-    ],
-    '08-agent-orchestration': [
-      {
-        path: '/assets/ch08-loop-vs-graph.html',
-        id: 'loop-vs-graph'
-      },
-      {
-        path: '/assets/ch08-langchain-vs-langgraph.html',
-        id: 'langchain-vs-langgraph'
-      },
-      {
-        path: '/assets/ch08-coding-agent-engineering.html',
-        id: 'coding-agent-engineering'
-      }
-    ],
-    '09-reliability-evaluation-observability': [
-      {
-        path: '/assets/ch09-reliability-control-plane.html',
-        id: 'reliability-control-plane',
-        position: 'afterLead'
-      },
-      {
-        path: '/assets/ch09-observability-evals.html',
-        id: 'observability-durable-evals'
-      },
-      {
-        path: '/assets/ch09-production-monitoring.html',
-        id: 'production-monitoring-loop'
-      },
-      {
-        path: '/assets/ch09-sentiment-ab.html',
-        id: 'sentiment-ab-monitoring'
-      },
-      {
-        path: '/assets/ch09-monitoring-capstone.html',
-        id: 'monitoring-capstone'
-      },
-      {
-        path: '/assets/ch09-cost-per-successful-task.html',
-        id: 'cost-per-successful-task'
-      }
-    ]
-  };
+  let chapterAdditionsPromise = null;
 
   const normalizeEnglishPunctuation = value => value
     .replace(/。/g, '.')
@@ -144,8 +78,7 @@
       for (const name of ['aria-label', 'placeholder']) {
         if (!element.hasAttribute(name)) continue;
         const original = rememberAttribute(element, name);
-        if (toEnglish) element.setAttribute(name, translateResidual(original));
-        else element.setAttribute(name, original);
+        element.setAttribute(name, toEnglish ? translateResidual(original) : original);
       }
     });
 
@@ -164,8 +97,10 @@
         return NodeFilter.FILTER_ACCEPT;
       }
     });
+
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
+
     for (const node of nodes) {
       if (!textOriginal.has(node)) textOriginal.set(node, node.nodeValue);
       const original = textOriginal.get(node);
@@ -173,34 +108,23 @@
     }
   };
 
-  const applyLanguageToRoot = (root, lang) => {
-    const toEnglish = lang === 'en';
-    root.querySelectorAll?.('.i18n-text').forEach(element => {
-      const value = toEnglish ? element.dataset.i18nEn : element.dataset.i18nZh;
-      if (value != null) element.textContent = toEnglish ? normalizeEnglishPunctuation(value) : value;
-    });
-
-    if (toEnglish) {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-        acceptNode(node) {
-          const parent = node.parentElement;
-          if (!parent || parent.closest('.i18n-text, script, style')) return NodeFilter.FILTER_REJECT;
-          return NodeFilter.FILTER_ACCEPT;
-        }
-      });
-      const nodes = [];
-      while (walker.nextNode()) nodes.push(walker.currentNode);
-      nodes.forEach(node => { node.nodeValue = translateResidual(node.nodeValue); });
-    }
-  };
-
   const currentChapterSlug = () => location.pathname.match(/\/chapters\/([^/]+)/)?.[1] || '';
 
+  const loadChapterAdditions = () => {
+    if (chapterAdditionsPromise) return chapterAdditionsPromise;
+    chapterAdditionsPromise = fetch('/assets/chapter-additions.json', {cache: 'no-cache'})
+      .then(response => {
+        if (!response.ok) throw new Error(`chapter-additions.json: ${response.status}`);
+        return response.json();
+      })
+      .then(value => value && typeof value === 'object' ? value : {});
+    return chapterAdditionsPromise;
+  };
+
   const fetchAdditionDocument = async addition => {
-    const response = await fetch(addition.path);
+    const response = await fetch(addition.path, {cache: 'no-cache'});
     if (!response.ok) throw new Error(`${addition.path}: ${response.status}`);
-    const source = await response.text();
-    return new DOMParser().parseFromString(source, 'text/html');
+    return new DOMParser().parseFromString(await response.text(), 'text/html');
   };
 
   const loadInteractionAssets = () => {
@@ -218,37 +142,47 @@
         resolve();
         return;
       }
+
       const existing = document.getElementById('handbook-interactions-js');
       if (existing) {
-        existing.addEventListener('load', resolve, {once:true});
-        existing.addEventListener('error', reject, {once:true});
+        existing.addEventListener('load', resolve, {once: true});
+        existing.addEventListener('error', reject, {once: true});
         return;
       }
+
       const script = document.createElement('script');
       script.id = 'handbook-interactions-js';
       script.src = '/assets/handbook-interactions.js';
       script.defer = true;
-      script.addEventListener('load', resolve, {once:true});
-      script.addEventListener('error', reject, {once:true});
+      script.addEventListener('load', resolve, {once: true});
+      script.addEventListener('error', reject, {once: true});
       document.head.append(script);
     });
     return interactionAssetsPromise;
   };
 
-  const injectCurrentChapterAddition = async () => {
-    const additions = chapterAdditions[currentChapterSlug()] || [];
+  const injectCurrentChapterAdditions = async () => {
+    const slug = currentChapterSlug();
+    if (!slug) return;
+
+    const manifest = await loadChapterAdditions();
+    const additions = Array.isArray(manifest[slug]) ? manifest[slug] : [];
     if (!additions.length) return;
+
     for (const addition of additions) {
-      if (document.getElementById(addition.id)) continue;
+      if (!addition?.path || !addition?.id || document.getElementById(addition.id)) continue;
+
       const doc = await fetchAdditionDocument(addition);
       const fragment = document.createDocumentFragment();
       [...doc.body.children].forEach(node => fragment.append(node));
+
       const lead = addition.position === 'afterLead' ? document.querySelector('main .ch > .lead') : null;
       const pageNav = document.querySelector('main .page-nav');
       if (lead) lead.after(fragment);
       else if (pageNav) pageNav.before(fragment);
       else document.querySelector('main')?.append(fragment);
     }
+
     await loadInteractionAssets();
     window.initHandbookInteractions?.();
   };
@@ -277,108 +211,12 @@
     }
 
     localStorage.setItem('ai-handbook-lang', toEnglish ? 'en' : 'zh');
-    document.dispatchEvent(new CustomEvent('handbook:languagechange', {detail:{lang:toEnglish ? 'en' : 'zh'}}));
-    if (searchInput && searchResults) runSearch();
+    document.dispatchEvent(new CustomEvent('handbook:languagechange', {detail: {lang: toEnglish ? 'en' : 'zh'}}));
   };
 
   langToggle?.addEventListener('click', () => setLanguage(html.dataset.lang === 'en' ? 'zh' : 'en'));
 
-  const chapterUrl = item => `/chapters/${item.slug}/`;
-
-  const loadSearchCorpus = () => {
-    if (searchCorpusPromise) return searchCorpusPromise;
-    searchCorpusPromise = fetch('/chapters.json')
-      .then(response => {
-        if (!response.ok) throw new Error(`chapters.json: ${response.status}`);
-        return response.json();
-      })
-      .then(async chapters => Promise.all(chapters.map(async item => {
-        const response = await fetch(chapterUrl(item));
-        if (!response.ok) throw new Error(`${item.slug}: ${response.status}`);
-        const source = await response.text();
-        const doc = new DOMParser().parseFromString(source, 'text/html');
-        const section = doc.querySelector('.ch') || doc.querySelector('main') || doc.body;
-        const zhParts = [section.textContent.replace(/\s+/g, ' ').trim()];
-        applyLanguageToRoot(section, 'en');
-        const enParts = [normalizeEnglishPunctuation(section.textContent.replace(/\s+/g, ' ').trim())];
-
-        const additions = chapterAdditions[item.slug] || [];
-        for (const addition of additions) {
-          try {
-            const additionDoc = await fetchAdditionDocument(addition);
-            const additionRoot = additionDoc.body;
-            zhParts.push(additionRoot.textContent.replace(/\s+/g, ' ').trim());
-            applyLanguageToRoot(additionRoot, 'en');
-            enParts.push(normalizeEnglishPunctuation(additionRoot.textContent.replace(/\s+/g, ' ').trim()));
-          } catch {
-            // Search still works for the base chapter if a supplemental fragment cannot load.
-          }
-        }
-
-        return {
-          href: chapterUrl(item),
-          titleZh: `${item.number} ${item.zh}`,
-          titleEn: `${item.number} ${item.en}`,
-          textZh: zhParts.filter(Boolean).join(' '),
-          textEn: enParts.filter(Boolean).join(' ')
-        };
-      })));
-    return searchCorpusPromise;
-  };
-
-  const currentSearchLanguage = () => html.dataset.lang === 'en' ? 'en' : 'zh';
-
-  const makeSnippet = (text, query) => {
-    const clean = text.replace(/\s+/g, ' ').trim();
-    if (!query) return clean.slice(0, 210) + (clean.length > 210 ? '…' : '');
-    const lower = clean.toLowerCase();
-    const index = lower.indexOf(query.toLowerCase());
-    const start = Math.max(0, index >= 0 ? index - 70 : 0);
-    const snippet = clean.slice(start, start + 230);
-    return `${start > 0 ? '…' : ''}${snippet}${start + 230 < clean.length ? '…' : ''}`;
-  };
-
-  const renderSearch = (corpus, query) => {
-    const lang = currentSearchLanguage();
-    const q = query.trim().toLowerCase();
-    const titleKey = lang === 'en' ? 'titleEn' : 'titleZh';
-    const textKey = lang === 'en' ? 'textEn' : 'textZh';
-    const matches = corpus.filter(item => {
-      if (!q) return true;
-      return `${item[titleKey]} ${item[textKey]}`.toLowerCase().includes(q);
-    }).slice(0, 30);
-
-    searchResults.replaceChildren(...matches.map(item => {
-      const link = document.createElement('a');
-      link.className = 'search-result';
-      link.href = item.href;
-      const title = document.createElement('b');
-      title.textContent = item[titleKey];
-      const snippet = document.createElement('small');
-      snippet.textContent = makeSnippet(item[textKey], q);
-      link.append(title, snippet);
-      return link;
-    }));
-
-    if (!matches.length) {
-      searchResults.textContent = lang === 'en' ? 'No matching content found.' : '没有找到匹配内容。';
-    }
-  };
-
-  const runSearch = () => {
-    if (!searchInput || !searchResults) return;
-    const lang = currentSearchLanguage();
-    searchResults.textContent = lang === 'en' ? 'Loading search index…' : '正在加载搜索索引…';
-    loadSearchCorpus()
-      .then(corpus => renderSearch(corpus, searchInput.value))
-      .catch(() => {
-        searchResults.textContent = lang === 'en' ? 'Search is temporarily unavailable.' : '搜索索引暂时不可用。';
-      });
-  };
-
-  searchInput?.addEventListener('input', runSearch);
-
-  fetch('/assets/i18n-residuals.json')
+  fetch('/assets/i18n-residuals.json', {cache: 'no-cache'})
     .then(response => {
       if (!response.ok) throw new Error(`i18n-residuals.json: ${response.status}`);
       return response.json();
@@ -388,16 +226,16 @@
       residualKeys = Object.keys(residual).sort((a, b) => b.length - a.length);
     })
     .catch(() => {
-      // Existing data-i18n attributes still work even if the residual dictionary cannot load.
+      // Explicit data-i18n attributes still work if the residual dictionary is unavailable.
     })
     .finally(() => {
-      injectCurrentChapterAddition()
-        .catch(() => {
-          // Base chapter remains usable if a supplemental fragment cannot load.
+      injectCurrentChapterAdditions()
+        .catch(error => {
+          console.error('Chapter additions failed to load', error);
+          // Base chapter remains usable if a presentation fragment cannot load.
         })
         .finally(() => {
           setLanguage(localStorage.getItem('ai-handbook-lang') || 'zh');
-          if (searchInput && searchResults) runSearch();
         });
     });
 })();

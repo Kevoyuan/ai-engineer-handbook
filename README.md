@@ -6,67 +6,99 @@ A practical, engineering-first handbook for building production AI systems.
 
 This repository focuses on reusable AI engineering knowledge rather than interview-specific memorization. The core handbook is organized around system design, retrieval, RAG, agent orchestration, context engineering, reliability, evaluation, observability, and semantic systems.
 
-## Core handbook
+## Core knowledge spine
 
-1. AI System Design Principles
+1. Model / API / Context Foundations *(planned)*
 2. Enterprise Retrieval
 3. Hybrid Retrieval & Query Routing
 4. RAG Reliability & Selective Answering
 5. Document / PDF RAG
-6. Skills & Routing
+6. Skills / MCP / Tools
 7. Memory & Context Engineering
-8. Agent Orchestration
-9. Reliability, Evaluation & Observability
-10. Ontology & Operational Semantic Layer
+8. Agent / Workflow / Orchestration
+9. Reliability / Evaluation / Observability
+10. Serving / Deployment / Security / AI Platform *(planned)*
+
+A system-level Chapter 00 provides the architecture map shared by the active chapters.
 
 ## Repository layout
 
 ```text
 ai-engineer-handbook/
 ├── README.md
-├── MAINTENANCE.md             # Canonical repository maintenance SOP
-├── handbook/                  # Core 1–10 knowledge map and future modular chapters
-├── web/                       # Interactive handbook web assets
-├── DESIGN.md                  # Design system / visualization contract
-└── archive/interview/         # Interview-specific material kept as secondary reference
+├── MAINTENANCE.md             # Canonical maintenance SOP
+├── DESIGN.md                  # Single design / visualization contract
+├── ROADMAP.md
+├── handbook/
+│   ├── README.md
+│   ├── ai_engineer_handbook.md # Legacy compatibility index only
+│   └── chapters/              # Canonical semantic source: one file per active chapter
+├── web/                       # Derived interactive handbook
+└── archive/interview/         # Interview-specific secondary reference
 ```
+
+## Canonical semantic chapters
+
+The currently active semantic modules are:
+
+```text
+handbook/chapters/00-ai-engineer-system-framework.md
+handbook/chapters/02-enterprise-retrieval.md
+handbook/chapters/03-hybrid-retrieval-query-routing.md
+handbook/chapters/04-rag-reliability-selective-answering.md
+handbook/chapters/05-document-pdf-rag.md
+handbook/chapters/06-skills-routing.md
+handbook/chapters/07-memory-context-engineering.md
+handbook/chapters/08-agent-orchestration.md
+handbook/chapters/09-reliability-evaluation-observability.md
+```
+
+The public web edition currently contains chapters 02–09. Chapters 01 and 10 remain roadmap gaps and are intentionally not represented by empty placeholders.
+
+## Source-of-truth model
+
+```text
+GitHub main
+→ handbook/chapters/*.md     technical meaning
+→ DESIGN.md                  presentation contract
+→ web/                       interactive rendering
+→ Vercel                     delivery
+```
+
+Do not maintain a second aggregate manuscript or a second design spec.
 
 ## Deployment
 
-The public web handbook is deployed on **Vercel**. GitHub `main` is the repository source of truth, and Vercel publishes the `web/` directory automatically after accepted changes reach `main`.
-
-Default delivery path:
+The public web handbook is deployed on **Vercel**. GitHub `main` is the repository source of truth, and Vercel publishes the `web/` directory after accepted changes reach `main`.
 
 ```text
 Handbook update
 → feature branch
 → pull request
-→ CI + Vercel Preview
+→ structural + language CI
+→ Vercel Preview
 → merge to main
 → Vercel production deployment
 → verify the stable public URL
 ```
 
-The current interactive edition contains the eight completed technical chapters numbered 02–09. Chapters 01 and 10 remain in the core knowledge map until their standalone web chapters are authored.
-
 ## Maintenance
 
 The canonical maintenance workflow lives in **[MAINTENANCE.md](./MAINTENANCE.md)**.
 
-In short:
-
 ```text
 New material
 → inspect latest main
+→ identify owning canonical chapter
 → research / verify
-→ semantic merge into handbook/
-→ choose diagram / table / interaction using DESIGN.md
+→ semantic merge into handbook/chapters/<chapter>.md
+→ choose presentation using DESIGN.md
 → update web/
-→ validate i18n / search / responsive / JS / HTML
-→ feature branch + pull request
+→ validate i18n / search / structural / responsive behavior
+→ feature branch + PR
 → CI + Vercel Preview
 → merge main
-→ verify production deployment
+→ verify production
 
 Interview-only material
 → archive/interview
