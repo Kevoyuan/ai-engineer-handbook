@@ -34,6 +34,10 @@
     {
       "path": "/assets/ch08-coding-agent-engineering.html",
       "id": "coding-agent-engineering"
+    },
+    {
+      "path": "/assets/ch08-agent-project-lifecycle.html",
+      "id": "agent-project-lifecycle"
     }
   ],
   "09-reliability-evaluation-observability": [
