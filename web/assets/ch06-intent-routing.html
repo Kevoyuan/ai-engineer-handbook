@@ -1,0 +1,52 @@
+<section id="intent-routing-cascade" aria-labelledby="intent-routing-cascade-title">
+  <h2 class="sub" id="intent-routing-cascade-title"><span class="i18n-text" data-i18n-zh="Intent Routing：不要让一种机制吃掉全部流量" data-i18n-en="Intent Routing: do not make one mechanism handle all traffic">Intent Routing：不要让一种机制吃掉全部流量</span> <small>§6.B</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="生产级意图识别不是“规则还是大模型”的二选一，而是按置信度、任务复杂度、风险与成本逐层升级。便宜且确定的请求应尽早退出；只有真正模糊或组合式任务才进入高成本 planner。" data-i18n-en="Production intent recognition is not a rules-versus-LLM choice. Escalate by confidence, task complexity, risk, and cost. Cheap deterministic requests should exit early; only ambiguous or compositional tasks should reach the expensive planner.">生产级意图识别不是“规则还是大模型”的二选一，而是按置信度、任务复杂度、风险与成本逐层升级。便宜且确定的请求应尽早退出；只有真正模糊或组合式任务才进入高成本 planner。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-6-b1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.6.B1 · COST-AWARE ROUTING CASCADE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="从确定性 Fast Path 到结构化 Planner" data-i18n-en="From deterministic fast paths to a structured planner">从确定性 Fast Path 到结构化 Planner</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="每一层都必须有置信度出口；不确定性进入下一层，而不是被强行分类。" data-i18n-en="Every layer needs an uncertainty exit. Unresolved requests escalate instead of being forced into a label.">每一层都必须有置信度出口；不确定性进入下一层，而不是被强行分类。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">INPUT</span></div><h2 class="bfs-card-title">User Turn + State</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先更新 current task、active entity、filled slots、corrections 与 topic-scoped state。" data-i18n-en="Update current task, active entity, filled slots, corrections, and topic-scoped state first.">先更新 current task、active entity、filled slots、corrections 与 topic-scoped state。</span></div></div>
+
+        <div class="bfs-card bfs-emerald" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">FAST PATH</span></div><h2 class="bfs-card-title">Deterministic Gate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Exact mapping · regex · FSM · typed command。只接稳定、低歧义、高置信边界。" data-i18n-en="Exact mapping · regex · FSM · typed command. Admit only stable, low-ambiguity, high-confidence boundaries.">Exact mapping · regex · FSM · typed command。只接稳定、低歧义、高置信边界。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CONTEXT</span></div><h2 class="bfs-card-title">State-aware Router</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Referent resolution · continuation/topic shift · lightweight classifier / semantic match · confidence gate。" data-i18n-en="Referent resolution · continuation/topic shift · lightweight classifier / semantic match · confidence gate.">Referent resolution · continuation/topic shift · lightweight classifier / semantic match · confidence gate。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">ESCALATE</span></div><h2 class="bfs-card-title">Structured LLM Planner</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="处理 ambiguous / compositional / multi-step 请求；输出 typed capability/tool proposal，而不是只猜一个 Intent label。" data-i18n-en="Handles ambiguous, compositional, and multi-step requests; emits typed capability/tool proposals rather than only guessing an intent label.">处理 ambiguous / compositional / multi-step 请求；输出 typed capability/tool proposal，而不是只猜一个 Intent label。</span></div></div>
+
+        <div class="bfs-card bfs-amber"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CONTROL</span></div><h2 class="bfs-card-title">Permission · Risk · Input Gate → Host</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Capability match 之后仍需 authorization、schema、approval、idempotency 与 result validation；Host 才拥有真实执行权。" data-i18n-en="Capability matching is followed by authorization, schema checks, approvals, idempotency, and result validation. The host owns real execution authority.">Capability match 之后仍需 authorization、schema、approval、idempotency 与 result validation；Host 才拥有真实执行权。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="升级原则" data-i18n-en="Escalation rule">升级原则</span></span><p class="say">Escalate by uncertainty, task complexity, and risk—not by a fixed technology ladder.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-6-b2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.6.B2 · ROUTING DECISION BOUNDARIES</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Intent、Capability 与 Authorization 是三个不同决策" data-i18n-en="Intent, capability, and authorization are three different decisions">Intent、Capability 与 Authorization 是三个不同决策</span></h2>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">1</span></div><h2 class="bfs-card-title">Intent Understanding</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="用户想完成什么？当前 turn 是否依赖旧 state / entity / slot？" data-i18n-en="What is the user trying to achieve? Does this turn depend on prior state, entities, or slots?">用户想完成什么？当前 turn 是否依赖旧 state / entity / slot？</span></div></div>
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">2</span></div><h2 class="bfs-card-title">Capability Routing</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="哪个 Skill / Workflow / Tool 组合能够完成该目标？允许 DIRECT、MULTI、CLARIFY、NO_MATCH。" data-i18n-en="Which Skill, Workflow, or Tool combination can satisfy the goal? Allow DIRECT, MULTI, CLARIFY, and NO_MATCH.">哪个 Skill / Workflow / Tool 组合能够完成该目标？允许 DIRECT、MULTI、CLARIFY、NO_MATCH。</span></div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">3</span></div><h2 class="bfs-card-title">Authorization / Execution</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="用户现在是否被允许调用它？风险是否要求审批？参数是否完整？Host 是否可以安全执行？" data-i18n-en="May this user invoke it now? Does risk require approval? Are arguments complete? Can the host execute safely?">用户现在是否被允许调用它？风险是否要求审批？参数是否完整？Host 是否可以安全执行？</span></div></div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px"><table>
+        <thead><tr><th><span class="i18n-text" data-i18n-zh="层" data-i18n-en="Layer">层</span></th><th><span class="i18n-text" data-i18n-zh="主要指标" data-i18n-en="Primary metrics">主要指标</span></th><th><span class="i18n-text" data-i18n-zh="常见失败" data-i18n-en="Typical failures">常见失败</span></th></tr></thead>
+        <tbody>
+          <tr><td>Fast Path</td><td>precision · conflict rate · unmatched rate</td><td>rule_conflict</td></tr>
+          <tr><td>Context Router</td><td>referent accuracy · continuation accuracy · calibration</td><td>state_staleness · forced_route</td></tr>
+          <tr><td>Planner</td><td>capability selection · argument correctness · plan completeness</td><td>planner_failure</td></tr>
+          <tr><td>System</td><td>task success · P50/P95 · cost/success · escalation share</td><td>unauthorized_route · execution_failure</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</section>

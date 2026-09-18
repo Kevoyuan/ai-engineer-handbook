@@ -16,6 +16,10 @@
       "path": "/assets/ch06-capability-architecture.html",
       "id": "capability-architecture",
       "position": "afterLead"
+    },
+    {
+      "path": "/assets/ch06-intent-routing.html",
+      "id": "intent-routing-cascade"
     }
   ],
   "08-agent-orchestration": [
