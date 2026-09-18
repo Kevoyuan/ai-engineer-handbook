@@ -12,3 +12,7 @@ Keep here:
 - historical interview-oriented versions of the handbook
 
 The reusable engineering principle behind any useful interview question should be promoted into the core handbook first. The interview version may then reference or summarize that knowledge for recall.
+
+## Current guides
+
+- [Agent / RAG Resume Guide](./agent-resume-guide.md) — turn Agent/RAG keywords into evidence-backed project bullets, ownership statements, and interview-ready follow-up depth.
