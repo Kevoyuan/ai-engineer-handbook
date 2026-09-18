@@ -1224,3 +1224,613 @@ Sources:
 - https://developers.openai.com/docs/agent-configuration/agents-md
 - https://openai.com/index/harness-engineering/
 
+## 8.12 Agent Architecture Selection：把“7 种架构”改写成可组合 Pattern Matrix
+
+很多架构讨论会把 Agent 系统排成一条线：
+
+~~~text
+Single Agent
+→ ReAct
+→ Plan & Execute
+→ Multi-Agent
+→ Route + Skill
+→ Blackboard
+→ Graph Workflow
+~~~
+
+这适合作为教学记忆，但不适合作为生产选型模型。
+
+这些名称其实混合了不同维度：
+
+~~~text
+Single Agent / Multi-Agent
+→ how many decision-making actors?
+
+ReAct / Plan & Execute
+→ how does one actor decide and schedule actions?
+
+Route + Skill
+→ how are capabilities selected?
+
+Blackboard / Shared State
+→ how do workers coordinate through state?
+
+Graph Workflow
+→ how is control flow represented and persisted?
+~~~
+
+因此更准确的规则是：
+
+> **Agent architectures are composable control patterns, not a maturity ladder.**
+
+一个真实系统完全可能是：
+
+~~~text
+Router
+→ Skill
+→ bounded ReAct loop
+→ Graph checkpoint
+→ Human approval
+~~~
+
+或者：
+
+~~~text
+Graph Workflow
+├─ deterministic node
+├─ planner node
+├─ multi-agent subgraph
+└─ tool execution node
+~~~
+
+### 8.12.1 选型先看控制问题，而不是架构名字
+
+在选 Pattern 前，先回答七个问题：
+
+~~~text
+1. Task uncertainty
+   任务路径是固定，还是每一步都需要动态判断？
+
+2. Capability cardinality
+   能力集合是有限且可描述，还是开放式探索？
+
+3. State topology
+   需要单一 working state、多个隔离 context，还是共享 state？
+
+4. Control topology
+   是否需要 branch / join / loop / retry / checkpoint / resume？
+
+5. Coordination
+   是否存在真实的并行、专业化、权限或工具边界？
+
+6. Reliability requirement
+   失败后要从哪里恢复？副作用能否重放？是否需要 HITL？
+
+7. Cost / latency envelope
+   每一步调用强模型是否可接受？能否缓存、并行、降级？
+~~~
+
+最终选择的不是一个标签，而是一组 control mechanisms。
+
+### 8.12.2 Pattern 1 · Single Agent / Tool-using Agent
+
+最小形态：
+
+~~~text
+User
+→ Agent
+→ Tool(s)
+→ Response
+~~~
+
+适合 bounded goal、small tool set、short horizon、single permission boundary、limited state 和 clear stop condition。
+
+优势：
+
+~~~text
+simple runtime
+low coordination overhead
+low implementation cost
+fast iteration
+~~~
+
+风险：
+
+~~~text
+too many tools
+too much context
+unclear stop condition
+mixed permissions
+long action horizon
+~~~
+
+问题不在“一个 Agent 天生弱”，而在它的责任边界不断扩张。
+
+> **Prefer one bounded Agent until real control boundaries justify more structure.**
+
+### 8.12.3 Pattern 2 · ReAct-style iterative loop
+
+ReAct 的稳定抽象不是把隐藏 Chain of Thought 暴露出来，而是：
+
+~~~text
+Observe
+→ decide next action
+→ execute action
+→ observe result
+→ continue / stop
+~~~
+
+它适合 unknown number of steps、interactive information gathering、tool choice depends on previous result 和 exploratory task。
+
+典型代价：
+
+~~~text
+one decision cycle per action
+longer trajectories
+token / latency accumulation
+loop drift
+stop-condition failure
+tool-error propagation
+~~~
+
+但不能因此得出“ReAct 不适合生产”。
+
+生产化 ReAct 通常会加：
+
+~~~text
+max_steps
+tool allowlist
+budget
+timeout
+state schema
+validation gate
+checkpoint
+fallback
+human approval
+~~~
+
+于是它更像 bounded local Agent loop inside a controlled runtime，而不是无限自主循环。
+
+> **ReAct is a local decision pattern; production reliability comes from the runtime around the loop.**
+
+Source:
+- ReAct: Synergizing Reasoning and Acting in Language Models, Yao et al., 2022.
+
+### 8.12.4 Pattern 3 · Plan & Execute
+
+核心是把：
+
+~~~text
+decide one step
+→ execute
+→ decide one step
+~~~
+
+改成：
+
+~~~text
+Plan
+→ execute plan steps
+→ verify
+→ re-plan or finish
+~~~
+
+适合 multi-step task、dependency-heavy work、longer execution horizon，以及 global decomposition 有帮助的任务。
+
+优势不是“计划一次就永远正确”，而是**把全局分解和局部执行分离**。
+
+生产设计通常需要：
+
+~~~text
+plan schema
+step dependencies
+plan version
+step status
+verification
+re-plan trigger
+max re-plans
+~~~
+
+如果没有 re-plan / verification，初始计划错误确实容易传播；但成熟 Plan & Execute 本身可以显式重规划。
+
+> **Plan & Execute should separate planning from execution without freezing a bad plan forever.**
+
+LangChain 早期 Plan-and-Execute 资料也明确讨论了重新规划和调整计划的必要性。
+
+### 8.12.5 Pattern 4 · Multi-Agent
+
+Multi-Agent 不等于：
+
+~~~text
+Planner Agent
+Reviewer Agent
+Executor Agent
+~~~
+
+然后三个角色用同一个 Context、同一组 Tool、同一权限和同一个 Model。
+
+真正值得拆的依据仍然是本章 8.5 的 Operational Boundary：
+
+~~~text
+different context
+different permission
+different tool environment
+different model / cost policy
+independent evaluation
+parallelizable work
+failure isolation
+real handoff boundary
+~~~
+
+Multi-Agent 可以采用 Supervisor → Workers、Router → Specialists、Handoff、Peer collaboration、Subagent delegation 等模式。
+
+它的成本包括：
+
+~~~text
+handoff ambiguity
+duplicated context
+communication overhead
+coordination latency
+conflicting state
+more tracing surface
+more evaluation surface
+~~~
+
+所以“多个 Agent 会自动减少 Context Pollution”并不成立。只有明确隔离 Context 和 Handoff Contract 才可能减少污染。
+
+> **Multi-Agent is a coordination pattern, not a cure for an overloaded single Agent.**
+
+### 8.12.6 Pattern 5 · Router + Skill
+
+结构：
+
+~~~text
+Request
+→ Router
+→ Candidate Skill(s)
+→ Decision Gate
+→ Skill / Workflow
+→ Validation
+~~~
+
+它特别适合：
+
+~~~text
+known capability catalog
+clear skill boundaries
+high-frequency routing
+independent skill evaluation
+cacheable / reusable procedures
+permission-aware capability selection
+~~~
+
+它的真正价值不是“不要让模型想”，而是：
+
+~~~text
+open-ended reasoning
+→ bounded candidate space
+→ explicit capability contract
+→ measurable routing decision
+~~~
+
+这让系统可以独立测 Candidate Recall@K、Top-1、No-Match Accuracy、Clarification Accuracy、Unauthorized Exposure、E2E Task Success、Latency 和 Cost。
+
+但当任务高度组合式、开放探索、需要动态生成新步骤时，Router + Skill 通常需要再组合 Planner / Graph / Agent Loop。
+
+> **Route + Skill is strongest when the capability space is explicit enough to retrieve, rank, authorize, and evaluate.**
+
+它不是所有 AI Coding 或企业 Agent 的统一最优架构。
+
+### 8.12.7 Pattern 6 · Shared State / Blackboard-like Coordination
+
+经典 Blackboard 思想可以抽象为：
+
+~~~text
+Shared State / Workspace
+        ↑   ↑   ↑
+   Worker A B C
+        ↓   ↓   ↓
+state change triggers new work
+~~~
+
+它适合多个独立处理单元围绕一个共享工作对象协作。
+
+Agent 系统里的类似形态可能是 research findings、draft、review comments、open tasks、artifact status，由不同 Worker 读取和更新。
+
+优势：
+
+~~~text
+shared situational awareness
+decoupled workers
+incremental refinement
+~~~
+
+代价：
+
+~~~text
+write conflicts
+state ownership ambiguity
+stale reads
+hard causal attribution
+large shared state
+implicit triggering
+~~~
+
+因此需要 typed state、reducer / merge rule、ownership、versioning、event / transition log 和 conflict policy。
+
+LangGraph 有共享 State、Reducer、Checkpoint 等机制，因此可以实现某些 Blackboard-like workflow；但：
+
+> **LangGraph is not synonymous with the Blackboard architecture.**
+
+LangGraph 是更一般的 stateful orchestration runtime。
+
+### 8.12.8 Pattern 7 · Explicit Graph / Workflow Orchestration
+
+Graph / Workflow 的核心不是“最重、最企业级”，而是把控制流显式化：
+
+~~~text
+State
+→ Node
+→ Transition
+→ State Update
+→ Next Node(s)
+~~~
+
+当需要以下能力时价值明显：
+
+~~~text
+branch
+join
+parallelism
+loop
+retry topology
+checkpoint / resume
+human approval
+failure isolation
+long-running execution
+explicit audit path
+~~~
+
+一个重要校正：
+
+~~~text
+Graph Workflow
+≠
+DAG only
+~~~
+
+DAG 适合没有循环依赖的 pipeline，但 Agent Workflow 常常需要 retry loop、repair loop、human resume、re-plan loop。
+
+LangGraph 官方定位是 long-running、stateful agent orchestration，并提供 durable execution、persistence、human-in-the-loop 等能力；它允许循环图，而不是只做 DAG。
+
+> **Use a graph when control-flow topology itself is part of the application contract.**
+
+### 8.12.9 Framework 名称不要和 Pattern 混为一谈
+
+视频把 LangGraph、Temporal、n8n、Perfect 放在 Graph Workflow 一组。这里需要拆开。
+
+#### LangGraph
+
+定位：
+
+~~~text
+stateful agent/workflow orchestration
+deterministic + agentic control
+persistence / checkpoint
+HITL
+streaming
+~~~
+
+适合 Agent-specific stateful orchestration。
+
+#### Temporal
+
+定位更接近：
+
+~~~text
+durable workflow execution platform
+long-running application workflow
+failure recovery
+reliable continuation
+~~~
+
+Temporal 官方强调工作流在 crash、network failure、infrastructure outage 后继续执行。
+
+它可以承载 Agent workflow，但不是“Agent Graph pattern”的同义词。
+
+#### Prefect
+
+视频里的 Perfect 应为 Prefect。
+
+Prefect 官方把自己定位为 workflow orchestration tool，重点包括 flow / task、dependency tracking、failure handling、deployment、monitoring 和 data pipeline orchestration。
+
+可以编排 AI/Agent 任务，但它的核心定位不是 LLM Agent runtime。
+
+#### n8n
+
+n8n 官方定位为 workflow automation tool，并支持 AI functionality / tools。
+
+它适合 integration-heavy workflow、business automation、low-code orchestration 和 API/app connectivity，也可以包含 Agent 节点，但仍然是更广义的 automation platform。
+
+因此：
+
+> **Choose the runtime for its execution guarantees and integration model, not because all orchestration tools are “Agent frameworks.”**
+
+### 8.12.10 Pattern 不是互斥的：生产系统往往组合
+
+一个更现实的企业系统：
+
+~~~text
+Request
+  ↓
+Route + Skill
+  ↓
+Graph Workflow
+  ├─ deterministic validation
+  ├─ bounded ReAct research loop
+  ├─ Plan & Execute subflow
+  ├─ human approval
+  └─ tool execution
+  ↓
+Checkpoint / Trace / Eval
+~~~
+
+也可能有 Multi-Agent subgraph：
+
+~~~text
+Graph
+├─ Research Agent
+├─ Policy Gate
+├─ Writer Agent
+└─ Reviewer Agent
+~~~
+
+这比问“七种架构选哪一个”更接近真实工程。
+
+### 8.12.11 Selection Matrix
+
+| Requirement | First pattern to consider | Why |
+|---|---|---|
+| 单一、短任务、小 Tool 集 | Bounded Single Agent | 最少协调复杂度 |
+| 每步依赖刚获得的信息 | ReAct-style loop | 局部动态决策 |
+| 长任务需要先分解 | Plan & Execute | 分离全局规划与局部执行 |
+| 能力集合明确、请求高频 | Router + Skill | 可检索、可评估、可缓存 |
+| 真实专业化 / 权限 / Context 隔离 | Multi-Agent | 独立 operational boundary |
+| 多 Worker 围绕共享工作对象 | Shared State / Blackboard-like | 协同更新共享状态 |
+| branch/join/loop/recovery/HITL 是业务规则 | Graph / Workflow | 控制流显式、可持久化 |
+| Crash 后必须可靠恢复长流程 | Durable Workflow Runtime | execution guarantee 优先 |
+
+### 8.12.12 Architecture Selection Scorecard
+
+不要用“复杂度高，所以 Multi-Agent”这种单变量判断。
+
+可以按 0–2 做定性评估：
+
+| Axis | 0 | 1 | 2 |
+|---|---|---|---|
+| Path uncertainty | 固定 | 少量分支 | 高度动态 |
+| Tool/capability set | 少且固定 | 中等 | 大且动态 |
+| State horizon | 单请求 | 多轮 | 长任务 / durable |
+| Branch/join | 无 | 少量 | 核心拓扑 |
+| Parallelism | 无 | 可选 | 关键收益 |
+| Permission boundaries | 单一 | 少量 | 多角色/高风险 |
+| Recovery | 失败重跑即可 | 局部重试 | checkpoint / reconciliation |
+| Coordination | 单 actor | delegate | 多 actor / shared state |
+
+它不是自动算分器，而是帮助识别真正需要增加哪一种控制机制。
+
+### 8.12.13 推荐演进路线
+
+与其：
+
+~~~text
+Single → ReAct → Plan → Multi-Agent → Graph
+~~~
+
+更建议：
+
+~~~text
+Start:
+minimal deterministic workflow
++ one bounded Agent where uncertainty exists
+
+Then add only when evidence demands it:
+
+unknown step count
+→ bounded Agent loop
+
+global decomposition problem
+→ planning / replanning
+
+large capability catalog
+→ Router + Skill
+
+parallel or isolated operational boundaries
+→ Multi-Agent / subgraphs
+
+complex shared state
+→ typed shared state / reducers
+
+recovery / branch / join / HITL
+→ explicit Graph / durable workflow
+~~~
+
+> **Add a control pattern when it solves an observed failure mode—not because it sits later on an architecture diagram.**
+
+### 8.12.14 Failure-driven architecture selection
+
+从失败反推 Pattern 往往更可靠：
+
+~~~text
+tool overload
+→ capability routing / skill retrieval
+
+loop never stops
+→ bounded loop + stop gate
+
+plan drifts
+→ verification + re-plan
+
+context pollution
+→ context isolation / state schema
+
+permission mixing
+→ operational split / policy gate
+
+parallel work serialized
+→ branch / join
+
+crash causes full restart
+→ checkpoint / durable execution
+
+shared state conflicts
+→ typed reducer / ownership / versioning
+~~~
+
+架构的目标不是“看起来高级”，而是让 failure mode 有明确 owner 和 recovery path。
+
+### 8.12.15 Source boundary
+
+Primary source:
+
+- 用户提供的视频转录：码首是粘，《如果从零搭一个 Agent 系统，你会选什么架构？》
+
+Source-derived elements retained:
+
+- Single Agent、ReAct、Plan & Execute、Multi-Agent、Route + Skill、Blackboard、Graph Workflow 七类教学框架；
+- 架构应按场景选择而不是追求统一最优；
+- Route + Skill 强调能力路由；
+- Blackboard 强调共享状态；
+- Graph 强调显式控制流、重试、并行、恢复。
+
+Handbook corrections / refinements:
+
+- 七类不是同一维度、不是互斥架构，也不是严格成熟度演进链；
+- ReAct 不被归类为“天然不适合工程化”，而是需要 bounded runtime；
+- Plan & Execute 增加 verification / re-plan，不接受“计划错了必然全盘崩”作为固有属性；
+- Multi-Agent 不假设自动消除 Context Pollution；
+- Route + Skill 不被描述成 AI Coding / 企业 Agent 的普遍最优方案；
+- LangGraph 不等于 Blackboard；
+- Graph Workflow 不要求 DAG；
+- 视频中的 Perfect 更正为 Prefect；
+- LangGraph / Temporal / Prefect / n8n 按各自 execution model 和 product positioning 区分。
+
+External verification:
+
+- ReAct paper: Yao et al., 2022.
+- LangChain Plan-and-Execute / Planning Agents material.
+- LangGraph official reference and checkpoint documentation.
+- Temporal official documentation.
+- Prefect official documentation.
+- n8n official documentation.
+
+Sources:
+- https://arxiv.org/abs/2210.03629
+- https://www.langchain.com/blog/plan-and-execute-agents
+- https://blog.langchain.dev/planning-agents/
+- https://langchain-ai.github.io/langgraph/reference/
+- https://langchain-ai.github.io/langgraph/reference/checkpoints/
+- https://docs.temporal.io/
+- https://docs.prefect.io/v3/get-started/quickstart
+- https://docs.n8n.io/
+
