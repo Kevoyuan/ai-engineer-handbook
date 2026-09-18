@@ -1,0 +1,83 @@
+<section id="agent-project-lifecycle" aria-labelledby="agent-project-lifecycle-title">
+  <h2 class="sub" id="agent-project-lifecycle-title"><span class="i18n-text" data-i18n-zh="Agent Project Engineering Lifecycle：从 Demo 到可维护系统" data-i18n-en="Agent Project Engineering Lifecycle: from demo to maintainable system">Agent Project Engineering Lifecycle：从 Demo 到可维护系统</span> <small>§8.P</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="能调用模型和 Tool 只说明执行链路存在。真正可维护的 Agent 项目还需要任务契约、仓库规范、运行拓扑、能力契约、状态生命周期、评估证据和生产反馈。" data-i18n-en="Calling a model and tools only proves that an execution path exists. A maintainable Agent project also needs a task contract, repository conventions, runtime topology, capability contracts, state lifecycles, evaluation evidence, and production feedback.">能调用模型和 Tool 只说明执行链路存在。真正可维护的 Agent 项目还需要任务契约、仓库规范、运行拓扑、能力契约、状态生命周期、评估证据和生产反馈。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-p1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.P1 · AGENT PROJECT ENGINEERING LIFECYCLE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="十个教学步骤，收敛成五个工程阶段" data-i18n-en="Ten teaching steps collapse into five engineering phases">十个教学步骤，收敛成五个工程阶段</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="这不是一次性的 waterfall。Eval、Trace 与 Production Failure 都可以把工作送回更早的错误层。" data-i18n-en="This is not a one-way waterfall. Evals, traces, and production failures can route work back to the earliest incorrect layer.">这不是一次性的 waterfall。Eval、Trace 与 Production Failure 都可以把工作送回更早的错误层。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px">
+          <div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">DEFINE</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="Task Contract + Repository Contract + Architecture" data-i18n-en="Task Contract + Repository Contract + Architecture">Task Contract + Repository Contract + Architecture</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Goal · Input · Output · Boundary · Success Criteria；再明确目录、测试命令、依赖/Secret 规则、模块职责和失败路径。" data-i18n-en="Goal · Input · Output · Boundary · Success Criteria; then define repository conventions, validation commands, dependency/secret rules, module responsibilities, and failure paths.">Goal · Input · Output · Boundary · Success Criteria；再明确目录、测试命令、依赖/Secret 规则、模块职责和失败路径。</span></div>
+        </div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px">
+          <div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">BUILD</span></div>
+          <h2 class="bfs-card-title">Agent · Tools · Skills · Context / Memory · Prompt</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Agent 负责不确定判断；Workflow 负责显式控制；Tool 提供单一能力；Skill 固化方法；State/Memory 管信息生命周期；Prompt 作为版本化行为配置。" data-i18n-en="Agents handle uncertain decisions; workflows own explicit control; tools expose single capabilities; skills encode methods; state/memory manage information lifecycles; prompts become versioned behavior configuration.">Agent 负责不确定判断；Workflow 负责显式控制；Tool 提供单一能力；Skill 固化方法；State/Memory 管信息生命周期；Prompt 作为版本化行为配置。</span></div>
+        </div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px">
+          <div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">VERIFY</span></div>
+          <h2 class="bfs-card-title">Test + Eval</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Test 验证程序契约；Eval 验证任务行为。固定 Dataset 让模型、Prompt、Skill 与 Workflow 版本可以被真正比较。" data-i18n-en="Tests validate program contracts; evals validate task behavior. A fixed dataset makes model, prompt, skill, and workflow versions genuinely comparable.">Test 验证程序契约；Eval 验证任务行为。固定 Dataset 让模型、Prompt、Skill 与 Workflow 版本可以被真正比较。</span></div>
+        </div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px">
+          <div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">OPERATE</span></div>
+          <h2 class="bfs-card-title">Deploy · Trace · Monitor</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="把 request、workflow state、Agent decision、Tool I/O、版本、Token、Latency、Cost 与 Task Outcome 连到同一条可诊断链路。" data-i18n-en="Connect request, workflow state, Agent decisions, tool I/O, versions, tokens, latency, cost, and task outcome into one diagnosable execution path.">把 request、workflow state、Agent decision、Tool I/O、版本、Token、Latency、Cost 与 Task Outcome 连到同一条可诊断链路。</span></div>
+        </div>
+
+        <div class="bfs-card bfs-emerald">
+          <div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">LEARN ↺</span></div>
+          <h2 class="bfs-card-title">Root Cause → Dataset → Fix → Regression</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="生产证据应回到最早错误层：错误 State 修 State；错误 Tool 修 Tool；过时数据源修数据源；不是所有问题都回去改 Prompt。" data-i18n-en="Production evidence should return to the earliest wrong layer: fix state when state is wrong, fix tools when tools fail, fix stale sources when evidence is stale—not every problem belongs in the prompt.">生产证据应回到最早错误层：错误 State 修 State；错误 Tool 修 Tool；过时数据源修数据源；不是所有问题都回去改 Prompt。</span></div>
+        </div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px">
+        <span class="co-t"><span class="i18n-text" data-i18n-zh="工程目标" data-i18n-en="Engineering goal">工程目标</span></span>
+        <p class="say">Make uncertain model behavior reliably serve a bounded, testable, observable business task.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-p2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.P2 · RESPONSIBILITY BOUNDARIES</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="别把所有东西都叫 Agent" data-i18n-en="Do not call every responsibility an Agent">别把所有东西都叫 Agent</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="长期可维护性来自责任边界：谁负责判断、谁负责执行、谁保存状态、谁验证成功。" data-i18n-en="Long-term maintainability comes from responsibility boundaries: who decides, who executes, who stores state, and who verifies success.">长期可维护性来自责任边界：谁负责判断、谁负责执行、谁保存状态、谁验证成功。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="组件" data-i18n-en="Component">组件</span></th>
+          <th><span class="i18n-text" data-i18n-zh="负责什么" data-i18n-en="Owns">负责什么</span></th>
+          <th><span class="i18n-text" data-i18n-zh="不应该偷偷负责什么" data-i18n-en="Should not silently own">不应该偷偷负责什么</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Workflow</td><td><span class="i18n-text" data-i18n-zh="顺序、分支、重试、回退、停止" data-i18n-en="Order, branching, retries, fallback, stopping">顺序、分支、重试、回退、停止</span></td><td><span class="i18n-text" data-i18n-zh="开放式业务判断" data-i18n-en="Open-ended business judgment">开放式业务判断</span></td></tr>
+          <tr><td>Agent</td><td><span class="i18n-text" data-i18n-zh="不确定判断、规划、诊断、选择" data-i18n-en="Uncertain judgment, planning, diagnosis, selection">不确定判断、规划、诊断、选择</span></td><td><span class="i18n-text" data-i18n-zh="隐式拥有全部流程和权限" data-i18n-en="Implicit ownership of all flow and authority">隐式拥有全部流程和权限</span></td></tr>
+          <tr><td>Tool</td><td><span class="i18n-text" data-i18n-zh="单一、可测试的外部操作" data-i18n-en="A single testable external operation">单一、可测试的外部操作</span></td><td><span class="i18n-text" data-i18n-zh="完整任务方法" data-i18n-en="A full task procedure">完整任务方法</span></td></tr>
+          <tr><td>Skill</td><td><span class="i18n-text" data-i18n-zh="经过验证的可复用任务方法" data-i18n-en="A validated reusable task method">经过验证的可复用任务方法</span></td><td><span class="i18n-text" data-i18n-zh="协议或最终授权" data-i18n-en="Protocol transport or final authorization">协议或最终授权</span></td></tr>
+          <tr><td>Context / State</td><td><span class="i18n-text" data-i18n-zh="当前任务真正需要的信息与执行状态" data-i18n-en="Task-relevant information and execution state">当前任务真正需要的信息与执行状态</span></td><td><span class="i18n-text" data-i18n-zh="无限历史堆积" data-i18n-en="Unlimited transcript accumulation">无限历史堆积</span></td></tr>
+          <tr><td>Memory</td><td><span class="i18n-text" data-i18n-zh="经筛选的长期有用信息" data-i18n-en="Curated durable information">经筛选的长期有用信息</span></td><td><span class="i18n-text" data-i18n-zh="所有临时结果和错误" data-i18n-en="Every temporary result and error">所有临时结果和错误</span></td></tr>
+          <tr><td>Test / Eval</td><td><span class="i18n-text" data-i18n-zh="程序契约 + 任务行为证据" data-i18n-en="Program contracts + task-behavior evidence">程序契约 + 任务行为证据</span></td><td><span class="i18n-text" data-i18n-zh="凭感觉判断“更聪明”" data-i18n-en="Judging improvement by intuition">凭感觉判断“更聪明”</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px">
+        <span class="co-t"><span class="i18n-text" data-i18n-zh="项目规范" data-i18n-en="Repository instructions">项目规范</span></span>
+        <p><span class="i18n-text" data-i18n-zh="Coding Agent 的项目指令文件应保持精炼，并指向真正的架构、测试和产品文档。以 Codex 为例，AGENTS.md 是官方支持的项目指令机制，但它不是所有 Agent 工具的统一标准。" data-i18n-en="Coding-agent repository instructions should stay concise and point to the real architecture, test, and product documentation. Codex officially supports AGENTS.md, but that filename is not a universal standard across all Agent tools.">Coding Agent 的项目指令文件应保持精炼，并指向真正的架构、测试和产品文档。以 Codex 为例，AGENTS.md 是官方支持的项目指令机制，但它不是所有 Agent 工具的统一标准。</span></p>
+      </div>
+    </div>
+  </div>
+</section>
