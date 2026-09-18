@@ -38,6 +38,10 @@
     {
       "path": "/assets/ch08-agent-project-lifecycle.html",
       "id": "agent-project-lifecycle"
+    },
+    {
+      "path": "/assets/ch08-agent-architecture-selection.html",
+      "id": "agent-architecture-selection"
     }
   ],
   "09-reliability-evaluation-observability": [
