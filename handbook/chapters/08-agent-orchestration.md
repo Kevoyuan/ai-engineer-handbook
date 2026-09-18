@@ -486,3 +486,741 @@ Reviewing 不应停在“代码看起来没问题”。它最终应进入 releas
 > **Use the highest-level abstraction that still makes important control boundaries explicit.**
 
 > **Checkpointing does not make external side effects transactional.**
+
+## 8.11 Agent Project Engineering Lifecycle：从 Demo 到可维护系统
+
+能调用模型、接上 Tool、跑通一个 Demo，只说明 **execution path exists**；它还不等于一个可长期维护、可验证、可交接、可上线的 Agent 项目。
+
+真正的工程问题是：
+
+~~~text
+What task are we solving?
+→ What is deterministic vs uncertain?
+→ What capabilities exist?
+→ What state must survive?
+→ What evidence proves success?
+→ What happens on failure?
+→ How do production signals return to Build/Test?
+~~~
+
+因此，一个 Agent 项目更适合被建模成：
+
+~~~text
+Task Contract
++ Repository / Engineering Contract
++ Runtime Topology
++ Agent / Capability Contracts
++ State / Context / Memory
++ Prompt / Policy Configuration
++ Test / Eval
++ Deployment / Observability
++ Production Learning Loop
+~~~
+
+> **The goal of Agent engineering is not to maximize autonomy; it is to make uncertain model behavior reliably serve a bounded business task.**
+
+### 8.11.1 Step 1 · 先定义 Task Contract，再选框架
+
+开工前至少写清：
+
+~~~text
+Goal
+Input
+Output
+Boundary
+Success Criteria
+~~~
+
+例如一个研究视频生成任务：
+
+~~~text
+Input
+→ topic
+
+Goal
+→ research reliable evidence
+→ produce script
+→ produce storyboard
+
+Boundary
+→ research / draft may be automatic
+→ publish / delete / paid side effect requires approval
+
+Success
+→ evidence-backed claims
+→ required output schema
+→ accepted script / storyboard
+~~~
+
+如果目标没有边界，后续通常会出现：
+
+~~~text
+more tools
++ more skills
++ more memory
++ bigger prompt
+≠
+better system
+~~~
+
+因为系统在用组件数量弥补需求定义缺失。
+
+> **Define the task before designing the Agent.**
+
+### 8.11.2 Step 2 · Repository Contract：先规定怎么改，再让 Agent 改
+
+一个长期维护的 Agent 项目需要基本工程约定，例如：
+
+~~~text
+README
+Git history
+environment-variable contract
+secret-handling rules
+build / test / lint commands
+dependency policy
+review / release rules
+agent-facing repository instructions
+~~~
+
+真实 Secret 不应进入源码或示例文件。常见模式：
+
+~~~text
+.env.example
+→ only variable names / safe examples
+
+.env
+→ local real values
+→ ignored by version control
+~~~
+
+如果使用 Coding Agent，还应提供它真正会读取的项目级 instruction mechanism。
+
+以 Codex 为例，官方支持目录层级的 `AGENTS.md` / `AGENTS.override.md`，用于提供项目结构、测试命令、开发约定与限制。它更适合作为**操作地图**，而不是把全部架构知识复制成一个巨大的 instruction blob。
+
+跨工具抽象应该写成：
+
+~~~text
+Agent-facing repository instructions
+→ repo conventions
+→ validation commands
+→ safety / permission rules
+→ links to deeper source-of-truth docs
+~~~
+
+而不是假设所有 Coding Agent 都共享同一个文件名。
+
+> **Repository instructions should point to sources of truth, not become a second source of truth.**
+
+Sources:
+- https://developers.openai.com/docs/agent-configuration/agents-md
+- https://openai.com/index/harness-engineering/
+
+### 8.11.3 Step 3 · Architecture：按职责和失败边界拆，不按“目录看起来专业”拆
+
+来源材料给出一种常见目录：
+
+~~~text
+agents/
+tools/
+skills/
+workflows/
+prompts/
+context/
+memory/
+tests/
+evals/
+~~~
+
+这可以作为起点，但不是成熟度标准。
+
+真正值得独立成模块的原因应该是：
+
+~~~text
+distinct responsibility
+distinct state lifecycle
+distinct permission boundary
+distinct test surface
+distinct owner
+distinct failure / recovery path
+~~~
+
+因此小项目可以先简单：
+
+~~~text
+app/
+  runtime.py
+  tools.py
+  prompts.py
+  tests/
+~~~
+
+等真实边界出现后再拆。
+
+> **Create modules when responsibilities diverge, not when folder count looks too small.**
+
+### 8.11.4 Workflow 管确定性控制，Agent 管不确定判断
+
+例如：
+
+~~~text
+Research
+→ Script
+→ Storyboard
+~~~
+
+“先 Research，再 Script”是 Workflow topology；而这些判断更适合 Agent / model decision：
+
+~~~text
+Are sources sufficient?
+Is this claim supported?
+Should we search again?
+Which repair strategy is best?
+~~~
+
+失败路径应显式进入 Workflow：
+
+~~~text
+Research
+→ Evidence Gate
+   ├─ insufficient → Search Again
+   └─ sufficient   → Script
+
+Script
+→ Eval
+   ├─ fail under retry budget → Regenerate
+   ├─ repeated evidence failure → Back to Research
+   └─ pass → Storyboard
+~~~
+
+这延续本章已有原则：
+
+> **Use agents for uncertain decisions and deterministic services for repeatable transformations.**
+
+不要让一个“超级 Agent”同时隐式掌握流程、重试、权限、状态和业务判断，否则很难解释：
+
+~~~text
+why this step?
+why this route?
+why retry?
+why stop?
+what changed?
+~~~
+
+### 8.11.5 Step 4 · Agent Contract：角色只是最小部分
+
+一个 Agent Contract 至少应明确：
+
+~~~text
+Role
+Goal
+Instructions
+Allowed Tools
+Input Schema
+Output Schema
+Stop Conditions
+Escalation Conditions
+Permission Boundary
+Validation Contract
+~~~
+
+例如 Research Agent：
+
+~~~text
+Role
+→ technical researcher
+
+Goal
+→ produce reliable evidence package
+
+Source policy
+→ prefer primary / official sources
+→ mark conflicts
+→ mark unknowns
+
+Tools
+→ search
+→ fetch
+→ repository lookup
+
+Output
+→ claims
+→ evidence
+→ provenance
+→ conflicts
+→ unresolved questions
+~~~
+
+Output Schema 的价值不是“格式漂亮”，而是把 Agent 输出变成后续节点可以稳定消费的 Artifact。
+
+~~~text
+free-form prose
+→ parsing ambiguity
+
+typed artifact
+→ validation
+→ downstream composition
+→ regression testing
+~~~
+
+> **Agent contracts should define handoff semantics, not only persona.**
+
+### 8.11.6 Step 5 · Tool：一个可独立验证的外部能力
+
+Tool 是执行边界，不是任务方法。
+
+好的 Tool 通常具备：
+
+~~~text
+single responsibility
+clear input schema
+stable output schema
+explicit error model
+timeout / retry policy
+permission requirement
+idempotency semantics when side effects exist
+standalone tests
+~~~
+
+例如：
+
+~~~python
+def search_web(query: str) -> list[dict]:
+    ...
+~~~
+
+返回稳定字段：
+
+~~~text
+title
+summary
+url
+~~~
+
+不要做：
+
+~~~text
+do_everything(task)
+→ search
+→ write
+→ query DB
+→ send email
+→ generate slides
+~~~
+
+因为职责越混杂，Tool description、authorization、failure attribution 和测试都会一起恶化。
+
+排障时先区分：
+
+~~~text
+tool selection failure
+≠
+tool execution failure
+~~~
+
+这与 Chapter 06 的 Capability Routing / Tool Failure Taxonomy 对齐。
+
+### 8.11.7 Step 6 · Skill：把验证过的任务方法固化下来
+
+Tool 回答：
+
+~~~text
+What operation can the system perform?
+~~~
+
+Skill 回答：
+
+~~~text
+What repeatable procedure should the system follow to complete this task?
+~~~
+
+例如：
+
+~~~text
+Tools
+→ search web
+→ fetch page
+→ search repository
+→ save artifact
+
+Skill: research_new_ai_product
+→ find official site
+→ inspect docs / repository
+→ collect secondary reporting
+→ compare conflicting claims
+→ remove duplicates / stale evidence
+→ produce sourced research artifact
+~~~
+
+所以能力积累不应只表现为“Tool 越来越多”，还应表现为**可复用、可验证、可版本化的 procedure** 越来越多。
+
+> **Tools provide operations; Skills encode reusable methods.**
+
+### 8.11.8 Step 7 · Context 与 Memory：按信息生命周期分，不按存储技术分
+
+首先问：
+
+~~~text
+What does this task need now?
+~~~
+
+而不是：
+
+~~~text
+Which vector database should we add?
+~~~
+
+当前任务可能需要：
+
+~~~text
+user request
+current artifact versions
+tool results
+workflow position
+open questions
+retry counters
+temporary evidence
+~~~
+
+这些属于 Context / Working State。
+
+跨任务仍然有价值的信息才可能进入长期 Memory：
+
+~~~text
+stable preference
+project rule
+validated reusable fact
+past approved decision
+durable profile
+~~~
+
+任务结束后的 Memory Write 应是一个 promotion decision：
+
+~~~text
+working information
+→ validate
+→ deduplicate
+→ decide durability
+→ save / update / expire / reject
+~~~
+
+而不是“所有历史全部保存”。
+
+> **Memory is curated durable state, not a dump of past context.**
+
+这部分的深入设计属于 Chapter 07。
+
+### 8.11.9 Step 8 · Prompt：把它当版本化配置和行为逻辑
+
+不要让一个巨大的 System Prompt 同时承担所有职责。
+
+可以拆成：
+
+~~~text
+System
+→ durable role / global behavior
+
+Task
+→ current objective
+
+Constraints
+→ boundaries / source / safety / policy
+
+Examples
+→ representative behavior
+
+Output Schema
+→ machine-consumable contract
+~~~
+
+这种拆分的价值是可定位变更：
+
+~~~text
+problem = unsupported claims
+→ inspect evidence policy / constraints
+
+problem = wrong output shape
+→ inspect schema
+
+problem = wrong task objective
+→ inspect task spec
+~~~
+
+而不是每次“重写整个 Prompt”。
+
+Prompt / instruction bundle 应进入版本管理，并把版本写进 Trace Metadata，便于 Chapter 09 的 A/B / Eval / Monitoring 分析。
+
+> **A prompt is behavior configuration; version it like behavior-changing code.**
+
+### 8.11.10 Step 9 · Test 与 Eval：分别回答“程序对不对”和“任务做得好不好”
+
+传统 Test 可以检查：
+
+~~~text
+function
+API
+tool schema
+parser
+state reducer
+permission rule
+retry policy
+~~~
+
+但：
+
+~~~text
+all tests pass
+≠
+task succeeded
+~~~
+
+Agent 仍可能：
+
+~~~text
+cite stale evidence
+select wrong tool
+invent unsupported facts
+miss a required constraint
+produce valid JSON with bad content
+~~~
+
+因此还需要 Eval。
+
+固定 Eval Case 至少可以保存：
+
+~~~text
+input
+required context
+expected constraints
+reference evidence
+acceptance criteria
+risk slice
+expected outcome
+~~~
+
+版本变更后重新执行同一批 Case，才能比较：
+
+~~~text
+task success
+factuality
+tool selection
+schema validity
+latency
+cost
+human-review rate
+~~~
+
+真实生产失败在脱敏、裁决后可以进入 regression dataset：
+
+~~~text
+Production Failure
+→ Root Cause
+→ Curate Case
+→ Add Regression
+→ Verify Fix
+~~~
+
+> **Tests validate program contracts; evals validate task behavior.**
+
+这部分的完整方法属于 Chapter 09。
+
+### 8.11.11 Step 10 · Deploy / Trace / Monitor：上线后才开始获得真实证据
+
+部署目标不只是“服务能启动”。
+
+运行时至少需要关联：
+
+~~~text
+request / thread
+workflow state
+agent decision
+tool call
+tool input / output
+artifact version
+prompt / model / workflow version
+token / latency / cost
+validation result
+task outcome
+~~~
+
+当用户说“结果错了”，Root Cause 可能在完全不同的层：
+
+~~~text
+Prompt?
+State?
+Router?
+Tool selection?
+Tool response?
+Stale external source?
+Model generation?
+Validator?
+~~~
+
+例如模型选择正确、Prompt 也正确，但搜索 Tool 返回过期网页，此时继续改 Prompt 只是在修错层。
+
+因此：
+
+~~~text
+Run
+→ Trace
+→ Eval
+→ Diagnose earliest wrong layer
+→ Fix
+→ Regression
+→ Release
+→ Monitor
+~~~
+
+> **Observability is useful when it tells you where to repair, not merely that something failed.**
+
+### 8.11.12 十步不是瀑布模型，而是一组工程交付物
+
+来源把流程描述为十步顺序。作为教学路径非常清楚，但生产工程不应把它解释成一次性 waterfall。
+
+更准确的是：
+
+~~~text
+DEFINE
+Task Contract
+Repository Contract
+Architecture
+
+BUILD
+Agent Contracts
+Tools
+Skills
+Context / Memory
+Prompt
+
+VERIFY
+Tests
+Evals
+
+OPERATE
+Deploy
+Trace
+Monitor
+
+LEARN
+Production evidence
+→ earlier stage
+~~~
+
+例如：
+
+~~~text
+Eval finds unsupported claims
+→ revise Research contract / source policy
+
+Trace finds stale context
+→ revise state lifecycle
+
+Tool incidents
+→ revise tool contract / retries / source
+
+Repeated Coding Agent mistakes
+→ revise repository instructions
+~~~
+
+因此每一步都有**可回流的 ownership boundary**。
+
+### 8.11.13 推荐交付物
+
+| Stage | Durable artifact |
+|---|---|
+| Requirement | Task Contract / Acceptance Criteria |
+| Repository | README + engineering rules + agent-facing instructions |
+| Architecture | Runtime topology + module ownership + failure paths |
+| Agent | Agent Contract + typed input/output |
+| Tools | Tool schemas + unit/integration tests |
+| Skills | Versioned reusable procedure |
+| Context / Memory | State schema + lifecycle / promotion policy |
+| Prompt | Versioned instruction bundle |
+| Test / Eval | Test suite + versioned eval dataset |
+| Production | Deployment config + trace schema + dashboards/runbook |
+
+这些 Artifact 比“用了什么 Agent framework”更能决定项目是否可以长期维护。
+
+### 8.11.14 一张总图
+
+~~~text
+                         TASK / PRODUCT CONTRACT
+                    goal · boundary · success criteria
+                                  │
+                                  ▼
+                        REPOSITORY CONTRACT
+                 structure · tests · instructions · secrets
+                                  │
+                                  ▼
+┌────────────────────────── RUNTIME DESIGN ────────────────────────────┐
+│ Workflow topology                                                   │
+│      ↓                                                              │
+│ Agent contracts → Skills → Tools                                    │
+│      │              │        │                                      │
+│      └──────────────┴────────┘                                      │
+│                     ↓                                               │
+│ Context / Working State ↔ Memory                                    │
+│                     ↓                                               │
+│ Prompt / Policy / Output Schema                                     │
+└─────────────────────┬───────────────────────────────────────────────┘
+                      ▼
+                TEST + EVALUATION
+                      ▼
+             DEPLOY / TRACE / MONITOR
+                      ▼
+           ROOT CAUSE / DATASET / FIX
+                      └──────────────↺
+~~~
+
+与整本 Handbook 的对应关系：
+
+~~~text
+Ch06
+→ Tools / Skills / Capability / Authorization
+
+Ch07
+→ Context / State / Memory
+
+Ch08
+→ Workflow / Agent / Orchestration / Lifecycle
+
+Ch09
+→ Test / Eval / Trace / Monitoring / Learning Loop
+~~~
+
+### 8.11.15 Source boundary
+
+Primary source:
+
+- 用户提供的视频转录：大昀懂点技术，《十分钟从0到1拆解 AI Agent 的搭建》
+
+Source-derived elements retained:
+
+- 从需求、项目规范、架构、Agent、Tools、Skills、Context/Memory、Prompt、Test/Eval 到部署监控的完整工程路径；
+- Goal / Input / Output / Boundary / Success Criteria；
+- Workflow 管确定性流程、Agent 管需要判断的部分；
+- Agent Contract、Tool 单一职责、Skill = 可复用方法；
+- Context 与 Memory 按当前任务/长期价值区分；
+- Test 与 Eval 分工；
+- Trace 用于定位问题发生在哪一层；
+- 生产失败回流改进与回归。
+
+Handbook engineering refinements:
+
+- 把“十步”定义为可回流 lifecycle，而不是固定 waterfall；
+- 把目录结构降级为一种实现模板，模块拆分依据真实责任/状态/权限/失败边界；
+- 将 AGENTS.md 限定为 Codex 的项目 instruction example，并推广为 tool-specific agent-facing repository instructions；
+- 补充 Agent Contract 的 Stop / Escalation / Permission / Validation；
+- 补充 Tool 的 error model / timeout / idempotency；
+- 补充 Memory promotion lifecycle；
+- 把 Prompt 纳入 version metadata；
+- 把 Test/Eval/Production Failure 连成 regression learning loop。
+
+External verification:
+
+- OpenAI Codex docs confirm hierarchical `AGENTS.md` / `AGENTS.override.md` project instructions.
+- OpenAI Harness Engineering recommends keeping `AGENTS.md` compact and using it as a map into deeper repository sources of truth rather than an encyclopedia.
+
+Sources:
+- https://developers.openai.com/docs/agent-configuration/agents-md
+- https://openai.com/index/harness-engineering/
+
