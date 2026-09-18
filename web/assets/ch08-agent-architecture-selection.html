@@ -1,0 +1,56 @@
+<section id="agent-architecture-selection" aria-labelledby="agent-architecture-selection-title">
+  <h2 class="sub" id="agent-architecture-selection-title"><span class="i18n-text" data-i18n-zh="Agent Architecture Selection：Pattern，不是七档成熟度" data-i18n-en="Agent Architecture Selection: patterns, not seven maturity tiers">Agent Architecture Selection：Pattern，不是七档成熟度</span> <small>§8.AS</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="Single Agent、ReAct、Plan &amp; Execute、Multi-Agent、Route + Skill、Shared State 与 Graph Workflow 不是同一维度的互斥架构。生产系统通常组合它们，真正的选型依据是控制流、状态、权限、恢复、成本与延迟。" data-i18n-en="Single Agent, ReAct, Plan &amp; Execute, Multi-Agent, Route + Skill, Shared State, and Graph Workflow are not mutually exclusive architectures on one axis. Production systems usually compose them; control flow, state, permissions, recovery, cost, and latency drive the choice.">Single Agent、ReAct、Plan &amp; Execute、Multi-Agent、Route + Skill、Shared State 与 Graph Workflow 不是同一维度的互斥架构。生产系统通常组合它们，真正的选型依据是控制流、状态、权限、恢复、成本与延迟。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-as1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.AS1 · AGENT ARCHITECTURE PATTERN SPACE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="“七种架构”其实分属五个控制维度" data-i18n-en="The seven architectures actually span five control dimensions">“七种架构”其实分属五个控制维度</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="不要问“我属于哪一档”，而要问“我的系统在哪些维度需要更强控制”。" data-i18n-en="Do not ask which tier you belong to; ask which dimensions of your system need stronger control.">不要问“我属于哪一档”，而要问“我的系统在哪些维度需要更强控制”。</span></p>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">ACTORS</span></div><h2 class="bfs-card-title">Single Agent ↔ Multi-Agent</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="决定需要几个独立决策主体，以及是否存在真实的 Context、权限、工具、评估或并行边界。" data-i18n-en="Decides how many independent decision makers are needed and whether real context, permission, tool, evaluation, or parallelism boundaries exist.">决定需要几个独立决策主体，以及是否存在真实的 Context、权限、工具、评估或并行边界。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">DECISION</span></div><h2 class="bfs-card-title">ReAct ↔ Plan &amp; Execute</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="局部一步一决策，还是先做全局分解再执行、验证与重新规划。" data-i18n-en="Choose between local step-by-step decisions and global decomposition followed by execution, verification, and replanning.">局部一步一决策，还是先做全局分解再执行、验证与重新规划。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CAPABILITY</span></div><h2 class="bfs-card-title">Router + Skill</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="当能力集合可枚举、边界可描述、路由可评估时，把开放推理压缩成候选能力选择。" data-i18n-en="When capabilities are enumerable, bounded, and evaluable, reduce open-ended reasoning into explicit capability selection.">当能力集合可枚举、边界可描述、路由可评估时，把开放推理压缩成候选能力选择。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">STATE</span></div><h2 class="bfs-card-title">Shared State / Blackboard-like</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="多个 Worker 围绕共享工作对象协作，需要 typed state、ownership、merge/reducer、version 与 conflict policy。" data-i18n-en="Multiple workers collaborate around shared work state, requiring typed state, ownership, merge/reducer rules, versioning, and conflict policy.">多个 Worker 围绕共享工作对象协作，需要 typed state、ownership、merge/reducer、version 与 conflict policy。</span></div></div>
+
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CONTROL</span></div><h2 class="bfs-card-title">Graph / Durable Workflow</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="当 branch、join、loop、checkpoint、resume、HITL、恢复与审计路径本身就是业务契约时，把拓扑显式化。" data-i18n-en="When branch, join, loop, checkpoint, resume, HITL, recovery, and audit paths are application contracts, make the topology explicit.">当 branch、join、loop、checkpoint、resume、HITL、恢复与审计路径本身就是业务契约时，把拓扑显式化。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="组合原则" data-i18n-en="Composition rule">组合原则</span></span><p class="say">Agent architectures are composable control patterns, not a maturity ladder.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-as2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.AS2 · FAILURE-DRIVEN SELECTION</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="从真实失败模式反推控制 Pattern" data-i18n-en="Select control patterns from observed failure modes">从真实失败模式反推控制 Pattern</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="只有当新的控制结构解决了已观察到的问题，它的复杂度才值得。" data-i18n-en="A new control structure is worth its complexity only when it solves an observed problem.">只有当新的控制结构解决了已观察到的问题，它的复杂度才值得。</span></p>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="失败 / 需求" data-i18n-en="Failure / requirement">失败 / 需求</span></th>
+          <th><span class="i18n-text" data-i18n-zh="优先考虑" data-i18n-en="First pattern to consider">优先考虑</span></th>
+          <th><span class="i18n-text" data-i18n-zh="为什么" data-i18n-en="Why">为什么</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Small tool set · short horizon</td><td>Bounded Single Agent</td><td><span class="i18n-text" data-i18n-zh="最小协调开销" data-i18n-en="Minimum coordination overhead">最小协调开销</span></td></tr>
+          <tr><td>Next action depends on fresh observation</td><td>ReAct-style loop</td><td><span class="i18n-text" data-i18n-zh="逐步动态决策" data-i18n-en="Stepwise dynamic decisions">逐步动态决策</span></td></tr>
+          <tr><td>Long task · global decomposition</td><td>Plan &amp; Execute</td><td><span class="i18n-text" data-i18n-zh="分离规划与执行，并允许 re-plan" data-i18n-en="Separate planning from execution and allow replanning">分离规划与执行，并允许 re-plan</span></td></tr>
+          <tr><td>Large known capability catalog</td><td>Router + Skill</td><td><span class="i18n-text" data-i18n-zh="可检索、可授权、可评估" data-i18n-en="Retrievable, authorizable, and evaluable">可检索、可授权、可评估</span></td></tr>
+          <tr><td>Context / permission isolation</td><td>Multi-Agent / Subgraph</td><td><span class="i18n-text" data-i18n-zh="真实 operational boundary" data-i18n-en="Real operational boundaries">真实 operational boundary</span></td></tr>
+          <tr><td>Shared work state conflicts</td><td>Typed Shared State</td><td><span class="i18n-text" data-i18n-zh="明确 ownership、reducer 和 version" data-i18n-en="Explicit ownership, reducers, and versions">明确 ownership、reducer 和 version</span></td></tr>
+          <tr><td>Branch / join / loop / HITL</td><td>Graph Workflow</td><td><span class="i18n-text" data-i18n-zh="控制拓扑成为业务规则" data-i18n-en="Control topology becomes application logic">控制拓扑成为业务规则</span></td></tr>
+          <tr><td>Crash must not restart the whole job</td><td>Durable Workflow Runtime</td><td><span class="i18n-text" data-i18n-zh="恢复保证优先" data-i18n-en="Recovery guarantees first">恢复保证优先</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="框架 ≠ Pattern" data-i18n-en="Framework ≠ pattern">框架 ≠ Pattern</span></span><p><span class="i18n-text" data-i18n-zh="LangGraph 是 stateful Agent orchestration；Temporal 强调 durable workflow execution；Prefect 是 workflow orchestration；n8n 是 workflow automation。选择 runtime 时看 execution guarantee 和 integration model，而不是都贴上“Agent Graph”标签。" data-i18n-en="LangGraph is stateful Agent orchestration; Temporal emphasizes durable workflow execution; Prefect is workflow orchestration; n8n is workflow automation. Choose runtimes by execution guarantees and integration model rather than labeling all of them Agent Graph frameworks.">LangGraph 是 stateful Agent orchestration；Temporal 强调 durable workflow execution；Prefect 是 workflow orchestration；n8n 是 workflow automation。选择 runtime 时看 execution guarantee 和 integration model，而不是都贴上“Agent Graph”标签。</span></p></div>
+    </div>
+  </div>
+</section>
