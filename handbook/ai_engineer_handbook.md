@@ -20,10 +20,11 @@ handbook/chapters/
 ├── 06-skills-routing.md
 ├── 07-memory-context-engineering.md
 ├── 08-agent-orchestration.md
-└── 09-reliability-evaluation-observability.md
+├── 09-reliability-evaluation-observability.md
+└── 10-serving-deployment-ai-platform.md
 ```
 
-Chapters 01 and 10 remain planned work and are intentionally not represented by empty placeholder chapters.
+Chapter 01 remains planned work. Chapter 10 is now active with inference-serving coverage and will expand incrementally.
 
 ## Source-of-truth rule
 
