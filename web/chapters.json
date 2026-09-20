@@ -46,5 +46,11 @@
     "number": "09",
     "zh": "可靠性、评估与可观测性",
     "en": "Reliability, Evaluation, and Observability"
+  },
+  {
+    "slug": "10-serving-deployment-ai-platform",
+    "number": "10",
+    "zh": "推理服务、部署、安全与 AI 平台",
+    "en": "Inference Serving, Deployment, Security, and AI Platform"
   }
 ]
