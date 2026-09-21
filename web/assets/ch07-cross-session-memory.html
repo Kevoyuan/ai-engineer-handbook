@@ -1,0 +1,47 @@
+<section id="cross-session-memory" aria-labelledby="cross-session-memory-title">
+  <h2 class="sub" id="cross-session-memory-title"><span class="i18n-text" data-i18n-zh="Cross-session Memory：跨会话记住的是受治理的状态" data-i18n-en="Cross-session Memory: persist governed state, not raw utterances">Cross-session Memory：跨会话记住的是受治理的状态</span> <small>§7.X</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="“预算不能超过 5000”是否应该跨会话记住，先看 scope 与 durability：它可能只是当前任务约束，也可能是项目级硬约束或稳定用户偏好。Memory 的核心不是存储介质，而是 promotion、scope、provenance、conflict 和 retrieval policy。" data-i18n-en="Whether “budget must not exceed 5000” should survive across sessions depends first on scope and durability: it may be a current-task constraint, a durable project constraint, or a stable user preference. Memory architecture is about promotion, scope, provenance, conflict, and retrieval policy—not merely storage.">“预算不能超过 5000”是否应该跨会话记住，先看 scope 与 durability：它可能只是当前任务约束，也可能是项目级硬约束或稳定用户偏好。Memory 的核心不是存储介质，而是 promotion、scope、provenance、conflict 和 retrieval policy。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-7-x1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.X1 · CROSS-SESSION MEMORY GOVERNANCE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="写入要晋升，读取要路由，冲突要保留 lineage" data-i18n-en="Promote on write, route on read, preserve lineage on conflict">写入要晋升，读取要路由，冲突要保留 lineage</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="长历史摘要只是 Context View。真正 durable 的约束应有结构化 scope、provenance、validity 与 supersession。" data-i18n-en="A long-history summary is only a Context View. Durable constraints need structured scope, provenance, validity, and supersession.">长历史摘要只是 Context View。真正 durable 的约束应有结构化 scope、provenance、validity 与 supersession。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">WRITE 01</span></div><h2 class="bfs-card-title">Candidate Extraction</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="从用户显式陈述、Tool observation 或模型推断中提取候选记忆，并先标记 source_kind。" data-i18n-en="Extract candidate memories from explicit user statements, tool observations, or model inferences, and label source_kind first.">从用户显式陈述、Tool observation 或模型推断中提取候选记忆，并先标记 source_kind。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">WRITE 02</span></div><h2 class="bfs-card-title">Scope + Durability Gate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="判断 task / thread / project / user / tenant scope，以及 temporary / stable / expiring。只有真正 durable 的信息进入长期存储。" data-i18n-en="Resolve task, thread, project, user, or tenant scope plus temporary, stable, or expiring durability. Only truly durable information enters long-term storage.">判断 task / thread / project / user / tenant scope，以及 temporary / stable / expiring。只有真正 durable 的信息进入长期存储。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">STORE</span></div><h2 class="bfs-card-title">Durable Memory + Provenance</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="保存 value 之外，还保存 source、confidence、valid_from / valid_to、supersedes、sensitivity 和 owner。" data-i18n-en="Persist not only the value but also source, confidence, valid_from / valid_to, supersedes, sensitivity, and owner.">保存 value 之外，还保存 source、confidence、valid_from / valid_to、supersedes、sensitivity 和 owner。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">READ</span></div><h2 class="bfs-card-title">Memory Route + Filters</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="当前 Decision 先决定需要哪类 Memory，再做 scope、permission、validity、relevance 过滤；不是对所有历史做一次全局向量搜索。" data-i18n-en="The current decision determines which memory class is needed, followed by scope, permission, validity, and relevance filtering—not one global vector search over all history.">当前 Decision 先决定需要哪类 Memory，再做 scope、permission、validity、relevance 过滤；不是对所有历史做一次全局向量搜索。</span></div></div>
+
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CONFLICT</span></div><h2 class="bfs-card-title">Authority + Supersession</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="explicit correction、scope specificity、source authority、valid time 与 confidence 一起决定当前有效值；newer 不自动等于更 authoritative。" data-i18n-en="Explicit correction, scope specificity, source authority, valid time, and confidence determine the active value together; newer does not automatically mean more authoritative.">explicit correction、scope specificity、source authority、valid time 与 confidence 一起决定当前有效值；newer 不自动等于更 authoritative。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心原则" data-i18n-en="Core rule">核心原则</span></span><p class="say">Write selectively. Read selectively. Expire explicitly. Correct with lineage.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-7-x2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.X2 · SAME SENTENCE, DIFFERENT MEMORY LIFETIME</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="同一句“预算 ≤5000”，可能属于三种不同生命周期" data-i18n-en="The same “budget ≤5000” statement can belong to three different lifetimes">同一句“预算 ≤5000”，可能属于三种不同生命周期</span></h2>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr><th><span class="i18n-text" data-i18n-zh="表达" data-i18n-en="Statement">表达</span></th><th>Scope</th><th><span class="i18n-text" data-i18n-zh="落点" data-i18n-en="Memory target">落点</span></th><th><span class="i18n-text" data-i18n-zh="何时失效" data-i18n-en="When it expires">何时失效</span></th></tr></thead>
+        <tbody>
+          <tr><td><span class="i18n-text" data-i18n-zh="“这次采购预算 ≤5000”" data-i18n-en="“This purchase must stay under 5000.”">“这次采购预算 ≤5000”</span></td><td>current_task</td><td>Working State</td><td><span class="i18n-text" data-i18n-zh="任务完成" data-i18n-en="Task completion">任务完成</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="“Atlas 本季度预算 ≤5000”" data-i18n-en="“Atlas has a quarterly budget cap of 5000.”">“Atlas 本季度预算 ≤5000”</span></td><td>project:atlas</td><td><span class="i18n-text" data-i18n-zh="Project-scoped durable constraint" data-i18n-en="Project-scoped durable constraint">Project-scoped durable constraint</span></td><td><span class="i18n-text" data-i18n-zh="valid_to / 明确修改" data-i18n-en="valid_to / explicit correction">valid_to / 明确修改</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="“以后旅行单次预算都 ≤5000”" data-i18n-en="“For future trips, keep each budget under 5000.”">“以后旅行单次预算都 ≤5000”</span></td><td>user</td><td>Structured Profile</td><td><span class="i18n-text" data-i18n-zh="用户更新偏好" data-i18n-en="User changes the preference">用户更新偏好</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co note" style="margin-top:14px"><span class="co-t">LONG CONTEXT ≠ DURABLE MEMORY</span><p><span class="i18n-text" data-i18n-zh="Lost in the Middle 说明长上下文存在位置敏感性，但跨会话真正需要的是 persisted state / memory lifecycle。如果信息根本没有被持久化，新 Thread 里就无从召回。" data-i18n-en="Lost in the Middle shows position sensitivity in long contexts, but cross-session continuity requires persisted state and a memory lifecycle. If information was never persisted, a new thread has nothing to recall.">Lost in the Middle 说明长上下文存在位置敏感性，但跨会话真正需要的是 persisted state / memory lifecycle。如果信息根本没有被持久化，新 Thread 里就无从召回。</span></p></div>
+    </div>
+  </div>
+</section>
