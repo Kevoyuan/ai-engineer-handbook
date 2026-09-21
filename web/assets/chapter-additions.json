@@ -70,5 +70,11 @@
       "path": "/assets/ch09-cost-per-successful-task.html",
       "id": "cost-per-successful-task"
     }
+  ],
+  "07-memory-context-engineering": [
+    {
+      "path": "/assets/ch07-cross-session-memory.html",
+      "id": "cross-session-memory"
+    }
   ]
 }

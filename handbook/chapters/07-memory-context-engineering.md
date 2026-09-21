@@ -223,6 +223,517 @@ state_reconstruction_failure
 
 把这些 Failure 单独记录在 Trace / Eval，才能判断问题来自记忆写入、读取、权限、压缩还是下游生成。
 
+
+## 7.10 Cross-session Memory：跨会话记住的不是“原句”，而是受治理的约束
+
+一个常见面试问题：
+
+~~~text
+用户在第 3 轮说：
+“预算不能超过 5000。”
+
+第 30 轮，甚至下一次会话，
+Agent 还能不能准确遵守？
+~~~
+
+不能只回答“把历史都塞进 Prompt”，也不能只回答“存到向量数据库”。
+
+真正的问题是：
+
+> **这条信息是什么类型、作用域是什么、是否值得持久化、以后什么时候应该召回、如果被用户修改又该如何失效？**
+
+### 7.10.1 Transcript-only memory 为什么不可靠
+
+把全部历史不断追加到 Prompt，至少会遇到：
+
+~~~text
+context growth
+irrelevant history
+position sensitivity
+constraint dilution
+token / latency cost
+conflicting old statements
+~~~
+
+Lost in the Middle 研究表明，长上下文模型对信息位置并不总是等价利用：相关信息位于长输入中部时，任务表现可能明显下降。
+
+但要注意：
+
+> **Lost in the Middle explains one failure mode of long-context use; it is not the definition of cross-session memory failure.**
+
+如果新会话根本没有 durable store / persisted state，早期约束甚至不会出现在新请求 Context 中，这不是 attention 问题，而是 memory lifecycle 根本不存在。
+
+### 7.10.2 “三层记忆”是教学模型，不是统一框架标准
+
+视频给出的：
+
+~~~text
+Working Memory
+Short-term Memory
+Long-term Memory
+~~~
+
+适合作为快速解释，但不同 runtime 的 taxonomy 并不一致。
+
+例如 LangGraph 当前官方明确区分：
+
+~~~text
+Short-term memory
+= thread-level state / persistence
+= checkpointer
+
+Long-term memory
+= user-specific or application-specific data across conversations
+= Store
+~~~
+
+Letta / MemGPT 系列则存在 persistent memory blocks、message/context state 与 archival memory；Mem0 又以 memory extraction、update / contradiction handling、semantic retrieval / graph memory 为主要机制。
+
+因此 Handbook 不把“三层”当标准，而映射到已有六层结构：
+
+| 视频术语 | Handbook 对应 |
+|---|---|
+| Working Memory | Session + Working State |
+| Short-term Memory | Thread persistence + compressed conversation view |
+| Long-term Memory | Structured Profile + Episodic + Semantic + Procedural |
+
+> **Memory taxonomy is an engineering model. The stable boundary is lifecycle and scope, not the number of layers.**
+
+### 7.10.3 “预算 ≤ 5000”先判断 Scope
+
+同一句话可以代表完全不同的 memory semantics。
+
+#### Case A · 当前任务约束
+
+~~~text
+“这次礼物采购预算不能超过 5000。”
+~~~
+
+更像：
+
+~~~text
+scope = current_task
+durability = task lifetime
+→ Working State
+~~~
+
+任务结束后通常不需要继续保存。
+
+#### Case B · 当前项目的长期约束
+
+~~~text
+“Project Atlas 整个季度的广告预算不能超过 5000。”
+~~~
+
+可能是：
+
+~~~text
+scope = project:atlas
+durability = until quarter end / explicit correction
+→ durable project constraint
+~~~
+
+跨会话仍需要召回。
+
+#### Case C · 用户稳定偏好
+
+~~~text
+“以后你帮我安排旅行时，单次预算都控制在 5000 以内。”
+~~~
+
+可能是：
+
+~~~text
+scope = user preference
+durability = until user changes it
+→ Structured Profile
+~~~
+
+所以：
+
+> **The same sentence can belong to working state, project memory, or profile memory depending on scope and durability.**
+
+### 7.10.4 Memory Write：不要直接把模型总结写进长期记忆
+
+一个更可靠的写入链：
+
+~~~text
+Conversation / Tool Observation
+        ↓
+Candidate Memory Extraction
+        ↓
+Classify
+  fact / preference / constraint / inference / event
+        ↓
+Resolve Scope
+  task / thread / project / user / tenant
+        ↓
+Validate Durability
+  temporary / stable / expires / unknown
+        ↓
+Normalize + Deduplicate
+        ↓
+Conflict / Supersession Check
+        ↓
+Permission + Sensitivity Gate
+        ↓
+Persist with provenance
+~~~
+
+建议长期 Memory 至少保存：
+
+~~~text
+memory_id
+subject
+predicate / type
+value
+scope
+source_event_id
+source_kind
+  user_explicit
+  tool_observed
+  model_inferred
+confidence
+recorded_at
+valid_from
+valid_to
+supersedes
+status
+sensitivity
+owner
+~~~
+
+其中 source_kind 比简单的“事实 / 推断”二分类更实用。
+
+例如：
+
+~~~text
+user_explicit
+“预算不能超过 5000”
+→ authoritative for that user's declared constraint
+
+tool_observed
+CRM says plan = enterprise
+→ authoritative only if that system is current source of truth
+
+model_inferred
+“用户可能偏好低预算”
+→ inference, not equivalent to an explicit constraint
+~~~
+
+> **An inferred memory must not silently acquire the authority of an explicit user instruction.**
+
+### 7.10.5 Rolling Summary 是 Context View，不等于长期 Memory
+
+滚动摘要很适合压缩 thread history：
+
+~~~text
+raw transcript
+→ summarize stable decisions / unresolved items
+→ compact thread view
+→ continue conversation
+~~~
+
+但它仍有两个风险：
+
+~~~text
+summary omission
+summary drift
+~~~
+
+因此：
+
+~~~text
+summary
+≠ source of truth
+~~~
+
+更稳的设计是：
+
+~~~text
+Event Log / raw evidence
+        ↓
+Structured State + Durable Memory
+        ↓
+Summary / Compact View
+        ↓
+Prompt Context
+~~~
+
+摘要是可重建的 Materialized View；关键约束应有结构化字段和 provenance，而不是只存在某段自然语言摘要里。
+
+### 7.10.6 Memory Read：按当前 Decision 检索，不是“搜相似句子”
+
+跨会话召回应先确定当前问题需要哪类记忆：
+
+~~~text
+Current Turn
+→ Intent / Task / State
+→ Memory Route
+~~~
+
+例如：
+
+~~~text
+output style request
+→ Profile Memory
+
+current project budget
+→ project-scoped constraint
+
+“上次发生了什么？”
+→ Episodic Memory
+
+“公司退款政策是什么？”
+→ Semantic / Knowledge source
+
+current retry / approval status
+→ Working State
+~~~
+
+然后再做：
+
+~~~text
+scope filter
+→ permission filter
+→ validity filter
+→ retrieve
+→ rank
+→ conflict resolve
+→ context assemble
+~~~
+
+因此：
+
+> **Memory retrieval is scoped evidence retrieval, not a global vector search over everything the Agent has ever seen.**
+
+向量搜索只是某些 Memory 类型的 retrieval mechanism，不是 Memory Architecture 本身。
+
+### 7.10.7 Conflict Resolution：时间戳不够
+
+视频提出“按时间戳和来源可信度仲裁”，方向是对的，但生产系统不能只用：
+
+~~~text
+newer wins
+~~~
+
+因为：
+
+~~~text
+a newer inference
+should not override
+an explicit authoritative policy
+~~~
+
+冲突可以综合：
+
+~~~text
+scope specificity
+explicit correction
+source authority
+valid time
+recorded time
+confidence
+business source-of-truth
+permission / ownership
+~~~
+
+例如：
+
+~~~text
+M1
+user_explicit
+Project Atlas budget <= 5000
+valid_from = 2026-09-01
+
+M2
+model_inferred
+User probably accepts 8000
+recorded_at = 2026-09-20
+~~~
+
+M2 虽然更新，但不应该覆盖 M1。
+
+如果用户后来明确说：
+
+~~~text
+“Atlas 预算改成 7000。”
+~~~
+
+则应：
+
+~~~text
+create new memory/event
+→ mark old constraint superseded / expired
+→ preserve lineage
+~~~
+
+而不是直接删掉历史事实。
+
+> **Correction should create a new authoritative version, not erase provenance.**
+
+### 7.10.8 Cross-session Architecture
+
+一个可操作的架构：
+
+~~~text
+                    NEW TURN
+                       │
+                       ▼
+                Thread / Working State
+                       │
+           ┌───────────┴───────────┐
+           │                       │
+           ▼                       ▼
+     Context Compression      Memory Read Router
+                                   │
+                  ┌────────────────┼─────────────────┐
+                  ▼                ▼                 ▼
+             Profile Store    Episodic Store    Semantic / Project
+                  └────────────────┼─────────────────┘
+                                   ▼
+                         Conflict / Validity Gate
+                                   ▼
+                         Prompt Context Builder
+                                   ▼
+                               Model / Agent
+                                   │
+                                   ▼
+                         Candidate Memory Write
+                                   │
+                         Promotion / Policy Gate
+                                   └──────────────↺
+~~~
+
+核心不是“存得更多”，而是：
+
+~~~text
+write selectively
+read selectively
+expire explicitly
+correct with lineage
+~~~
+
+### 7.10.9 Letta / Mem0 / LangGraph 分别说明什么
+
+这些系统不代表统一标准，但可以说明不同设计重点。
+
+#### LangGraph
+
+官方把 thread-level short-term memory 与 cross-conversation long-term memory 明确分开：前者通过 checkpointer / graph state 持久化，后者通过 Store 等长期存储跨 conversation 使用。
+
+这验证了：
+
+> **Thread persistence and cross-thread memory are different lifecycles.**
+
+#### Letta / MemGPT lineage
+
+Letta 当前文档中，memory blocks 是持久、可编辑、可以长期附着在 Agent Context 中的结构；archival memory 则可以通过搜索按需召回。
+
+这说明长期记忆不必只有“Vector DB Top-K”，还可以区分：
+
+~~~text
+always-visible durable state
+vs
+retrievable archival state
+~~~
+
+#### Mem0
+
+Mem0 当前文档强调 memory extraction、store、update / contradiction handling、semantic / graph retrieval，并支持按 user / agent / run 等维度组织记忆。
+
+它说明：
+
+> **The hard part of memory is not persistence alone; it is lifecycle management around persistence.**
+
+### 7.10.10 Eval：怎么证明第 30 轮真的“记住了”
+
+不要只做一个 Demo 问：
+
+~~~text
+“你还记得我预算多少吗？”
+~~~
+
+至少要测：
+
+| Slice | Example |
+|---|---|
+| Delayed recall | 第 3 轮约束，第 30 轮任务仍遵守 |
+| Cross-session recall | 新 Thread 中正确召回 project/user durable memory |
+| Scope isolation | Project A 的预算不污染 Project B |
+| Correction | 5000 → 7000 后新值生效，旧值保留 lineage 但不再执行 |
+| Inference vs explicit | 模型推断不能覆盖用户显式约束 |
+| No-recall | 当前任务不需要的偏好不进入 Context |
+| Compression | 摘要后关键 constraint 不丢失 |
+| Unauthorized read | 无权限用户无法看到其他 user / tenant memory |
+| Stale memory | 已过 valid_to 的约束不再应用 |
+
+指标可以包括：
+
+~~~text
+constraint adherence
+cross-session recall accuracy
+scope leakage rate
+stale-memory application rate
+correction propagation accuracy
+memory precision
+memory recall
+unnecessary-memory injection rate
+context tokens / turn
+~~~
+
+> **A memory system is good when it recalls the right durable fact at the right decision and ignores the rest.**
+
+### 7.10.11 面试回答模板
+
+如果面试官问：
+
+> “Agent 能不能跨会话记住第三轮说的预算不能超过 5000？”
+
+可以回答：
+
+> 能不能记住，首先取决于这条信息是不是被定义成 durable memory，而不是聊天窗口够不够长。如果它只是当前任务约束，我会放在 Working State；如果它是项目或用户跨会话仍有效的硬约束，就通过 Memory Write Pipeline 做类型、scope、有效期和 provenance 判断后晋升到长期存储。下一次会话不会全量加载历史，而是根据当前 task / project / user scope 做 Memory Routing，先做权限和有效性过滤，再召回相关约束。用户后来把 5000 改成 7000 时，不是简单按最新时间戳覆盖，而是记录新的 authoritative version，让旧值 superseded，同时保留 lineage。长对话摘要可以减少 Context，但关键约束不能只存在自然语言 summary 中。LangGraph 可以用 checkpointer 保存 thread state、用 Store 保存跨 thread memory；Letta 和 Mem0 则展示了 persistent blocks、archival retrieval、memory update / contradiction handling 等不同实现。核心不是 Vector DB，而是 write、read、conflict、scope 和 lifecycle governance。
+
+### 7.10.12 Source boundary
+
+Primary source:
+
+- 用户提供的视频总结：Agent 跨会话记忆、“预算不能超过 5000”、三层记忆、写入治理、冲突处理，以及 MemGPT / Mem0 示例。
+
+Source-derived ideas retained:
+
+- 不应依赖无限 transcript 堆叠；
+- Working / Short-term / Long-term 的分层思路；
+- Rolling summary 用于长会话压缩；
+- 长期记忆按需召回；
+- 事实/推断、来源、时间和冲突治理很重要；
+- 跨会话记忆适合用户偏好、项目事实与长期约束。
+
+Handbook corrections / synthesis:
+
+- “三层记忆”定义为教学抽象，不宣称是框架统一标准；
+- Lost in the Middle 只解释 long-context positional sensitivity，不等价于所有跨会话遗忘；
+- 把“事实 vs 推断”扩成 user_explicit / tool_observed / model_inferred 等 provenance class；
+- 冲突仲裁不能只按 timestamp，需要结合 scope、explicit correction、source authority 与 valid time；
+- Vector DB 只是 retrieval backend，不是 Memory Architecture；
+- Rolling Summary 是可重建 Context View，不应成为关键约束的唯一 source of truth；
+- 增加 project / task / user scope，以及 no-recall / stale / unauthorized 等 Eval slices。
+
+External verification:
+
+- LangGraph official memory docs: short-term memory is thread-level state/persistence; long-term memory stores user/application data across conversations.
+- Letta docs: persistent memory blocks can remain attached to agents, while archival memory supports searchable persistent passages.
+- Mem0 docs: persistent user memory includes extraction, update/contradiction handling, semantic search, and optional graph memory.
+- Liu et al., Lost in the Middle: long-context performance varies with the position of relevant information.
+
+Sources:
+
+- https://docs.langchain.com/oss/python/langgraph/add-memory
+- https://docs.letta.com/
+- https://docs.mem0.ai/platform/quickstart
+- https://docs.mem0.ai/features/contextual-add
+- https://arxiv.org/abs/2307.03172
+
 ## Canonical rules
 
 > **The transcript is not the state.**
@@ -234,3 +745,7 @@ state_reconstruction_failure
 > **Memory writes and memory reads both require policy.**
 
 > **Topic-scoped working state can be invalidated without deleting stable profile or authorization state.**
+
+> **The same statement may require different memory lifetimes depending on task, project, user, or tenant scope.**
+
+> **Correction should supersede a memory with lineage; newer does not automatically mean more authoritative.**
