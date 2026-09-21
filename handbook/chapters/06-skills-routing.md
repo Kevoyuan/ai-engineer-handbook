@@ -116,24 +116,381 @@ Routing Eval 应看 Candidate Recall@K、Top-1、MRR、No-Match Accuracy、Clari
 
 ## 6.5 MCP vs Skill
 
-MCP 解决的是**协议层能力接入**：Tools / Resources / Context 的 exposure、discovery、schema、connection 和 transport。
+一个更稳的判断方式不是：
 
-Skill 解决的是**能力契约**：一类任务什么时候适用、需要什么输入、如何执行、怎样验证、如何版本治理。
+~~~text
+MCP = 外部
+Skill = 内部
+~~~
 
-两者不是替代关系：
+而是：
 
-```text
-Business Goal
-→ Skill Contract
-→ Workflow / FSM
+~~~text
+MCP
+= interoperability / capability-access protocol
+= 怎么发现、描述、连接、调用一个 capability
+
+Skill
+= reusable procedure / expertise package
+= 什么时候做、按什么方法做、需要哪些参考资料/脚本、怎样验证
+~~~
+
+> **MCP standardizes capability access. Skill packages reusable task procedure and expertise.**
+
+这两个层次可以重叠，但解决的问题不同。
+
+| 维度 | MCP | Skill |
+|---|---|---|
+| 核心问题 | 如何让 Host / Client 发现并调用能力 | 如何让 Agent 稳定完成一类任务 |
+| 典型单元 | Server · Tool · Resource · Prompt · protocol operation | metadata · instructions · workflow · references · scripts · templates |
+| 主要复用边界 | 跨应用 / 跨进程 / 跨工具系统的接入 | 跨任务 / 跨 Agent / 跨团队的任务方法 |
+| 是否必须连接外部系统 | 否；也可以连接本地进程或本地能力 | 否 |
+| 是否定义业务授权 | 否 | 否 |
+| 是否天然包含 Workflow | 否 | 可以编码 procedure，但复杂控制流仍应交给 Workflow / FSM |
+| Context 策略 | 由 Host / Client 决定哪些能力描述进入模型上下文 | 某些实现支持 progressive disclosure / 按需加载 |
+
+### 6.5.1 MCP 的三个典型使用场景
+
+#### A. 接入外部系统或数据源
+
+例如：
+
+~~~text
+company database
+GitHub repository / PR
+SaaS API
+ticketing system
+CRM
+internal search service
+~~~
+
+可以把能力包装成 MCP Server，通过 Tools / Resources / Prompts 等协议原语向支持 MCP 的 Host 暴露。
+
+这里的价值不是“模型突然会查数据库”，而是：
+
+~~~text
+capability exposure
++ discovery
++ schema
++ protocol transport
++ reusable client integration
+~~~
+
+#### B. 对外暴露可复用能力服务
+
+如果一项能力希望被多个 Agent Host / IDE / AI Application 重用，可以把它做成 MCP Server，而不是为每个客户端重新维护一套私有 Tool Adapter。
+
+例如：
+
+~~~text
+GitHub operations server
+internal data query server
+document processing server
+deployment operations server
+~~~
+
+多个 Host 可以复用同一个 protocol surface。
+
+但这并不意味着：
+
+~~~text
+one MCP server
+= automatically safe for every client
+~~~
+
+Server 仍需要处理认证、授权、租户隔离、审计、速率限制等基础设施问题；Host 仍需要执行自己的业务 Policy / Approval Gate。
+
+#### C. 标准化同类能力的接入面
+
+如果系统同时支持多个 Search Provider、Vector Store、Ticket System 或其他后端，MCP 可以减少“每个 Host × 每个 Provider”重复写连接协议的成本。
+
+但要注意：
+
+> **Protocol interoperability ≠ business-semantic interoperability.**
+
+MCP 可以统一：
+
+~~~text
+discovery
+call shape
+transport
+capability metadata
+~~~
+
+但不会自动统一：
+
+~~~text
+provider-specific semantics
+query language
+filter behavior
+permission model
+consistency semantics
+ranking semantics
+error taxonomy
+~~~
+
+如果希望上层真的把多个后端当成同一个 Business Capability，通常还需要 Adapter / Capability Contract 做语义归一化。
+
+### 6.5.2 Skill 的三个典型使用场景
+
+#### A. 固化团队内部流程与规范
+
+例如：
+
+~~~text
+code review procedure
+incident postmortem procedure
+research workflow
+release checklist
+document publication rules
+~~~
+
+这类问题重点不是“怎么连接一个外部服务”，而是：
+
+~~~text
+what steps should be followed?
+what evidence is required?
+what rules apply?
+what is the expected output?
+how is completion verified?
+~~~
+
+因此更适合编码成 Skill / Procedure，而不是为了“有标准协议”硬做成一个 MCP Tool。
+
+#### B. 注入领域知识与专家方法
+
+Skill 可以把：
+
+~~~text
+domain instructions
+reference material
+templates
+worked examples
+checklists
+validation steps
+scripts
+~~~
+
+组织成可复用任务包。
+
+例如合同审查 Skill 可以规定：
+
+~~~text
+1. identify jurisdiction
+2. inspect mandatory clauses
+3. classify risk
+4. cite source clause
+5. separate unknown from verified fact
+6. route high-risk findings to human review
+~~~
+
+在法律、医疗、金融等高风险领域，Skill 只能承载 procedure / reference / validation guidance；它不能替代真实业务授权、合规 policy 或必要的人类专业审查。
+
+#### C. Progressive Disclosure / Context Economy
+
+以 Anthropic Agent Skills 为具体实现例子：
+
+~~~text
+Level 1
+metadata
+→ always available for discovery
+
+Level 2
+SKILL.md instructions
+→ loaded when the Skill is triggered
+
+Level 3+
+references / scripts / templates
+→ loaded or executed only as needed
+~~~
+
+这种 Progressive Disclosure 的价值是：
+
+~~~text
+large reusable knowledge package
+≠
+all content must occupy every request context
+~~~
+
+因此 Skill 很适合承载“可能很大，但只在相关任务中才需要”的 instruction / reference package。
+
+但要注意：
+
+> **Progressive disclosure is a runtime / Skill implementation property, not a universal law of the word “Skill”.**
+
+不同 Agent framework 对 Skill 的发现、加载、缓存和执行方式可能不同。
+
+### 6.5.3 “MCP 会把全部 Tools 塞进 Prompt”不是协议定义
+
+这是视频材料里最需要修正的一点。
+
+MCP 提供的是能力发现与调用原语，例如：
+
+~~~text
+tools/list
+tools/call
+resources/list
+resources/read
+prompts/list
+prompts/get
+~~~
+
+这些原语让 Host / Client 可以知道 Server 暴露了什么能力。
+
+但：
+
+~~~text
+Server exposes N tools
+≠
+the model must receive all N tool schemas on every turn
+~~~
+
+真正决定模型上下文中出现哪些 Tool Definition 的是：
+
+~~~text
+Host / Agent runtime
+→ discovery
+→ permission / availability filter
+→ capability retrieval / routing
+→ model-visible candidate set
+~~~
+
+一个简单 Host 确实可能把所有 Tool Schema 一次性传给模型，从而产生：
+
+~~~text
+token overhead
+tool-selection confusion
+description collision
+unauthorized capability exposure
+~~~
+
+但这是 **Host architecture choice**，不是 MCP 协议强制要求。
+
+因此更成熟的设计是：
+
+~~~text
+MCP Server exposes capability catalog
+        ↓
+Host discovers capabilities
+        ↓
+Permission / availability filter
+        ↓
+Capability retrieval / routing
+        ↓
+Only relevant model-visible tools
+        ↓
+Model proposes tool call
+~~~
+
+这与本章前面的 Skill Routing 完全一致。
+
+### 6.5.4 MCP 与 Skill 可以组合
+
+最常见的生产组合是：
+
+~~~text
+User Goal
+→ Skill / Procedure
+→ Workflow / State
+→ capability required
 → MCP / Function Interface
 → Host
-→ Tool / API / DB Execution
-```
+→ Tool / API / DB
+→ result validation
+→ continue Skill / Workflow
+~~~
 
-MCP 可以提供协议级接入和 transport-level authorization mechanisms，但它不替代应用业务授权、policy、approval、idempotency、transaction semantics 或 task verification。Skill 也不定义跨进程通信协议。
+例如：
 
-> **Protocol exposes capabilities; skills encode reusable task procedures. Neither one replaces authorization, validation, or orchestration.**
+~~~text
+Skill: investigate-production-incident
+    ↓
+Step 1 read logs
+    ↓ MCP → observability server
+
+Step 2 inspect recent deploy
+    ↓ MCP → GitHub / deployment server
+
+Step 3 compare known runbook
+    ↓ Skill reference file
+
+Step 4 propose remediation
+    ↓ Policy / Approval Gate
+~~~
+
+这里：
+
+~~~text
+Skill
+= defines how the incident should be investigated
+
+MCP
+= provides standardized access to the systems needed by the investigation
+~~~
+
+两者不是替代关系。
+
+### 6.5.5 快速选型
+
+先问：
+
+~~~text
+Q1. 我的主要问题是不是“Agent 怎么连接 / 发现 / 调用一个独立系统能力”？
+    → yes: consider MCP / API / Function Interface
+
+Q2. 我的主要问题是不是“这类任务应该按什么成熟方法完成”？
+    → yes: consider Skill
+
+Q3. 任务是否包含确定性的多步分支 / retry / approval / recovery？
+    → yes: add Workflow / State Machine
+
+Q4. 是否涉及权限或真实副作用？
+    → yes: add Authorization / Risk / Approval / Host Gate
+~~~
+
+因此不要用：
+
+~~~text
+MCP or Skill?
+~~~
+
+替代真正的系统设计问题。
+
+更合理的问题是：
+
+> **Which layer owns interoperability, which layer owns reusable procedure, which layer owns control flow, and which layer owns authority?**
+
+### 6.5.6 Source boundary
+
+本节补充材料来自用户提供的视频总结《MCP 与 Skill 的使用场景》。
+
+原材料保留的核心：
+
+- MCP 适合连接外部系统 / 数据源与可复用能力服务；
+- Skill 适合固化团队内部流程、领域方法和可复用知识；
+- MCP 与 Skill 可以组合使用；
+- Skill 的按需加载可以降低不必要的上下文消耗。
+
+Handbook 做了以下校正与扩展：
+
+- “外部 vs 内部”改成 **protocol interoperability vs reusable procedure**；
+- MCP 不要求所有 Tool Schema 每轮都进入模型上下文；
+- MCP 统一协议接入面，不自动统一不同后端的业务语义；
+- Progressive Disclosure 明确标记为 Agent Skills 等具体 Runtime 的实现能力，而不是所有“Skill”概念的必然属性；
+- 增加 Host-side capability retrieval / permission filtering；
+- 强化 Skill / MCP / Workflow / Authorization 四层边界。
+
+External verification:
+
+- Model Context Protocol official SDK/docs: Hosts/Clients discover and call server Tools, Resources, and Prompts through protocol operations.
+- Anthropic Agent Skills documentation: Skills package metadata, instructions, scripts/templates/resources and use progressive disclosure to load content in stages.
+
+Sources:
+
+- https://ts.sdk.modelcontextprotocol.io/v2/
+- https://py.sdk.modelcontextprotocol.io/zh/client/
+- https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+- https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 
 ## 6.6 Function Calling：模型提议，Host 执行
 
@@ -215,6 +572,10 @@ side_effect_reconciliation_failure
 > **A router that always returns a skill is not reliable.**
 
 > **Protocol-level access does not replace business authorization or task verification.**
+
+> **MCP standardizes capability access, not business semantics.**
+
+> **The Host decides which discovered capabilities become model-visible context.**
 
 ## 6.9 Intent Routing：把意图识别设计成 Cost-aware Routing Cascade
 
