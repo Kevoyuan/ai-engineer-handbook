@@ -23,10 +23,11 @@
   - adaptation decision path: prompt/context/retrieval vs fine-tuning / PEFT / LoRA
   - model/version evaluation before and after adaptation
 - [x] Keep Chapters 02–09 as the current Applied AI / RAG / Agent production spine
-- [ ] Add Chapter 10: Serving / Deployment / Security / AI Platform
-  - inference serving: queueing, batching, KV/prefix cache, streaming, concurrency, rate limits, warm-up, capacity
-  - deployment: registry, artifact lineage, environments, shadow/canary, rollback, config/version governance
-  - security operations: identity, tenant isolation, secrets, prompt injection, sandbox/approval, exfiltration, audit
+- [ ] Complete Chapter 10: Serving / Deployment / Security / AI Platform
+  - [x] inference serving foundation: Prefill/Decode, KV cache, cross-request prefix reuse, SGLang RadixAttention, vLLM APC, semantic-cache boundary, multi-tenant cache isolation
+  - [ ] inference serving expansion: queueing, continuous batching, streaming, concurrency, rate limits, warm-up, capacity, prefill/decode disaggregation
+  - [ ] deployment: registry, artifact lineage, environments, shadow/canary, rollback, config/version governance
+  - [ ] security operations: identity, tenant isolation, secrets, prompt injection, sandbox/approval, exfiltration, audit
 - [x] Split active Chapters 02–09 into maintainable canonical Markdown modules
 - [x] Retire the manually maintained aggregate semantic manuscript as a compatibility index
 - [x] Keep framework-specific details as implementation examples under general engineering principles
@@ -44,7 +45,7 @@
 
 ## Coverage rule
 
-The current 02–09 edition is strongest as a **production Applied AI / RAG / Agent Engineering** handbook. Do not claim complete AI Platform / Model Engineering coverage until Chapters 01 and 10 exist.
+The current 02–10 edition is strongest in **production Applied AI / RAG / Agent Engineering**, with Chapter 10 beginning the Serving / Platform layer. Do not claim complete Model Engineering / AI Platform coverage until Chapter 01 and the remaining Chapter 10 platform sections are complete.
 
 The durable system map is:
 

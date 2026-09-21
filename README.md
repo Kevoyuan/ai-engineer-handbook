@@ -17,7 +17,7 @@ This repository focuses on reusable AI engineering knowledge rather than intervi
 7. Memory & Context Engineering
 8. Agent / Workflow / Orchestration
 9. Reliability / Evaluation / Observability
-10. Serving / Deployment / Security / AI Platform *(planned)*
+10. Serving / Deployment / Security / AI Platform *(in progress)*
 
 A system-level Chapter 00 provides the architecture map shared by the active chapters.
 
@@ -51,9 +51,10 @@ handbook/chapters/06-skills-routing.md
 handbook/chapters/07-memory-context-engineering.md
 handbook/chapters/08-agent-orchestration.md
 handbook/chapters/09-reliability-evaluation-observability.md
+handbook/chapters/10-serving-deployment-ai-platform.md
 ```
 
-The public web edition currently contains chapters 02–09. Chapters 01 and 10 remain roadmap gaps and are intentionally not represented by empty placeholders.
+The public web edition now contains chapters 02–10. Chapter 01 remains a roadmap gap; Chapter 10 has started with inference serving / KV and prefix-cache engineering and will expand into deployment, security operations, and AI platform concerns.
 
 ## Source-of-truth model
 

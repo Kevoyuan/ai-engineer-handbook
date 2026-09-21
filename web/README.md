@@ -25,7 +25,7 @@ web/
 └── vercel.json
 ```
 
-The current web edition contains chapters 02–09. Preserve their technical content, diagrams, bilingual support, theme switching, search, navigation, and responsive behavior.
+The current web edition contains chapters 02–10. Preserve their technical content, diagrams, bilingual support, theme switching, search, navigation, and responsive behavior.
 
 ## Source ownership
 

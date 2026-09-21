@@ -19,7 +19,8 @@ const canonicalChapters = [
   '06-skills-routing.md',
   '07-memory-context-engineering.md',
   '08-agent-orchestration.md',
-  '09-reliability-evaluation-observability.md'
+  '09-reliability-evaluation-observability.md',
+  '10-serving-deployment-ai-platform.md'
 ];
 
 const retiredSupplements = [
@@ -86,7 +87,8 @@ const semanticByWebSlug = {
   '06-skills-routing': '06-skills-routing.md',
   '07-memory-context-engineering': '07-memory-context-engineering.md',
   '08-agent-orchestration': '08-agent-orchestration.md',
-  '09-reliability-evaluation-observability': '09-reliability-evaluation-observability.md'
+  '09-reliability-evaluation-observability': '09-reliability-evaluation-observability.md',
+  '10-serving-deployment-ai-platform': '10-serving-deployment-ai-platform.md'
 };
 
 for (const chapter of chapters) {

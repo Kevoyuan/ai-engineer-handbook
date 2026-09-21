@@ -87,6 +87,9 @@ const items = slugs.map(slug => {
 
 write('chapters.json', JSON.stringify(items.map(({html, ...item}) => item), null, 2));
 
+const sitemapUrls = ['/', ...items.map(item => `/chapters/${item.slug}/`), '/search/'];
+write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map(url => `  <url><loc>https://kevoyuan-ai-handbook.vercel.app${url}</loc></url>`).join('\n')}\n</urlset>\n`);
+
 const span = (zh, en) => `<span class="i18n-text" data-i18n-zh="${zh}" data-i18n-en="${en}">${zh}</span>`;
 const asset = name => {
   const content = fs.readFileSync(fromWeb('assets', name));
@@ -94,7 +97,8 @@ const asset = name => {
   return `/assets/${name}?v=${version}`;
 };
 
-const nav = current => `<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>${items.length} CHAPTERS</span></div><nav aria-label="手册章节">${items.map(c => `<a href="/chapters/${c.slug}/"${current === c.slug ? ' aria-current="page"' : ''}><i>${c.number}</i>${span(c.zh, c.en)}</a>`).join('')}</nav><div class="sd-f">${span('当前技术章节 02–09', 'Current technical chapters 02–09')}</div></aside>`;
+const chapterRange = `${items[0]?.number ?? ''}–${items.at(-1)?.number ?? ''}`;
+const nav = current => `<aside id="side" aria-label="章节导航"><div class="sd-h"><a href="/">AI ENGINEERING</a><span>${items.length} CHAPTERS</span></div><nav aria-label="手册章节">${items.map(c => `<a href="/chapters/${c.slug}/"${current === c.slug ? ' aria-current="page"' : ''}><i>${c.number}</i>${span(c.zh, c.en)}</a>`).join('')}</nav><div class="sd-f">${span(`当前技术章节 ${chapterRange}`, `Current technical chapters ${chapterRange}`)}</div></aside>`;
 
 const pageFiles = [
   'index.html',

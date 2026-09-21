@@ -16,12 +16,13 @@ handbook/chapters/
 ├── 06-skills-routing.md
 ├── 07-memory-context-engineering.md
 ├── 08-agent-orchestration.md
-└── 09-reliability-evaluation-observability.md
+├── 09-reliability-evaluation-observability.md
+└── 10-serving-deployment-ai-platform.md
 ```
 
 `handbook/ai_engineer_handbook.md` is retained only as a compatibility entry point for old links. It is **not** a semantic manuscript and must not receive new handbook content.
 
-Chapters 01 and 10 remain planned work. Empty placeholder chapters are intentionally avoided because a filename should not imply knowledge coverage that does not yet exist.
+Chapter 01 remains planned work. Chapter 10 is now active, beginning with inference serving and prefix-cache engineering; deployment lifecycle, security operations, and broader AI platform topics remain incremental work.
 
 ## Repository responsibilities
 
@@ -59,6 +60,7 @@ If Markdown and `web/` disagree on **technical meaning**, re-check the original 
 | 07 | Memory & Context Engineering | State, memory layers, promotion, compaction, provenance, permission isolation |
 | 08 | Agent / Workflow / Orchestration | Artifacts, bounded loops, graphs, LangChain/LangGraph, coding-agent engineering |
 | 09 | Reliability / Eval / Observability | Harness, datasets, traces, monitoring, experiments, security, cost, release gates |
+| 10 | Serving / Deployment / Security / AI Platform | Inference serving, KV/prefix cache, cache isolation; deployment/security/platform sections expanding incrementally |
 
 ## Adding knowledge
 

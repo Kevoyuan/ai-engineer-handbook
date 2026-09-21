@@ -166,5 +166,6 @@
   ": 只修 Prompt 而不分类根因，会制造新回归。": ": Fixing only the prompt without classifying the root cause creates new regressions.",
   "Task Success Rate · 业务 SLA 达成率": "Task Success Rate · business SLA attainment",
   "Correctness · Groundedness · CSAT 满意度": "Correctness · Groundedness · CSAT satisfaction",
-  ": 推荐总指标：Cost per Successful Task，而不是 Cost per Query。": ": Recommended top-level metric: Cost per Successful Task, not Cost per Query."
+  ": 推荐总指标：Cost per Successful Task，而不是 Cost per Query。": ": Recommended top-level metric: Cost per Successful Task, not Cost per Query.",
+  "推理服务与 AI 平台：Prefill、Decode、KV Cache、Prefix Cache、RadixAttention、Automatic Prefix Caching、Semantic Cache 与多租户隔离。": "Inference serving and AI platform: Prefill, Decode, KV Cache, Prefix Cache, RadixAttention, Automatic Prefix Caching, Semantic Cache, and multi-tenant isolation."
 }
