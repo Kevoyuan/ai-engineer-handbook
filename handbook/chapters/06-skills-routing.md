@@ -579,3 +579,156 @@ Sources:
 - https://langchain-ai.github.io/langgraph/reference/
 - https://openai.com/index/introducing-structured-outputs-in-the-api/
 
+
+
+## 6.10 System-One Decision Models：Jev 作为 Typed Probabilistic Fast Path
+
+§6.9 的 Routing Cascade 不要求“轻量 Router”必须是传统 classifier、embedding similarity 或小型 LLM。只要一个组件能够在明确边界内，以足够低的 latency / cost 给出**可校准、可验证、可拒绝升级**的决策，它就可以占据 fast decision layer。
+
+TypeSafe AI 在 2026-09-15 发布的 Jev 是这一设计空间中的一个具体实现。TypeSafe 将它称为 **System One Model**：输入可以是自然语言或结构化 program state，但输出不是自由文本，而是预先定义的 typed probabilistic decisions。
+
+官方当前公开三类 decision primitive：
+
+| Primitive | 语义 | 典型用途 |
+|---|---|---|
+| **Noul** | yes / no，并返回概率 | 风险判断、条件 gate、是否升级 |
+| **Choice** | 从给定候选集合中选择，并返回候选分布 / confidence | Intent、Route、Tool / Capability selection |
+| **Score** | 在给定 scale 上输出 rating，并返回 level distribution / confidence | 质量、风险、优先级、相关性评分 |
+
+因此更合适的心智模型不是：
+
+~~~text
+Jev = a smaller chat LLM
+~~~
+
+而是：
+
+~~~text
+unstructured / structured state
+→ typed probabilistic decisions
+→ deterministic workflow logic
+~~~
+
+这类模型特别适合**答案空间可以提前定义、但边界无法可靠写成硬规则**的判断任务。例如：
+
+~~~text
+intent routing
+content / risk gate
+ticket triage
+tool / capability choice
+quality scoring
+agent trace evaluation
+high-volume filtering
+~~~
+
+### 6.10.1 System-One + System-Two：不是替代，而是分工
+
+在 Agent 架构里，System-One decision model 更适合承担高频、封闭、低延迟的前置判断；开放式生成、多步骤规划与长上下文推理仍交给通用 LLM / planner。
+
+~~~text
+User / Program State
+        ↓
+Typed Decision Layer
+Noul · Choice · Score
+        ↓
+Confidence / Policy Gate
+   ├─ confident + low risk → deterministic branch / tool route
+   ├─ missing / uncertain  → clarify / review
+   └─ complex / open task  → System-Two LLM Planner
+                                ↓
+                         Tool / Workflow Proposal
+                                ↓
+                    Authorization + Validation
+                                ↓
+                              Host
+~~~
+
+这与 §6.9 的核心原则一致：
+
+> **Escalate by uncertainty, task complexity, and risk—not by a fixed technology ladder.**
+
+Jev 这类模型可以替换或补充 Context-aware Router、scorer、verifier 或 guardrail，但它不替代 Authorization、Workflow State、Host Execution，也不替代真正需要开放推理的 Planner。
+
+### 6.10.2 Type-safe ≠ Semantically correct
+
+这里最容易出现一个危险误解：
+
+~~~text
+schema-valid output
+≠
+correct business decision
+~~~
+
+TypeSafe 官方所说的“no type errors / zero hallucinations”主要指：输出被限制在预定义类型和候选空间中，不会生成 schema 外的任意字符串。这个性质对自动化非常重要，但它**不意味着每次分类、选择或评分都一定正确**。
+
+因此生产系统仍需要：
+
+~~~text
+confidence calibration
+threshold tuning
+fallback / escalation
+slice-based evaluation
+drift monitoring
+human review for high-risk cases
+~~~
+
+例如 Choice 永远可以返回一个合法候选，但候选可能是错误的业务 Route；Score 永远可以返回合法分值，但评分可能偏离 ground truth。
+
+> **Type safety removes one failure class; it does not remove semantic error.**
+
+### 6.10.3 Jev vs traditional LLM：比较的是任务形状
+
+| Dimension | System-One / Jev-shaped task | General LLM / System-Two-shaped task |
+|---|---|---|
+| Output space | predefined, typed | open-ended text / code / plan |
+| Core operation | classify · choose · score · gate | generate · reason · synthesize · plan |
+| Integration | direct software branch | parser / tool proposal / workflow orchestration |
+| Best fit | high-volume closed decisions | open or compositional tasks |
+| Uncertainty | probability / confidence is part of the interface | often requires explicit calibration strategy |
+| Main limitation | cannot freely generate arbitrary answers | higher latency/cost; output freedom adds validation burden |
+
+关键不是“新模型是否比 LLM 更先进”，而是：
+
+> **Is the task fundamentally a closed decision or an open generation / reasoning problem?**
+
+如果候选答案无法提前定义，或者任务的核心产物本身就是文章、代码、报告、计划，那么把它硬塞进 System-One primitive 反而会丢失必要表达能力。
+
+### 6.10.4 Benchmark / vendor boundary
+
+截至 2026-09-23，Jev 仍处于 early access。TypeSafe 官方公开材料报告了其在 System-One-shaped workflows 上显著更低的 latency / cost，并展示了并行 decision sampling；这些数字是**厂商在其特定 workflow 与评测设置下的结果**，不能直接外推成“所有业务都快两个数量级”或固定 SLA。
+
+工程选型应自己验证：
+
+~~~text
+decision accuracy / macro F1
+calibration / ECE / Brier score
+abstain or escalation quality
+P50 / P95 latency
+cost / request
+cost / successful decision
+task success after downstream execution
+failure slices
+~~~
+
+尤其要把“输出永远合法”与“输出足够正确”分别评估。
+
+### 6.10.5 Source boundary
+
+本节的触发材料来自用户提供的视频总结，核心观点是：Jev 面向预定义闭环决策，适合与传统 LLM 形成 System-One + System-Two 分工。
+
+Handbook 对其做了以下工程化整理：
+
+- 把 Jev 放入既有 **cost-aware routing cascade**，而不是创建独立架构；
+- 将 Noul / Choice / Score 视为 typed decision primitives；
+- 明确 **type safety ≠ semantic correctness**；
+- 把厂商 benchmark 与可复用架构原则分开；
+- 将选型标准归结为 **closed decision vs open generation / reasoning**；
+- 保留 confidence、fallback、authorization、evaluation 与 human review 边界。
+
+官方核对日期：2026-09-23。
+
+Sources:
+
+- https://typesafe.ai/blog/introducing-system-one-models-and-jev
+- https://api.typesafe.ai/docs
+- https://evals.typesafe.ai/
