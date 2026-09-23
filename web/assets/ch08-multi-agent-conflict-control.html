@@ -1,0 +1,57 @@
+<section id="multi-agent-conflict-control" aria-labelledby="multi-agent-conflict-control-title">
+  <h2 class="sub" id="multi-agent-conflict-control-title"><span class="i18n-text" data-i18n-zh="Multi-Agent Conflict Control：冲突要进 Control Plane" data-i18n-en="Multi-Agent Conflict Control: route disagreement into the control plane">Multi-Agent Conflict Control：冲突要进 Control Plane</span> <small>§8.R</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="生产级 Multi-Agent 不追求“Agent 永远不冲突”，而是把冲突分类成 authority、quality、resource 三类，并分别用权限、证据、状态机与并发控制解决。" data-i18n-en="Production Multi-Agent systems do not aim for agents that never disagree. They classify conflicts into authority, quality, and resource conflicts, then resolve them with permissions, evidence, state machines, and concurrency control.">生产级 Multi-Agent 不追求“Agent 永远不冲突”，而是把冲突分类成 authority、quality、resource 三类，并分别用权限、证据、状态机与并发控制解决。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-r1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.R1 · CONFLICT CONTROL MATRIX</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="先问冲突属于哪一层，再决定怎么仲裁" data-i18n-en="Classify the conflict before choosing a resolution mechanism">先问冲突属于哪一层，再决定怎么仲裁</span></h2>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="冲突类型" data-i18n-en="Conflict type">冲突类型</span></th>
+          <th><span class="i18n-text" data-i18n-zh="真正问题" data-i18n-en="Actual question">真正问题</span></th>
+          <th><span class="i18n-text" data-i18n-zh="错误默认" data-i18n-en="Weak default">错误默认</span></th>
+          <th><span class="i18n-text" data-i18n-zh="生产控制" data-i18n-en="Production control">生产控制</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><b>Authority</b></td><td><span class="i18n-text" data-i18n-zh="谁有权决定下一步？" data-i18n-en="Who is authorized to decide the next step?">谁有权决定下一步？</span></td><td><span class="i18n-text" data-i18n-zh="职位高的 Agent 自动正确" data-i18n-en="Higher-ranked agent is automatically correct">职位高的 Agent 自动正确</span></td><td>authority matrix · evidence · policy / human escalation</td></tr>
+          <tr><td><b>Quality</b></td><td><span class="i18n-text" data-i18n-zh="结果是否真的满足标准？" data-i18n-en="Does the artifact actually satisfy the acceptance criteria?">结果是否真的满足标准？</span></td><td><span class="i18n-text" data-i18n-zh="再叫一个 Judge 发表意见" data-i18n-en="Ask another Judge for one more opinion">再叫一个 Judge 发表意见</span></td><td>read-only verifier · reproducible evidence · bounded repair</td></tr>
+          <tr><td><b>Resource</b></td><td><span class="i18n-text" data-i18n-zh="谁能修改共享资源，什么时候修改？" data-i18n-en="Who may mutate shared resources, and when?">谁能修改共享资源，什么时候修改？</span></td><td><span class="i18n-text" data-i18n-zh="Prompt 里提醒“别改同一文件”" data-i18n-en="Prompt everyone not to touch the same file">Prompt 里提醒“别改同一文件”</span></td><td>ownership · isolation · CAS · merge / validation gate</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px">
+        <span class="co-t"><span class="i18n-text" data-i18n-zh="多数票边界" data-i18n-en="Voting boundary">多数票边界</span></span>
+        <p class="say">Three votes are not three independent observations. Count independent evidence before counting Agent opinions.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-r2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.R2 · MULTI-AGENT HARNESS CONTROL</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Evidence → Authority → State Transition → Recovery" data-i18n-en="Evidence → Authority → State Transition → Recovery">Evidence → Authority → State Transition → Recovery</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="意见可以来自模型，但真正的执行权、状态转换和共享资源修改必须由 Harness 明确控制。" data-i18n-en="Opinions may come from models, but execution authority, state transitions, and shared-resource mutation must be controlled explicitly by the harness.">意见可以来自模型，但真正的执行权、状态转换和共享资源修改必须由 Harness 明确控制。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">01</span></div><h2 class="bfs-card-title">Finding / Artifact</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Worker / Specialist 返回结论，但同时携带 evidence、uncertainty、artifact version 与 blocking risk。" data-i18n-en="Workers and specialists return conclusions together with evidence, uncertainty, artifact versions, and blocking risks.">Worker / Specialist 返回结论，但同时携带 evidence、uncertainty、artifact version 与 blocking risk。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">02</span></div><h2 class="bfs-card-title">Verifier</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="优先用 test / command / structured check；模型 Judge 只在需要语境判断时进入，并输出 PASS / FAIL / PARTIAL + evidence。" data-i18n-en="Prefer tests, commands, and structured checks. Use a model judge only when contextual judgment is needed, returning PASS / FAIL / PARTIAL plus evidence.">优先用 test / command / structured check；模型 Judge 只在需要语境判断时进入，并输出 PASS / FAIL / PARTIAL + evidence。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">03</span></div><h2 class="bfs-card-title">Authority Gate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Lead 可拥有 orchestration authority，但 truth authority 来自 evidence；高风险、越权或超 Scope 决策进入 Policy / Human Gate。" data-i18n-en="The Lead may own orchestration authority, while truth authority comes from evidence. High-risk, unauthorized, or out-of-scope decisions route to a Policy or Human Gate.">Lead 可拥有 orchestration authority，但 truth authority 来自 evidence；高风险、越权或超 Scope 决策进入 Policy / Human Gate。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">04</span></div><h2 class="bfs-card-title">State / Concurrency Gate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Task DAG、owner、revision / CAS、write-scope warning、workspace isolation 与 merge gate 约束共享状态修改。" data-i18n-en="Task DAGs, ownership, revision/CAS, write-scope warnings, workspace isolation, and merge gates constrain shared-state mutation.">Task DAG、owner、revision / CAS、write-scope warning、workspace isolation 与 merge gate 约束共享状态修改。</span></div></div>
+
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">05</span></div><h2 class="bfs-card-title">Repair / Escalate / Complete</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Repair Loop 必须有 attempt budget；超过预算、证据不足或权限不够时显式 ESCALATE，而不是无限 Reviewer ↔ Worker 循环。" data-i18n-en="Repair loops need an attempt budget. When the budget is exhausted, evidence is insufficient, or authority is missing, escalate explicitly instead of looping forever between reviewer and worker.">Repair Loop 必须有 attempt budget；超过预算、证据不足或权限不够时显式 ESCALATE，而不是无限 Reviewer ↔ Worker 循环。</span></div></div>
+      </div>
+
+      <div class="co note" style="margin-top:14px"><span class="co-t">DEEPSEEK HARNESS</span><p><span class="i18n-text" data-i18n-zh="当前实验性 Agent Teams 一手资料支持 shared task DAG、monotonic revision + CAS、Lead-only teammate lifecycle 与 write-scope overlap warning；但 writeScopes 明确只是 advisory，不是 lock，而且默认共享 checkout，不会自动创建 Git worktree。" data-i18n-en="Current first-party material for the experimental Agent Teams supports a shared task DAG, monotonic revisions with CAS, Lead-only teammate lifecycle controls, and write-scope overlap warnings. But writeScopes are explicitly advisory rather than locks, and the default is a shared checkout with no automatic Git worktree creation.">当前实验性 Agent Teams 一手资料支持 shared task DAG、monotonic revision + CAS、Lead-only teammate lifecycle 与 write-scope overlap warning；但 writeScopes 明确只是 advisory，不是 lock，而且默认共享 checkout，不会自动创建 Git worktree。</span></p></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">A reliable Multi-Agent system is not one where Agents rarely disagree; it is one where disagreement has a deterministic resolution path.</p></div>
+    </div>
+  </div>
+</section>
