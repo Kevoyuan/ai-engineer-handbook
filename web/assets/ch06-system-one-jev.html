@@ -1,0 +1,67 @@
+<section id="system-one-jev" aria-labelledby="system-one-jev-title">
+  <h2 class="sub" id="system-one-jev-title"><span class="i18n-text" data-i18n-zh="System-One Decision Models：把 Jev 放进 Routing Cascade" data-i18n-en="System-One Decision Models: placing Jev inside the routing cascade">System-One Decision Models：把 Jev 放进 Routing Cascade</span> <small>§6.C</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="Jev 更适合被理解为一种 typed probabilistic decision layer，而不是更小的聊天模型。它处理答案空间预先定义的 Noul / Choice / Score 决策；开放式生成、复杂规划和多步推理继续交给 System-Two LLM。" data-i18n-en="Jev is better understood as a typed probabilistic decision layer, not a smaller chat model. It handles predefined Noul, Choice, and Score decisions; open generation, complex planning, and multi-step reasoning remain System-Two LLM work.">Jev 更适合被理解为一种 typed probabilistic decision layer，而不是更小的聊天模型。它处理答案空间预先定义的 Noul / Choice / Score 决策；开放式生成、复杂规划和多步推理继续交给 System-Two LLM。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-6-c1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.6.C1 · SYSTEM-ONE + SYSTEM-TWO</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="快决策负责封闭判断，慢推理负责开放任务" data-i18n-en="Fast decisions handle closed judgments; deliberative reasoning handles open tasks">快决策负责封闭判断，慢推理负责开放任务</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="这不是模型代际替换，而是把不同任务形状放进不同执行层。" data-i18n-en="This is not a model-generation replacement story; it assigns different task shapes to different execution layers.">这不是模型代际替换，而是把不同任务形状放进不同执行层。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">STATE</span></div><h2 class="bfs-card-title">User / Program State</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="自然语言、结构化业务状态、Agent trace 或其他待判断输入。" data-i18n-en="Natural language, structured business state, agent traces, or other inputs that require a decision.">自然语言、结构化业务状态、Agent trace 或其他待判断输入。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">SYSTEM ONE</span></div><h2 class="bfs-card-title">Typed Probabilistic Decisions</h2><div class="bfs-card-desc">Noul · Choice · Score<br><span class="i18n-text" data-i18n-zh="输出预定义类型、概率与 confidence，适合 classify / route / score / gate。" data-i18n-en="Returns predefined types, probabilities, and confidence for classify / route / score / gate decisions.">输出预定义类型、概率与 confidence，适合 classify / route / score / gate。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">GATE</span></div><h2 class="bfs-card-title">Confidence + Policy</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="高置信、低风险可以直接分支；低置信、缺信息或高风险进入 clarify / review / escalation。" data-i18n-en="High-confidence, low-risk cases can branch directly; uncertain, incomplete, or high-risk cases go to clarify, review, or escalation.">高置信、低风险可以直接分支；低置信、缺信息或高风险进入 clarify / review / escalation。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">SYSTEM TWO</span></div><h2 class="bfs-card-title">General LLM Planner</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="开放式生成、组合意图、多步骤规划、代码与报告等不能提前枚举答案空间的任务。" data-i18n-en="Open generation, compositional intents, multi-step planning, code, reports, and tasks whose answer space cannot be enumerated in advance.">开放式生成、组合意图、多步骤规划、代码与报告等不能提前枚举答案空间的任务。</span></div></div>
+
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CONTROL</span></div><h2 class="bfs-card-title">Authorization · Validation · Host</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="无论哪种模型作出决策，真实副作用仍由权限、schema、审批、验证和 Host 控制。" data-i18n-en="Regardless of which model makes the decision, real side effects remain controlled by permissions, schemas, approvals, validation, and the host.">无论哪种模型作出决策，真实副作用仍由权限、schema、审批、验证和 Host 控制。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="架构原则" data-i18n-en="Architecture rule">架构原则</span></span><p class="say">Closed decision → typed probabilistic fast path. Open reasoning → general planner.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-6-c2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.6.C2 · DECISION PRIMITIVES</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="三种 primitive 对应三种可编程决策形状" data-i18n-en="Three primitives map to three programmable decision shapes">三种 primitive 对应三种可编程决策形状</span></h2>
+    </div></div>
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Primitive</th>
+          <th><span class="i18n-text" data-i18n-zh="输出" data-i18n-en="Output">输出</span></th>
+          <th><span class="i18n-text" data-i18n-zh="适合" data-i18n-en="Best fit">适合</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><strong>Noul</strong></td><td><span class="i18n-text" data-i18n-zh="yes / no 概率" data-i18n-en="yes / no probability">yes / no 概率</span></td><td>risk gate · condition · escalation</td></tr>
+          <tr><td><strong>Choice</strong></td><td><span class="i18n-text" data-i18n-zh="给定候选集合上的分布 + confidence" data-i18n-en="distribution over a defined candidate set + confidence">给定候选集合上的分布 + confidence</span></td><td>intent · route · capability / tool choice</td></tr>
+          <tr><td><strong>Score</strong></td><td><span class="i18n-text" data-i18n-zh="scale rating + level distribution + confidence" data-i18n-en="scale rating + level distribution + confidence">scale rating + level distribution + confidence</span></td><td>quality · risk · priority · relevance</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="关键边界" data-i18n-en="Critical boundary">关键边界</span></span><p><strong>Type-safe ≠ semantically correct.</strong> <span class="i18n-text" data-i18n-zh="输出不会跑出 schema，不代表业务判断一定正确；confidence calibration、fallback、slice eval 与高风险人工复核仍然需要。" data-i18n-en="Staying inside the schema does not guarantee a correct business judgment; confidence calibration, fallback, slice-based evaluation, and high-risk human review are still required.">输出不会跑出 schema，不代表业务判断一定正确；confidence calibration、fallback、slice eval 与高风险人工复核仍然需要。</span></p></div>
+    </div>
+  </div>
+
+  <div class="table-wrap" style="margin-top:18px"><table>
+    <thead><tr>
+      <th><span class="i18n-text" data-i18n-zh="维度" data-i18n-en="Dimension">维度</span></th>
+      <th>System-One / Jev-shaped</th>
+      <th>General LLM / System-Two-shaped</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span class="i18n-text" data-i18n-zh="答案空间" data-i18n-en="Answer space">答案空间</span></td><td><span class="i18n-text" data-i18n-zh="预定义、typed" data-i18n-en="predefined, typed">预定义、typed</span></td><td><span class="i18n-text" data-i18n-zh="开放文本 / 代码 / 计划" data-i18n-en="open text / code / plans">开放文本 / 代码 / 计划</span></td></tr>
+      <tr><td><span class="i18n-text" data-i18n-zh="核心动作" data-i18n-en="Core operation">核心动作</span></td><td>classify · choose · score · gate</td><td>generate · reason · synthesize · plan</td></tr>
+      <tr><td><span class="i18n-text" data-i18n-zh="主要优势" data-i18n-en="Primary advantage">主要优势</span></td><td><span class="i18n-text" data-i18n-zh="直接进入代码分支；显式概率 / confidence" data-i18n-en="direct software branching; explicit probability / confidence">直接进入代码分支；显式概率 / confidence</span></td><td><span class="i18n-text" data-i18n-zh="表达能力强；能处理开放和组合任务" data-i18n-en="high expressive power; handles open and compositional tasks">表达能力强；能处理开放和组合任务</span></td></tr>
+      <tr><td><span class="i18n-text" data-i18n-zh="主要限制" data-i18n-en="Primary limitation">主要限制</span></td><td><span class="i18n-text" data-i18n-zh="无法自由生成任意内容" data-i18n-en="cannot freely generate arbitrary content">无法自由生成任意内容</span></td><td><span class="i18n-text" data-i18n-zh="延迟 / 成本更高，输出自由度增加验证负担" data-i18n-en="higher latency / cost; output freedom increases validation burden">延迟 / 成本更高，输出自由度增加验证负担</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <p><span class="i18n-text" data-i18n-zh="截至 2026-09-23，Jev 仍为 TypeSafe early access。其速度与成本优势来自 TypeSafe 公布的 System-One-shaped workflow 评测，应视为 vendor benchmark，而不是通用 SLA。生产选型仍应在自己的数据上测 accuracy、calibration、P50/P95、cost/success 与 downstream task success。" data-i18n-en="As of 2026-09-23, Jev remains in TypeSafe early access. Its speed and cost advantages come from TypeSafe's published System-One-shaped workflow evaluations and should be treated as vendor benchmarks, not universal SLAs. Production selection should still measure accuracy, calibration, P50/P95, cost per success, and downstream task success on your own data.">截至 2026-09-23，Jev 仍为 TypeSafe early access。其速度与成本优势来自 TypeSafe 公布的 System-One-shaped workflow 评测，应视为 vendor benchmark，而不是通用 SLA。生产选型仍应在自己的数据上测 accuracy、calibration、P50/P95、cost/success 与 downstream task success。</span></p>
+</section>
