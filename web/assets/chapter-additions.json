@@ -20,6 +20,10 @@
     {
       "path": "/assets/ch06-intent-routing.html",
       "id": "intent-routing-cascade"
+    },
+    {
+      "path": "/assets/ch06-system-one-jev.html",
+      "id": "system-one-jev"
     }
   ],
   "08-agent-orchestration": [
