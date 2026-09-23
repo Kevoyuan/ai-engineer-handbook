@@ -261,6 +261,48 @@ Host Execution
 
 这里的“层”不是固定标准。两层、三层或四层都可以；核心是把**便宜、稳定、可验证的判断放在前面，把昂贵、开放式的推理留给真正需要它的长尾请求**。
 
+从流量经济学看，成熟 Routing Cascade 通常希望形成一个**漏斗**：
+
+~~~text
+traffic share        high ───────────────→ low
+ambiguity             low ───────────────→ high
+task complexity       low ───────────────→ high
+unit latency / cost   low ───────────────→ high
+
+L1 deterministic
+        ↓ unresolved only
+L2 context-aware
+        ↓ uncertain / compositional only
+L3 structured planner
+~~~
+
+这不是要求人为把某个百分比“压到 L1”。真正目标是：
+
+~~~text
+simple + stable
+→ exit early
+
+context-dependent but routine
+→ resolve cheaply with state-aware routing
+
+ambiguous / cross-domain / compositional
+→ spend expensive reasoning budget
+~~~
+
+因此要同时防两个反模式：
+
+~~~text
+Rule Black Hole
+→ every new edge case becomes another regex / exception
+→ conflict + precedence + ownership debt keeps growing
+
+LLM Front Door
+→ every request starts with the most expensive model
+→ unnecessary latency + cost + output variance
+~~~
+
+> **A routing funnel should reduce average decision cost without hiding uncertainty or turning the fast path into a rule warehouse.**
+
 ### 6.9.1 Layer 1 · Deterministic fast path
 
 适合：
@@ -563,20 +605,23 @@ correct tool, invalid args
 Handbook 做了以下工程化扩展：
 
 - 把固定三层改写成可配置的 **cost-aware routing cascade**；
+- 保留“三层漏斗”的流量经济学：越往下请求比例应倾向下降，而歧义、复杂度与单请求成本倾向上升；
+- 明确两个反模式：规则层无限扩张形成 **Rule Black Hole**，以及让高成本 LLM 成为所有请求的默认 Front Door；
 - 把“上下文层”显式拆成 State / Referent Resolution / Confidence Gate；
 - 增加 CLARIFY / NO_MATCH / ESCALATE / MULTI_CAPABILITY 等不确定性出口；
 - 区分 Intent、Capability Routing 与 Authorization；
 - 增加 calibration、traffic-share、latency、cost、task-success 与 failure taxonomy；
 - 把 LLM 层限定为 structured planning / action proposal，而不是自由执行。
 
-外部核对：
+外部核对（2026-09-23）：
 
-- LangGraph official reference: low-level orchestration for long-running stateful agents; deterministic + agentic workflows, customization, and latency control are explicit use cases.
+- LangChain / LangGraph 当前官方 Learn 与 Thinking in LangGraph 文档继续把 routing、shared state、显式 transitions 与可定制 workflow 作为核心 orchestration primitive；这与本节的 state-aware cascade 一致。
 - OpenAI Structured Outputs / Function Calling: models can produce schema-constrained structured outputs and tool arguments; this supports typed action proposals but does not replace application authorization.
 
 Sources:
 
-- https://langchain-ai.github.io/langgraph/reference/
+- https://docs.langchain.com/oss/python/learn
+- https://docs.langchain.com/oss/javascript/langgraph/thinking-in-langgraph
 - https://openai.com/index/introducing-structured-outputs-in-the-api/
 
 
