@@ -88,5 +88,11 @@
       "path": "/assets/ch07-cross-session-memory.html",
       "id": "cross-session-memory"
     }
+  ],
+  "10-serving-deployment-ai-platform": [
+    {
+      "path": "/assets/ch10-agent-sandbox-security.html",
+      "id": "agent-sandbox-security"
+    }
   ]
 }
