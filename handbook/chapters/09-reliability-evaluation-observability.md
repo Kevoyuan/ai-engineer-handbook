@@ -847,6 +847,458 @@ Real Traffic
 
 > **Monitoring must produce learning assets.**
 
+## 9.21 Agent Experience Learning：经验不是自动写回，而是受控晋升
+
+一个常见问题：
+
+~~~text
+Agent 怎么积累经验？
+是不是每跑完一次任务，就把 trajectory 拿去 fine-tune？
+~~~
+
+生产系统真正需要回答的是：
+
+~~~text
+What happened?
+→ What did we learn?
+→ Is this lesson trustworthy?
+→ Where should it live?
+→ When should it affect future behavior?
+→ How do we test and roll it back?
+~~~
+
+因此更稳定的架构不是 `Trajectory → Fine-tune`，也不是 `Trajectory → Vector DB`，而是：
+
+~~~text
+Production Experience
+→ Distillation
+→ Validation
+→ Promotion Decision
+   ├─ Case / Episodic Memory
+   ├─ Skill / Procedure
+   ├─ Deterministic Rule / Validator
+   ├─ Regression Dataset
+   └─ Training Dataset
+→ Offline Eval
+→ Release Gate
+→ Runtime / Model Update
+~~~
+
+> **Agent self-learning is a controlled experience-promotion system, not an uncontrolled self-modification loop.**
+
+### 9.21.1 为什么不应该“每次任务结束就在线 Fine-tune”
+
+Raw Agent Trace 可能包含用户输入、规划、Tool 调用、重试、错误、Fallback 和最终输出，但它并不天然是高质量训练样本。
+
+~~~text
+successful final answer
+≠
+good trajectory
+~~~
+
+一个最终成功的任务仍可能包含错误 Tool、无效重试、越权提议、幸运恢复或过高成本；直接把整条轨迹当示范，会把偶然路径也写进训练数据。
+
+> **Raw success logs are evidence, not ground-truth demonstrations.**
+
+生产流量通常还高度失衡：routine success 很多，真正值得学习的 rare failure / boundary case 很少，因此需要 sampling、dedup、failure slicing、hard-case mining 和 adjudication。
+
+外置经验还有一个重要优势：一条错误 Memory / Skill 可以单独失效或回滚；模型版本当然也可以 rollback，但单条训练样本对参数行为的影响通常不像删除一个外部记录那样容易局部撤销。
+
+持续 Fine-tuning 还存在 forgetting / interference 风险。已有研究在 continual instruction tuning 中观察到 catastrophic forgetting，但这不是“每次 Fine-tune 都一定破坏底座”的定律。风险取决于 model、training method、data mix、learning rate、task similarity、replay / regularization 和 eval coverage。
+
+> **Parameter updates require a slower, better-evaluated promotion path than external experience updates.**
+
+### 9.21.2 Fast Path 与 Slow Path
+
+更准确的生产设计是两速学习：
+
+~~~text
+FAST LEARNING PATH
+External experience
+→ Memory / Skill / Rule / Regression
+→ fast release
+
+SLOW LEARNING PATH
+Curated experience
+→ Training Dataset
+→ SFT / preference optimization / RL
+→ full regression
+→ model release
+~~~
+
+Fast Path 更适合需要 traceable、editable、deletable、scope-aware、低更新延迟的业务经验；Slow Path 更适合稳定、重复、可评测的行为缺口。
+
+> **Use external experience for rapid adaptation; use parameter learning for stable repeated behavior that survives evaluation.**
+
+### 9.21.3 Fine-tuning 不是“只适合一次性知识注入”
+
+Fine-tuning 更常见的价值包括 task specialization、format consistency、instruction-following correction、classification / extraction、behavior shaping 和 smaller-model specialization。
+
+对于经常变化的事实，例如价格、库存、项目状态、客户数据、政策版本，通常更适合 RAG / Memory / Tool retrieval，而不是反复写进参数。
+
+> **Fine-tuning primarily changes learned behavior; retrieval and memory are usually better for frequently changing external facts.**
+
+### 9.21.4 Raw Trajectory：保存可观察证据，不依赖隐藏 CoT
+
+轨迹至少记录：
+
+~~~text
+request
+task / user / tenant scope
+model / prompt / workflow versions
+structured decision / plan
+tool + arguments
+tool result
+state transition
+validator result
+retry / fallback
+latency / token / cost
+final output
+task outcome
+human feedback
+~~~
+
+不要把隐藏 Chain-of-Thought 当作经验系统的必需数据。经验学习应建立在 observable action、structured decision、explicit reasoning summary when needed、environment feedback 和 outcome 上。
+
+> **Experience learning should be built on observable behavior and outcomes, not hidden Chain-of-Thought.**
+
+### 9.21.5 Trace ≠ Experience
+
+Trace 是“发生了什么”；Experience 是“从发生过的事情里抽象出一条经过验证、可复用、带适用边界的知识”。
+
+例如一个很长的 Coding Agent Trace，最后可能只提炼成：
+
+~~~text
+Task family:
+Python package upgrade with async client
+
+Failure:
+library v3 removed implicit event-loop creation
+
+Applicable condition:
+Python >= 3.12 + library >= v3
+
+Lesson:
+create / enter async runtime before client initialization
+
+Evidence:
+test id + docs ref + trace_id
+
+Do not apply when:
+sync client path
+~~~
+
+这一步叫 **Experience Distillation**。
+
+### 9.21.6 Candidate Experience Schema
+
+一个可治理经验条目至少可以包含：
+
+~~~text
+experience_id
+task_family
+trigger_conditions
+problem_pattern
+recommended_action
+anti_pattern
+evidence_refs
+source_trace_ids
+outcome
+confidence
+validation_status
+tool / workflow / model compatibility
+environment constraints
+scope: global / team / project / tenant / user
+created_at
+last_validated_at
+valid_to
+supersedes
+version
+~~~
+
+特别要有 trigger_conditions 和 do_not_apply_when。
+
+> **A lesson without applicability boundaries becomes a future source of context pollution.**
+
+### 9.21.7 成功案例和失败案例都不能直接照抄
+
+成功案例应继续问：哪个 decision 真正有因果价值？哪些步骤只是偶然？哪些 Tool output 真正决定结果？哪些步骤可以删除？
+
+失败案例则要先归因：
+
+~~~text
+agent mistake
+tool outage
+bad data
+permission denied
+environment drift
+unanswerable task
+evaluator bug
+~~~
+
+例如 API timeout 不一定是 Planning lesson；wrong tool arguments 才更可能是 Tool / Planner lesson；stale index 导致答案错误则应修 ingestion / retrieval。
+
+### 9.21.8 Promotion Router：经验应该去哪里
+
+| Experience type | Best promotion target | Example |
+|---|---|---|
+| 一次性用户偏好 | Profile Memory | “答案保持三句话以内” |
+| 项目临时约束 | Project / Working Memory | “Atlas 暂时不能升级 SDK” |
+| 相似任务历史案例 | Episodic / Case Memory | “这类迁移曾因 schema mismatch 失败” |
+| 稳定可复用任务方法 | Skill / Procedure | “调查生产事故的标准步骤” |
+| 必须满足的业务不变量 | Code / Policy / Validator | “付款 > X 必须审批” |
+| 历史真实失败 | Regression Dataset | “不能再次出现这个失败” |
+| Judge 校准案例 | Calibration Dataset | “人类裁决认为此输出越权” |
+| 稳定、重复的参数层行为缺口 | Training Dataset | “模型长期无法稳定完成该结构化任务” |
+
+> **Not every experience should become memory, and not every memory should become training data.**
+
+### 9.21.9 Case Bank 不是“全局向量库”
+
+经验库需要的是 retrieval key + scope + validity + provenance + applicability + ranking。Backend 可以是 relational store、document store、vector index、graph、hybrid，甚至 exact lookup。
+
+新任务检索经验时更合理的是：
+
+~~~text
+Current Task
+→ task-family / intent
+→ scope filter
+→ environment / tool-version filter
+→ permission filter
+→ retrieve candidates
+→ applicability rerank
+→ contradiction / stale check
+→ context budget
+~~~
+
+只做 embedding similarity 容易召回“语义像、但环境不兼容”的旧经验。
+
+### 9.21.10 Experience Retrieval 的三类风险
+
+**Stale Experience**：旧 SDK / Tool 行为在升级后仍被召回，因此经验应记录 tool_version、environment、valid_to、last_validated_at。
+
+**Self-reinforcing Error**：bad experience → retrieved → bad behavior → new trace reinforces same lesson。因此 Candidate 不能只靠 Agent 自我反思就直接变 Active，需要 validation、counter-example、regression 与 promotion gate。
+
+**Scope Leakage**：用户 A 的私人偏好不能晋升成 global SOP，因此必须区分 user / tenant / project / team / global。
+
+### 9.21.11 从 Case 晋升为 Skill
+
+如果 Case Bank 中反复出现相同 validated pattern，例如“升级前先读 migration guide → 查 breaking changes → 跑 compatibility tests”，就不应永远检索多个历史案例。
+
+更合理的是：
+
+~~~text
+Repeated validated pattern
+→ Skill candidate
+→ consolidate steps
+→ define trigger / non-trigger
+→ attach references / scripts
+→ eval against representative tasks
+→ versioned Skill
+~~~
+
+> **Cases remember what happened; Skills encode how to act repeatedly.**
+
+### 9.21.12 有些经验最终应该退出 LLM
+
+如果系统反复学到：
+
+~~~text
+transfer_amount > threshold
+→ human approval required
+~~~
+
+最成熟的落点不是继续把这条经验塞进 Prompt，而是把它变成 Policy Gate。
+
+类似地：HTTP 401 不 blind retry → Tool Error Policy；SQL DELETE 必须确认 → Permission Gate；Artifact 必须过 Schema → Validator。
+
+> **The most mature lesson may become code, not memory.**
+
+### 9.21.13 失败首先应该晋升为 Regression Asset
+
+任何值得记住的生产失败，都应该先问：能否复现？能否评估？能否阻止再次发生？
+
+~~~text
+Production Failure
+→ Root Cause
+→ Curated Regression Case
+→ Evaluator
+→ Candidate Fix
+→ Release Gate
+~~~
+
+> **Learning is incomplete until the lesson becomes testable.**
+
+### 9.21.14 什么经验才值得进入 Training Dataset
+
+通常至少满足：stable task distribution、repeated behavior gap、high-quality labels / preference signal、clear evaluator、representative cases、low policy volatility、acceptable regression risk。
+
+训练方法也应按问题选，而不是默认 DPO：
+
+~~~text
+known good demonstrations
+→ SFT
+
+preference pairs / relative quality
+→ preference optimization
+
+verifiable reward / grader
+→ RL / reinforcement fine-tuning style approach
+
+small specialist decision
+→ distill / train smaller decision model
+~~~
+
+任何 Training Promotion 都必须经过 holdout、regression、safety/policy、cost/latency 和 release gate。
+
+> **No training promotion without an evaluation contract.**
+
+### 9.21.15 “只训练小模型、不动底座”不是通用规则
+
+合理选择可以包括：冻结 foundation model + external memory / skills；训练 small specialist；训练 adapter / LoRA；fine-tune selected model；或进行 preference / reinforcement optimization。
+
+选择取决于 task stability、data quality、model ownership、latency、cost、privacy、release cadence 和 regression risk。
+
+> **Freeze-by-default is a useful operational bias, not a universal law.**
+
+### 9.21.16 Reflexion、ExpeL、Voyager 分别说明什么
+
+这些研究不代表统一生产标准，但说明了三种不改底座权重的 Experience Promotion 路径：
+
+~~~text
+Reflexion
+feedback → verbal reflection → episodic memory
+
+ExpeL
+trajectories → distilled natural-language insight → inference-time retrieval
+
+Voyager
+experience → executable skill library → retrieval / composition
+~~~
+
+因此经验学习不应该被缩成一个 Vector DB。
+
+### 9.21.17 Production Architecture
+
+~~~text
+Production Task
+→ Agent / Workflow Run
+→ Observable Trace / Outcome
+→ Eval + Root Cause
+→ Experience Distillation
+→ Candidate Experience
+   ├─ Memory / Case
+   ├─ Skill / Procedure
+   ├─ Deterministic Rule
+   ├─ Regression Asset
+   └─ Training Candidate
+→ Offline Eval / Shadow
+→ Release Gate
+→ New Production
+↺
+~~~
+
+不同目标应该有不同 release cadence：Working/Local memory 可以分钟级；Case/Skill/Rule/Regression 可以小时到天级；训练与模型发布通常更慢。
+
+> **Different learning targets deserve different release cadences.**
+
+### 9.21.18 Promotion State Machine
+
+不要让 Agent 自己说“I learned this”然后直接生效。
+
+~~~text
+OBSERVED
+→ CANDIDATE
+→ VALIDATED
+→ SHADOW
+→ ACTIVE
+→ DEPRECATED
+→ RETIRED
+~~~
+
+每个经验应有 version、owner、evidence、release history 和 rollback path。
+
+### 9.21.19 Experience Eval
+
+至少评估：
+
+~~~text
+Retrieval
+  experience Recall@K
+  applicability precision
+  stale-experience rate
+  scope leakage rate
+
+Behavior
+  task success
+  first-attempt success
+  recovery success
+  tool-call correctness
+  trajectory length
+
+Learning quality
+  positive-transfer rate
+  negative-transfer rate
+  experience-induced failure rate
+  counter-example robustness
+
+Efficiency
+  context tokens
+  latency overhead
+  retrieval cost
+  cost per successful task
+~~~
+
+尤其要测 negative transfer：被召回或晋升的经验是否让原本正确的任务变差。
+
+> **Experience systems must measure harm from remembered lessons, not only benefit from recalled lessons.**
+
+### 9.21.20 面试回答模板
+
+> Agent 的经验积累我会分成快慢两条路径。生产 Trace 先作为原始证据保存，通过 Eval 和 Root Cause 抽取 Candidate Experience；经验经过去重、适用条件、scope、版本和证据验证后，由 Promotion Router 决定进入 Case Memory、Skill、Deterministic Policy 还是 Regression Dataset。新任务只检索当前 task / environment 真正适用的经验，不做全局相似度乱召回。只有长期稳定、重复出现、且有明确 Eval Contract 的行为缺口才进入训练数据，再根据数据形式选择 SFT、preference optimization 或 RL，并经过完整 Regression 和 Release Gate。Fine-tuning 不是不能用，而是不应该成为每条生产轨迹的实时第一落点。核心是让经验可追溯、可验证、可失效、可回滚，并且只有成熟经验才晋升到参数层。
+
+### 9.21.21 Source boundary
+
+Primary source:
+
+- 用户提供的视频提取：《王二讲Agent｜Agent怎么做经验积累和自我学习？》
+
+Source-derived ideas retained:
+
+- 保存 Agent 执行轨迹；
+- 从长轨迹中过滤并提炼成功 SOP、失败教训和任务模式；
+- 新任务检索历史经验作为上下文；
+- Fine-tuning / preference optimization 放在更慢的离线路径；
+- Experience Bank 要做去重、坏案例过滤和 scope 区分。
+
+Handbook corrections / synthesis:
+
+- “不能 Fine-tune”改成“不应把每条生产轨迹直接在线晋升成参数更新”；
+- catastrophic forgetting 定位为 continual fine-tuning 的真实风险，而非必然结果；
+- Fine-tuning 定位为 task / behavior specialization，而不是“只做一次性知识注入”；
+- 模型版本可 rollback，但单条训练样本影响不像外置 Memory 那样容易局部删除；
+- “只训练小模型、不动底座”改成一种策略，而非统一规则；
+- Promotion target 扩展为 Memory / Skill / Deterministic Rule / Regression Dataset / Training Dataset；
+- 增加 applicability、version compatibility、staleness、scope leakage 和 negative transfer；
+- Raw Trace 不把隐藏 Chain-of-Thought 当作必要资产。
+
+External verification:
+
+- Reflexion: verbal feedback can be stored in episodic memory to improve later trials without weight updates.
+- ExpeL: trajectories can be distilled into experiential knowledge and recalled at inference time.
+- Voyager: experience can become a reusable executable skill library without fine-tuning the underlying LLM.
+- Continual fine-tuning research documents catastrophic forgetting as a real risk.
+- Current OpenAI model-optimization guidance treats evals, prompt/context methods, and fine-tuning as complementary optimization mechanisms.
+
+Sources:
+
+- https://arxiv.org/abs/2303.11366
+- https://arxiv.org/abs/2308.10144
+- https://arxiv.org/abs/2305.16291
+- https://arxiv.org/abs/2308.08747
+- https://developers.openai.com/api/docs/guides/model-optimization
+- https://developers.openai.com/api/docs/guides/supervised-fine-tuning
+- https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning
 ## Source notes
 
 LangChain Academy 课程在本章中作为 implementation evidence，而不是通用架构定义。涉及内容包括 Reliable Agents 与 Production Monitoring 中的 observability、datasets、experiments、online evals、automations、sentiment、A/B testing、security monitoring、dashboards/alerts 和 capstone。
@@ -877,3 +1329,9 @@ Representative sources:
 > **No alert under partial sampling does not prove zero incidents.**
 
 > **Production monitoring closes the loop only when signals become curated learning assets and repeatable regression tests.**
+
+> **Agent self-learning is a controlled experience-promotion system, not an uncontrolled self-modification loop.**
+
+> **Not every experience should become memory, and not every memory should become training data.**
+
+> **Learning is incomplete until the lesson becomes testable.**

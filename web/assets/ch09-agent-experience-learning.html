@@ -1,0 +1,61 @@
+<section id="agent-experience-learning" aria-labelledby="agent-experience-learning-title">
+  <h2 class="sub" id="agent-experience-learning-title"><span class="i18n-text" data-i18n-zh="Agent Experience Learning：经验要经过 Promotion Gate" data-i18n-en="Agent Experience Learning: promote experience through explicit gates">Agent Experience Learning：经验要经过 Promotion Gate</span> <small>§9.X</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="Agent 自我学习不是“任务结束后自动改权重”。Raw Trace 先经过 Eval、Root Cause、Distillation 和 Validation，再决定它应该进入 Memory、Skill、Deterministic Rule、Regression Dataset 还是 Training Dataset。" data-i18n-en="Agent self-learning is not automatic weight mutation after every task. Raw traces first pass through evaluation, root-cause analysis, distillation, and validation before being promoted into memory, skills, deterministic rules, regression datasets, or training data.">Agent 自我学习不是“任务结束后自动改权重”。Raw Trace 先经过 Eval、Root Cause、Distillation 和 Validation，再决定它应该进入 Memory、Skill、Deterministic Rule、Regression Dataset 还是 Training Dataset。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-9-x1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.X1 · EXPERIENCE PROMOTION SYSTEM</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="把“发生过”变成“以后可以安全复用”" data-i18n-en="Turn what happened into something safe to reuse later">把“发生过”变成“以后可以安全复用”</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="Trace 是证据，Experience 是经过验证的抽象；不同经验应该晋升到不同系统层。" data-i18n-en="A trace is evidence; an experience is a validated abstraction. Different lessons belong in different system layers.">Trace 是证据，Experience 是经过验证的抽象；不同经验应该晋升到不同系统层。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">01</span></div><h2 class="bfs-card-title">Production Trace</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="记录 observable action、structured decision、Tool I/O、state transition、validation、cost 和 outcome；Raw success log 不是 ground truth demonstration。" data-i18n-en="Record observable actions, structured decisions, tool I/O, state transitions, validation, cost, and outcome. A raw success log is not a ground-truth demonstration.">记录 observable action、structured decision、Tool I/O、state transition、validation、cost 和 outcome；Raw success log 不是 ground truth demonstration。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">02</span></div><h2 class="bfs-card-title">Eval + Root Cause</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先判断是 Agent、Tool、Data、Permission、Environment 还是 Evaluator 的问题，再决定有没有可复用 lesson。" data-i18n-en="First identify whether the problem came from the agent, tool, data, permissions, environment, or evaluator before deciding whether there is a reusable lesson.">先判断是 Agent、Tool、Data、Permission、Environment 还是 Evaluator 的问题，再决定有没有可复用 lesson。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">03</span></div><h2 class="bfs-card-title">Experience Distillation</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="抽取 trigger、recommended action、anti-pattern、applicability、evidence、scope、version compatibility 和 do-not-apply 条件。" data-i18n-en="Extract triggers, recommended actions, anti-patterns, applicability, evidence, scope, version compatibility, and do-not-apply conditions.">抽取 trigger、recommended action、anti-pattern、applicability、evidence、scope、version compatibility 和 do-not-apply 条件。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">04</span></div><h2 class="bfs-card-title">Promotion Router</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="根据稳定性、作用域、权限、是否可程序化、是否可评测，选择 Memory / Skill / Rule / Regression / Training。" data-i18n-en="Use stability, scope, authority, programmability, and evaluability to choose Memory, Skill, Rule, Regression, or Training.">根据稳定性、作用域、权限、是否可程序化、是否可评测，选择 Memory / Skill / Rule / Regression / Training。</span></div></div>
+
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">05</span></div><h2 class="bfs-card-title">Eval / Shadow / Release</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="经验从 CANDIDATE → VALIDATED → SHADOW → ACTIVE；任何 promotion 都需要版本、证据、回滚路径和 regression protection。" data-i18n-en="Experience moves from CANDIDATE to VALIDATED to SHADOW to ACTIVE. Every promotion needs versioning, evidence, rollback, and regression protection.">经验从 CANDIDATE → VALIDATED → SHADOW → ACTIVE；任何 promotion 都需要版本、证据、回滚路径和 regression protection。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心原则" data-i18n-en="Core rule">核心原则</span></span><p class="say">Agent self-learning is a controlled experience-promotion system, not an uncontrolled self-modification loop.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-9-x2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.X2 · WHERE SHOULD EXPERIENCE LIVE?</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="不是所有经验都应该进 Memory，更不是所有 Memory 都应该进权重" data-i18n-en="Not every experience belongs in memory, and not every memory belongs in model weights">不是所有经验都应该进 Memory，更不是所有 Memory 都应该进权重</span></h2>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="经验类型" data-i18n-en="Experience type">经验类型</span></th>
+          <th><span class="i18n-text" data-i18n-zh="推荐落点" data-i18n-en="Promotion target">推荐落点</span></th>
+          <th><span class="i18n-text" data-i18n-zh="为什么" data-i18n-en="Why">为什么</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="i18n-text" data-i18n-zh="用户 / 项目临时约束" data-i18n-en="User or project-specific constraint">用户 / 项目临时约束</span></td><td>Profile / Project Memory</td><td><span class="i18n-text" data-i18n-zh="需要 scope、失效与可删除性" data-i18n-en="Needs scope, expiry, and deletability">需要 scope、失效与可删除性</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="重复出现的成熟任务方法" data-i18n-en="Repeated validated procedure">重复出现的成熟任务方法</span></td><td>Skill / Procedure</td><td><span class="i18n-text" data-i18n-zh="把多个 Case 抽象成可复用步骤" data-i18n-en="Abstract repeated cases into reusable steps">把多个 Case 抽象成可复用步骤</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="必须满足的业务不变量" data-i18n-en="Business invariant that must always hold">必须满足的业务不变量</span></td><td>Code / Policy / Validator</td><td><span class="i18n-text" data-i18n-zh="不应该依赖模型“记得”" data-i18n-en="Should not depend on the model remembering it">不应该依赖模型“记得”</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="真实生产失败" data-i18n-en="Real production failure">真实生产失败</span></td><td>Regression Dataset</td><td><span class="i18n-text" data-i18n-zh="学习必须变成可重复验证" data-i18n-en="The lesson must become reproducibly testable">学习必须变成可重复验证</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="稳定、重复、参数层行为缺口" data-i18n-en="Stable repeated model-behavior gap">稳定、重复、参数层行为缺口</span></td><td>Training Dataset</td><td><span class="i18n-text" data-i18n-zh="只有有明确 Eval Contract 才进入 SFT / preference / RL" data-i18n-en="Promote to SFT, preference optimization, or RL only with a clear evaluation contract">只有有明确 Eval Contract 才进入 SFT / preference / RL</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="grid g2" style="margin-top:14px">
+        <div class="cd" style="--c:var(--grn)"><div class="cd-h"><span class="ic">FAST</span><span class="i18n-text" data-i18n-zh="外置经验快路径" data-i18n-en="External-experience fast path">外置经验快路径</span></div><small><span class="i18n-text" data-i18n-zh="Memory / Skill / Rule / Regression：可追溯、可失效、更新快。" data-i18n-en="Memory / Skill / Rule / Regression: traceable, invalidatable, and fast to update.">Memory / Skill / Rule / Regression：可追溯、可失效、更新快。</span></small></div>
+        <div class="cd" style="--c:var(--pur)"><div class="cd-h"><span class="ic">SLOW</span><span class="i18n-text" data-i18n-zh="参数学习慢路径" data-i18n-en="Parameter-learning slow path">参数学习慢路径</span></div><small><span class="i18n-text" data-i18n-zh="Curated Training Data → SFT / preference / RL → full regression → model release。" data-i18n-en="Curated training data → SFT / preference / RL → full regression → model release.">Curated Training Data → SFT / preference / RL → full regression → model release。</span></small></div>
+      </div>
+
+      <div class="co note" style="margin-top:14px"><span class="co-t">NEGATIVE TRANSFER</span><p><span class="i18n-text" data-i18n-zh="经验系统不能只测“召回后变好多少”，还要测被召回或晋升的经验是否让原本正确的任务变差。Stale lesson、scope leakage 和 self-reinforcing error 都属于必须监控的学习风险。" data-i18n-en="Experience systems must not measure only improvement after recall; they must also detect whether retrieved or promoted lessons make previously correct tasks worse. Stale lessons, scope leakage, and self-reinforcing errors are learning risks that need monitoring.">经验系统不能只测“召回后变好多少”，还要测被召回或晋升的经验是否让原本正确的任务变差。Stale lesson、scope leakage 和 self-reinforcing error 都属于必须监控的学习风险。</span></p></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">Learning is incomplete until the lesson becomes testable.</p></div>
+    </div>
+  </div>
+</section>

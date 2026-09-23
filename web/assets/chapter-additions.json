@@ -77,6 +77,10 @@
     {
       "path": "/assets/ch09-cost-per-successful-task.html",
       "id": "cost-per-successful-task"
+    },
+    {
+      "path": "/assets/ch09-agent-experience-learning.html",
+      "id": "agent-experience-learning"
     }
   ],
   "07-memory-context-engineering": [
