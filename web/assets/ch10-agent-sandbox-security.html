@@ -1,0 +1,85 @@
+<section id="agent-sandbox-security" aria-labelledby="agent-sandbox-security-title">
+  <h2 class="sub" id="agent-sandbox-security-title"><span class="i18n-text" data-i18n-zh="Agent Sandbox：把执行能力限制在可证明的 Blast Radius 内" data-i18n-en="Agent Sandbox: constrain execution to a provable blast radius">Agent Sandbox：把执行能力限制在可证明的 Blast Radius 内</span> <small>§10.S</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="Sandbox 不是 VM 的同义词，而是受控执行边界。真正需要同时约束 filesystem、network、process/syscall、resource、credential、lifecycle 与 audit；模型只负责提出动作，Host/Sandbox Policy 才拥有真实执行权。" data-i18n-en="A sandbox is not synonymous with a VM; it is a controlled execution boundary. A production design constrains filesystem, network, process/syscalls, resources, credentials, lifecycle, and audit. The model proposes actions; the host and sandbox policy hold actual execution authority.">Sandbox 不是 VM 的同义词，而是受控执行边界。真正需要同时约束 filesystem、network、process/syscall、resource、credential、lifecycle 与 audit；模型只负责提出动作，Host/Sandbox Policy 才拥有真实执行权。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-10-s1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.S1 · SANDBOX CONTROL PLANE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Approval 控制意图，Sandbox 限制能力" data-i18n-en="Approval controls intent; sandboxing constrains capability">Approval 控制意图，Sandbox 限制能力</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="把 Agent proposal、权限决策、运行时隔离、执行证据与验证串成一条可审计链。" data-i18n-en="Connect agent proposals, permission decisions, runtime isolation, execution evidence, and validation into one auditable chain.">把 Agent proposal、权限决策、运行时隔离、执行证据与验证串成一条可审计链。</span></p>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">01</span></div><h2 class="bfs-card-title">Agent Proposal</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="run command · install package · write file · connect endpoint；模型表达意图，但没有直接宿主权限。" data-i18n-en="run command · install package · write file · connect endpoint; the model expresses intent but does not directly hold host authority.">run command · install package · write file · connect endpoint；模型表达意图，但没有直接宿主权限。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">02</span></div><h2 class="bfs-card-title">Permission / Risk Gate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="根据 action、scope、tenant、risk、approval 与 policy 决定是否允许进入执行层。" data-i18n-en="Use action, scope, tenant, risk, approval, and policy to decide whether execution is allowed.">根据 action、scope、tenant、risk、approval 与 policy 决定是否允许进入执行层。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">03</span></div><h2 class="bfs-card-title">Sandbox Scheduler</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="选择 image / template、writable roots、network policy、CPU / memory / disk / PID / timeout 与 secret strategy。" data-i18n-en="Select image/template, writable roots, network policy, CPU/memory/disk/PID/time limits, and secret strategy.">选择 image / template、writable roots、network policy、CPU / memory / disk / PID / timeout 与 secret strategy。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">04</span></div><h2 class="bfs-card-title">Isolated Runtime</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="OS sandbox / container / gVisor-like / microVM / constrained runtime 在技术层强制 filesystem、process 与 egress 边界。" data-i18n-en="An OS sandbox, container, gVisor-like runtime, microVM, or constrained runtime enforces filesystem, process, and egress boundaries.">OS sandbox / container / gVisor-like / microVM / constrained runtime 在技术层强制 filesystem、process 与 egress 边界。</span></div></div>
+
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">05</span></div><h2 class="bfs-card-title">Evidence + Validation</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="command、exit code、file diff、network、resource、policy decision 与 artifact validation 回写 Trace；失败可 kill / reset / rollback。" data-i18n-en="Commands, exit codes, file diffs, network activity, resource use, policy decisions, and artifact validation return to the trace; failures can be killed, reset, or rolled back.">command、exit code、file diff、network、resource、policy decision 与 artifact validation 回写 Trace；失败可 kill / reset / rollback。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心原则" data-i18n-en="Core rule">核心原则</span></span><p class="say">The model proposes an action; the sandbox enforces the physical capability boundary.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-10-s2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.S2 · ISOLATION PATTERN MATRIX</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="不要做“process < container < microVM”的单轴排行榜" data-i18n-en="Avoid a one-dimensional “process &lt; container &lt; microVM” ranking">不要做“process &lt; container &lt; microVM”的单轴排行榜</span></h2>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Pattern</th>
+          <th><span class="i18n-text" data-i18n-zh="共享 Host Kernel？" data-i18n-en="Shares host kernel?">共享 Host Kernel？</span></th>
+          <th><span class="i18n-text" data-i18n-zh="兼容性" data-i18n-en="Compatibility">兼容性</span></th>
+          <th><span class="i18n-text" data-i18n-zh="启动倾向" data-i18n-en="Startup tendency">启动倾向</span></th>
+          <th><span class="i18n-text" data-i18n-zh="典型场景" data-i18n-en="Typical fit">典型场景</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><b>OS Sandbox</b></td><td>Yes</td><td><span class="i18n-text" data-i18n-zh="很高" data-i18n-en="Very high">很高</span></td><td><span class="i18n-text" data-i18n-zh="极快" data-i18n-en="Very fast">极快</span></td><td>Local Coding Agent</td></tr>
+          <tr><td><b>Container</b></td><td>Yes</td><td><span class="i18n-text" data-i18n-zh="很高" data-i18n-en="Very high">很高</span></td><td><span class="i18n-text" data-i18n-zh="快" data-i18n-en="Fast">快</span></td><td><span class="i18n-text" data-i18n-zh="通用云端执行" data-i18n-en="General cloud execution">通用云端执行</span></td></tr>
+          <tr><td><b>gVisor-like</b></td><td><span class="i18n-text" data-i18n-zh="减少直接 Host Kernel 暴露" data-i18n-en="Reduces direct host-kernel exposure">减少直接 Host Kernel 暴露</span></td><td><span class="i18n-text" data-i18n-zh="高" data-i18n-en="High">高</span></td><td>fast–medium</td><td><span class="i18n-text" data-i18n-zh="多租户容器 workload" data-i18n-en="Multi-tenant container workloads">多租户容器 workload</span></td></tr>
+          <tr><td><b>MicroVM</b></td><td>No</td><td><span class="i18n-text" data-i18n-zh="高" data-i18n-en="High">高</span></td><td>fast–medium</td><td><span class="i18n-text" data-i18n-zh="高风险不可信代码 / 多租户 Agent" data-i18n-en="High-risk untrusted code / multi-tenant agents">高风险不可信代码 / 多租户 Agent</span></td></tr>
+          <tr><td><b>WASM / Isolate</b></td><td><span class="i18n-text" data-i18n-zh="由 Runtime 定义" data-i18n-en="Runtime-defined">由 Runtime 定义</span></td><td><span class="i18n-text" data-i18n-zh="有限–中等" data-i18n-en="Limited–medium">有限–中等</span></td><td><span class="i18n-text" data-i18n-zh="极快" data-i18n-en="Very fast">极快</span></td><td><span class="i18n-text" data-i18n-zh="受限计算 / 插件" data-i18n-en="Constrained compute / plugins">受限计算 / 插件</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="选型变量" data-i18n-en="Selection variables">选型变量</span></span><p><span class="i18n-text" data-i18n-zh="真实安全性还取决于 mounts、credentials、egress、host services、kernel/hypervisor patching、escape hatch、image provenance 与 runtime configuration。隔离技术名词本身不能替代 threat model。" data-i18n-en="Real security still depends on mounts, credentials, egress, host services, kernel/hypervisor patching, escape hatches, image provenance, and runtime configuration. The isolation technology name does not replace a threat model.">真实安全性还取决于 mounts、credentials、egress、host services、kernel/hypervisor patching、escape hatch、image provenance 与 runtime configuration。隔离技术名词本身不能替代 threat model。</span></p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-10-s3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.S3 · VERIFIED IMPLEMENTATION SNAPSHOT</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="把产品事实和通用架构分开" data-i18n-en="Keep product facts separate from general architecture">把产品事实和通用架构分开</span></h2>
+    </div></div>
+
+    <div class="bfs-body" style="margin-top:12px">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Implementation</th>
+          <th><span class="i18n-text" data-i18n-zh="已验证边界" data-i18n-en="Verified boundary">已验证边界</span></th>
+          <th><span class="i18n-text" data-i18n-zh="不要误写成" data-i18n-en="Do not overstate as">不要误写成</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><b>Claude Code Local</b></td><td>macOS Seatbelt · Linux bubblewrap · filesystem + network policy</td><td><span class="i18n-text" data-i18n-zh="统一 VM / container 架构" data-i18n-en="One universal VM/container architecture">统一 VM / container 架构</span></td></tr>
+          <tr><td><b>Codex Cloud / Local</b></td><td><span class="i18n-text" data-i18n-zh="Cloud isolated container；Local 按平台使用 Seatbelt 或 Landlock/seccomp" data-i18n-en="Cloud isolated container; local uses Seatbelt or Landlock/seccomp by platform">Cloud isolated container；Local 按平台使用 Seatbelt 或 Landlock/seccomp</span></td><td>container + microVM</td></tr>
+          <tr><td><b>E2B</b></td><td>Firecracker microVM · snapshot resume · COW rootfs</td><td><span class="i18n-text" data-i18n-zh="普通 Docker 容器" data-i18n-en="A plain Docker container">普通 Docker 容器</span></td></tr>
+          <tr><td><b>CubeSandbox</b></td><td>RustVMM + KVM · dedicated guest kernel · E2B SDK compatible</td><td><span class="i18n-text" data-i18n-zh="所有环境恒定 &lt;60ms / &lt;5MB" data-i18n-en="Universally &lt;60ms / &lt;5MB in every environment">所有环境恒定 &lt;60ms / &lt;5MB</span></td></tr>
+          <tr><td><b>Firecracker</b></td><td><span class="i18n-text" data-i18n-zh="microVM VMM building block；指定测试条件下 ≤125ms / ≤5MiB" data-i18n-en="microVM VMM building block; ≤125ms / ≤5MiB under specified test conditions">microVM VMM building block；指定测试条件下 ≤125ms / ≤5MiB</span></td><td><span class="i18n-text" data-i18n-zh="完整 Agent Sandbox 平台" data-i18n-en="A complete agent-sandbox platform">完整 Agent Sandbox 平台</span></td></tr>
+          <tr><td><b>Bubblewrap</b></td><td>mount/user/PID/network namespaces · optional seccomp</td><td><span class="i18n-text" data-i18n-zh="单独就等于完整安全策略" data-i18n-en="A complete security policy by itself">单独就等于完整安全策略</span></td></tr>
+          <tr><td><b>Sandock</b></td><td>Docker-based isolated containers · resource limits · persistent volumes</td><td><span class="i18n-text" data-i18n-zh="dedicated guest-kernel microVM" data-i18n-en="A dedicated guest-kernel microVM">dedicated guest-kernel microVM</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="Secret Rule" data-i18n-en="Secret rule">Secret Rule</span></span><p class="say">The safest secret in a sandbox is the secret that never enters it.</p></div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="Benchmark Rule" data-i18n-en="Benchmark rule">Benchmark Rule</span></span><p><span class="i18n-text" data-i18n-zh="启动时间与内存数字必须带 workload、hardware、snapshot/template、guest size 与 concurrency 条件；不要把 vendor benchmark 当成跨产品恒定事实。" data-i18n-en="Startup and memory numbers require workload, hardware, snapshot/template, guest-size, and concurrency context. Vendor benchmarks are not universal cross-product constants.">启动时间与内存数字必须带 workload、hardware、snapshot/template、guest size 与 concurrency 条件；不要把 vendor benchmark 当成跨产品恒定事实。</span></p></div>
+    </div>
+  </div>
+</section>
