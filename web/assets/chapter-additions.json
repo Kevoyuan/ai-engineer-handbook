@@ -93,6 +93,10 @@
     {
       "path": "/assets/ch10-agent-sandbox-security.html",
       "id": "agent-sandbox-security"
+    },
+    {
+      "path": "/assets/ch10-production-agent-multitenancy.html",
+      "id": "production-agent-multitenancy"
     }
   ]
 }

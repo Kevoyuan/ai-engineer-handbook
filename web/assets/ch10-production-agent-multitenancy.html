@@ -1,0 +1,65 @@
+<section id="production-agent-multitenancy" aria-labelledby="production-agent-multitenancy-title">
+  <h2 class="sub" id="production-agent-multitenancy-title"><span class="i18n-text" data-i18n-zh="Production Multi-Tenant Agent：把 Tenant Isolation 做成控制面" data-i18n-en="Production Multi-Tenant Agents: make tenant isolation a control plane">Production Multi-Tenant Agent：把 Tenant Isolation 做成控制面</span> <small>§10.T</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="真正的多租户边界不是用 Prompt 告诉模型不要看别人数据，而是：即使模型、Router 或 Tool Arguments 出错，Tenant A 的执行仍然无法读取、修改、调用或推断 Tenant B 的受保护资源。" data-i18n-en="A real multi-tenant boundary is not a prompt telling the model to avoid other customers' data. Even when the model, router, or tool arguments are wrong, an execution for Tenant A must still be unable to read, mutate, invoke, or infer Tenant B's protected resources.">真正的多租户边界不是用 Prompt 告诉模型不要看别人数据，而是：即使模型、Router 或 Tool Arguments 出错，Tenant A 的执行仍然无法读取、修改、调用或推断 Tenant B 的受保护资源。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-10-t1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.T1 · TENANT ISOLATION CONTROL PLANE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Tenant Context 必须从身份层贯穿到每一个资源访问点" data-i18n-en="Tenant context must flow from identity to every resource access point">Tenant Context 必须从身份层贯穿到每一个资源访问点</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="tenant_id 是可信安全上下文，不是允许模型自由改写的 Agent State。" data-i18n-en="tenant_id is trusted security context, not agent state that the model is allowed to rewrite.">tenant_id 是可信安全上下文，不是允许模型自由改写的 Agent State。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">01 · IDENTITY</span></div><h2 class="bfs-card-title">User / Service → Trusted Tenant Context</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Identity Provider 解析 user / service identity，并绑定 tenant_id、role、entitlement。Prompt 和 LLM output 不能覆盖这个上下文。" data-i18n-en="The identity provider resolves user or service identity and binds tenant_id, roles, and entitlements. Prompts and model output cannot override this context.">Identity Provider 解析 user / service identity，并绑定 tenant_id、role、entitlement。Prompt 和 LLM output 不能覆盖这个上下文。</span></div></div>
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">02 · POLICY</span></div><h2 class="bfs-card-title">Principal + Tenant + Action + Resource</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Authentication 只回答是谁；Authorization 判断动作；Tenant Isolation 继续限制这个执行永远只能触达哪个资源宇宙。" data-i18n-en="Authentication answers who the caller is; authorization evaluates the action; tenant isolation further constrains which resource universe the execution can ever touch.">Authentication 只回答是谁；Authorization 判断动作；Tenant Isolation 继续限制这个执行永远只能触达哪个资源宇宙。</span></div></div>
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">03 · RUNTIME</span></div><h2 class="bfs-card-title">State · Memory · RAG · Tools · Cache · Jobs</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="每个共享面都必须 tenant-scoped：Checkpoint、Retriever、MCP credential、Queue envelope、Cache namespace、Sandbox 与 Trace 都不能丢失租户上下文。" data-i18n-en="Every shared surface must be tenant-scoped: checkpoints, retrievers, MCP credentials, queue envelopes, cache namespaces, sandboxes, and traces must not lose tenant context.">每个共享面都必须 tenant-scoped：Checkpoint、Retriever、MCP credential、Queue envelope、Cache namespace、Sandbox 与 Trace 都不能丢失租户上下文。</span></div></div>
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">04 · RESOURCE</span></div><h2 class="bfs-card-title">Storage Policy · Credential Broker · Namespace · RLS</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="最终资源层继续 fail closed：数据库、对象存储、Vector Store 和外部 SaaS 通过 policy、namespace、RLS 或 tenant-scoped credential 做第二道边界。" data-i18n-en="The resource layer continues to fail closed: databases, object stores, vector stores, and external SaaS use policy, namespaces, RLS, or tenant-scoped credentials as a second boundary.">最终资源层继续 fail closed：数据库、对象存储、Vector Store 和外部 SaaS 通过 policy、namespace、RLS 或 tenant-scoped credential 做第二道边界。</span></div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">05 · VERIFY</span></div><h2 class="bfs-card-title">Audit · Negative Tests · Quotas · Fairness</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="上线验证不只测自己能访问自己，还要主动猜别人的 thread/document、篡改 tenant context、碰撞 cache、重放 checkpoint，并做 per-tenant noisy-neighbor load test。" data-i18n-en="Release verification must test more than valid self-access: actively guess another tenant's thread or document, tamper with tenant context, collide caches, replay checkpoints, and run per-tenant noisy-neighbor load tests.">上线验证不只测自己能访问自己，还要主动猜别人的 thread/document、篡改 tenant context、碰撞 cache、重放 checkpoint，并做 per-tenant noisy-neighbor load test。</span></div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心原则" data-i18n-en="Core rule">核心原则</span></span><p class="say">The agent may be wrong; the infrastructure must still make cross-tenant access fail closed.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-10-t2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.T2 · ISOLATION SURFACE MATRIX</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="多租户事故通常发生在主数据之外的共享面" data-i18n-en="Multi-tenant incidents often occur on shared surfaces beyond the primary database">多租户事故通常发生在主数据之外的共享面</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="共享面" data-i18n-en="Shared surface">共享面</span></th>
+          <th><span class="i18n-text" data-i18n-zh="危险默认" data-i18n-en="Unsafe default">危险默认</span></th>
+          <th><span class="i18n-text" data-i18n-zh="生产控制" data-i18n-en="Production control">生产控制</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>State / Checkpoint</td><td>thread_id only</td><td>tenant + user/project + thread + authorization</td></tr>
+          <tr><td>Memory / RAG</td><td><span class="i18n-text" data-i18n-zh="全局候选后让模型忽略" data-i18n-en="Retrieve globally, then ask the model to ignore">全局候选后让模型忽略</span></td><td><span class="i18n-text" data-i18n-zh="检索前注入 tenant namespace / ACL" data-i18n-en="Inject tenant namespace / ACL before retrieval">检索前注入 tenant namespace / ACL</span></td></tr>
+          <tr><td>SQL / Storage</td><td><span class="i18n-text" data-i18n-zh="只靠开发者记得 WHERE" data-i18n-en="Rely only on developers remembering WHERE">只靠开发者记得 WHERE</span></td><td>app authz + RLS / storage policy</td></tr>
+          <tr><td>Tool / MCP</td><td><span class="i18n-text" data-i18n-zh="共享 raw credential" data-i18n-en="Shared raw credential">共享 raw credential</span></td><td>host-side tenant-scoped credential broker</td></tr>
+          <tr><td>Semantic / Prefix Cache</td><td>hash(query) / implicit cross-tenant reuse</td><td>tenant/permission namespace · cache salt where required</td></tr>
+          <tr><td>Queue / Worker</td><td>job_id only</td><td>trusted tenant-aware job envelope + re-authorization</td></tr>
+          <tr><td>Trace / Logs</td><td><span class="i18n-text" data-i18n-zh="全局可搜索 Prompt / Tool Output" data-i18n-en="Globally searchable prompts and tool outputs">全局可搜索 Prompt / Tool Output</span></td><td>tenant-aware query policy · redaction · audit</td></tr>
+          <tr><td>Compute / Quota</td><td><span class="i18n-text" data-i18n-zh="只有全局限流" data-i18n-en="Global throttling only">只有全局限流</span></td><td>per-tenant concurrency · token/tool/cost budgets · fair queueing</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-10-t3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.T3 · DEPLOYMENT SPECTRUM</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Pooled / Bridge / Silo 是逐资源的选择，不是整个系统一个开关" data-i18n-en="Pooled, bridge, and silo are per-resource choices, not one global system switch">Pooled / Bridge / Silo 是逐资源的选择，不是整个系统一个开关</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">POOLED</span></div><h2 class="bfs-card-title">Shared Runtime + Logical Isolation</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="高利用率、低成本；要求强 tenant policy、严格 credential boundary 和持续 cross-tenant test。" data-i18n-en="High utilization and lower cost, but requires strong tenant policies, strict credential boundaries, and continuous cross-tenant testing.">高利用率、低成本；要求强 tenant policy、严格 credential boundary 和持续 cross-tenant test。</span></div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">BRIDGE</span></div><h2 class="bfs-card-title">Shared Control Plane + Selective Isolation</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="默认 pooled；按 tenant、risk、tier 或 compliance 给特定 storage / compute / sandbox 独立资源。" data-i18n-en="Pool by default, but dedicate selected storage, compute, or sandboxes based on tenant, risk, tier, or compliance.">默认 pooled；按 tenant、risk、tier 或 compliance 给特定 storage / compute / sandbox 独立资源。</span></div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">SILO</span></div><h2 class="bfs-card-title">Dedicated Resource Boundary</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="更小 cross-tenant blast radius，但增加成本、容量碎片与 fleet lifecycle 复杂度。" data-i18n-en="Reduces cross-tenant blast radius but increases cost, capacity fragmentation, and fleet lifecycle complexity.">更小 cross-tenant blast radius，但增加成本、容量碎片与 fleet lifecycle 复杂度。</span></div></div>
+      </div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="不要漏掉性能隔离" data-i18n-en="Do not forget performance isolation">不要漏掉性能隔离</span></span><p><span class="i18n-text" data-i18n-zh="Tenant Isolation 不只防数据越界。共享 LLM、Queue、Tool API、Cache 和 Sandbox 还需要 per-tenant / tier concurrency、token、tool、storage 与 cost budget，避免 noisy neighbor。" data-i18n-en="Tenant isolation is not only about data boundaries. Shared LLMs, queues, tool APIs, caches, and sandboxes also need per-tenant or tier concurrency, token, tool, storage, and cost budgets to prevent noisy neighbors.">Tenant Isolation 不只防数据越界。共享 LLM、Queue、Tool API、Cache 和 Sandbox 还需要 per-tenant / tier concurrency、token、tool、storage 与 cost budget，避免 noisy neighbor。</span></p></div>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="外部核验日期：2026-09-23。实现例包括 AWS multi-tenant agentic AI guidance、PostgreSQL Row-Level Security、Pinecone namespaces 与 vLLM prefix-cache salting；这些是具体实现证据，Handbook 的核心规则仍然是 vendor-neutral 的 tenant-isolation control plane。" data-i18n-en="External verification date: 2026-09-23. Implementation examples include AWS multi-tenant agentic AI guidance, PostgreSQL Row-Level Security, Pinecone namespaces, and vLLM prefix-cache salting. These are implementation evidence; the handbook's core rule remains a vendor-neutral tenant-isolation control plane.">外部核验日期：2026-09-23。实现例包括 AWS multi-tenant agentic AI guidance、PostgreSQL Row-Level Security、Pinecone namespaces 与 vLLM prefix-cache salting；这些是具体实现证据，Handbook 的核心规则仍然是 vendor-neutral 的 tenant-isolation control plane。</span></p>
+</section>
