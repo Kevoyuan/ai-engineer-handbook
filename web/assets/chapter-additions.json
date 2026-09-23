@@ -46,6 +46,10 @@
     {
       "path": "/assets/ch08-agent-architecture-selection.html",
       "id": "agent-architecture-selection"
+    },
+    {
+      "path": "/assets/ch08-multi-agent-conflict-control.html",
+      "id": "multi-agent-conflict-control"
     }
   ],
   "09-reliability-evaluation-observability": [

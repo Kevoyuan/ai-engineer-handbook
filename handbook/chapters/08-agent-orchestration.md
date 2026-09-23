@@ -1834,3 +1834,764 @@ Sources:
 - https://docs.prefect.io/v3/get-started/quickstart
 - https://docs.n8n.io/
 
+## 8.13 Multi-Agent Conflict Control：不要用“投票”代替 Harness
+
+Multi-Agent 系统里出现分歧并不奇怪。真正需要工程化的是：
+
+~~~text
+What kind of conflict is this?
+→ Who has authority?
+→ What evidence can resolve it?
+→ Which state transition is allowed?
+→ What happens if it still cannot be resolved?
+~~~
+
+一个实用分类是：
+
+~~~text
+Authority Conflict
+→ 主 Agent / Worker / Reviewer 对“应该做什么”意见不一致
+
+Quality Conflict
+→ Worker 与 Reviewer 对“结果是否合格”意见不一致
+
+Resource Conflict
+→ 多个 Worker 同时修改同一任务、文件或共享状态
+~~~
+
+它们分别需要不同的 Control Plane：
+
+~~~text
+Authority
+→ role / policy / escalation
+
+Quality
+→ validator / evidence / bounded repair
+
+Resource
+→ ownership / isolation / versioning / concurrency control
+~~~
+
+> **Multi-Agent conflict is not one problem. It is an authority problem, an evidence problem, or a shared-state concurrency problem.**
+
+### 8.13.1 为什么“少数服从多数”通常不是默认答案
+
+假设三个 Agent 都输出：
+
+~~~text
+“应该重构鉴权模块”
+~~~
+
+这不意味着你获得了三份独立证据。
+
+如果它们：
+
+~~~text
+same model
+same prompt family
+same retrieved context
+same tool results
+same hidden assumptions
+~~~
+
+那么：
+
+~~~text
+3 votes
+≠
+3 independent observations
+~~~
+
+多数投票可以是有用的 ensemble 技术，但前提是你明确设计了：
+
+~~~text
+diverse evidence
+diverse model / prompt policy
+independent sampling
+calibrated aggregation
+known error correlation
+~~~
+
+否则“3:1”可能只是 correlated error。
+
+因此 Harness 应优先聚合：
+
+~~~text
+evidence
+tests
+tool observations
+source provenance
+policy constraints
+~~~
+
+而不是先聚合 vote count。
+
+> **Count independent evidence before counting Agent opinions.**
+
+### 8.13.2 “裁判 Agent”不是错，Opinion-only Judge 才危险
+
+另一个常见极端是：
+
+~~~text
+Worker says A
+Reviewer says B
+→ call Judge Agent
+→ Judge chooses one
+~~~
+
+如果 Judge 只读取两段自然语言意见，再凭主观判断选边，它只是把 conflict 移到第三个模型调用。
+
+但 Judge / Evaluator 可以很有价值，如果它被限制为：
+
+~~~text
+fixed rubric
+explicit acceptance criteria
+read-only evidence
+reproducible commands
+structured output
+confidence / unverified fields
+no direct mutation authority
+~~~
+
+更稳的层级是：
+
+~~~text
+deterministic check
+        ↓
+structured evidence evaluator
+        ↓
+contextual model judge
+        ↓
+human / policy escalation
+~~~
+
+而不是默认：
+
+~~~text
+Agent disagreement
+→ more Agent opinion
+~~~
+
+> **A reviewer becomes reliable when it produces inspectable evidence, not merely a stronger opinion.**
+
+### 8.13.3 Conflict A · Authority Conflict：主从分歧
+
+例子：
+
+~~~text
+Lead:
+“重构 authentication module”
+
+Research Sub-Agent:
+“当前耦合严重，缺少测试，建议先补 characterization tests”
+~~~
+
+这里首先要区分：
+
+~~~text
+truth authority
+≠
+execution authority
+~~~
+
+Sub-Agent 可能更接近局部事实，但不一定拥有改变全局计划的权限。
+
+推荐结构：
+
+~~~text
+Sub-Agent
+→ return finding
+→ include evidence / uncertainty / blocking risk
+
+Lead / Orchestrator
+→ must incorporate finding
+→ re-evaluate plan
+
+Policy / Authority Gate
+→ within delegated authority?
+   ├─ yes → Lead decides
+   └─ no  → user / human / policy owner
+~~~
+
+一个 Authority Matrix 可以是：
+
+| Decision | Default authority |
+|---|---|
+| 局部调研结论 | Specialist / evidence owner |
+| Task routing / reassignment | Lead / Orchestrator |
+| 高风险 destructive action | Policy + Human approval |
+| 超出预算 / Scope | User / business owner |
+| Security exception | Security policy owner |
+| Final factual claim | Evidence + Validator, not role rank |
+
+所以：
+
+> **The Lead may own orchestration without owning truth.**
+
+### 8.13.4 Context Isolation：Sub-Agent 应该带独立上下文边界
+
+Sub-Agent 的一个真实价值是隔离：
+
+~~~text
+local instructions
+local task context
+local tool surface
+local execution history
+local failure
+~~~
+
+Anthropic 当前公开 guidance 也建议在以下场景使用 subagents：
+
+~~~text
+parallel work
+isolated context
+independent workstreams
+~~~
+
+但不要把某个内部函数名当成稳定架构契约。
+
+更稳定的工程抽象是：
+
+~~~text
+spawn subtask
+→ choose fresh / inherited context
+→ choose tool permissions
+→ run independently
+→ return bounded artifact
+~~~
+
+对于只负责调研 / 验证的 Agent，最好限制 mutation surface：
+
+~~~text
+read
+search
+run tests / diagnostics
+
+but no:
+edit
+commit
+deploy
+delete
+~~~
+
+具体工具权限机制因 runtime 而异。Claude Code CLI 公开支持 allowed / disallowed tool policy；这比依赖未经公开保证的内部实现名更适合作为 Handbook 知识。
+
+### 8.13.5 Conflict B · Quality Conflict：Worker vs Reviewer 死循环
+
+典型坏循环：
+
+~~~text
+Worker
+→ implement
+
+Reviewer
+→ “还有问题”
+
+Worker
+→ modify
+
+Reviewer
+→ “仍然有问题”
+
+↺ forever
+~~~
+
+问题通常不是“缺少更聪明的 Reviewer”，而是缺少：
+
+~~~text
+acceptance criteria
+evidence contract
+repair budget
+state transition
+stop / escalation policy
+~~~
+
+推荐把 Reviewer 拆成 Verifier / Evaluator：
+
+~~~text
+Input:
+artifact
+acceptance criteria
+test plan
+
+Allowed actions:
+read
+run deterministic commands
+probe boundary cases
+inspect traces
+
+Output:
+PASS
+FAIL
+PARTIAL
+
++ evidence
++ exact command
++ observed output
++ failed criterion
++ unverified criterion
+~~~
+
+对于 Coding Agent，Verifier 可以主动测试：
+
+~~~text
+unit / integration
+concurrency
+boundary values
+idempotency
+permission failure
+timeout / cancellation
+migration / rollback
+~~~
+
+但它最好默认不修改被审查 Artifact。
+
+> **Verification should produce repair instructions backed by evidence, not free-form criticism.**
+
+这与本章已有原则一致：
+
+> **Evaluation should produce repair instructions, not only scores.**
+
+### 8.13.6 Bounded Repair Loop：任何 Review 都必须有停止条件
+
+将 Worker / Reviewer 建模成状态机：
+
+~~~text
+READY
+  ↓
+IMPLEMENTING
+  ↓
+VERIFYING
+  ├─ PASS → COMPLETED
+  ├─ FAIL + repairable → REPAIR
+  │                       ↓
+  │                  IMPLEMENTING
+  └─ FAIL + exhausted / ambiguous
+                          ↓
+                       ESCALATE
+~~~
+
+至少显式保存：
+
+~~~text
+attempt_count
+max_attempts
+failed_criteria
+last_evidence
+artifact_version
+owner
+status
+~~~
+
+如果任务从 COMPLETED 被重新打开，应明确：
+
+~~~text
+old completion invalidated
+→ previous owner retained or released by policy
+→ new revision
+→ fresh verification required
+~~~
+
+不要让 Agent 自己在自然语言里隐式决定状态。
+
+### 8.13.7 Dependency Gate：先阻止不该开始的工作
+
+很多所谓“Agent 冲突”其实是调度错误。
+
+例如：
+
+~~~text
+Task B depends on Task A
+~~~
+
+如果 A 还没有稳定输出，B 就开始写代码：
+
+~~~text
+parallelism
+→ stale assumption
+→ rework
+→ reviewer conflict
+~~~
+
+更好的做法：
+
+~~~text
+Task DAG
+
+A
+↓
+B
+
+B.ready = false
+until
+A.status = completed
+~~~
+
+DeepSeek Harness 当前实验性 Agent Teams 就采用 durable task DAG：blockedBy 保存任务依赖，只有 blocker 满足后任务才 ready。
+
+因此：
+
+> **The cheapest conflict resolution is preventing an invalid concurrent schedule.**
+
+### 8.13.8 Conflict C · Resource Conflict：多个 Worker 同时写共享资源
+
+这是最接近传统并发控制的问题。
+
+不要靠 Prompt：
+
+~~~text
+“大家注意不要改同一个文件”
+~~~
+
+应使用多层控制：
+
+~~~text
+1. Ownership partition
+2. Write-scope detection
+3. Isolated workspace where needed
+4. Version / CAS check
+5. Merge / validation gate
+~~~
+
+#### Layer 1 · Read parallel, write deliberately
+
+可以并行的通常包括：
+
+~~~text
+search
+read files
+run independent analysis
+query read-only systems
+~~~
+
+需要谨慎并发：
+
+~~~text
+edit same file
+write shared state
+run formatter on shared tree
+generate overlapping artifacts
+deploy
+mutate database
+~~~
+
+一些 Agent runtime 会直接把 Tool 标成 parallel-safe 或 exclusive。DeepSeek Harness 当前 Tool runtime 就区分可安全并行的调用与 ordering-barrier 式 exclusive calls。
+
+#### Layer 2 · Explicit Ownership
+
+任务至少带：
+
+~~~text
+owner
+write_scope
+dependencies
+artifact ids
+~~~
+
+例如：
+
+~~~text
+worker-a
+→ src/auth/**
+
+worker-b
+→ tests/payment/**
+~~~
+
+但：
+
+> **Write scope is a warning / coordination contract unless the storage layer actually enforces it.**
+
+DeepSeek Harness 当前 Agent Teams 的 writeScopes 就明确是 advisory path prefixes：会产生 overlap warning，但不是 lock，也不授予写权限。
+
+#### Layer 3 · Workspace Isolation
+
+跨 Agent 并行修改代码时，一个通用方案是：
+
+~~~text
+Worker A → worktree / branch A
+Worker B → worktree / branch B
+
+                 ↓
+             Merge Gate
+                 ↓
+          conflict / tests / review
+~~~
+
+这把：
+
+~~~text
+concurrent mutation conflict
+~~~
+
+推迟成：
+
+~~~text
+explicit merge conflict
+~~~
+
+更容易审计和恢复。
+
+但要区分 runtime guarantee 与 deployment strategy：DeepSeek Harness 当前 Agent Teams 官方文档明确说明不会自动创建 worktree；所有成员默认共享 checkout。Worktree isolation 可以由 deployment / prompt / external harness 安排，但不是它当前 Team runtime 的内建保证。
+
+#### Layer 4 · Compare-and-Set / stale-write rejection
+
+共享任务或状态更新可以采用：
+
+~~~text
+read version = 17
+modify
+write(expected_version = 17)
+
+if current_version != 17:
+    reject stale update
+~~~
+
+DeepSeek Harness 的 Team Task 当前就是这种语义：
+
+~~~text
+task.revision
++ expectedRevision
+→ compare-and-set
+~~~
+
+陈旧 mutation 会被拒绝。
+
+需要注意：
+
+> **Task-board CAS does not automatically prevent file-content races.**
+
+DeepSeek Harness 还在 filesystem observation policy 中实现了基于已观察版本的 stale-write rejection；但 Bash、formatter、generator 或外部 writer 仍可能绕过这一层。
+
+所以生产系统仍需：
+
+~~~text
+CAS
++ ownership
++ isolation
++ final diff / merge validation
+~~~
+
+而不是单靠一个 revision number。
+
+### 8.13.9 DeepSeek Harness：哪些视频细节有一手依据
+
+当前官方 / source-backed Agent Teams 设计确实包括：
+
+~~~text
+Lead + durable teammates
+durable mailbox
+shared task DAG
+task ownership
+blockedBy dependencies
+monotonic task revision
+CAS mutation
+write-scope overlap warnings
+Lead-only teammate creation / interruption
+~~~
+
+而且官方文档明确写出：
+
+~~~text
+writeScopes
+= advisory
+≠ lock
+~~~
+
+以及：
+
+~~~text
+shared checkout
+= default
+
+automatic worktree isolation
+= not runtime behavior
+~~~
+
+这两个细节非常重要，因为它们避免把“warning”误写成“并发安全保证”。
+
+### 8.13.10 Cordis Reversible Effects：解决的是生命周期污染，不是观点冲突
+
+DeepSeek Harness 建在 Cordis plugin system 上。当前官方架构说明：
+
+~~~text
+plugin registers service / listener / tool / resource
+→ registration owned by plugin context
+→ plugin unloads
+→ reversible effects unwind
+~~~
+
+这很适合防止：
+
+~~~text
+failed plugin
+stale registration
+dangling timer
+orphan listener
+resource leakage
+~~~
+
+但它解决的是 runtime lifecycle cleanup，不是：
+
+~~~text
+Lead vs Worker disagreement
+Reviewer disagreement
+file merge conflict
+~~~
+
+所以更准确的说法是：
+
+> **Reversible effects prevent lifecycle residue; they are not a conflict-resolution policy by themselves.**
+
+### 8.13.11 Conflict Control Matrix
+
+| Conflict | Bad default | Better control |
+|---|---|---|
+| Lead vs Specialist | role rank ignores evidence | authority matrix + evidence + escalation |
+| Agent vote | majority = truth | evidence diversity + calibrated aggregation |
+| Worker vs Reviewer | endless critique loop | evidence-producing verifier + repair budget |
+| Task dependency | everybody starts immediately | DAG readiness / blocker gate |
+| Same-file edit | prompt-based coordination | ownership + isolation + merge gate |
+| Shared task mutation | last-write-wins | revision / CAS |
+| Write scope overlap | assume owner = lock | warning + real storage/workspace control |
+| Runtime cleanup | trust agent to undo | lifecycle-owned reversible effects |
+
+### 8.13.12 Observability：每次冲突都要能解释为什么这样解决
+
+Trace 至少记录：
+
+~~~text
+conflict_type
+actors
+task / artifact ids
+
+authority_before
+authority_after
+
+evidence_refs
+validator_result
+
+revision_before
+revision_after
+
+retry_count
+repair_count
+
+escalation_reason
+human_decision
+
+workspace / branch
+merge_result
+~~~
+
+否则你只能看到：
+
+~~~text
+Agent A said X
+Agent B said Y
+final = X
+~~~
+
+却无法回答：
+
+~~~text
+why X?
+what evidence?
+who had authority?
+what changed?
+was the losing evidence preserved?
+~~~
+
+### 8.13.13 Eval：测试的不只是最终答案
+
+至少建立这些 slices：
+
+~~~text
+correlated-majority trap
+specialist correctly blocks unsafe Lead plan
+specialist wrong, Lead correctly overrides
+reviewer hallucinates a bug
+reviewer finds reproducible bug
+repair budget exhausted
+blocked task cannot start
+stale task revision rejected
+overlapping write scopes detected
+isolated parallel edits merge cleanly
+merge conflict routed to owner
+high-risk decision escalates to human
+~~~
+
+指标：
+
+~~~text
+conflict-resolution accuracy
+unsupported-review rate
+evidence-backed rejection rate
+repair-loop length
+escalation precision
+stale-write rejection rate
+write-conflict rate
+merge-failure rate
+time-to-resolution
+cost per successful task
+~~~
+
+> **A reliable Multi-Agent system is not one where Agents rarely disagree; it is one where disagreement has a deterministic resolution path.**
+
+### 8.13.14 面试回答模板
+
+如果面试官问：
+
+> “生产级 Multi-Agent 怎么解决冲突？”
+
+可以回答：
+
+> 我不会把所有冲突都交给投票或另一个裁判 Agent，因为同源 Agent 的票数不等于独立证据。生产上我会先把冲突分成三类。第一类是 Authority Conflict，例如 Lead 和 Specialist 对下一步有分歧，我会让 Specialist 返回带证据的 finding，Lead 负责全局编排，但高风险或超出授权的决策交给 Policy / Human Gate；Lead 有 orchestration authority，不代表它天然拥有 truth authority。第二类是 Worker 和 Reviewer 的 Quality Conflict，我会用只读 Verifier 执行测试、边界值和并发探测，输出 PASS / FAIL / PARTIAL、命令和实际 evidence，再通过有 max-attempts 的 repair state machine 控制回退，避免无限打回。第三类是多个 Worker 的 Resource Conflict，读操作可以并行，写操作要做 ownership / write scope 管理；必要时每个 Worker 使用独立 worktree / branch，最后通过 Merge Gate；共享 task board 或状态再加 revision / CAS，拒绝 stale update。像 DeepSeek Harness 当前 Agent Teams 就有 task DAG、revision CAS 和 write-scope overlap warning，但它明确说明 writeScopes 不是 lock，默认也是 shared checkout，所以还需要真正的 workspace / storage isolation。核心不是让 Agent 不冲突，而是让每类冲突都有明确 authority、evidence、state transition 和 recovery path。
+
+### 8.13.15 Source boundary
+
+Primary source:
+
+- 用户提供的视频总结：字节跳动 Agent 面试题，围绕 Multi-Agent 主从分歧、Worker/Reviewer 质检对抗和并发写冲突。
+
+Source-derived elements retained:
+
+- 多数投票可能受同源错误影响；
+- 主从意见冲突需要显式裁决与 escalation；
+- Reviewer 应产出可验证证据；
+- Review / Repair 需要状态机和停止条件；
+- 并行写需要串行化、隔离或版本控制；
+- Git worktree 是 Coding Agent 隔离写工作区的一种可行策略；
+- CAS / optimistic concurrency 和路径重叠检测可以降低共享状态冲突。
+
+Handbook corrections / synthesis:
+
+- 多数投票不是绝对错误；在真正独立、多样、可校准的 ensemble 中仍可能有价值；
+- Judge Agent 也不是绝对错误；关键是 rubric、证据、可复现验证和权限边界；
+- “Lead 最终裁决”改成 authority matrix：Lead 可以拥有 orchestration authority，但高风险决策仍由 Policy / Human Gate 控制；
+- 未保留未经公开一手资料支持的 Claude Code 内部函数名 createSubagentContext；
+- Anthropic 官方公开 guidance 支持将 subagent 用于 isolated context / independent workstream，并公开 Tool allow/disallow policy；
+- DeepSeek Harness 当前实验性 Agent Teams 一手资料确认 task DAG、CAS revision、write-scope overlap warning、Lead-only teammate lifecycle；
+- 明确 DeepSeek writeScopes 只是 advisory，不是 lock；
+- 明确 DeepSeek Harness 当前不会自动创建 Git worktree，worktree isolation 是 deployment / external harness strategy；
+- 区分 task-board CAS 与真实 filesystem write conflict；
+- Cordis reversible effects 被定位为 lifecycle cleanup，而不是 Agent disagreement 的通用仲裁机制。
+
+External verification:
+
+- Anthropic Claude prompting / subagent orchestration guidance.
+- Anthropic Claude Code CLI tool allow/disallow policy.
+- DeepSeek Harness Agent Teams subsystem / tool catalog / implementation notes.
+- DeepSeek Harness filesystem stale-version policy.
+- DeepSeek Harness Cordis architecture and reversible effects.
+
+Sources:
+
+- https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-templates-and-variables
+- https://docs.anthropic.com/en/docs/claude-code/cli-usage
+- https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/agent-team.md
+- https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/tool-catalog.md
+- https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/feature/2026-08-05-agent-teams.md
+- https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/architecture/2026-06-26-file-context-as-event-gate.md
+- https://www.deepseek.com/harness/en/
+
