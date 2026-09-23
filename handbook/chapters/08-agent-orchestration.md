@@ -278,6 +278,49 @@ LangGraph
 
 > **LangChain and LangGraph are abstraction layers, not mutually exclusive competitors.**
 
+### 从单次模型调用到有状态应用
+
+把“LLM 很健忘”作为入门直觉可以，但工程上更准确的说法是：
+
+> **A model invocation is not durable application state.**
+
+一次普通 inference / chat-model 调用，只会基于这次请求中可见的输入产生输出。除非应用或服务端显式保存并重新提供 conversation / thread / workflow state，否则模型不会自动拥有业务流程的长期执行状态。
+
+因此复杂 Agent 需要把两个层次分开：
+
+~~~text
+Model call
+input → model → output
+
+Agent runtime
+state
+→ node execution
+→ state update
+→ route
+→ checkpoint
+→ resume / retry / branch
+~~~
+
+即使某个模型 API 提供 conversation / thread abstraction，也不能把“消息历史”直接等同于完整 Workflow State。真实业务通常还要保存：
+
+~~~text
+current task
+intermediate artifacts
+tool results
+retry count
+approval status
+pending action
+error state
+next node / runnable tasks
+execution metadata
+~~~
+
+这也是 LangGraph 的核心价值之一：**把原本隐含在代码、Prompt 和临时变量里的执行状态，提升成显式 State + Transition。**
+
+LangGraph 官方当前的“Thinking in LangGraph”文档也明确把 State 描述为所有 Node 都可读写的 shared memory；Node 读取 State、执行工作并返回更新，后续路由再根据更新后的 State 决定下一步。citeturn306199search7
+
+> **Conversation memory answers “what happened before”; workflow state answers “where the execution is now and what may happen next.”**
+
 ### LangChain：组件抽象 + 高层 Agent API
 
 `langchain-core` 提供 Chat Model、LLM、Vector Store、Retriever、Tool 等统一接口，并通过 Runnable 提供：
@@ -410,7 +453,7 @@ Checkpoint 可以支持 durable execution、interrupt/resume、HITL、time-trave
 
 > **Use LangChain to avoid rebuilding common agent/application components; use LangGraph when orchestration itself becomes domain logic.**
 
-官方资料校验日期：2026-09-17。来源包括 LangChain / LangGraph 官方 README、Runnable reference、`create_agent` reference、`StateGraph` reference 和 checkpointer documentation。
+官方资料校验日期：2026-09-23。来源包括 LangChain / LangGraph 官方 README、Runnable reference、`create_agent` reference、`StateGraph` reference 和 checkpointer documentation。
 
 ## 8.9 不用框架，最小 Agent State Machine 怎么设计
 

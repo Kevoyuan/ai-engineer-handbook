@@ -17,3 +17,4 @@ The reusable engineering principle behind any useful interview question should b
 
 - [Agent / RAG Resume Guide](./agent-resume-guide.md) — turn Agent/RAG keywords into evidence-backed project bullets, ownership statements, and interview-ready follow-up depth.
 - [iFLYTEK AI Product Manager Interview Prep](./iflytek-ai-product-manager-prep.md) — public-source question map, AI/product answer frameworks, product research checklist, and mock-interview rubric. This is a preparation guide, not a transcript.
+- [LangChain / LangGraph Interview Card](./langchain-langgraph-interview.md) — 30-second and 60–90 second answers, minimal state-machine follow-up, and checkpoint/state pitfalls.
