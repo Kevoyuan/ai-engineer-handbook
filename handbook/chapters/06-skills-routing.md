@@ -613,14 +613,15 @@ Handbook 做了以下工程化扩展：
 - 增加 calibration、traffic-share、latency、cost、task-success 与 failure taxonomy；
 - 把 LLM 层限定为 structured planning / action proposal，而不是自由执行。
 
-外部核对：
+外部核对（2026-09-23）：
 
-- LangGraph official reference: low-level orchestration for long-running stateful agents; deterministic + agentic workflows, customization, and latency control are explicit use cases.
+- LangChain / LangGraph 当前官方 Learn 与 Thinking in LangGraph 文档继续把 routing、shared state、显式 transitions 与可定制 workflow 作为核心 orchestration primitive；这与本节的 state-aware cascade 一致。
 - OpenAI Structured Outputs / Function Calling: models can produce schema-constrained structured outputs and tool arguments; this supports typed action proposals but does not replace application authorization.
 
 Sources:
 
-- https://langchain-ai.github.io/langgraph/reference/
+- https://docs.langchain.com/oss/python/learn
+- https://docs.langchain.com/oss/javascript/langgraph/thinking-in-langgraph
 - https://openai.com/index/introducing-structured-outputs-in-the-api/
 
 
