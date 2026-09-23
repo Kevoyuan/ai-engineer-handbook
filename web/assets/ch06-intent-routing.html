@@ -26,6 +26,64 @@
     </div>
   </div>
 
+
+  <div class="bfs-canvas rv" id="fig-6-b1a" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.6.B1A · ROUTING FUNNEL ECONOMICS</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="越往下流量越少，歧义、复杂度和单请求成本越高" data-i18n-en="As requests move down the funnel, traffic falls while ambiguity, complexity, and per-request cost rise">越往下流量越少，歧义、复杂度和单请求成本越高</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="漏斗不是为了强行追求某个流量比例，而是让简单稳定的问题尽早退出，把昂贵推理预算留给真正需要它的长尾请求。" data-i18n-en="The funnel is not about forcing a target traffic percentage. It lets simple, stable requests exit early and reserves expensive reasoning budget for the long tail that actually needs it.">漏斗不是为了强行追求某个流量比例，而是让简单稳定的问题尽早退出，把昂贵推理预算留给真正需要它的长尾请求。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-emerald">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">L1 · WIDE</span></div>
+          <h2 class="bfs-card-title">Deterministic Fast Path</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="高频 · 低歧义 · 低单位成本。只收 stable command / regex / FSM / typed action，不把边缘例外不断塞进规则库。" data-i18n-en="High-volume, low-ambiguity, low unit cost. Admit stable commands, regex/FSM, and typed actions without endlessly encoding edge cases into the rule set.">高频 · 低歧义 · 低单位成本。只收 stable command / regex / FSM / typed action，不把边缘例外不断塞进规则库。</span></div>
+        </div>
+        <div class="bfs-card bfs-teal">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">L2 · CORE</span></div>
+          <h2 class="bfs-card-title">Context-aware Router</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="承担主要常规语义流量。依赖 state freshness、referent resolution、continuation/topic shift 与轻量 classifier / semantic match。" data-i18n-en="Handles most routine semantic traffic. Quality depends on state freshness, referent resolution, continuation/topic-shift detection, and lightweight classification or semantic matching.">承担主要常规语义流量。依赖 state freshness、referent resolution、continuation/topic shift 与轻量 classifier / semantic match。</span></div>
+        </div>
+        <div class="bfs-card bfs-purple">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">L3 · NARROW</span></div>
+          <h2 class="bfs-card-title">Structured LLM Planner</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="低流量 · 高歧义 · 高单位成本。用于 cross-domain、compositional、multi-step 和 dynamic tool choice，输出结构化 capability / tool proposal。" data-i18n-en="Low-volume, high-ambiguity, high unit cost. Use for cross-domain, compositional, multi-step, and dynamic-tool-choice requests, producing structured capability or tool proposals.">低流量 · 高歧义 · 高单位成本。用于 cross-domain、compositional、multi-step 和 dynamic tool choice，输出结构化 capability / tool proposal。</span></div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="方向" data-i18n-en="Dimension">方向</span></th>
+          <th>L1</th>
+          <th>L2</th>
+          <th>L3</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Traffic share</td><td>high</td><td>medium</td><td>low</td></tr>
+          <tr><td>Ambiguity</td><td>low</td><td>medium</td><td>high</td></tr>
+          <tr><td>Task complexity</td><td>low</td><td>medium</td><td>high</td></tr>
+          <tr><td>Unit latency / cost</td><td>low</td><td>medium</td><td>high</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="bfs-grid bfs-g2" style="margin-top:14px">
+        <div class="bfs-card bfs-rose">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">ANTI-PATTERN</span></div>
+          <h2 class="bfs-card-title">Rule Black Hole</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="每个新边缘案例都变成 regex / exception，最终产生 precedence、conflict、test surface 与 ownership debt。" data-i18n-en="Every new edge case becomes another regex or exception, creating growing precedence, conflict, test-surface, and ownership debt.">每个新边缘案例都变成 regex / exception，最终产生 precedence、conflict、test surface 与 ownership debt。</span></div>
+        </div>
+        <div class="bfs-card bfs-amber">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">ANTI-PATTERN</span></div>
+          <h2 class="bfs-card-title">LLM Front Door</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="所有请求默认先走最昂贵模型，导致不必要的 latency、cost 和 output variance，并把确定性问题也暴露给概率模型。" data-i18n-en="Every request starts with the most expensive model, adding unnecessary latency, cost, and output variance while exposing deterministic problems to probabilistic behavior.">所有请求默认先走最昂贵模型，导致不必要的 latency、cost 和 output variance，并把确定性问题也暴露给概率模型。</span></div>
+        </div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="漏斗原则" data-i18n-en="Funnel rule">漏斗原则</span></span><p class="say">Reduce average decision cost without hiding uncertainty or turning the fast path into a rule warehouse.</p></div>
+    </div>
+  </div>
+
   <div class="bfs-canvas rv" id="fig-6-b2" style="margin-top:18px">
     <div class="bfs-head"><div>
       <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.6.B2 · ROUTING DECISION BOUNDARIES</span>
