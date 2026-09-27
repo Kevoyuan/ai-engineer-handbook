@@ -54,6 +54,10 @@
     {
       "path": "/assets/ch08-effective-agent-harness-aci.html",
       "id": "effective-agent-harness-aci"
+    },
+    {
+      "path": "/assets/ch08-long-running-multi-agent-handoff.html",
+      "id": "long-running-multi-agent-handoff"
     }
   ],
   "09-reliability-evaluation-observability": [
