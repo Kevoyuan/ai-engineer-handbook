@@ -1,0 +1,81 @@
+<section id="long-running-multi-agent-handoff" aria-labelledby="long-running-multi-agent-handoff-title">
+  <h2 class="sub" id="long-running-multi-agent-handoff-title"><span class="i18n-text" data-i18n-zh="Long-Running Multi-Agent Handoff：接力必须先验证再提交" data-i18n-en="Long-Running Multi-Agent Handoff: validate before committing the handoff">Long-Running Multi-Agent Handoff：接力必须先验证再提交</span> <small>§8.S</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="长周期 Multi-Agent 的关键不是让每个 Agent 自己记住做到哪，而是让 Agent 可以随时消失，而 Workflow State、已验证 Artifact 和合法状态转移仍然持续存在。" data-i18n-en="The key to long-running multi-agent work is not asking each agent to remember its own progress. Agents should be disposable while workflow state, validated artifacts, and legal state transitions remain durable.">长周期 Multi-Agent 的关键不是让每个 Agent 自己记住做到哪，而是让 Agent 可以随时消失，而 Workflow State、已验证 Artifact 和合法状态转移仍然持续存在。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-s1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.S1 · DURABLE HANDOFF PROTOCOL</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Candidate ≠ Committed Artifact；Agent 说 done ≠ Workflow 已推进" data-i18n-en="Candidate ≠ committed artifact; an agent saying done ≠ a committed workflow transition">Candidate ≠ Committed Artifact；Agent 说 done ≠ Workflow 已推进</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">01 · READ</span></div><h2 class="bfs-card-title">Committed State + Versioned Inputs</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Worker 读取 durable workflow state、revision、owner/lease 与已经提交的 input artifact，不直接把上一 Agent 的自由文本当作事实。" data-i18n-en="The worker reads durable workflow state, revision, ownership or lease, and committed input artifacts rather than treating the previous agent's free text as fact.">Worker 读取 durable workflow state、revision、owner/lease 与已经提交的 input artifact，不直接把上一 Agent 的自由文本当作事实。</span></div></div>
+
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">02 · PRODUCE</span></div><h2 class="bfs-card-title">Candidate Artifact</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Agent 在 bounded task 内工作，输出 typed candidate artifact；此时它还不能让下游开始。" data-i18n-en="The agent performs bounded work and emits a typed candidate artifact. Downstream work is not runnable yet.">Agent 在 bounded task 内工作，输出 typed candidate artifact；此时它还不能让下游开始。</span></div></div>
+
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">03 · VALIDATE</span></div><h2 class="bfs-card-title">Schema → Semantic → Integrity → Acceptance</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先检查结构可解析，再检查业务 invariant，再确认引用的文件/证据真实存在，必要时验证实际任务目标是否达成。" data-i18n-en="Validate structural parseability, then business invariants, then referenced files and evidence, and when needed verify the stage's actual acceptance criteria.">先检查结构可解析，再检查业务 invariant，再确认引用的文件/证据真实存在，必要时验证实际任务目标是否达成。</span></div></div>
+
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">04 · COMMIT</span></div><h2 class="bfs-card-title">Artifact Commit + Atomic State Transition</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="验证通过后把 Artifact 标为 authoritative，并用 CAS、single writer、transaction 或 workflow engine 提交合法 transition。" data-i18n-en="After validation, mark the artifact authoritative and commit the legal transition using CAS, a single writer, a transaction, or workflow-engine-owned state.">验证通过后把 Artifact 标为 authoritative，并用 CAS、single writer、transaction 或 workflow engine 提交合法 transition。</span></div></div>
+
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">05 · PUBLISH</span></div><h2 class="bfs-card-title">Next Task Becomes Runnable</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="只有 committed state 才发布给下游；失败则 repair、retry 或 escalate，不让 invalid candidate 静默传播。" data-i18n-en="Only committed state is published downstream. Failures route to repair, retry, or escalation instead of silently propagating an invalid candidate.">只有 committed state 才发布给下游；失败则 repair、retry 或 escalate，不让 invalid candidate 静默传播。</span></div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心顺序" data-i18n-en="Core ordering">核心顺序</span></span><p class="say">produce → validate → commit → publish downstream</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-s2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.S2 · STATE SEPARATION</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="不要把 Workflow State、Artifact 和 Agent Context 混进一个 Conversation" data-i18n-en="Do not collapse workflow state, artifacts, and agent context into one conversation">不要把 Workflow State、Artifact 和 Agent Context 混进一个 Conversation</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">WORKFLOW STATE</span></div><h2 class="bfs-card-title">Where execution is now</h2><div class="bfs-card-desc">stage · status · revision · owner · lease · retry · approval · next transitions</div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">ARTIFACT STORE</span></div><h2 class="bfs-card-title">What work actually exists</h2><div class="bfs-card-desc">artifact_id · version · lineage · checksum · schema · validation_status · storage_uri</div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">AGENT CONTEXT</span></div><h2 class="bfs-card-title">What this worker needs now</h2><div class="bfs-card-desc">prompt · retrieved context · tool results · scratch state · local plan</div></div>
+      </div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="恢复边界" data-i18n-en="Recovery boundary">恢复边界</span></span><p><span class="i18n-text" data-i18n-zh="Agent 进程崩溃不应让 Workflow State 或已验证 Artifact 一起消失。恢复依赖 durable state / checkpoint / event history，而不是模型“记得上次做到哪”。" data-i18n-en="An agent process crash should not erase workflow state or validated artifacts. Recovery depends on durable state, checkpoints, or event history—not on the model remembering where it stopped.">Agent 进程崩溃不应让 Workflow State 或已验证 Artifact 一起消失。恢复依赖 durable state / checkpoint / event history，而不是模型“记得上次做到哪”。</span></p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-s3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.S3 · FAILURE / RECOVERY MATRIX</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="不是所有失败都叫“回滚 checkpoint”" data-i18n-en="Not every failure should be described as rolling back a checkpoint">不是所有失败都叫“回滚 checkpoint”</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="失败" data-i18n-en="Failure">失败</span></th>
+          <th><span class="i18n-text" data-i18n-zh="优先处理" data-i18n-en="Preferred response">优先处理</span></th>
+          <th><span class="i18n-text" data-i18n-zh="为什么" data-i18n-en="Why">为什么</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Schema invalid</td><td>repair / rerun current stage</td><td><span class="i18n-text" data-i18n-zh="上游已验证产物通常无需重做" data-i18n-en="Validated upstream artifacts usually remain valid">上游已验证产物通常无需重做</span></td></tr>
+          <tr><td>Evidence missing</td><td>repair reference / rerun producer</td><td><span class="i18n-text" data-i18n-zh="从最早失效 Artifact 修复" data-i18n-en="Repair from the earliest invalid artifact">从最早失效 Artifact 修复</span></td></tr>
+          <tr><td>Worker crashed</td><td>lease expiry → reconcile → reassign</td><td><span class="i18n-text" data-i18n-zh="进程死亡不等于副作用未发生" data-i18n-en="A dead process does not imply the side effect did not occur">进程死亡不等于副作用未发生</span></td></tr>
+          <tr><td>Stale state write</td><td>reject revision / reload</td><td>CAS / explicit concurrency control</td></tr>
+          <tr><td>External side effect uncertain</td><td>idempotency · reconciliation · compensation</td><td><span class="i18n-text" data-i18n-zh="Checkpoint 不能撤销现实世界" data-i18n-en="A checkpoint cannot undo the external world">Checkpoint 不能撤销现实世界</span></td></tr>
+          <tr><td>Repeated repair failure</td><td>bounded escalation</td><td><span class="i18n-text" data-i18n-zh="避免 Agent 无限互相打回" data-i18n-en="Avoid endless agent-to-agent repair loops">避免 Agent 无限互相打回</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-s4" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.S4 · LONG-RUNNING OPERATIONS</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="跨小时/跨天还要解决 Lease、版本兼容与 Handoff Metrics" data-i18n-en="Multi-hour and multi-day workflows also need leases, version compatibility, and handoff metrics">跨小时/跨天还要解决 Lease、版本兼容与 Handoff Metrics</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">LEASE</span></div><h2 class="bfs-card-title">Who owns the task now?</h2><div class="bfs-card-desc">owner · lease_token · heartbeat · expires_at · reassignment</div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">VERSIONING</span></div><h2 class="bfs-card-title">Can old state run on new code?</h2><div class="bfs-card-desc">workflow_version · schema_version · prompt/tool/policy version · migration / pinning</div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-card-head"><span class="bfs-stage-pill">METRICS</span></div><h2 class="bfs-card-title">Is the handoff reliable?</h2><div class="bfs-card-desc">handoff failure · resume success · stale-write reject · duplicate side effect · time in stage</div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="总原则" data-i18n-en="Final rule">总原则</span></span><p class="say">Agents may be ephemeral; workflow state and validated artifacts must be durable.</p></div>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="外部核验日期：2026-09-28。LangGraph 当前 Persistence 文档支持 checkpoint-based graph-state persistence 与 failure recovery；Temporal 当前 Durable AI / Workflow 文档支持基于持久 Event History 的 crash recovery、multi-day workflow、version-aware deterministic replay 与 compensation pattern。它们是实现证据，不代表所有系统必须采用同一种 checkpoint 机制。" data-i18n-en="External verification date: 2026-09-28. Current LangGraph Persistence documentation supports checkpoint-based graph-state persistence and failure recovery; current Temporal Durable AI and Workflow documentation supports crash recovery from durable event history, multi-day workflows, version-aware deterministic replay, and compensation patterns. These are implementation evidence, not a claim that every system must use the same checkpoint mechanism.">外部核验日期：2026-09-28。LangGraph 当前 Persistence 文档支持 checkpoint-based graph-state persistence 与 failure recovery；Temporal 当前 Durable AI / Workflow 文档支持基于持久 Event History 的 crash recovery、multi-day workflow、version-aware deterministic replay 与 compensation pattern。它们是实现证据，不代表所有系统必须采用同一种 checkpoint 机制。</span></p>
+</section>
