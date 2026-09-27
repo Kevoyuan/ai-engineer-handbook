@@ -40,7 +40,7 @@ timestamp
 
 > **Every artifact needs an ID, version, lineage, and validation status.**
 
-Agent 适合 clarification、planning、creative revision、diagnosis、replanning 等不确定决策；Deterministic Service 适合 schema validation、prompt assembly、rendering、subtitle generation、permission checks、file conversion 等可重复转换。
+Agent 适合 clarification、planning、creative revision、diagnosis、replanning 等不确定决策；Deterministic Service 适合 schema validation、prompt assembly、rendering、subtitle formatting（字幕文本已确定）、permission checks、file conversion 等可重复转换。
 
 > **Use agents for uncertain decisions and deterministic services for repeatable transformations.**
 
@@ -73,7 +73,7 @@ QUEUED · RUNNING · SUCCEEDED · FAILED · CANCELLED
 
 前端可通过 SSE / WebSocket / Polling 获取进度。
 
-所有可能产生副作用或计费的生成任务都需要 `idempotency_key`。Request timeout 不代表任务没开始；重试前先 reconciliation，避免重复计费和重复 Artifact。
+所有可能产生副作用或计费的生成任务都需要明确去重 / 幂等 / 对账策略；服务支持时使用 `idempotency_key`，否则通过任务账本、唯一约束和结果查询协调。仅在请求上增加一个未被服务端实现的 key 不会产生幂等保证。Request timeout 不代表任务没开始；重试前先 reconciliation，避免重复计费和重复 Artifact。
 
 可并行的通常是 independent shots、audio variants、preview；continuity-dependent shots 与上游未锁定的任务需要串行。
 
@@ -317,7 +317,7 @@ execution metadata
 
 这也是 LangGraph 的核心价值之一：**把原本隐含在代码、Prompt 和临时变量里的执行状态，提升成显式 State + Transition。**
 
-LangGraph 官方当前的“Thinking in LangGraph”文档也明确把 State 描述为所有 Node 都可读写的 shared memory；Node 读取 State、执行工作并返回更新，后续路由再根据更新后的 State 决定下一步。citeturn306199search7
+LangGraph 官方当前的“Thinking in LangGraph”文档也明确把 State 描述为所有 Node 都可读写的 shared memory；Node 读取 State、执行工作并返回更新，后续路由再根据更新后的 State 决定下一步。（见 [Thinking in LangGraph](https://docs.langchain.com/oss/python/langgraph/thinking-in-langgraph)）。
 
 > **Conversation memory answers “what happened before”; workflow state answers “where the execution is now and what may happen next.”**
 
@@ -412,7 +412,7 @@ A ─────     ├→ D
        → C ─┘
 ```
 
-B/C 可以位于同一 super-step 并行执行，再通过 reducer / join 形成后续 State。
+B/C 可以位于同一 super-step 并行执行。Reducer 负责合并字段更新，不等于等待所有分支的 barrier；需要等待 B/C 都完成时，应显式定义 join（例如 `add_edge(["B", "C"], "D")`），不要把不同长度分支的独立边误当作完整 join。
 
 > **A graph is State + Nodes + Reducers + Routing + Scheduler, not merely boxes and arrows.**
 
@@ -427,7 +427,7 @@ thread_id
 → pending / next tasks
 ```
 
-Checkpoint 可以支持 durable execution、interrupt/resume、HITL、time-travel debugging、fault-tolerant execution 和 conversation state persistence。
+配置合适的持久化 Checkpointer 后，Checkpoint 可以支持 durable execution、interrupt/resume、HITL、time-travel debugging、fault-tolerant execution 和 conversation state persistence。InMemorySaver 只保存在进程内存中，不能承诺进程崩溃后恢复；实际持久化时机和恢复语义需按所用版本与 durability 配置验证。
 
 但“从第五步原地继续”只是直觉说法；更准确的是从 checkpoint / super-step semantics 恢复，不是任意 instruction pointer resume。
 
@@ -655,7 +655,7 @@ Agent-facing repository instructions
 > **Repository instructions should point to sources of truth, not become a second source of truth.**
 
 Sources:
-- https://developers.openai.com/docs/agent-configuration/agents-md
+- https://developers.openai.com/codex/guides/agents-md
 - https://openai.com/index/harness-engineering/
 
 ### 8.11.3 Step 3 · Architecture：按职责和失败边界拆，不按“目录看起来专业”拆
@@ -1264,7 +1264,7 @@ External verification:
 - OpenAI Harness Engineering recommends keeping `AGENTS.md` compact and using it as a map into deeper repository sources of truth rather than an encyclopedia.
 
 Sources:
-- https://developers.openai.com/docs/agent-configuration/agents-md
+- https://developers.openai.com/codex/guides/agents-md
 - https://openai.com/index/harness-engineering/
 
 ## 8.12 Agent Architecture Selection：把“7 种架构”改写成可组合 Pattern Matrix
@@ -1871,8 +1871,8 @@ Sources:
 - https://arxiv.org/abs/2210.03629
 - https://www.langchain.com/blog/plan-and-execute-agents
 - https://blog.langchain.dev/planning-agents/
-- https://langchain-ai.github.io/langgraph/reference/
-- https://langchain-ai.github.io/langgraph/reference/checkpoints/
+- https://docs.langchain.com/oss/python/langgraph/graph-api
+- https://docs.langchain.com/oss/python/langgraph/persistence
 - https://docs.temporal.io/
 - https://docs.prefect.io/v3/get-started/quickstart
 - https://docs.n8n.io/
@@ -2630,7 +2630,7 @@ External verification:
 
 Sources:
 
-- https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-templates-and-variables
+- https://code.claude.com/docs/en/sub-agents
 - https://docs.anthropic.com/en/docs/claude-code/cli-usage
 - https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/agent-team.md
 - https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/tool-catalog.md
@@ -3264,3 +3264,16 @@ Sources:
 - https://github.com/humanlayer/12-factor-agents
 - https://openai.com/index/harness-engineering/
 
+
+
+## Verification boundary · 2026-09-28
+
+幂等 key 需要服务端实现。Reducer 合并状态，不替代分支 join；InMemorySaver 不支持进程重启恢复。DeepSeek writeScopes 是提示，不是锁；Pi / DeepSeek 的具体行为均受源码版本约束。
+
+核对依据：[LangGraph Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
+
+- [LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)
+- [Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
+- [Cordis lifecycle](https://github.com/deepseek-ai/deepseek-harness/blob/21638c56315ae6a2b552d6091945d3144c9af32e/docs/cordis-primer.md)

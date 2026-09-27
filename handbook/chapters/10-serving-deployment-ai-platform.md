@@ -84,7 +84,7 @@ shared token prefix
 - 更高的 Prefill throughput；
 - 在采用共享 block/ref-count 设计的实现中，避免重复保存相同前缀 block。
 
-但 Prefix Caching **不会让生成阶段本身变快**。如果 workload 主要耗在长输出 Decode，而共享输入很短，收益可能很有限。
+但 Prefix Caching **不直接减少 Decode 的逐 Token 计算量**；共享资源、排队和调度变化可能间接改变实测 Decode latency。如果 workload 主要耗在长输出 Decode，而共享输入很短，收益可能很有限。
 
 ## 10.3 Prefix Match 必须是 token-level identity，不是语义相似
 
@@ -222,7 +222,7 @@ cache memory pressure
 
 跨请求 Prefix Cache 会让 latency 取决于是否命中共享前缀，因此多租户系统需要考虑 timing side channel 与 cache namespace 隔离。
 
-vLLM 当前提供 request-level `cache_salt`：salt 进入 Prefix Cache key，不同 salt 的请求不会共享 KV blocks。这样可以按 user / tenant / trust group 定义复用边界。
+vLLM 当前提供 request-level `cache_salt`：salt 进入 Prefix Cache key，不同 salt 的请求不会共享 KV blocks。这样可以按 user / tenant / trust group 定义复用边界。Salt 应由可信服务按授权边界注入且不可预测，不能直接用公开 tenant ID，也不能允许客户端冒用其他租户的 salt；它隔离 Prefix KV 复用，不替代其他缓存和资源的授权。
 
 这产生一个直接 trade-off：
 
@@ -945,7 +945,8 @@ Codex Cloud 当前公开资料确认：
 
 ~~~text
 isolated cloud container
-network disabled by default
+agent-phase internet access disabled by default (environment-configurable)
+setup phase may access the internet for dependencies
 workspace-scoped execution
 ~~~
 
@@ -953,7 +954,7 @@ Codex Local 则按平台使用不同 OS sandbox：
 
 ~~~text
 macOS → Seatbelt
-Linux → Landlock + seccomp
+Linux → bubblewrap filesystem isolation + no_new_privs / seccomp (current source; historical releases used Landlock)
 ~~~
 
 并提供：
@@ -964,7 +965,7 @@ workspace-write
 danger-full-access
 ~~~
 
-等 sandbox policy。
+等 sandbox policy。`danger-full-access` 表示关闭该执行沙箱限制，不是第三种同等隔离强度的沙箱；具体能力以平台、版本和运行配置为准。
 
 因此没有公开依据把 Codex 统一写成“container + microVM”。
 
@@ -1054,7 +1055,7 @@ process < container < microVM
 
 | Pattern | Host kernel shared? | Native Linux compatibility | Startup tendency | Isolation boundary | Typical fit |
 |---|---|---|---|---|---|
-| OS sandbox | Yes | Very high | Very fast | OS policy / namespace / syscall | Local coding agent |
+| OS sandbox | Yes | Host-OS dependent (macOS sandbox does not run Linux binaries) | Very fast | OS policy / namespace / syscall | Local coding agent |
 | Container | Yes | Very high | Fast | Namespace / cgroup / LSM | General cloud execution |
 | gVisor-like | Reduced direct host-kernel exposure | High | Fast–medium | User-space kernel + host sandbox | Multi-tenant container workloads |
 | MicroVM | No guest/host kernel sharing | High | Fast–medium | Hypervisor + dedicated guest kernel | Untrusted code / multi-tenant Agent |
@@ -1143,7 +1144,7 @@ Handbook corrections / synthesis:
 - Sandbox 定义为 execution boundary，而不是 VM 同义词；
 - 不保留“Anthropic 三层沙箱”这一未经官方统一定义的产品架构；
 - Claude Code Local 明确为 Seatbelt / bubblewrap OS sandbox，Claude Code Web 单独视为云端 isolated sandbox；
-- Codex Cloud 明确为 isolated cloud container；Codex Local 按平台使用 Seatbelt 或 Landlock/seccomp，不写成统一的 container + microVM；
+- Codex Cloud 明确为 isolated cloud container；Codex Local 按平台使用 Seatbelt 或当前 bubblewrap + seccomp（旧版本曾用 Landlock），不写成统一的 container + microVM；
 - E2B 当前开源 Runtime 确认为 Firecracker microVM；
 - CubeSandbox <60ms / <5MB 只作为其官方指定测试条件下 benchmark，不做跨产品绝对比较；
 - Firecracker ≤125ms / ≤5MiB 只按当前 specification 对应测试条件引用；
@@ -1157,7 +1158,7 @@ External verification:
 
 - Anthropic engineering: Claude Code sandboxing uses filesystem + network boundaries, Seatbelt on macOS and bubblewrap on Linux; Claude Code on the web uses isolated cloud sandboxes with credentials kept outside.
 - Anthropic containment review: different products use different containment patterns including gVisor container, local OS sandbox, and sealed VM.
-- OpenAI Codex: cloud agents run in isolated containers with network disabled by default; local Codex uses platform-specific filesystem/network sandbox policies.
+- OpenAI Codex: cloud agents run in isolated containers; agent-phase internet is disabled by default but configurable, while setup can access the internet; local Codex uses platform-specific filesystem/network sandbox policies.
 - E2B Runtime: Firecracker microVM, snapshot resume, lazy memory, copy-on-write rootfs.
 - Firecracker specification: bounded VMM overhead and startup under defined test configuration.
 - CubeSandbox official repository: RustVMM/KVM dedicated-kernel sandbox with published benchmark conditions.
@@ -1212,7 +1213,7 @@ Sources:
 - https://docs.vllm.ai/en/latest/usage/security/
 - https://huggingface.co/docs/transformers/en/kv_cache
 - https://arxiv.org/abs/2312.07104
-- https://docs.sglang.ai/developer_guide/bench_serving
+- https://docs.sglang.io/developer_guide/bench_serving.html
 - https://redis.io/docs/latest/develop/use-cases/semantic-cache/
 
 
@@ -1812,3 +1813,14 @@ Sources:
 > **Authorization must constrain retrieval before model context is assembled.**
 
 > **The agent may be wrong; the infrastructure must still make cross-tenant access fail closed.**
+
+
+## Verification boundary · 2026-09-28
+
+Codex 当前 Linux 源码使用 bubblewrap + seccomp；Cloud 默认禁网指 agent 阶段，setup 可联网。Prefix Cache 不直接减少 Decode 计算；salt 应由可信服务注入且不可预测。Firecracker / CubeSandbox 性能只按来源测试条件解读，本次未复现。
+
+核对依据：[Codex pinned source](https://github.com/openai/codex/blob/99f7758a577740f32df3aad53502e948142758a4/codex-rs/linux-sandbox/src/lib.rs)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
+
+- [Codex Cloud internet phases](https://developers.openai.com/codex/cloud/internet-access)

@@ -30,7 +30,7 @@ Claim Verification
 Safety
 ```
 
-> **The model proposes completion. The harness proves completion.**
+> **The model proposes completion. The harness checks it against an explicit acceptance contract.**
 
 失败恢复必须按原因路由：
 
@@ -53,7 +53,7 @@ Identity
 → Tool Execution
 ```
 
-send email、delete data、deploy、approve payment 等动作需要 confirmation、approval、idempotency 与 audit log。
+send email、delete data、deploy、approve payment 等动作需要明确授权、风险适配的 approval policy、幂等/对账与审计；已有有效授权可以覆盖后续动作，不必机械地每次重复确认。验证通过仅支持已定义的验收条件，不等于证明所有未来行为正确。
 
 ## 9.2 Evaluation 是生命周期基础设施
 
@@ -174,7 +174,7 @@ Root Run
 = Trace
 ```
 
-Trace 应尽可能记录：
+以下是可选的 Trace 观测字段，不是默认全量采集要求；Prompt、Tool 参数/结果与身份信息需先经过最小化、脱敏、访问控制和保留策略：
 
 ```text
 request
@@ -249,7 +249,7 @@ feedback: {user_sentiment, groundedness, pii_leakage}
 
 ### Code-based
 
-适合 Schema、Output Shape、Action / Tool Type、Keyword / Filter、精确数值、SQL、Unit Test、Latency、Cost、Semantic Retrieval Quality 等可稳定程序化判断的问题。
+适合 Schema、Output Shape、Action / Tool Type、Keyword / Filter、精确数值、SQL、Unit Test、Latency、Cost、有 relevance labels / qrels 的 Recall@K、MRR、nDCG 等可程序化计算的问题。程序可以计算检索指标，但不能仅凭相似度自动获得语义相关性的 ground truth。
 
 优势：确定性、快速、便宜、容易 Debug。
 
@@ -311,7 +311,7 @@ Business
 
 ## 9.8 Offline + Online Evaluation
 
-离线比较 Prompt / Model / Tool / Memory / Workflow 时，固定 dataset version、judge version、model settings、tool mocks / data snapshot、random seed，确保版本比较可复现。
+离线比较 Prompt / Model / Tool / Memory / Workflow 时，固定 dataset version、judge version、model settings、tool mocks / data snapshot，并在支持时固定 random seed，以减少混杂。Seed 不保证跨硬件、SDK、并发调度或托管模型版本的完全确定性；应重复运行、报告方差/置信区间，并记录运行环境与失败样本。
 
 ```text
 Target Agent
@@ -413,9 +413,12 @@ Queue
 → Route
 → Embed
 → Retrieve / Rerank
-→ Prompt / Prefill
-→ TTFT / Decode
+→ Prompt Assembly / Prefill
+→ First Token
+→ Remaining Decode / Streaming
 ```
+
+TTFT 是从所选请求起点到首 Token 的累计时延，常已包含排队、路由、检索和 Prefill，不能再与这些阶段直接相加；应区分模型服务端 TTFT 与用户端 TTFT。
 
 第一次慢、后面快，常见是 Model loading、GPU runtime init、index load、cold cache；在线服务应遵循：
 
@@ -472,15 +475,21 @@ Execution
 模型价格低，不等于任务成本低。弱模型如果导致更多重试、更多轮次、更多检索和更长 Context，总 Token 量可能上升，Task Success 也可能下降。
 
 ```text
-cost_per_attempt
-= tokens_per_attempt / 1,000,000 × blended_token_price
+total_cost
+= sum(all attempt costs + tool / infrastructure / review costs)
 
 cost_per_task
-= cost_per_attempt × average_attempts
+= total_cost / number_of_tasks
+
+task_success_rate
+= number_of_successful_tasks / number_of_tasks
 
 cost_per_successful_task
+= total_cost / number_of_successful_tasks
 = cost_per_task / task_success_rate
 ```
+
+以上分母必须来自同一统计窗口与任务集合，失败任务的成本也计入；成功数为 0 时指标未定义，应单独报告总成本和零成功。Token 费用按输入、输出、缓存等实际计价分别求和；`平均单次成本 × 平均重试次数` 只有口径一致时才是可用近似，不能忽略重试任务更贵等相关性。
 
 成本有两根杠杆：
 
@@ -638,7 +647,7 @@ timestamp
 
 ## 9.17 A/B Testing：用版本 Metadata 验证修复
 
-发现问题后，不能只“上线新 Prompt 希望它更好”。核心是：给每个 Run 打上版本 Metadata，然后按版本比较真实生产指标。
+发现问题后，不能只“上线新 Prompt 希望它更好”。版本 Metadata 让差异可观测，但单纯按版本分组只是观察性比较。有效 A/B 还需要随机分流、稳定的 user/thread 分配单元、同时期可比流量、预先确定主指标/护栏、足够样本和不确定性分析；否则时间、用户构成和多轮串组会混淆版本效果。
 
 ```text
 Real Traffic
@@ -753,7 +762,7 @@ Risk Profile
 → Sampling Policy
 ```
 
-如果只评估 10% Trace 且一周没有告警，唯一能确认的是：**没有被评估的样本被 Flag**，不能推出“没有泄漏”。
+如果只评估 10% Trace 且一周没有告警，唯一能确认的是：**已评估样本中没有记录到 Flag**，不能推出“没有泄漏”。
 
 > **No alert under partial sampling does not prove that no incident occurred.**
 
@@ -1042,7 +1051,7 @@ evaluator bug
 
 | Experience type | Best promotion target | Example |
 |---|---|---|
-| 一次性用户偏好 | Profile Memory | “答案保持三句话以内” |
+| 用户明确要求长期生效的稳定偏好 | Profile Memory | “以后回答都保持三句话以内”；仅本次要求留在 Working State |
 | 项目临时约束 | Project / Working Memory | “Atlas 暂时不能升级 SDK” |
 | 相似任务历史案例 | Episodic / Case Memory | “这类迁移曾因 schema mismatch 失败” |
 | 稳定可复用任务方法 | Skill / Procedure | “调查生产事故的标准步骤” |
@@ -1314,7 +1323,7 @@ Representative sources:
 
 ## Canonical rules
 
-> **The model proposes completion; the harness proves completion.**
+> **The model proposes completion; the harness checks it against an explicit acceptance contract.**
 
 > **Traces make failures visible; evals make them durable.**
 
@@ -1335,3 +1344,17 @@ Representative sources:
 > **Not every experience should become memory, and not every memory should become training data.**
 
 > **Learning is incomplete until the lesson becomes testable.**
+
+
+## Verification boundary · 2026-09-28
+
+Seed 不保证确定性；A/B 需要随机分流而非仅按版本分组。TTFT 是首 Token 的累计时延，不能与所包含阶段重复相加。Cost/success = 同一任务集合总成本/成功数（含失败成本；零成功时未定义）。临时偏好留在 Working State，Trace 采集遵循数据最小化。
+
+核对依据：[Controlled experiments](https://www.microsoft.com/en-us/research/publication/online-experimentation-at-microsoft/)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
+
+- [PyTorch reproducibility](https://github.com/pytorch/pytorch/blob/main/docs/source/notes/randomness.md)
+- [Judge bias](https://arxiv.org/abs/2306.05685)
+- [LangSmith cost tracking](https://docs.langchain.com/langsmith/cost-tracking)
+- [OpenTelemetry GenAI](https://opentelemetry.io/blog/2026/genai-observability/)

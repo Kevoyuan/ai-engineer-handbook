@@ -7,7 +7,7 @@
 
 ## 6.1 Skill Contract
 
-一个成熟 Skill 至少描述：
+以下是本手册建议的业务 Skill Registry 契约，不是可直接复制为所有平台 `SKILL.md` frontmatter 的标准 Schema；字段和命名规则应适配目标运行时：
 
 ```yaml
 name: analyze_contract_risk
@@ -507,7 +507,7 @@ Function Calling 是 Structured Action Proposal，不是授权系统。模型不
 
 > **The model proposes; the host executes.**
 
-Transient timeout / 5xx 可以 bounded retry；4xx / permission denied 一般不应盲目重试。对有副作用的动作，如果状态不确定，应先 reconciliation，再决定是否重试，避免重复扣款、重复创建或重复发送。
+Transient timeout / 可恢复 5xx 可以 bounded retry；4xx 需按语义处理：429 通常按服务端 Retry-After 和退避策略重试，401 可在凭证刷新成功后有限重试，403 / permission denied 不应盲目重试。对有副作用的动作，如果状态不确定，应先 reconciliation，再决定是否重试，避免重复扣款、重复创建或重复发送。
 
 ## 6.7 Capability architecture
 
@@ -992,11 +992,11 @@ Sources:
 
 TypeSafe AI 在 2026-09-15 发布的 Jev 是这一设计空间中的一个具体实现。TypeSafe 将它称为 **System One Model**：输入可以是自然语言或结构化 program state，但输出不是自由文本，而是预先定义的 typed probabilistic decisions。
 
-官方当前公开三类 decision primitive：
+官方当前公开三类 decision primitive（Noul 是正式名称，不是 Bool 的拼写错误）：
 
 | Primitive | 语义 | 典型用途 |
 |---|---|---|
-| **Noul** | yes / no，并返回概率 | 风险判断、条件 gate、是否升级 |
+| **Noul** | 返回命题为真的概率 `noul ∈ [0,1]`，业务 yes/no 由阈值策略决定 | 风险判断、条件 gate、是否升级 |
 | **Choice** | 从给定候选集合中选择，并返回候选分布 / confidence | Intent、Route、Tool / Capability selection |
 | **Score** | 在给定 scale 上输出 rating，并返回 level distribution / confidence | 质量、风险、优先级、相关性评分 |
 
@@ -1135,5 +1135,17 @@ Handbook 对其做了以下工程化整理：
 Sources:
 
 - https://typesafe.ai/blog/introducing-system-one-models-and-jev
+- https://docs.typesafe.ai/introduction
 - https://api.typesafe.ai/docs
 - https://evals.typesafe.ai/
+
+
+## Verification boundary · 2026-09-28
+
+Skill Contract 是业务注册表建议，不是通用 SKILL.md Schema。429 可按 Retry-After 重试。Noul 是官方名称，返回 [0,1] 概率；yes/no 由业务阈值决定。Jev 性能仍是厂商报告，未独立复现。
+
+核对依据：[TypeSafe primitives](https://docs.typesafe.ai/introduction)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
+
+- [HTTP retry semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110.html)

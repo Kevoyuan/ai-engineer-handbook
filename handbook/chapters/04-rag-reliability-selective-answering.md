@@ -101,7 +101,7 @@ Conflict Detection Rate
 Evidence Sufficiency Accuracy
 ```
 
-真正要看的是 **Risk–Coverage Curve**，而不是单点 Accuracy：回答越多 Coverage 越高，但风险可能上升；拒答越多风险下降，但可用性也下降。
+真正要看的是 **Risk–Coverage Curve**，而不是单点 Accuracy。Coverage = 已回答请求数 / 总请求数；0–1 loss 下的 Selective Risk = 错误回答数 / 已回答请求数，零回答时该比率未定义。拒答更多会降低 Coverage，但只有拒答机制能优先识别错误回答时，Selective Risk 才可能下降；随机或失准的拒答不保证风险下降。比较策略时必须使用同一请求分布和错误定义。
 
 ## 4.3 High-quality abstention
 
@@ -178,6 +178,19 @@ RAG 可靠性不能只靠一个平均分。发布前应至少按风险 Slice 检
 
 > **Citation presence ≠ citation correctness.**
 
-> **Prompt can encourage abstention; evaluation and evidence policy must prove when abstention is appropriate.**
+> **Prompt can encourage abstention; calibrated evaluation and evidence policy provide evidence for when abstention is appropriate.**
+
+Six Gates、决策标签和发布门禁是本手册的工程设计建议；有限评测不能证明对所有未来输入都正确。
 
 > **Overall score improvement cannot compensate for a critical safety regression.**
+
+
+## Verification boundary · 2026-09-28
+
+Coverage = 回答数/请求数；Selective Risk = 错误回答数/回答数，零回答时未定义。多拒答不保证低风险。Six Gates 是工程综合，有限评测不能证明所有未来请求都可靠。
+
+核对依据：[Selective Classification](https://arxiv.org/abs/1705.08500)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
+
+- [ALCE citation evaluation](https://arxiv.org/abs/2305.14627)

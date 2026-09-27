@@ -1,0 +1,1007 @@
+{
+  "date": "2026-09-28",
+  "notice": "Retrieval log, including failed and unused candidates. HTTP success is not semantic verification.",
+  "sources": [
+    {
+      "url": "https://aiengineering.beehiiv.com/p/hands-on-build-a-grounded-document-agent",
+      "resolved_url": "https://aiengineering.beehiiv.com/p/hands-on-build-a-grounded-document-agent",
+      "http_status": 403,
+      "sha256": "5bfac8833471357187fbf666a4ba4c0a84d7041eca2741e671b7ca5882d1ac12",
+      "chars": 753,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://api.typesafe.ai/docs",
+      "resolved_url": "https://api.typesafe.ai/docs",
+      "http_status": 200,
+      "sha256": "3d17f546be88d7ba4a75a4153c74ac8244a3bd677bbcbbfa282c6b25f1e37a93",
+      "chars": 21,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/1705.08500",
+      "resolved_url": "https://arxiv.org/abs/1705.08500",
+      "http_status": 200,
+      "sha256": "8af4138386f323f9fa7b57c722911036d4c51b8e3faee8391916e32a46ae7d8c",
+      "chars": 3929,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2004.04906",
+      "resolved_url": "https://arxiv.org/abs/2004.04906",
+      "http_status": 200,
+      "sha256": "769c22fd7b352a6d61add95a3116af5d85f4e1f540f9d52a6faa392999ed5aab",
+      "chars": 3943,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2104.08663",
+      "resolved_url": "https://arxiv.org/abs/2104.08663",
+      "http_status": 200,
+      "sha256": "ac20a9340bbf8531f35ed876a785ef0f3edd1e76fc658c4bc487c00f56a44487",
+      "chars": 4819,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2210.03629",
+      "resolved_url": "https://arxiv.org/abs/2210.03629",
+      "http_status": 200,
+      "sha256": "66a324b6bf6075b6534db3df10867474023791818c05099d5d6e7e776a624d87",
+      "chars": 4871,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2303.11366",
+      "resolved_url": "https://arxiv.org/abs/2303.11366",
+      "http_status": 200,
+      "sha256": "b218d29df0a0b750337cbaddef0568f0c9fc209590e8a2e9bbf92b7269a27059",
+      "chars": 4599,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.14627",
+      "resolved_url": "https://arxiv.org/abs/2305.14627",
+      "http_status": 200,
+      "sha256": "06ce495cf7b9817887a44db85a8ed5d254ed47ea556a60b668fee5c8c09fa72e",
+      "chars": 4409,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2305.16291",
+      "resolved_url": "https://arxiv.org/abs/2305.16291",
+      "http_status": 200,
+      "sha256": "623da6dcf7bdc4c5fd8ec06df5fb3222e93df8529e058d8f44d3188253e961f6",
+      "chars": 4509,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2306.05685",
+      "resolved_url": "https://arxiv.org/abs/2306.05685",
+      "http_status": 200,
+      "sha256": "77854867787231a84724d8825cb1754bf14a29b8a93629cf9fc00d76a0734123",
+      "chars": 4555,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2307.03172",
+      "resolved_url": "https://arxiv.org/abs/2307.03172",
+      "http_status": 200,
+      "sha256": "af63ac4b31d2d47748f3ad62081349ff820ca488c577888c8b0289545915c275",
+      "chars": 4399,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2308.08747",
+      "resolved_url": "https://arxiv.org/abs/2308.08747",
+      "http_status": 200,
+      "sha256": "97c49c0ee5bb535374b01b8ba296791e9e7ed7c1f84a4c127ec07b5231f850fc",
+      "chars": 4626,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2308.10144",
+      "resolved_url": "https://arxiv.org/abs/2308.10144",
+      "http_status": 200,
+      "sha256": "748c39ee9996b0aa040efe320f3ab2e9044bc74b02937b58e84b13cd3a06dd18",
+      "chars": 4564,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2312.07104",
+      "resolved_url": "https://arxiv.org/abs/2312.07104",
+      "http_status": 200,
+      "sha256": "c5faa88e188eab0b0d9933a74987c63ec9a00ae7b585f5cf0ba701a3865f638a",
+      "chars": 4205,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://blog.langchain.dev/planning-agents/",
+      "resolved_url": "https://www.langchain.com/blog/planning-agents",
+      "http_status": 200,
+      "sha256": "f9fc0fe215b945097c51b5c94c1078821e20c717457d8302ae10158deb8e1556",
+      "chars": 8293,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://blog.modelcontextprotocol.io/posts/2026-07-28/",
+      "resolved_url": "https://blog.modelcontextprotocol.io/posts/2026-07-28/",
+      "http_status": 200,
+      "sha256": "9e3c347f359baa66725fffe8e88f348299905d236dea320cd8457e8c4619e520",
+      "chars": 15650,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/model-optimization",
+      "resolved_url": "https://developers.openai.com/api/docs/guides/model-optimization",
+      "http_status": 200,
+      "sha256": "d5e5137ea58fca8c7bfdd63260e072885353c6bffc5172820e2ddb0af83c8110",
+      "chars": 7190,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning",
+      "resolved_url": "https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning",
+      "http_status": 200,
+      "sha256": "dc6d3a3892490d8c96003e5846448b9a74039be87ac18301d881c8ec2072cd37",
+      "chars": 50009,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/supervised-fine-tuning",
+      "resolved_url": "https://developers.openai.com/api/docs/guides/supervised-fine-tuning",
+      "http_status": 200,
+      "sha256": "888060742b71c4944fc5b4fa525d0a4eb8cd9f3aa2112da5dd01e6fb152ee84f",
+      "chars": 23988,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/codex/cloud/internet-access",
+      "resolved_url": "https://learn.chatgpt.com/docs/cloud/internet-access",
+      "http_status": 200,
+      "sha256": "2b8a2e91a5433c2cda52e9b5f78a9b0da689c24781630728765e70b53334b059",
+      "chars": 5842,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/codex/security",
+      "resolved_url": "https://learn.chatgpt.com/docs/security",
+      "http_status": 200,
+      "sha256": "126e66bce48afb6378a367ec7db0f5aca8f9aac87be0286c49dbeb388cb651d8",
+      "chars": 5223,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/docs/agent-configuration/agents-md",
+      "resolved_url": "https://developers.openai.com/api/docs/agent-configuration/agents-md",
+      "http_status": 404,
+      "sha256": "e3ebaa16dd9d9b9fc107c42183fb6cf9d22927e1af03dbbdfa0ccc38e4e4ac31",
+      "chars": 9,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docling-project.github.io/docling/",
+      "resolved_url": "https://docling-project.github.io/docling/",
+      "http_status": 200,
+      "sha256": "d5dfc71b56b00d659f6d02e4526feb7dbc3b745efd232a0d1b6621b52d319e47",
+      "chars": 3287,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/prompt-templates-and-variables",
+      "resolved_url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "http_status": 200,
+      "sha256": "a0e026d488cb5c6ac9fa0ed0fcacc26143c2e81bec96143bca5d745650372cd1",
+      "chars": 47094,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.anthropic.com/en/docs/claude-code/cli-usage",
+      "resolved_url": "https://code.claude.com/docs/en/cli-usage",
+      "http_status": 200,
+      "sha256": "d77b1ac20af7ee74db7f8066da881449fc2cc7c21fec000cee13ac11ac15d13b",
+      "chars": 36228,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.anthropic.com/en/docs/claude-code/sub-agents",
+      "resolved_url": "https://code.claude.com/docs/en/sub-agents",
+      "http_status": 200,
+      "sha256": "ddb1ec3e1427d7a4878834f910099ecc41f42c93e2cf53c8c09b4649bea185b6",
+      "chars": 92560,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/agentic-ai-multitenant/enforcing-tenant-isolation.html",
+      "resolved_url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/agentic-ai-multitenant/enforcing-tenant-isolation.html",
+      "http_status": 200,
+      "sha256": "9a89e2ad33a272dfe215b593bc31765655ece09e8fdf83675f0257e4a92c356b",
+      "chars": 5563,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/agentic-ai-multitenant/introducing-and-applying-tenant-context.html",
+      "resolved_url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/agentic-ai-multitenant/introducing-and-applying-tenant-context.html",
+      "http_status": 200,
+      "sha256": "05a8ce5be644043e9743e07d0215cd096a5db100f311bdecbaefd1871b0c644c",
+      "chars": 6422,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/agentic-ai-multitenant/introduction.html",
+      "resolved_url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/agentic-ai-multitenant/introduction.html",
+      "http_status": 200,
+      "sha256": "c9bd3e893ab3ef63a4363d9242413c29e75247b01da5ebd5015f8a47577edf62",
+      "chars": 3293,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/cost-tracking",
+      "resolved_url": "https://docs.langchain.com/langsmith/cost-tracking",
+      "http_status": 200,
+      "sha256": "ba0a99309c773fcc6854e348d477ff0d5a38e02a7150703c323fb3e87bcb9843",
+      "chars": 35495,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/javascript/langgraph/thinking-in-langgraph",
+      "resolved_url": "https://docs.langchain.com/oss/javascript/langgraph/thinking-in-langgraph",
+      "http_status": 200,
+      "sha256": "a1c6781f36e574a8c3f9d79e050cf4e6d09c27806562abad79a1c0aad48eb7c0",
+      "chars": 23676,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/concepts/memory",
+      "resolved_url": "https://docs.langchain.com/oss/python/concepts/memory",
+      "http_status": 200,
+      "sha256": "e0f5ee7abd8c8e0543bf1884bb51e6b37de5f694bfc221da1b8d7c08801e2e97",
+      "chars": 15499,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langchain/agents",
+      "resolved_url": "https://docs.langchain.com/oss/python/langchain/agents",
+      "http_status": 200,
+      "sha256": "d3548756b0d764309ae7c21b6aaacce4c910f5a415cff9a9a37731d99460a502",
+      "chars": 50727,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/add-memory",
+      "resolved_url": "https://docs.langchain.com/oss/python/langgraph/add-memory",
+      "http_status": 200,
+      "sha256": "bf05198507e1d2085bdda85242a9bb8fc7488b3d6b1ad73301a4e9d6ea27a19d",
+      "chars": 56434,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+      "resolved_url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+      "http_status": 200,
+      "sha256": "4e29c6bcad7614aa5a4ac2e7844f39727ba4cf43e27b35f86ff1e0da723a4937",
+      "chars": 47774,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+      "resolved_url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+      "http_status": 200,
+      "sha256": "23fcec6d073d44717250fa7071a474d341197d489e8c83d2e721fc3040b0e147",
+      "chars": 3780,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/learn",
+      "resolved_url": "https://docs.langchain.com/oss/python/learn",
+      "http_status": 200,
+      "sha256": "117ef6e8582c59c788bb4d37479123e74c9b1d7c37df34ad42295268200c031c",
+      "chars": 2576,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.letta.com/",
+      "resolved_url": "https://docs.letta.com/",
+      "http_status": 200,
+      "sha256": "5e610575d4045f7da2bdc147820cacfa2ad032ec92b5dcea64ea04636b4e3e2a",
+      "chars": 2343,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.mem0.ai/features/contextual-add",
+      "resolved_url": "https://docs.mem0.ai/core-concepts/memory-operations/add",
+      "http_status": 200,
+      "sha256": "af1fa9e5e96aa1bfb5a81927a7254d6ef0cd5b12dd387a9b2f6501f13b7d83ed",
+      "chars": 7150,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.mem0.ai/platform/quickstart",
+      "resolved_url": "https://docs.mem0.ai/platform/quickstart",
+      "http_status": 200,
+      "sha256": "b1e5082e8c165bf314c9a1305885c948762e6320c76f55af97239a3544e9c97d",
+      "chars": 4632,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.n8n.io/",
+      "resolved_url": "https://docs.n8n.io/",
+      "http_status": 200,
+      "sha256": "46897e948f1afd918d0a1982c754221d0858eda9c94159493404e7cee301da3e",
+      "chars": 963,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html",
+      "resolved_url": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html",
+      "http_status": 200,
+      "sha256": "e601536eb697e6f04953fb5589c80c7292fbc3cea78bdbdd02c71a087d2aaef6",
+      "chars": 3128,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/batcher.html",
+      "resolved_url": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/batcher.html",
+      "http_status": 200,
+      "sha256": "409b3c582b5c370de91cbc9998e777ef6e97727049595185b9039fd891290595",
+      "chars": 11382,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.pinecone.io/guides/operations/moving-to-production",
+      "resolved_url": "https://docs.pinecone.io/guides/production/production-checklist",
+      "http_status": 200,
+      "sha256": "bebc9948dfca0f3c087a01aa9295b2e6750738b70500ab7178c97a656fa5c0e4",
+      "chars": 5224,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.prefect.io/v3/get-started/quickstart",
+      "resolved_url": "https://docs.prefect.io/v3/get-started/quickstart",
+      "http_status": 200,
+      "sha256": "7a96d967e8b2a6522ae08194898d8f191fabc16d1671e6686b13f61374697c16",
+      "chars": 9742,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/notes/randomness.html",
+      "resolved_url": "https://docs.pytorch.org/docs/stable/notes/randomness.html",
+      "http_status": 200,
+      "sha256": "83c43570b1c6a498e0606d35a08ee794827d3cbdfdc09b72b558c9d6bafd36dd",
+      "chars": 57,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.sglang.ai/developer_guide/bench_serving",
+      "resolved_url": "https://docs.sglang.io/developer_guide/bench_serving",
+      "http_status": 404,
+      "sha256": "bbb6ee74fa3a3d02408b256a77140214b1327b2bbfdb2f76fbe4db022408154d",
+      "chars": 0,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.temporal.io/",
+      "resolved_url": "https://docs.temporal.io/",
+      "http_status": 200,
+      "sha256": "90b6b2779c05a4d939dc06a595f05cdef8a1744b3a1aede7b7aa12a0a858cc6d",
+      "chars": 1417,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.typesafe.ai/introduction",
+      "resolved_url": "https://docs.typesafe.ai/introduction",
+      "http_status": 200,
+      "sha256": "2af1cdf645b0b4678a9404ae8370853cdeb42e98aeeaf1197ae7c17b9f194b39",
+      "chars": 2884,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.vllm.ai/en/latest/design/prefix_caching/",
+      "resolved_url": "https://docs.vllm.ai/en/latest/design/prefix_caching/",
+      "http_status": 200,
+      "sha256": "0134da746b1f61e954e601616305264a4caafb4df2336856ce8905c7e2d52357",
+      "chars": 12671,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/",
+      "resolved_url": "https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/",
+      "http_status": 200,
+      "sha256": "3672693a02c47ef60ce114c5c10ed6afae9d7ab7b7f06fc471ebf9f78a595ccd",
+      "chars": 3540,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.vllm.ai/en/latest/usage/security/",
+      "resolved_url": "https://docs.vllm.ai/en/latest/usage/security/",
+      "http_status": 200,
+      "sha256": "9aa364ebc4136414a9f916a38e10e4211624005a909a2f6bf5478e049b671dfd",
+      "chars": 40792,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://evals.typesafe.ai/",
+      "resolved_url": "https://evals.typesafe.ai/",
+      "http_status": 200,
+      "sha256": "8e162e9bcf35ff3a5612780c300e0727ca12300e8e7e278a6ef934f0485c1641",
+      "chars": 8955,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/TencentCloud/CubeSandbox",
+      "resolved_url": "https://github.com/TencentCloud/CubeSandbox",
+      "http_status": 200,
+      "sha256": "a8b834f1dbd92926add66a1a6cae685e256b08b14a9773063655d62b361ce59d",
+      "chars": 12053,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-cookbooks/tree/main/patterns/agents",
+      "resolved_url": "https://github.com/anthropics/claude-cookbooks/tree/main/patterns/agents",
+      "http_status": 200,
+      "sha256": "e826051f8eed3262f4d70e42b56c606ba3f0be832a15ca226d5780fe3c051657",
+      "chars": 1365,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/containers/bubblewrap",
+      "resolved_url": "https://github.com/containers/bubblewrap",
+      "http_status": 200,
+      "sha256": "54070b9b54bce20309de072bf5e8ffefc04597471f451ea835ecc5731b68d63f",
+      "chars": 10380,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/architecture/2026-06-26-file-context-as-event-gate.md",
+      "resolved_url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/.agents/notes/implemented/architecture/2026-06-26-file-context-as-event-gate.md",
+      "http_status": 200,
+      "sha256": "3b289dad808d121ccf6e96113861ab9f33c4fa00a8b5ff5c3140bb15c953eabb",
+      "chars": 22218,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/feature/2026-08-05-agent-teams.md",
+      "resolved_url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/.agents/notes/implemented/feature/2026-08-05-agent-teams.md",
+      "http_status": 200,
+      "sha256": "5041200f5e8d4124889e5406de08a116c459539d728bebe551f65eefa9791397",
+      "chars": 15501,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/agent-team.md",
+      "resolved_url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/docs/subsystems/agent-team.md",
+      "http_status": 200,
+      "sha256": "aa77fce1a4bd98fa1861c4ab3db163ed4bc822b2ed9c0fd13dcab68e74358181",
+      "chars": 10064,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/tool-catalog.md",
+      "resolved_url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/docs/tool-catalog.md",
+      "http_status": 200,
+      "sha256": "72d08fc177ec0e71fcb58a6efc1d3a35a1635fe1ed9efd5adcd028f104fb0041",
+      "chars": 96840,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/e2b-dev/runtime/blob/main/docs/ARCHITECTURE.md",
+      "resolved_url": "https://raw.githubusercontent.com/e2b-dev/runtime/main/docs/ARCHITECTURE.md",
+      "http_status": 200,
+      "sha256": "cdbc3213a7a29bca351a75b8d64065b8dc84a103af63b1d20f6ca18ac2ce2dad",
+      "chars": 47071,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/earendil-works/pi",
+      "resolved_url": "https://github.com/earendil-works/pi",
+      "http_status": 200,
+      "sha256": "ec3640bd77b2195a8d3e1947259ccccd4132403735a7fe4b5a37cfaa08c429db",
+      "chars": 6450,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/session-format.md",
+      "resolved_url": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/docs/session-format.md",
+      "http_status": 200,
+      "sha256": "22be6491a049299cdd56c625eaf3d20589870792d52a168cca7a92603461f9d6",
+      "chars": 15259,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/system-prompt.ts",
+      "resolved_url": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/core/system-prompt.ts",
+      "http_status": 200,
+      "sha256": "f92aef055417513395a1e7d5f4ef9cd66ccdb34d9f8fbb7bc368154ab6280939",
+      "chars": 9427,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/tools/edit.ts",
+      "resolved_url": "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/core/tools/edit.ts",
+      "http_status": 200,
+      "sha256": "31a368c14cf5437ecac157765660001b16063302d9bd746303d6d1b1dcb5625d",
+      "chars": 8564,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/firecracker-microvm/firecracker/blob/main/SPECIFICATION.md",
+      "resolved_url": "https://raw.githubusercontent.com/firecracker-microvm/firecracker/main/SPECIFICATION.md",
+      "http_status": 200,
+      "sha256": "90aee041dd417464a0d422ad86dd7ab458fa2dd9b5fc386287dfff4b563f9b62",
+      "chars": 3816,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/humanlayer/12-factor-agents",
+      "resolved_url": "https://github.com/humanlayer/12-factor-agents",
+      "http_status": 200,
+      "sha256": "f14dfcb12689a8f6f35288c52317a395ad903a09ef6b8fea7c3856188501b491",
+      "chars": 10082,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://github.com/openai/codex",
+      "resolved_url": "https://github.com/openai/codex",
+      "http_status": 200,
+      "sha256": "747801d4cf3f5abe5101fca954bb36635d17a2d44e60c833a23717006053fcaa",
+      "chars": 4181,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://huggingface.co/docs/peft/index",
+      "resolved_url": "https://huggingface.co/docs/peft/index",
+      "http_status": 200,
+      "sha256": "2e7cb7a7a802b36d253a8b60cecff73cc6e69e76d01a9654143131dedd593cf8",
+      "chars": 2292,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://huggingface.co/docs/transformers/en/kv_cache",
+      "resolved_url": "https://huggingface.co/docs/transformers/en/kv_cache",
+      "http_status": 200,
+      "sha256": "dc30fd55cb548b67969836c12fbcfdd37fb7d6d8afaca7232a74d749237bbc7a",
+      "chars": 21188,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/langgraph/reference/",
+      "resolved_url": "https://langchain-ai.github.io/langgraph/reference/",
+      "http_status": 200,
+      "sha256": "f31cf3e85026e31d7e54dc1f01141848f39dad882d95a39edb688854fb176585",
+      "chars": 29,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/langgraph/reference/checkpoints/",
+      "resolved_url": "https://langchain-ai.github.io/langgraph/reference/checkpoints/",
+      "http_status": 200,
+      "sha256": "6b0d51d10676c42b540ffaabd3b9ee5ec004a84bb0284416774f0acfc2c66f3a",
+      "chars": 29,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-3/ab-testing",
+      "resolved_url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-3/ab-testing",
+      "http_status": 200,
+      "sha256": "5040f06ec189fbcf9489e940a5dbee8f16959423894d88dddaa494e743931685",
+      "chars": 1980,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-3/user-sentiment",
+      "resolved_url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-3/user-sentiment",
+      "http_status": 200,
+      "sha256": "1c457ff1b68dbffc54ac9b26d381ce640fa7a451c73ef6a95fffd1cbab021f5f",
+      "chars": 6564,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-4/online-evals-for-security",
+      "resolved_url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-4/online-evals-for-security",
+      "http_status": 200,
+      "sha256": "439d92b615161f5a8322ca5b19fb051118a704f52eacf201c264740374fb9234",
+      "chars": 6673,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-4/setting-up-alerts",
+      "resolved_url": "https://langchain-ai.github.io/lca-lessons/production-monitoring/module-4/setting-up-alerts",
+      "http_status": 200,
+      "sha256": "6fb8ca763722ef21e9c40ed3b49cadef1cca09350b84ba811af23e79973e21b5",
+      "chars": 3174,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/lca-lessons/reliable-agents/module-1/observability",
+      "resolved_url": "https://langchain-ai.github.io/lca-lessons/reliable-agents/module-1/observability",
+      "http_status": 200,
+      "sha256": "bdb65045dc4495c1202ff7ea77c8d1cb7a38649f099ab0fc8a9d2e2cb7744163",
+      "chars": 2369,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/evaluating-agents",
+      "resolved_url": "https://langchain-ai.github.io/lca-lessons/reliable-agents/module-2/evaluating-agents",
+      "http_status": 200,
+      "sha256": "b1da32e5c8bc79f0e7509ed0506a55b42672c17a2563b720033ba06f4e796c78",
+      "chars": 4645,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://mlflow.org/docs/latest/ml/model-registry",
+      "resolved_url": "https://mlflow.org/docs/latest/ml/model-registry",
+      "http_status": 200,
+      "sha256": "b3986484a3c0223806cc5c1d0c8373ca424f6578eeaba2fd0f06bd3a7e0a0027",
+      "chars": 9059,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://openai.com/index/harness-engineering/",
+      "resolved_url": "https://openai.com/index/harness-engineering/",
+      "http_status": 403,
+      "sha256": "1faffc0576a553c484cb88513c54b5e4c5e4afb4c69f20ac663791d41f7e75ee",
+      "chars": 41,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://openai.com/index/introducing-codex/",
+      "resolved_url": "https://openai.com/index/introducing-codex/",
+      "http_status": 403,
+      "sha256": "42c24e31c5c3ab2960c15823b01195056663d45a5cb46a1a3609b51c26cb0d6f",
+      "chars": 41,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://openai.com/index/introducing-structured-outputs-in-the-api/",
+      "resolved_url": "https://openai.com/index/introducing-structured-outputs-in-the-api/",
+      "http_status": 403,
+      "sha256": "ce511578c7f6c0f66c23c5fcc494049da39b4b8331a324879af65793b07d6e8a",
+      "chars": 41,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://opentelemetry.io/blog/2026/genai-observability/",
+      "resolved_url": "https://opentelemetry.io/blog/2026/genai-observability/",
+      "http_status": 200,
+      "sha256": "38f6127808da4fe61a5ca30a04cb717cf82c31ef4bc70cdf3adcd3495da2d8ca",
+      "chars": 5705,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://opentelemetry.io/docs/specs/semconv/",
+      "resolved_url": "https://opentelemetry.io/docs/specs/semconv/",
+      "http_status": 200,
+      "sha256": "aca2edf6095c903c39774dc4ec5830310d86ca2ccc3d9531ad687c7d8812931b",
+      "chars": 3384,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices",
+      "resolved_url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices",
+      "http_status": 200,
+      "sha256": "935a650133aaad40ab3cf5be41600aaae48fbf5ff05c05d755b718e4893eb7ff",
+      "chars": 37560,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+      "resolved_url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
+      "http_status": 200,
+      "sha256": "ee370aee58fc5724e67e32cc2ded3399ebc4ba7b3e0a3d79bb9841d911c87326",
+      "chars": 16220,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/langchain-ai/langsmith-sdk/main/python/langsmith/client.py",
+      "resolved_url": "https://raw.githubusercontent.com/langchain-ai/langsmith-sdk/main/python/langsmith/client.py",
+      "http_status": 200,
+      "sha256": "b17a174e2766f1cb797a562d5f0269a87aa0872c3757d4c3c2513e701ba18d08",
+      "chars": 476565,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://redis.io/docs/latest/develop/use-cases/semantic-cache/",
+      "resolved_url": "https://redis.io/docs/latest/develop/use-cases/semantic-cache/",
+      "http_status": 200,
+      "sha256": "1cc15682c31d3a4a61bd8a9e8a31ff12734c5baad77c4e9e5f1d21ba92e175e0",
+      "chars": 6142,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://sandock.ai/docs",
+      "resolved_url": "https://sandock.ai/docs",
+      "http_status": 200,
+      "sha256": "eddff2bfe7ba21da0e2a65eebc4cf9a201765705ee3b9032467a0186d0c34608",
+      "chars": 6111,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://ts.sdk.modelcontextprotocol.io/v2/",
+      "resolved_url": "https://ts.sdk.modelcontextprotocol.io/v2/",
+      "http_status": 200,
+      "sha256": "ec240725c789a61e63a79f70bd0bcedbd0f695cbbad46735452e0d0c123f84e1",
+      "chars": 2089,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "resolved_url": "https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "http_status": 200,
+      "sha256": "f0847d2096c4e37f666345d866133c891810fc48e13ee185516fe42c9fb23a54",
+      "chars": 13720,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.andrewng.org/writing",
+      "resolved_url": "https://www.andrewng.org/writing",
+      "http_status": 200,
+      "sha256": "f231eb67894ff28a726ed54673e4545ae7121def0cad2ce4a244bcbd1200e2a0",
+      "chars": 1728,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "resolved_url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "http_status": 200,
+      "sha256": "3eca44a2d062ac190dfbbc7e226364dd0dbbc1f74c95b678d5377adcd491f166",
+      "chars": 18562,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/claude-code-sandboxing",
+      "resolved_url": "https://www.anthropic.com/engineering/claude-code-sandboxing",
+      "http_status": 200,
+      "sha256": "460139417f38c2c59953a609b96c6624dc508d743b308d9c53f235e3a49beb07",
+      "chars": 7750,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.anthropic.com/engineering/how-we-contain-claude",
+      "resolved_url": "https://www.anthropic.com/engineering/how-we-contain-claude",
+      "http_status": 200,
+      "sha256": "493b3af5cb2373f61cbf312a80e0a32e2a8bfa5e66dbc97a63c2944491ba46f8",
+      "chars": 28008,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.deepseek.com/harness/en/",
+      "resolved_url": "https://www.deepseek.com/harness/en/",
+      "http_status": 200,
+      "sha256": "ac70ae9e5e949194f79948e669fc864c62b168582090ae637b12e0fbdd8668a5",
+      "chars": 5475,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion",
+      "resolved_url": "https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion",
+      "http_status": 200,
+      "sha256": "52d7c6046418d684d98b935777df9533db7ca07e43e2e7470c41867151730735",
+      "chars": 23947,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/solutions/search/hybrid-search",
+      "resolved_url": "https://www.elastic.co/docs/solutions/search/hybrid-search",
+      "http_status": 200,
+      "sha256": "47208c5afbb617296d14eea0e525b473286240fc36b9759ce72c095c4c281cfe",
+      "chars": 901,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/solutions/search/ranking",
+      "resolved_url": "https://www.elastic.co/docs/solutions/search/ranking",
+      "http_status": 200,
+      "sha256": "097b86374a53d7d55ec66538c5d43454a77a8a6d6adefb565865c90d131142a9",
+      "chars": 2901,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.langchain.com/blog/plan-and-execute-agents",
+      "resolved_url": "https://www.langchain.com/blog/plan-and-execute-agents",
+      "http_status": 200,
+      "sha256": "6dd3b6614b5f5bab9137ee05eb349fb8cb04c5ee96ae290c3d8116792c8ac5be",
+      "chars": 6555,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/ddl-rowsecurity.html",
+      "resolved_url": "https://www.postgresql.org/docs/18/ddl-rowsecurity.html",
+      "http_status": 200,
+      "sha256": "296aa9a0fd3a3b08fb065e0c655e5b9b5cf4bd36f44736fc13afb7f7f569efa1",
+      "chars": 16494,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/sql-createpolicy.html",
+      "resolved_url": "https://www.postgresql.org/docs/18/sql-createpolicy.html",
+      "http_status": 200,
+      "sha256": "daf9dae7b1dcec58b1c378dd2ed8fced5e0284a0221c5afb727953973974daef",
+      "chars": 19185,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "resolved_url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "http_status": 200,
+      "sha256": "d431760660ea44e130f6e919dab216df2d0b3a490567a98089267523368fe1e5",
+      "chars": 460315,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://x.com/AndrewYNg/status/2095890279865721217",
+      "resolved_url": "https://x.com/AndrewYNg/status/2095890279865721217",
+      "http_status": 200,
+      "sha256": "95385d9be186cdeb08e4f0d77ffcd8a5a4d8b8015c474099d0c116178c38c964",
+      "chars": 8967,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/99f7758a577740f32df3aad53502e948142758a4/codex-rs/linux-sandbox/src/lib.rs",
+      "resolved_url": "https://raw.githubusercontent.com/openai/codex/99f7758a577740f32df3aad53502e948142758a4/codex-rs/linux-sandbox/src/lib.rs",
+      "http_status": 200,
+      "sha256": "242787f4c2d3f21b9b0705a6776238de9a41d66e7c384a283b9fd9ebb726dda0",
+      "chars": 1109,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/master/libs/langchain/langchain/agents/factory.py",
+      "resolved_url": "https://raw.githubusercontent.com/langchain-ai/langchain/master/libs/langchain/langchain/agents/factory.py",
+      "http_status": 404,
+      "sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed",
+      "chars": 14,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.typesafe.ai/primitives/noul",
+      "resolved_url": "https://docs.typesafe.ai/primitives/noul",
+      "http_status": 200,
+      "sha256": "44979612ca175bf4a2833581d17cb6393b6576c46b6b3c4a6b99a2daa5d6a266",
+      "chars": 13605,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://developers.openai.com/codex/guides/agents-md",
+      "resolved_url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+      "http_status": 200,
+      "sha256": "c099de53c67bb5a761a7502a3505dbb094e5c89fd901c180306f5597096280d2",
+      "chars": 7219,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.pytorch.org/docs/stable/notes/randomness",
+      "resolved_url": "https://docs.pytorch.org/docs/stable/notes/randomness",
+      "http_status": 200,
+      "sha256": "8983950dad7c54e52a6909edaf598ee4019df5a71d4f8ca7135ee404365576e0",
+      "chars": 57,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.sglang.io/developer_guide/bench_serving.html",
+      "resolved_url": "https://docs.sglang.io/docs/developer_guide/bench_serving",
+      "http_status": 200,
+      "sha256": "085f9978b5267942b43f6f49dde36ab6ccf5da6d1f90e08253257065f1e50185",
+      "chars": 18419,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://gvisor.dev/docs/architecture_guide/intro/",
+      "resolved_url": "https://gvisor.dev/docs/architecture_guide/intro/",
+      "http_status": 200,
+      "sha256": "78a4ada6ad3dccf5038af1fe617cc245a6b44b42c6415224c3981558ea2f7854",
+      "chars": 14438,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-term-query",
+      "resolved_url": "https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-term-query",
+      "http_status": 200,
+      "sha256": "c4177a5446605ad8ddd99450d5ceb3d24866a4cba5f8170dbee14cd392308744",
+      "chars": 4221,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity",
+      "resolved_url": "https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity",
+      "http_status": 200,
+      "sha256": "c0228596067c4e5e5cde7c4bb8068f819c1e32e92afd9f73f599cf0461a27a8b",
+      "chars": 9777,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/normalizer",
+      "resolved_url": "https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/normalizer",
+      "http_status": 200,
+      "sha256": "a043722af75a044a1c807a9bafa65f7f5b7f57e69acd7edcb4cdebaf62ae98ea",
+      "chars": 3346,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/docs/reference/elasticsearch/configuration-reference/field-and-document-access-control",
+      "resolved_url": "https://www.elastic.co/docs/reference/elasticsearch/configuration-reference/field-and-document-access-control",
+      "http_status": 404,
+      "sha256": "581ddaec4b6148d8fe2fffa72be3b34af054e88d4e22c53c41c966491a0e9fa0",
+      "chars": 114,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/articles/experimentation/",
+      "resolved_url": "https://www.microsoft.com/en-us/research/articles/experimentation-and-the-north-star-metric/",
+      "http_status": 200,
+      "sha256": "7c63cbc37568b82b769e89cdbc6430a77b9047cd0dce73fcfc162bc676e33530",
+      "chars": 14344,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://reference.langchain.com/python/langchain/agents/factory/create_agent",
+      "resolved_url": "https://reference.langchain.com/python/langchain/agents/factory/create_agent",
+      "http_status": 200,
+      "sha256": "4711a2a7526361e65a5e737a3b3b291530b3908234978e9cab0d2caadf068c95",
+      "chars": 7565,
+      "fetch_note": "Retried with Accept: text/markdown; signature read",
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/pytorch/pytorch/main/docs/source/notes/randomness.md",
+      "resolved_url": "https://raw.githubusercontent.com/pytorch/pytorch/main/docs/source/notes/randomness.md",
+      "http_status": 200,
+      "sha256": "a76a40ed971524450b8f08b4162d06d1f58c694391a6c82b6472975ceef4cfe1",
+      "chars": 10997,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://arxiv.org/abs/2404.16130",
+      "resolved_url": "https://arxiv.org/abs/2404.16130",
+      "http_status": 200,
+      "sha256": "855117eeed1d12d807df77154b203ba20a1664fd6f17891395557b379989add7",
+      "chars": 4645,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.elastic.co/guide/en/elasticsearch/reference/current/document-level-security.html",
+      "resolved_url": "https://www.elastic.co/docs/deploy-manage/users-roles/cluster-or-deployment-auth/controlling-access-at-document-field-level",
+      "http_status": 200,
+      "sha256": "b0055cbafb891cad8cf938fcbcf231ee8e8b86005bb01361bbfb5489663cebc3",
+      "chars": 21790,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://www.microsoft.com/en-us/research/publication/online-experimentation-at-microsoft/",
+      "resolved_url": "https://www.microsoft.com/en-us/research/publication/online-experimentation-at-microsoft/",
+      "http_status": 200,
+      "sha256": "c5adfbf70bbedcb598c61d62f84b1d34b7e68c398a728ec9dc2d9941fbbb3e29",
+      "chars": 1853,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "resolved_url": "https://code.claude.com/docs/en/sub-agents",
+      "http_status": 200,
+      "sha256": "ddb1ec3e1427d7a4878834f910099ecc41f42c93e2cf53c8c09b4649bea185b6",
+      "chars": 92560,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://docs.langchain.com/langsmith/insights",
+      "resolved_url": "https://docs.langchain.com/langsmith/insights",
+      "http_status": 200,
+      "sha256": "958004f7b74dbce30f86325ebefcf996f5b31e0ad67f065f91b8d83883a4b196",
+      "chars": 11617,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/earendil-works/pi/6f7551516b84278eb9da1c340c8e7bc66be1a6ba/packages/coding-agent/src/core/tools/edit.ts",
+      "resolved_url": "https://raw.githubusercontent.com/earendil-works/pi/6f7551516b84278eb9da1c340c8e7bc66be1a6ba/packages/coding-agent/src/core/tools/edit.ts",
+      "http_status": 200,
+      "sha256": "31a368c14cf5437ecac157765660001b16063302d9bd746303d6d1b1dcb5625d",
+      "chars": 8564,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/21638c56315ae6a2b552d6091945d3144c9af32e/docs/cordis-primer.md",
+      "resolved_url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/21638c56315ae6a2b552d6091945d3144c9af32e/docs/cordis-primer.md",
+      "http_status": 200,
+      "sha256": "f0cc573cc10b60d1bd76039fb0bd666edfb32c9b18027d4dc301c042a9e65d58",
+      "chars": 4130,
+      "hash_scope": "retrieved extracted text; full text not distributed"
+    }
+  ]
+}

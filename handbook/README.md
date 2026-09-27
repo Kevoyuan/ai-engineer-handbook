@@ -84,7 +84,7 @@ Do not create a new semantic supplement next to an existing canonical chapter me
 1. **Authorization before semantic similarity.**
 2. **Evidence relevance ≠ evidence sufficiency.**
 3. **Citation presence ≠ citation correctness.**
-4. **Parsing quality sets the upper bound for retrieval.**
+4. **Parsing quality constrains text-only retrieval; original-page or image retrieval can recover information lost during parsing.**
 5. **Use the cheapest reliable route first.**
 6. **Skill match is not authorization.**
 7. **The model proposes; the host executes.**
@@ -100,3 +100,7 @@ Do not create a new semantic supplement next to an existing canonical chapter me
 ## Product principle
 
 > **Book first, interaction second.** Interaction should serve understanding rather than turn the handbook into a dashboard.
+
+## 知识核验
+
+[2026-09-28 全章节资料核验报告](verification/2026-09-28.md)：逐节覆盖、修正记录、来源和未验证边界。

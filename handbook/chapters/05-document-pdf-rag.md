@@ -29,7 +29,7 @@ Hard Requirement 2: Layered Evaluation Loop
 
 ### Scanned PDF
 
-扫描件本质是图片容器。OCR 至少输出 recognized text、bbox、confidence、page rotation 与 language。低置信区域不能静默进入索引，应重识别、换模型、标记低质量证据或进入人工复核。
+扫描件本质是图片容器。OCR / 页面处理链应尽量保留 recognized text、bbox、confidence、page rotation 与 language；具体 OCR 未提供的字段应标为 unknown 或由其他组件估计，不能伪造 confidence，也不能直接比较不同引擎未校准的分数。低置信区域不能静默进入索引，应重识别、换模型、标记低质量证据或进入人工复核。
 
 ### Mixed text-image PDF
 
@@ -80,7 +80,7 @@ bounding_box
 
 Chunk 应顺着文档结构，而不是固定字符数：同标题下连续段落形成语义 Chunk；完整条款尽量不切断；表格独立结构化；图 + caption + description 绑定；超长 section 再按子标题/段落切分。
 
-太小会缺上下文、导致碎片化召回；太大会降低 Recall precision、增加 Context 成本。
+太小可能缺上下文、导致碎片化召回；太大可能稀释相关内容、增加 Context 成本。Recall 和 Precision 是不同指标，Chunk 大小对两者的影响应分别实测；结构切分也不是必然优于固定窗口的定律。
 
 可以给孤立 Chunk 增加短 contextual enrichment，但**原文与模型生成的上下文必须分开存储**，避免把生成摘要当原始证据。
 
@@ -216,7 +216,7 @@ retrieval_score
 
 这些字段服务于版本与权限、可验证定位、缓存/回放/评估、视觉文档定位、Parser 回归分析以及 Threshold / Reranking / Failure Analysis。
 
-> **Parsing quality sets the upper bound for retrieval.**
+> **Parsing limits what a text-only index can retrieve; access to original pages or images can provide a recovery path.**
 
 工程上可以把质量理解成短板乘法：
 
@@ -244,3 +244,10 @@ Document QA quality
 Grounded Document Agent 的公开实现示例曾使用 AI Engineering, *Hands-On: Build a Grounded Document Agent* 作为来源之一。框架和具体 parser/tool 只是实现样例；本章 canonical 规则是 provenance-first parsing、controlled evidence access、support gate、claim verification、bounded re-retrieval 与 abstention。
 
 Source: https://aiengineering.beehiiv.com/p/hands-on-build-a-grounded-document-agent
+
+
+## Verification boundary · 2026-09-28
+
+OCR 字段支持依引擎而异；未知 confidence 不能伪造。Chunk 大小对 Recall 与 Precision 要分别评测。解析质量约束文本索引；重新读取原始页面/图像可以提供补救路径。原有 newsletter 实例全文本次未能取得。
+
+核对依据：[Docling](https://docling-project.github.io/docling/)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。

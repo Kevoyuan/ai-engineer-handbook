@@ -1,7 +1,7 @@
 # AI Engineer System Framework
 ## 全局知识框架与 2026-09 内容审计
 
-> This document is the system-level knowledge map for the current handbook. It is not a vendor framework. It separates durable engineering layers from product-specific implementations and records the coverage boundary of the current 02–09 chapters.
+> This document is the system-level knowledge map for the current handbook. It is not a vendor framework. It separates durable engineering layers from product-specific implementations and records the coverage boundary of the current 02–10 chapters. Coverage judgments below are editorial assessments, not empirical certification.
 
 AI Engineering 不能被压成 RAG、Agent 或某个框架。一个生产 AI 系统至少需要同时回答四类问题：
 
@@ -64,7 +64,7 @@ RAG、Memory、MCP、Agent、Eval 都只是这张系统图里的子系统，而�
 
 > **AI engineering is the engineering of a controlled runtime plus a measurable learning loop.**
 
-## 2. 当前 02–09 如何映射到框架
+## 2. 当前 02–10 如何映射到框架
 
 | Handbook | 系统位置 | 当前覆盖判断 |
 |---|---|---|
@@ -76,6 +76,7 @@ RAG、Memory、MCP、Agent、Eval 都只是这张系统图里的子系统，而�
 | 07 Memory & Context | State & Memory | Strong：thread state、long-term store、promotion、compression；六层 taxonomy 属于 handbook synthesis |
 | 08 Agent Orchestration | Runtime · Workflow / Execution | Strong：bounded loop、graph、artifact、idempotency、HITL、repair scope |
 | 09 Reliability / Eval / Observability | Control Plane + Learning Loop | Strong：Trace、Dataset、Evaluator、Release Gate、Monitoring、Cost 已形成生产闭环 |
+| 10 Serving / Deployment / Security | Platform Foundation + Control Plane | 已覆盖 KV/Prefix Cache、Sandbox、多租户；完整部署生命周期和容量工程仍待扩展 |
 
 ## 3. Validation：哪些知识可以继续作为 canonical principle
 
@@ -146,7 +147,7 @@ MCP、LangGraph、LangSmith、模型 pricing、provider token subtype、SDK API 
 
 ### 4.3 “AI Engineer” 当前 edition 的 scope 需要更诚实
 
-当前 02–09 深度集中在 **Applied AI / RAG / Agent / Evaluation / Reliability**。这部分已经可以形成高质量 production application engineering spine，但还不足以声称完整覆盖 AI Platform / Model Engineering。
+当前主体深度集中在 **Applied AI / RAG / Agent / Evaluation / Reliability**。这部分已经可以形成高质量 production application engineering spine，但还不足以声称完整覆盖 AI Platform / Model Engineering。
 
 ## 5. 当前真正缺的核心知识
 
@@ -166,7 +167,7 @@ Fine-tuning 不是默认第一步；它应该与 prompt/context/tool design 和 
 
 ### Gap B · Inference Serving
 
-这是当前 “AI Platform” 最大缺口：
+Chapter 10 已覆盖 Prefill / Decode、KV / Prefix Cache、隔离和相关指标；以下是仍需补齐的 Serving 全链路：
 
 ```text
 Request Queue
@@ -198,7 +199,7 @@ Model / Prompt / Workflow / Dataset / Pricing Config 都应可追踪版本和 li
 
 ### Gap D · Security Operations
 
-当前权限原则分散在 Retrieval、Skills、Memory、Harness 中，但缺一张完整 security threat model：
+当前权限原则分散在 Retrieval、Skills、Memory、Harness 中，Chapter 10 已补入 Sandbox threat model 与多租户控制面；完整安全运营仍需继续覆盖：
 
 - identity / tenant isolation；
 - secrets / token handling；
@@ -223,7 +224,7 @@ Security 应成为 cross-cutting control plane，而不是某一章最后的注�
 07  State · Memory · Context Engineering
 08  Agent · Workflow · Orchestration
 09  Reliability · Eval · Observability · Cost
-10  Serving · Deployment · Security · AI Platform ← missing
+10  Serving · Deployment · Security · AI Platform ← active; partial coverage
 ```
 
 这样 02–09 不需要推倒重写；它们会成为全局框架里的中间主干，而不是整本 AI Engineering 的全部。
@@ -253,3 +254,10 @@ Primary/current references used for this audit:
   - https://mlflow.org/docs/latest/ml/model-registry
 - Hugging Face PEFT / LoRA
   - https://huggingface.co/docs/peft/index
+
+
+## Verification boundary · 2026-09-28
+
+本章系统分层与 Strong 评级属于编辑判断，不是行业标准或实测认证。Ch10 已是活动章节；完整 Model/Adaptation、部署生命周期和容量工程仍未覆盖。
+
+核对依据：[MCP 2026-07-28](https://blog.modelcontextprotocol.io/posts/2026-07-28/)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
