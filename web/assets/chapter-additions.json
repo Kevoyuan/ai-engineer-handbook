@@ -50,6 +50,10 @@
     {
       "path": "/assets/ch08-multi-agent-conflict-control.html",
       "id": "multi-agent-conflict-control"
+    },
+    {
+      "path": "/assets/ch08-effective-agent-harness-aci.html",
+      "id": "effective-agent-harness-aci"
     }
   ],
   "09-reliability-evaluation-observability": [
