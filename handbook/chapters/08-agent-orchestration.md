@@ -2638,3 +2638,629 @@ Sources:
 - https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/architecture/2026-06-26-file-context-as-event-gate.md
 - https://www.deepseek.com/harness/en/
 
+## 8.14 Effective Agent Harness：Simplicity、Transparency 与 ACI
+
+“模型更强 + Tool 更多 + Prompt 更长”并不会自动得到更好的 Agent。模型能力只是一个输入变量，真实系统效果还取决于 Harness 如何组织 Context、Tool、Environment Feedback、State、Validation 与 Human Control。
+
+Anthropic 在 Building Effective Agents 中把 Agent 实现原则压缩成三点：
+
+~~~text
+Simplicity
+→ maintain simplicity in agent design
+
+Transparency
+→ explicitly expose planning / execution progress
+
+ACI · Agent-Computer Interface
+→ carefully design and test the interface between model and environment
+~~~
+
+这三点与本章已有原则是一致的：
+
+> **Use the least control-flow complexity necessary.**
+
+更完整地说：
+
+~~~text
+Capable Model
+      │
+      ▼
+Harness
+├─ Prompt / Context
+├─ Tool Surface / ACI
+├─ State / Session
+├─ Environment Feedback
+├─ Permission / Sandbox
+├─ Validation
+└─ Trace / Eval
+      │
+      ▼
+Reliable Task Execution
+~~~
+
+因此：
+
+> **Model capability determines what may be possible; the harness determines how reliably that capability can be turned into repeatable work.**
+
+### 8.14.1 Simplicity：只为已经观察到的控制问题增加复杂度
+
+一个常见错误是从目标倒推框架名：
+
+~~~text
+Need AI feature
+→ Agent
+→ Graph
+→ Multi-Agent
+→ many tools
+→ many abstractions
+~~~
+
+更合理的升级顺序是：
+
+~~~text
+single model call
+→ retrieval / structured output
+→ tool-using loop
+→ explicit workflow
+→ state graph
+→ multi-agent coordination
+~~~
+
+只有当下一层复杂度能解决一个**已经明确存在**的问题时才升级，例如：
+
+~~~text
+fixed pipeline cannot express retry
+→ add explicit retry state
+
+single context causes permission collision
+→ split context / worker boundary
+
+one agent cannot safely parallelize writes
+→ add ownership / isolation
+
+simple tool loop cannot resume long task
+→ add durable checkpoint
+~~~
+
+框架本身不是问题；真正的问题是 abstraction 是否把关键边界藏起来：
+
+~~~text
+actual prompt?
+actual model input?
+tool schema?
+state transition?
+retry policy?
+stop condition?
+permission decision?
+tool result?
+~~~
+
+如果这些问题难以回答，生产调试成本会快速上升。
+
+> **Use the highest-level abstraction that still leaves important control boundaries inspectable.**
+
+Anthropic 的原始建议也是：从简单 Prompt 开始，先做 comprehensive evaluation，只有简单方案确实不足时才加入 multi-step agentic system。
+
+### 8.14.2 Tool Minimalism：减少语义重叠，不是机械减少 Tool 数量
+
+“工具越少越好”是有用直觉，但不应变成绝对规则。
+
+真正的问题是 **tool decision boundary**：
+
+~~~text
+search
+grep
+find
+ls
+scan
+lookup
+browse
+~~~
+
+如果这些 Tool 的适用边界高度重叠，模型每轮都必须额外解决：
+
+~~~text
+which one?
+which parameter shape?
+which path semantics?
+which one returns enough evidence?
+~~~
+
+这会增加 tool-selection entropy。
+
+更好的目标是：
+
+> **Minimize overlapping ways to express the same action; keep distinct capabilities when their boundaries are operationally meaningful.**
+
+例如一个 Coding Agent 可以让 Bash 承担多种成熟 shell 操作，从而减少重复 file-search tools；但如果专用 search tool 能提供更安全的权限、更稳定的结构化输出、更好的远端执行语义或明显更高的成功率，那么保留专用 Tool 反而合理。
+
+所以 Tool Registry 应同时考虑：
+
+~~~text
+semantic overlap
+model familiarity
+schema complexity
+permission boundary
+failure semantics
+latency / cost
+observability
+environment portability
+~~~
+
+而不是只优化 tool_count。
+
+### 8.14.3 Pi：Minimal Harness 的一个当前实现例
+
+截至 2026-09-28，Pi 当前源码默认给 coding agent 启用：
+
+~~~text
+read
+bash
+edit
+write
+~~~
+
+另外还存在 grep / find / ls 等可选 built-in tools。
+
+Pi 的 system prompt 会根据当前 selected tools 组装 Tool 描述和 guidelines。例如只有 Bash 而没有 grep / find / ls 时，会追加：
+
+~~~text
+Use bash for file operations like ls, rg, find
+~~~
+
+这个设计展示了两个可复用原则：
+
+~~~text
+tool surface
+→ should match actual enabled capability
+
+prompt guidance
+→ should be generated from the same capability state
+~~~
+
+否则会出现：
+
+~~~text
+Prompt says a tool exists
+but runtime disabled it
+
+or
+
+Runtime exposes a tool
+but Prompt gives no usage boundary
+~~~
+
+> **Prompt inventory and executable capability inventory should not drift apart.**
+
+但 Pi 只是实现案例，不是“优秀 Agent 必须只有四个工具”的证据。
+
+### 8.14.4 Transparency：展示可观察执行证据，不等于暴露 Hidden Chain-of-Thought
+
+Anthropic 所说的 transparency 包括显式显示 Agent 的 planning steps；同时在 Agent loop 中，每一步应从环境获得 ground truth，例如：
+
+~~~text
+tool result
+code execution output
+test result
+file diff
+retrieval result
+browser observation
+policy decision
+~~~
+
+然后再决定下一步。
+
+生产系统应该让用户和工程师看到足够的**可操作证据**：
+
+~~~text
+current plan / todo
+current step
+tool being invoked
+important arguments
+tool result summary
+artifact / diff
+state transition
+retry / fallback
+approval request
+completion evidence
+~~~
+
+但不要把 transparency 误解为“必须暴露模型隐藏 Chain-of-Thought”。
+
+更安全、也更工程化的规则是：
+
+> **Expose plans, actions, state transitions, evidence, and concise reasoning summaries when useful; do not make hidden Chain-of-Thought an observability dependency.**
+
+这与 Chapter 09 的经验学习原则一致：可靠 Trace 应建立在 observable behavior / outcomes，而不是隐藏 CoT。
+
+### 8.14.5 Environment Feedback：Agent 不能只靠自己的文本判断成功
+
+一个 Agent Loop：
+
+~~~text
+Plan
+→ Act
+→ Observe
+→ Update
+→ Verify
+→ Continue / Stop
+~~~
+
+其中 Observe / Verify 必须尽量来自真实环境，而不是：
+
+~~~text
+model generated code
+→ model says "looks correct"
+→ done
+~~~
+
+对于 Coding Agent，更强证据通常是：
+
+~~~text
+tests pass
+typecheck pass
+lint pass
+app behavior reproduced
+bug no longer reproduces
+diff matches scope
+runtime logs support claim
+~~~
+
+对于 RAG / Business Agent：
+
+~~~text
+retrieval evidence
+API result
+database state
+workflow status
+policy result
+human approval
+~~~
+
+> **The agent's claim of success is not completion evidence.**
+
+### 8.14.6 ACI：把 Tool Interface 当作给模型使用的 HCI
+
+ACI 的核心不是“有 Function Calling API”，而是：
+
+~~~text
+Can the model understand what this tool does?
+Can it distinguish it from neighboring tools?
+Can it construct valid arguments?
+Can the interface prevent predictable mistakes?
+Can failures teach the model how to recover?
+~~~
+
+一个 Tool Contract 至少应该考虑：
+
+~~~text
+name
+description
+input schema
+examples
+edge cases
+when_to_use
+when_not_to_use
+error model
+permission / side effect
+result shape
+recovery hint
+~~~
+
+Anthropic 的类比很重要：
+
+~~~text
+HCI
+→ reduce human interaction error
+
+ACI
+→ reduce model interaction error
+~~~
+
+因此参数名和 schema 本身就是 Prompt Engineering。
+
+### 8.14.7 Poka-yoke：把常见错误从 Prompt 提醒升级成 Interface Constraint
+
+仅仅写：
+
+~~~text
+"Please be careful."
+~~~
+
+通常不如改变接口。
+
+Anthropic 在 SWE-bench Agent 上给出的具体案例是：模型在工作目录变化后容易错误使用 relative filepath，因此他们把相关 Tool 改成**要求 absolute filepath**，从接口层移除了这一类错误。
+
+这里要注意产品边界：
+
+~~~text
+Anthropic SWE-bench tool example
+→ required absolute paths
+
+Pi current edit tool
+→ accepts relative OR absolute path
+→ resolves it against cwd
+~~~
+
+因此“绝对路径”不是所有 Coding Agent 的通用规范。
+
+真正可复用的原则是：
+
+> **When the same model error repeats, first ask whether the interface can make that error impossible or easier to diagnose.**
+
+其他 Poka-yoke 例子：
+
+~~~text
+free-form status string
+→ enum
+
+arbitrary resource id
+→ scoped typed handle
+
+delete(path)
+→ delete(resource_id, expected_version)
+
+ambiguous amount
+→ amount + currency
+
+implicit destructive action
+→ explicit confirm / approval token
+
+edit by line number
+→ exact unique text / structured patch
+~~~
+
+### 8.14.8 Pi edit：从实现里看 ACI 防呆
+
+Pi 当前 edit tool 是一个很好的 ACI 例子。
+
+其关键约束包括：
+
+~~~text
+oldText
+→ exact match
+→ must be unique
+
+multiple edits
+→ matched against the same original file
+→ not incrementally against already-mutated content
+
+overlapping / nested edits
+→ rejected / discouraged
+
+result
+→ returns diff + unified patch
+~~~
+
+这种设计把很多“模型自己维护行号 / offset / mutation ordering”的隐式负担移到 deterministic tool implementation。
+
+注意当前 Pi 的 path schema 是：
+
+~~~text
+relative or absolute
+~~~
+
+所以 Handbook 不把“Pi edit 强制绝对路径”作为事实。
+
+可复用原则是：
+
+> **Move bookkeeping that software can perform deterministically out of the model's action space.**
+
+### 8.14.9 Session Transparency：原始历史、Active Context 与 Summary 不要混成一件事
+
+Pi 当前 Session 使用 JSONL，entry 通过 id / parentId 组成树，可以从历史节点分叉。
+
+它同时区分：
+
+~~~text
+Raw Session History
+→ append-style persisted entries
+
+Active Model Context
+→ current leaf → root path
+→ compaction / context edit semantics
+
+Compaction
+→ summary replaces older material in model context
+→ raw source entries remain in session history
+~~~
+
+这个设计展示了一个很重要的生产原则：
+
+> **Context compaction should not require destroying the audit history.**
+
+更一般地：
+
+~~~text
+audit history
+≠
+model context
+≠
+UI summary
+≠
+long-term memory
+~~~
+
+它们生命周期和用途不同。
+
+树状 Session 还有一个工程优势：用户从早期分叉探索另一条路线时，不一定需要覆盖或删除原始路径，可以保留：
+
+~~~text
+what was tried
+what evidence existed
+where branch happened
+what summary carried forward
+~~~
+
+这对 debugging、replay、comparison 和 human steering 都有价值。
+
+### 8.14.10 Harness ≠ Feature Checklist
+
+把 Agent Harness 写成：
+
+~~~text
+browser
+computer use
+memory
+hooks
+plugins
+worktree
+subagents
+skills
+MCP
+~~~
+
+很容易再次陷入“组件越多越成熟”。
+
+更好的问题是每个组件解决什么 failure mode：
+
+| Mechanism | It should exist when... |
+|---|---|
+| Browser / computer use | task requires environment interaction that APIs cannot adequately expose |
+| Memory | information must survive beyond current task/context with a clear lifecycle |
+| Hooks | deterministic lifecycle events need policy/automation |
+| Skills | validated reusable procedures need bounded activation |
+| Worktree / isolated workspace | concurrent writers or risky changes need write isolation |
+| Subagent | context/permission/tool boundary or genuine parallel specialization exists |
+| Checkpoint | long-running execution must survive interruption |
+| Sandbox | untrusted execution needs a physical capability boundary |
+
+> **Add harness mechanisms to solve explicit operational problems, not to complete an Agent feature checklist.**
+
+OpenAI 的 Harness Engineering 也给出类似证据：他们的 Agent 效果并不只来自模型，而依赖 agent-legible repository、工具、可执行环境、worktree 级应用实例、日志/指标、自动化验证和反馈循环。该文章同时明确提醒，这种高自主能力依赖特定 repository structure / tooling investment，不能无条件外推。
+
+### 8.14.11 ACI Eval Loop：用真实 Tool Failure 改接口
+
+Tool 设计不应该一次完成。
+
+一个生产迭代循环：
+
+~~~text
+Representative Task Set
+→ Agent Runs
+→ Tool-call Trace
+→ Failure Clustering
+→ Root Cause
+   ├─ description ambiguity
+   ├─ schema ambiguity
+   ├─ overlapping tools
+   ├─ bad default
+   ├─ missing validation
+   ├─ poor error message
+   └─ model capability limit
+→ ACI Change
+→ Regression Eval
+→ Release
+~~~
+
+值得记录的 Tool metrics：
+
+~~~text
+tool_selection_accuracy
+argument_validity
+first-attempt_success
+tool_error_rate
+recovery_success
+duplicate / redundant tool calls
+wrong-tool-with-correct-intent rate
+latency
+cost
+task success after tool use
+~~~
+
+不要看到所有 Tool Failure 都去改 Prompt。可能的修复位置包括：
+
+~~~text
+rename tool
+split / merge tools
+change schema
+add enum
+remove optional ambiguity
+change default
+add validation
+improve error message
+add permission gate
+change environment
+remove the tool
+~~~
+
+Anthropic 明确建议用大量 example inputs 测试模型如何使用 Tool，然后迭代参数、描述与边界。
+
+Chapter 09 负责把这些失败样本进入 Eval / Regression / Release Control Plane。
+
+### 8.14.12 12-Factor Agents：Own Prompt / Context 的正确边界
+
+12-factor-agents 提出的 “Own your prompts” 与 “Own your context window” 对生产系统有一个很有价值的提醒：
+
+~~~text
+do not outsource critical behavior
+to an opaque abstraction you cannot inspect / test / version
+~~~
+
+这不意味着“不要使用框架”。
+
+更准确的 Handbook 原则是：
+
+> **Own the behaviorally critical interfaces even when a framework implements them.**
+
+至少应该能检查和版本化：
+
+~~~text
+prompt
+context assembly
+tool schemas
+state
+routing
+policy
+model / provider config
+eval metadata
+~~~
+
+框架可以减少样板代码，但不应该让关键行为变得不可观测。
+
+### 8.14.13 Source boundary · Effective Agent Harness / ACI
+
+Primary input:
+
+- 用户提供的视频总结：字节面试题“如何设计像 Pi 一样优秀的 Agent”，以 Anthropic Building Effective Agents 的 Simplicity / Transparency / ACI 三原则为骨架，并使用 Pi、Claude cookbook、12-factor-agents 等作为实现参考。
+
+Source-derived ideas retained:
+
+- Agent 设计优先保持简单；
+- 显式展示 planning / execution progress；
+- Agent 每一步从真实环境结果获得 feedback；
+- ACI / Tool Definition 需要像 HCI 一样精心设计；
+- Poka-yoke 应把重复模型错误转化为 interface constraint；
+- Anthropic SWE-bench 案例将易错 relative filepath 改为 required absolute filepath；
+- Pi 当前默认 coding tools 为 read / bash / edit / write；
+- Pi prompt 根据 enabled tools 组装相关 tool inventory / guideline；
+- Pi session 当前使用 JSONL + id / parentId tree；
+- Pi compaction 可以改变 active model context，而 raw session history 仍保留；
+- Pi edit 要求 oldText 唯一，多处 edits 对同一 original file 匹配；
+- claude-cookbooks 提供 Prompt Chaining、Orchestrator-Workers、Evaluator-Optimizer 等 Building Effective Agents reference implementations；
+- 12-factor-agents 强调 own prompts / own context window。
+
+Handbook corrections / synthesis:
+
+- Transparency 不解释为暴露 hidden Chain-of-Thought，而是暴露 plan、action、state transition、environment evidence 与必要的 concise reasoning summary；
+- “工具越少越好”改写成减少 semantic overlap 与 choice ambiguity，而不是机械最小化 tool count；
+- 不把 Pi 当前 edit 写成“必须绝对路径”：当前源码明确支持 relative or absolute；absolute-path requirement 是 Anthropic SWE-bench tool 的具体 ACI 案例；
+- Pi 被定位为 minimal-harness implementation example，不作为通用 Agent 标准；
+- Harness feature list 被改写成 failure-driven mechanism selection；
+- ACI 优化进入 task-set → trace → failure clustering → interface repair → regression loop；
+- 12-factor-agents 的 “own” 被解释为关键行为接口必须 inspectable / testable / versionable，而不是拒绝框架；
+- Harness 与 Model 的关系被定义为 capability 与 reliability conversion 的分工，而不是二选一。
+
+External verification date: 2026-09-28.
+
+Sources:
+
+- https://www.anthropic.com/engineering/building-effective-agents
+- https://github.com/anthropics/claude-cookbooks/tree/main/patterns/agents
+- https://github.com/earendil-works/pi
+- https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/system-prompt.ts
+- https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/tools/edit.ts
+- https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/session-format.md
+- https://github.com/humanlayer/12-factor-agents
+- https://openai.com/index/harness-engineering/
+
