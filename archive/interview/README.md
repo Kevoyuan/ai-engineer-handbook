@@ -19,3 +19,4 @@ The reusable engineering principle behind any useful interview question should b
 - [iFLYTEK AI Product Manager Interview Prep](./iflytek-ai-product-manager-prep.md) — public-source question map, AI/product answer frameworks, product research checklist, and mock-interview rubric. This is a preparation guide, not a transcript.
 - [LangChain / LangGraph Interview Card](./langchain-langgraph-interview.md) — 30-second and 60–90 second answers, minimal state-machine follow-up, and checkpoint/state pitfalls.
 - [Effective Agent Design Interview Card](./effective-agent-design.md) — Simplicity, Transparency, ACI, Harness, Pi implementation boundaries, and tool-interface follow-ups.
+- [Long-Running Multi-Agent Collaboration](./long-running-multi-agent-collaboration.md) — Durable state, validated handoff, concurrency control, checkpoint recovery, leases, and side-effect reconciliation.
