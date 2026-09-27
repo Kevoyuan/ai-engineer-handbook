@@ -1,0 +1,58 @@
+<section id="effective-agent-harness-aci" aria-labelledby="effective-agent-harness-aci-title">
+  <h2 class="sub" id="effective-agent-harness-aci-title"><span class="i18n-text" data-i18n-zh="Effective Agent Harness：Simplicity · Transparency · ACI" data-i18n-en="Effective Agent Harness: Simplicity · Transparency · ACI">Effective Agent Harness：Simplicity · Transparency · ACI</span> <small>§8.Z</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="优秀 Agent 不是“最强模型 + 最多工具 + 最复杂框架”。模型提供能力上限，Harness 决定 Context、Tool、State、Environment Feedback、Validation 与 Human Control 如何把能力转成稳定执行。" data-i18n-en="A strong agent is not the strongest model plus the most tools and the most complex framework. The model supplies capability; the harness determines how context, tools, state, environment feedback, validation, and human control convert that capability into reliable execution.">优秀 Agent 不是“最强模型 + 最多工具 + 最复杂框架”。模型提供能力上限，Harness 决定 Context、Tool、State、Environment Feedback、Validation 与 Human Control 如何把能力转成稳定执行。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-z1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.Z1 · EFFECTIVE AGENT PRINCIPLES</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Anthropic 的三原则可以直接落成 Harness 设计问题" data-i18n-en="Anthropic's three principles map directly to harness design questions">Anthropic 的三原则可以直接落成 Harness 设计问题</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">SIMPLICITY</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="只为真实 failure mode 增加复杂度" data-i18n-en="Add complexity only for real failure modes">只为真实 failure mode 增加复杂度</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="single call → tool loop → workflow → graph → multi-agent。升级必须能解释解决了哪个 state、recovery、permission、parallelism 或 observability 问题。" data-i18n-en="single call → tool loop → workflow → graph → multi-agent. Each upgrade should solve a concrete state, recovery, permission, parallelism, or observability problem.">single call → tool loop → workflow → graph → multi-agent。升级必须能解释解决了哪个 state、recovery、permission、parallelism 或 observability 问题。</span></div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">TRANSPARENCY</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="展示 Plan · Action · Evidence · State" data-i18n-en="Expose Plan · Action · Evidence · State">展示 Plan · Action · Evidence · State</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="透明不是暴露 hidden CoT，而是让 todo、工具调用、结果、diff、测试、retry、approval 与 completion evidence 可观察、可纠偏。" data-i18n-en="Transparency is not exposing hidden chain-of-thought. Make todos, tool calls, results, diffs, tests, retries, approvals, and completion evidence observable and steerable.">透明不是暴露 hidden CoT，而是让 todo、工具调用、结果、diff、测试、retry、approval 与 completion evidence 可观察、可纠偏。</span></div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">ACI</span></div><h2 class="bfs-card-title">Agent-Computer Interface</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Tool name、schema、参数语义、错误模型与返回证据本身就是 Prompt Engineering；重复错误优先通过 interface constraint 消除。" data-i18n-en="Tool names, schemas, parameter semantics, error models, and returned evidence are themselves prompt engineering. Repeated errors should first be attacked with interface constraints.">Tool name、schema、参数语义、错误模型与返回证据本身就是 Prompt Engineering；重复错误优先通过 interface constraint 消除。</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-z2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.Z2 · HARNESS CONTROL LOOP</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="模型输出不是完成证据，Environment Feedback 才能闭环" data-i18n-en="Model output is not completion evidence; environment feedback closes the loop">模型输出不是完成证据，Environment Feedback 才能闭环</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">1</span></div><h2 class="bfs-card-title">Plan / Decide</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="选择下一步，不把规划本身当真相。" data-i18n-en="Choose the next step without treating the plan itself as ground truth.">选择下一步，不把规划本身当真相。</span></div></div>
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">2</span></div><h2 class="bfs-card-title">Tool / Action</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="通过清晰 ACI 执行 bounded action；Host / Policy 保留真实权限。" data-i18n-en="Execute a bounded action through a clear ACI while the host and policy layer retain real authority.">通过清晰 ACI 执行 bounded action；Host / Policy 保留真实权限。</span></div></div>
+        <div class="bfs-card bfs-emerald" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">3</span></div><h2 class="bfs-card-title">Observe Ground Truth</h2><div class="bfs-card-desc">tool result · test · diff · browser observation · retrieval evidence · policy result</div></div>
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">4</span></div><h2 class="bfs-card-title">Update State / Verify</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="根据真实环境证据继续、修复、回退、升级或停止。" data-i18n-en="Use real environment evidence to continue, repair, roll back, escalate, or stop.">根据真实环境证据继续、修复、回退、升级或停止。</span></div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">5</span></div><h2 class="bfs-card-title">Trace → Eval → ACI Repair</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="把重复工具错误聚类，修 name/schema/default/error message/validation，再跑 regression。" data-i18n-en="Cluster repeated tool failures, repair names, schemas, defaults, error messages, or validation, then rerun regression evaluation.">把重复工具错误聚类，修 name/schema/default/error message/validation，再跑 regression。</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-z3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.Z3 · ACI / PI IMPLEMENTATION NOTES</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="实现案例要保留产品边界，不把具体设计误写成通用定律" data-i18n-en="Keep implementation boundaries explicit instead of turning product details into universal laws">实现案例要保留产品边界，不把具体设计误写成通用定律</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="table-wrap"><table>
+        <thead><tr><th><span class="i18n-text" data-i18n-zh="案例" data-i18n-en="Example">案例</span></th><th><span class="i18n-text" data-i18n-zh="当前可验证事实" data-i18n-en="Currently verified fact">当前可验证事实</span></th><th><span class="i18n-text" data-i18n-zh="可复用原则" data-i18n-en="Reusable principle">可复用原则</span></th></tr></thead>
+        <tbody>
+          <tr><td>Pi Tool Surface</td><td>default: read · bash · edit · write; prompt rules follow enabled tools</td><td><span class="i18n-text" data-i18n-zh="Prompt inventory 与 executable capability inventory 不应漂移" data-i18n-en="Prompt inventory and executable capability inventory should not drift">Prompt inventory 与 executable capability inventory 不应漂移</span></td></tr>
+          <tr><td>Pi edit</td><td>unique oldText · same-original multi-edit · diff/patch evidence</td><td><span class="i18n-text" data-i18n-zh="把 deterministic bookkeeping 移出模型 action space" data-i18n-en="Move deterministic bookkeeping out of the model's action space">把 deterministic bookkeeping 移出模型 action space</span></td></tr>
+          <tr><td>Pi path</td><td>relative OR absolute</td><td><span class="i18n-text" data-i18n-zh="不要把产品实现误写成绝对路径通则" data-i18n-en="Do not turn a product implementation into a universal absolute-path rule">不要把产品实现误写成绝对路径通则</span></td></tr>
+          <tr><td>Anthropic SWE-bench Tool</td><td>relative-path errors → required absolute path</td><td>Poka-yoke repeated failure at the interface</td></tr>
+          <tr><td>Pi Session</td><td>JSONL · id/parentId tree · compaction preserves raw history</td><td><span class="i18n-text" data-i18n-zh="Audit history ≠ active model context ≠ summary" data-i18n-en="Audit history ≠ active model context ≠ summary">Audit history ≠ active model context ≠ summary</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="工具最小化" data-i18n-en="Tool minimalism">工具最小化</span></span><p><strong>Minimize overlapping ways to express the same action.</strong> <span class="i18n-text" data-i18n-zh="目标是减少语义重叠和选择歧义，不是机械追求 tool count 最小。" data-i18n-en="The goal is to reduce semantic overlap and choice ambiguity, not mechanically minimize tool count.">目标是减少语义重叠和选择歧义，不是机械追求 tool count 最小。</span></p></div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="透明边界" data-i18n-en="Transparency boundary">透明边界</span></span><p><strong>Expose plans, actions, state transitions, evidence, and concise reasoning summaries when useful.</strong> <span class="i18n-text" data-i18n-zh="不要让系统依赖 hidden Chain-of-Thought 才能调试或审计。" data-i18n-en="Do not make debugging or auditing depend on hidden chain-of-thought.">不要让系统依赖 hidden Chain-of-Thought 才能调试或审计。</span></p></div>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="外部核验日期：2026-09-28。来源包括 Anthropic Building Effective Agents、Pi 当前源码与 Session 文档、Anthropic claude-cookbooks、12-factor-agents，以及 OpenAI Harness Engineering。产品事实作为 implementation evidence，核心规则保持 vendor-neutral。" data-i18n-en="External verification date: 2026-09-28. Sources include Anthropic's Building Effective Agents, current Pi source and session documentation, Anthropic claude-cookbooks, 12-factor-agents, and OpenAI Harness Engineering. Product facts are implementation evidence; the core rules remain vendor-neutral.">外部核验日期：2026-09-28。来源包括 Anthropic Building Effective Agents、Pi 当前源码与 Session 文档、Anthropic claude-cookbooks、12-factor-agents，以及 OpenAI Harness Engineering。产品事实作为 implementation evidence，核心规则保持 vendor-neutral。</span></p>
+</section>
