@@ -13,7 +13,7 @@ Memory 不是“把聊天记录永久保存”。可靠设计必须区分生命�
 conversation_id · user_id · tenant_id · locale · current_task · permissions
 ```
 
-作用域是单次请求/会话，属于 ephemeral context。
+这里保存的是单次请求/会话的上下文引用；user_id / tenant_id 对应的身份本身可以长期存在。权限必须来自可信授权系统并按需重新校验，不能由模型写入的 Memory 授予。
 
 ### 2. Working Memory
 
@@ -29,7 +29,7 @@ current plan · intermediate results · open questions · tool outputs
 language preference · role · approved tools · report format
 ```
 
-保存稳定、显式维护的偏好与配置。
+保存稳定、显式维护的偏好与配置。`approved tools` 若作为视图保存，只能引用授权系统的状态，不能作为独立授权依据。
 
 ### 4. Episodic Memory
 
@@ -49,7 +49,7 @@ language preference · role · approved tools · report format
 
 ## 7.2 Ledger + Views + Policy
 
-建议事件与事实 append-only，不原地改写历史；当前 Profile / Current State 作为 Materialized View 从事件日志派生。
+Append-only Event Log + Materialized View 是本手册建议的一种审计设计，不是所有 Memory 系统的必要实现。正常纠正通过新事件表达，当前 Profile / State 可从日志派生；敏感内容仍需支持保留期限、删除、脱敏和派生缓存失效，append-only 不意味着永久保存原始个人数据。
 
 每条长期 Memory 需要明确：
 
@@ -287,7 +287,7 @@ Long-term memory
 = Store
 ~~~
 
-Letta / MemGPT 系列则存在 persistent memory blocks、message/context state 与 archival memory；Mem0 又以 memory extraction、update / contradiction handling、semantic retrieval / graph memory 为主要机制。
+Letta V1 SDK / MemGPT lineage 存在 persistent memory blocks、message/context state 与 archival memory；Mem0 又以 memory extraction、update / contradiction handling、semantic retrieval / graph memory 为主要机制。
 
 因此 Handbook 不把“三层”当标准，而映射到已有六层结构：
 
@@ -628,7 +628,9 @@ correct with lineage
 
 #### Letta / MemGPT lineage
 
-Letta 当前文档中，memory blocks 是持久、可编辑、可以长期附着在 Agent Context 中的结构；archival memory 则可以通过搜索按需召回。
+Letta V1 SDK 文档中，memory blocks 是持久、可编辑、可以长期附着在 Agent Context 中的结构；archival memory 则可以通过搜索按需召回。
+
+当前 [Agent SDK memory](https://docs.letta.com/agent-sdk/memory) 则使用 agent-owned Git repository / MemFS：初始化记忆成为 `system/` 下的 Markdown 文件，其他文件按需读取，编辑经 commit / push 后持久化。迁移时应按 SDK 版本核对存储与提交语义。
 
 这说明长期记忆不必只有“Vector DB Top-K”，还可以区分：
 
@@ -722,14 +724,15 @@ Handbook corrections / synthesis:
 External verification:
 
 - LangGraph official memory docs: short-term memory is thread-level state/persistence; long-term memory stores user/application data across conversations.
-- Letta docs: persistent memory blocks can remain attached to agents, while archival memory supports searchable persistent passages.
+- Letta V1 SDK docs: persistent memory blocks can remain attached to agents, while archival memory supports searchable persistent passages.
 - Mem0 docs: persistent user memory includes extraction, update/contradiction handling, semantic search, and optional graph memory.
 - Liu et al., Lost in the Middle: long-context performance varies with the position of relevant information.
 
 Sources:
 
 - https://docs.langchain.com/oss/python/langgraph/add-memory
-- https://docs.letta.com/
+- https://docs.letta.com/agent-sdk/memory
+- https://docs.letta.com/v1-sdk/memory/memory-blocks
 - https://docs.mem0.ai/platform/quickstart
 - https://docs.mem0.ai/features/contextual-add
 - https://arxiv.org/abs/2307.03172
@@ -749,3 +752,10 @@ Sources:
 > **The same statement may require different memory lifetimes depending on task, project, user, or tenant scope.**
 
 > **Correction should supersede a memory with lineage; newer does not automatically mean more authoritative.**
+
+
+## Verification boundary · 2026-09-28
+
+六层记忆是本手册 taxonomy。身份/权限来源于可信安全上下文；Memory 不授予权限。Append-only 不等于永久保留敏感内容；纠正、删除、保留期限和派生视图失效都需单独设计。
+
+核对依据：[LangGraph memory](https://docs.langchain.com/oss/python/langgraph/add-memory)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。

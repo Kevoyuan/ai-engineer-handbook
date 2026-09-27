@@ -1,0 +1,2066 @@
+{
+  "date": "2026-09-28",
+  "purpose": "Coverage inventory, not a claim-level proof certificate",
+  "chapters": [
+    {
+      "file": "handbook/chapters/00-ai-engineer-system-framework.md",
+      "sha256": "f71a17bd45d3d99b1c9337285e306b3f4592dd058c7c9823922fa6cec8565f80",
+      "assessment": "综合：框架、编辑判断及内容映射；不作为经验定律",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "AI Engineer System Framework"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "全局知识框架与 2026-09 内容审计"
+        },
+        {
+          "line": 13,
+          "level": 2,
+          "title": "1. AI Engineering System Framework"
+        },
+        {
+          "line": 67,
+          "level": 2,
+          "title": "2. 当前 02–10 如何映射到框架"
+        },
+        {
+          "line": 81,
+          "level": 2,
+          "title": "3. Validation：哪些知识可以继续作为 canonical principle"
+        },
+        {
+          "line": 83,
+          "level": 3,
+          "title": "Retrieval / RAG"
+        },
+        {
+          "line": 95,
+          "level": 3,
+          "title": "Memory / State"
+        },
+        {
+          "line": 105,
+          "level": 3,
+          "title": "Skills / MCP / Tools"
+        },
+        {
+          "line": 115,
+          "level": 3,
+          "title": "Observability / Evaluation / Cost"
+        },
+        {
+          "line": 132,
+          "level": 2,
+          "title": "4. 需要收紧的表述"
+        },
+        {
+          "line": 134,
+          "level": 3,
+          "title": "4.1 Page-level citation 不是所有系统唯一的 hard requirement"
+        },
+        {
+          "line": 144,
+          "level": 3,
+          "title": "4.2 Framework-specific behavior 必须带 version boundary"
+        },
+        {
+          "line": 148,
+          "level": 3,
+          "title": "4.3 “AI Engineer” 当前 edition 的 scope 需要更诚实"
+        },
+        {
+          "line": 152,
+          "level": 2,
+          "title": "5. 当前真正缺的核心知识"
+        },
+        {
+          "line": 154,
+          "level": 3,
+          "title": "Gap A · Model Selection & Adaptation"
+        },
+        {
+          "line": 168,
+          "level": 3,
+          "title": "Gap B · Inference Serving"
+        },
+        {
+          "line": 184,
+          "level": 3,
+          "title": "Gap C · Deployment / Model & Artifact Lifecycle"
+        },
+        {
+          "line": 200,
+          "level": 3,
+          "title": "Gap D · Security Operations"
+        },
+        {
+          "line": 214,
+          "level": 2,
+          "title": "6. 建议的 01–10 durable spine"
+        },
+        {
+          "line": 232,
+          "level": 2,
+          "title": "Verification sources"
+        },
+        {
+          "line": 259,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/02-enterprise-retrieval.md",
+      "sha256": "cefc6accfac9a50ba011bdf7ebb324647b62677ddbd7ce76b6ca79cf8369fddf",
+      "assessment": "事实 + 综合：检索机制有依据；选型依数据，权限不可放宽",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 02 · 企业检索基础"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Enterprise Retrieval Foundations"
+        },
+        {
+          "line": 8,
+          "level": 2,
+          "title": "2.1 Exact Retrieval：确定性匹配"
+        },
+        {
+          "line": 16,
+          "level": 2,
+          "title": "2.2 BM25：词法相关性"
+        },
+        {
+          "line": 24,
+          "level": 2,
+          "title": "2.3 Dense Retrieval：语义相似性"
+        },
+        {
+          "line": 37,
+          "level": 2,
+          "title": "2.4 Graph Retrieval：关系与多跳"
+        },
+        {
+          "line": 43,
+          "level": 2,
+          "title": "2.5 Metadata Filtering：先缩小合法候选空间"
+        },
+        {
+          "line": 74,
+          "level": 2,
+          "title": "2.6 Selection mental model"
+        },
+        {
+          "line": 87,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/03-hybrid-retrieval-query-routing.md",
+      "sha256": "981ee909595d54b322221c4f987f9d759269f6a2ee2f076114f71589ff879632",
+      "assessment": "事实 + 综合：融合公式与路由策略；成本/召回收益需实测",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 03 · 混合检索与 Query Routing"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Hybrid Retrieval and Query Routing"
+        },
+        {
+          "line": 8,
+          "level": 2,
+          "title": "3.1 Hybrid Retrieval Pipeline"
+        },
+        {
+          "line": 32,
+          "level": 3,
+          "title": "RRF"
+        },
+        {
+          "line": 44,
+          "level": 2,
+          "title": "3.2 Query Routing：先判断证据形状"
+        },
+        {
+          "line": 82,
+          "level": 2,
+          "title": "3.3 Router 演进：不要一开始就用最复杂模型"
+        },
+        {
+          "line": 100,
+          "level": 2,
+          "title": "3.4 多路并行不是默认答案"
+        },
+        {
+          "line": 106,
+          "level": 2,
+          "title": "3.5 路由失败与恢复"
+        },
+        {
+          "line": 140,
+          "level": 2,
+          "title": "3.6 Retrieval Budget ≠ Context Budget"
+        },
+        {
+          "line": 155,
+          "level": 2,
+          "title": "3.7 Conversational Retrieval Control：先恢复可检索语义"
+        },
+        {
+          "line": 194,
+          "level": 3,
+          "title": "Five common failure modes"
+        },
+        {
+          "line": 206,
+          "level": 2,
+          "title": "3.8 Structured conversational state"
+        },
+        {
+          "line": 243,
+          "level": 3,
+          "title": "Referential resolution"
+        },
+        {
+          "line": 280,
+          "level": 2,
+          "title": "3.9 Topic switch / correction handling"
+        },
+        {
+          "line": 303,
+          "level": 2,
+          "title": "3.10 Context pruning and evidence-side validation"
+        },
+        {
+          "line": 332,
+          "level": 2,
+          "title": "3.11 Full conversational RAG loop"
+        },
+        {
+          "line": 352,
+          "level": 2,
+          "title": "3.12 Multi-turn evaluation"
+        },
+        {
+          "line": 382,
+          "level": 2,
+          "title": "3.13 Latency trade-off"
+        },
+        {
+          "line": 402,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 415,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/04-rag-reliability-selective-answering.md",
+      "sha256": "74a5a9aca117e56bc8c4a082da445d4234c5d4b6c91cd6827cec7308125726f3",
+      "assessment": "定义 + 综合：风险/覆盖率与证据检查；阈值需校准，非正确性证明",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 04 · RAG 可靠性与选择性回答"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "RAG Reliability and Selective Answering"
+        },
+        {
+          "line": 12,
+          "level": 2,
+          "title": "4.1 Six Gates"
+        },
+        {
+          "line": 14,
+          "level": 3,
+          "title": "Gate 0 · Query Analysis"
+        },
+        {
+          "line": 18,
+          "level": 3,
+          "title": "Gate 1 · Knowledge Coverage"
+        },
+        {
+          "line": 22,
+          "level": 3,
+          "title": "Gate 2 · Retrieval Quality"
+        },
+        {
+          "line": 28,
+          "level": 3,
+          "title": "Gate 3 · Evidence Sufficiency"
+        },
+        {
+          "line": 44,
+          "level": 3,
+          "title": "Gate 4 · Claim Verification"
+        },
+        {
+          "line": 55,
+          "level": 3,
+          "title": "Gate 5 · Decision Policy"
+        },
+        {
+          "line": 67,
+          "level": 2,
+          "title": "4.2 Threshold 需要校准"
+        },
+        {
+          "line": 106,
+          "level": 2,
+          "title": "4.3 High-quality abstention"
+        },
+        {
+          "line": 119,
+          "level": 2,
+          "title": "4.4 Evidence conflict"
+        },
+        {
+          "line": 132,
+          "level": 2,
+          "title": "4.5 Claim–evidence contract"
+        },
+        {
+          "line": 144,
+          "level": 2,
+          "title": "4.6 Layered failure diagnosis"
+        },
+        {
+          "line": 162,
+          "level": 2,
+          "title": "4.7 Release criteria"
+        },
+        {
+          "line": 175,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 188,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/05-document-pdf-rag.md",
+      "sha256": "1d5c797c773eac0c702926cb649965da8029dd809ebdfce76cbd26a8554d610e",
+      "assessment": "事实 + 综合：解析和溯源能力依工具；原案例归因部分未验证",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 05 · 生产级 PDF / Document RAG"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Production-grade Document / PDF RAG"
+        },
+        {
+          "line": 24,
+          "level": 2,
+          "title": "5.1 Parsing：按页面类型选择方法"
+        },
+        {
+          "line": 26,
+          "level": 3,
+          "title": "Native-text PDF"
+        },
+        {
+          "line": 30,
+          "level": 3,
+          "title": "Scanned PDF"
+        },
+        {
+          "line": 34,
+          "level": 3,
+          "title": "Mixed text-image PDF"
+        },
+        {
+          "line": 40,
+          "level": 2,
+          "title": "5.2 Structure Reconstruction：恢复文档语义"
+        },
+        {
+          "line": 79,
+          "level": 2,
+          "title": "5.3 Semantic Chunking + Hybrid Index"
+        },
+        {
+          "line": 100,
+          "level": 2,
+          "title": "5.4 Controlled Document Tools"
+        },
+        {
+          "line": 120,
+          "level": 2,
+          "title": "5.5 Grounding Contract"
+        },
+        {
+          "line": 141,
+          "level": 2,
+          "title": "5.6 Layered Evaluation"
+        },
+        {
+          "line": 162,
+          "level": 2,
+          "title": "5.7 Permissions, Versions, Lifecycle"
+        },
+        {
+          "line": 179,
+          "level": 2,
+          "title": "5.8 Grounded Document Agent"
+        },
+        {
+          "line": 205,
+          "level": 3,
+          "title": "EvidenceChunk"
+        },
+        {
+          "line": 234,
+          "level": 3,
+          "title": "Agentic boundary"
+        },
+        {
+          "line": 242,
+          "level": 2,
+          "title": "Source notes"
+        },
+        {
+          "line": 249,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/06-skills-routing.md",
+      "sha256": "f83d16b41a490be64f46e1358bb70bec17227dc2b38a7fc318ad3bdd43e379c5",
+      "assessment": "事实 + 综合：协议/模型按版本；registry 与路由是设计建议",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 06 · Skills、MCP、Tools 与 Capability Routing"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Skills, MCP, Tools, and Capability Routing"
+        },
+        {
+          "line": 8,
+          "level": 2,
+          "title": "6.1 Skill Contract"
+        },
+        {
+          "line": 38,
+          "level": 2,
+          "title": "6.2 Soft Hierarchical Routing"
+        },
+        {
+          "line": 78,
+          "level": 2,
+          "title": "6.3 Skill Match ≠ Authorization"
+        },
+        {
+          "line": 98,
+          "level": 2,
+          "title": "6.4 Skill Registry & Governance"
+        },
+        {
+          "line": 117,
+          "level": 2,
+          "title": "6.5 MCP vs Skill"
+        },
+        {
+          "line": 152,
+          "level": 3,
+          "title": "6.5.1 MCP 的三个典型使用场景"
+        },
+        {
+          "line": 154,
+          "level": 4,
+          "title": "A. 接入外部系统或数据源"
+        },
+        {
+          "line": 179,
+          "level": 4,
+          "title": "B. 对外暴露可复用能力服务"
+        },
+        {
+          "line": 203,
+          "level": 4,
+          "title": "C. 标准化同类能力的接入面"
+        },
+        {
+          "line": 234,
+          "level": 3,
+          "title": "6.5.2 Skill 的三个典型使用场景"
+        },
+        {
+          "line": 236,
+          "level": 4,
+          "title": "A. 固化团队内部流程与规范"
+        },
+        {
+          "line": 260,
+          "level": 4,
+          "title": "B. 注入领域知识与专家方法"
+        },
+        {
+          "line": 289,
+          "level": 4,
+          "title": "C. Progressive Disclosure / Context Economy"
+        },
+        {
+          "line": 323,
+          "level": 3,
+          "title": "6.5.3 “MCP 会把全部 Tools 塞进 Prompt”不是协议定义"
+        },
+        {
+          "line": 387,
+          "level": 3,
+          "title": "6.5.4 MCP 与 Skill 可以组合"
+        },
+        {
+          "line": 433,
+          "level": 3,
+          "title": "6.5.5 快速选型"
+        },
+        {
+          "line": 463,
+          "level": 3,
+          "title": "6.5.6 Source boundary"
+        },
+        {
+          "line": 494,
+          "level": 2,
+          "title": "6.6 Function Calling：模型提议，Host 执行"
+        },
+        {
+          "line": 512,
+          "level": 2,
+          "title": "6.7 Capability architecture"
+        },
+        {
+          "line": 546,
+          "level": 2,
+          "title": "6.8 Failure taxonomy"
+        },
+        {
+          "line": 565,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 579,
+          "level": 2,
+          "title": "6.9 Intent Routing：把意图识别设计成 Cost-aware Routing Cascade"
+        },
+        {
+          "line": 666,
+          "level": 3,
+          "title": "6.9.1 Layer 1 · Deterministic fast path"
+        },
+        {
+          "line": 705,
+          "level": 3,
+          "title": "6.9.2 Layer 2 · Context-aware routing"
+        },
+        {
+          "line": 749,
+          "level": 3,
+          "title": "6.9.3 Confidence Gate：不要强制分类"
+        },
+        {
+          "line": 778,
+          "level": 3,
+          "title": "6.9.4 Layer 3 · Structured LLM planner / tool route"
+        },
+        {
+          "line": 837,
+          "level": 3,
+          "title": "6.9.5 Intent Routing ≠ Capability Routing ≠ Authorization"
+        },
+        {
+          "line": 867,
+          "level": 3,
+          "title": "6.9.6 Cascading 不是“规则 → 小模型 → 大模型”的固定顺序"
+        },
+        {
+          "line": 900,
+          "level": 3,
+          "title": "6.9.7 Evaluation：别只测 Top-1 Intent Accuracy"
+        },
+        {
+          "line": 928,
+          "level": 3,
+          "title": "6.9.8 Failure taxonomy"
+        },
+        {
+          "line": 961,
+          "level": 3,
+          "title": "6.9.9 Source boundary"
+        },
+        {
+          "line": 989,
+          "level": 2,
+          "title": "6.10 System-One Decision Models：Jev 作为 Typed Probabilistic Fast Path"
+        },
+        {
+          "line": 1029,
+          "level": 3,
+          "title": "6.10.1 System-One + System-Two：不是替代，而是分工"
+        },
+        {
+          "line": 1057,
+          "level": 3,
+          "title": "6.10.2 Type-safe ≠ Semantically correct"
+        },
+        {
+          "line": 1084,
+          "level": 3,
+          "title": "6.10.3 Jev vs traditional LLM：比较的是任务形状"
+        },
+        {
+          "line": 1101,
+          "level": 3,
+          "title": "6.10.4 Benchmark / vendor boundary"
+        },
+        {
+          "line": 1120,
+          "level": 3,
+          "title": "6.10.5 Source boundary"
+        },
+        {
+          "line": 1143,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/07-memory-context-engineering.md",
+      "sha256": "a542ab6dd0e573436637a3c2dbf749beef716e6d23e7425d67fb837ef2e07d9e",
+      "assessment": "事实 + 综合：区分持久化机制和记忆治理；Letta 按 SDK 版本",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 07 · Memory、State 与 Context Engineering"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Memory, State, and Context Engineering"
+        },
+        {
+          "line": 8,
+          "level": 2,
+          "title": "7.1 六层 Memory Structure"
+        },
+        {
+          "line": 10,
+          "level": 3,
+          "title": "1. Session Metadata"
+        },
+        {
+          "line": 18,
+          "level": 3,
+          "title": "2. Working Memory"
+        },
+        {
+          "line": 26,
+          "level": 3,
+          "title": "3. Structured Profile"
+        },
+        {
+          "line": 34,
+          "level": 3,
+          "title": "4. Episodic Memory"
+        },
+        {
+          "line": 38,
+          "level": 3,
+          "title": "5. Semantic Memory"
+        },
+        {
+          "line": 42,
+          "level": 3,
+          "title": "6. Procedural Memory"
+        },
+        {
+          "line": 50,
+          "level": 2,
+          "title": "7.2 Ledger + Views + Policy"
+        },
+        {
+          "line": 68,
+          "level": 3,
+          "title": "Write Pipeline"
+        },
+        {
+          "line": 80,
+          "level": 3,
+          "title": "Read Pipeline"
+        },
+        {
+          "line": 93,
+          "level": 2,
+          "title": "7.3 Short-term → Long-term Promotion"
+        },
+        {
+          "line": 107,
+          "level": 2,
+          "title": "7.4 Context Compression"
+        },
+        {
+          "line": 126,
+          "level": 2,
+          "title": "7.5 State ≠ Transcript"
+        },
+        {
+          "line": 155,
+          "level": 2,
+          "title": "7.6 Thread persistence vs cross-thread memory"
+        },
+        {
+          "line": 171,
+          "level": 2,
+          "title": "7.7 Read budget and write budget"
+        },
+        {
+          "line": 195,
+          "level": 2,
+          "title": "7.8 Provenance and correction"
+        },
+        {
+          "line": 210,
+          "level": 2,
+          "title": "7.9 Failure taxonomy"
+        },
+        {
+          "line": 227,
+          "level": 2,
+          "title": "7.10 Cross-session Memory：跨会话记住的不是“原句”，而是受治理的约束"
+        },
+        {
+          "line": 245,
+          "level": 3,
+          "title": "7.10.1 Transcript-only memory 为什么不可靠"
+        },
+        {
+          "line": 266,
+          "level": 3,
+          "title": "7.10.2 “三层记忆”是教学模型，不是统一框架标准"
+        },
+        {
+          "line": 302,
+          "level": 3,
+          "title": "7.10.3 “预算 ≤ 5000”先判断 Scope"
+        },
+        {
+          "line": 306,
+          "level": 4,
+          "title": "Case A · 当前任务约束"
+        },
+        {
+          "line": 322,
+          "level": 4,
+          "title": "Case B · 当前项目的长期约束"
+        },
+        {
+          "line": 338,
+          "level": 4,
+          "title": "Case C · 用户稳定偏好"
+        },
+        {
+          "line": 356,
+          "level": 3,
+          "title": "7.10.4 Memory Write：不要直接把模型总结写进长期记忆"
+        },
+        {
+          "line": 426,
+          "level": 3,
+          "title": "7.10.5 Rolling Summary 是 Context View，不等于长期 Memory"
+        },
+        {
+          "line": 465,
+          "level": 3,
+          "title": "7.10.6 Memory Read：按当前 Decision 检索，不是“搜相似句子”"
+        },
+        {
+          "line": 512,
+          "level": 3,
+          "title": "7.10.7 Conflict Resolution：时间戳不够"
+        },
+        {
+          "line": 575,
+          "level": 3,
+          "title": "7.10.8 Cross-session Architecture"
+        },
+        {
+          "line": 617,
+          "level": 3,
+          "title": "7.10.9 Letta / Mem0 / LangGraph 分别说明什么"
+        },
+        {
+          "line": 621,
+          "level": 4,
+          "title": "LangGraph"
+        },
+        {
+          "line": 629,
+          "level": 4,
+          "title": "Letta / MemGPT lineage"
+        },
+        {
+          "line": 643,
+          "level": 4,
+          "title": "Mem0"
+        },
+        {
+          "line": 651,
+          "level": 3,
+          "title": "7.10.10 Eval：怎么证明第 30 轮真的“记住了”"
+        },
+        {
+          "line": 689,
+          "level": 3,
+          "title": "7.10.11 面试回答模板"
+        },
+        {
+          "line": 699,
+          "level": 3,
+          "title": "7.10.12 Source boundary"
+        },
+        {
+          "line": 740,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 757,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/08-agent-orchestration.md",
+      "sha256": "8a0178a66e4247930d32f50bd772e10e9c4820804654c341c6b5098d4b408aac",
+      "assessment": "事实 + 综合：框架与源码语义；流程、矩阵和面试模板非唯一标准",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 08 · Agent、Workflow 与 Orchestration"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Agent, Workflow, and Orchestration"
+        },
+        {
+          "line": 8,
+          "level": 2,
+          "title": "8.1 Artifact-driven Workflow"
+        },
+        {
+          "line": 47,
+          "level": 2,
+          "title": "8.2 D-I-R：Root Cause + Minimum-scope Repair"
+        },
+        {
+          "line": 60,
+          "level": 2,
+          "title": "8.3 Async State, Idempotency, Parallelism"
+        },
+        {
+          "line": 82,
+          "level": 2,
+          "title": "8.4 Workflow State Machine"
+        },
+        {
+          "line": 102,
+          "level": 2,
+          "title": "8.5 Multi-Agent：按 Operational Boundary 拆"
+        },
+        {
+          "line": 132,
+          "level": 2,
+          "title": "8.6 Loop vs Graph：局部自治 vs 显式拓扑"
+        },
+        {
+          "line": 136,
+          "level": 3,
+          "title": "Loop"
+        },
+        {
+          "line": 149,
+          "level": 3,
+          "title": "Graph"
+        },
+        {
+          "line": 181,
+          "level": 2,
+          "title": "8.7 Coding Agent Engineering"
+        },
+        {
+          "line": 192,
+          "level": 3,
+          "title": "Planning"
+        },
+        {
+          "line": 196,
+          "level": 3,
+          "title": "Execution"
+        },
+        {
+          "line": 200,
+          "level": 3,
+          "title": "Deployment & Monitoring"
+        },
+        {
+          "line": 250,
+          "level": 2,
+          "title": "8.8 LangChain vs LangGraph：抽象层，而不是二选一框架"
+        },
+        {
+          "line": 281,
+          "level": 3,
+          "title": "从单次模型调用到有状态应用"
+        },
+        {
+          "line": 324,
+          "level": 3,
+          "title": "LangChain：组件抽象 + 高层 Agent API"
+        },
+        {
+          "line": 348,
+          "level": 3,
+          "title": "LangGraph：显式 Stateful Orchestration"
+        },
+        {
+          "line": 389,
+          "level": 3,
+          "title": "Compile / execution model"
+        },
+        {
+          "line": 419,
+          "level": 3,
+          "title": "Checkpoint semantics"
+        },
+        {
+          "line": 438,
+          "level": 3,
+          "title": "Selection matrix"
+        },
+        {
+          "line": 458,
+          "level": 2,
+          "title": "8.9 不用框架，最小 Agent State Machine 怎么设计"
+        },
+        {
+          "line": 506,
+          "level": 2,
+          "title": "8.10 Chapter 08 ↔ Chapter 09"
+        },
+        {
+          "line": 521,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 533,
+          "level": 2,
+          "title": "8.11 Agent Project Engineering Lifecycle：从 Demo 到可维护系统"
+        },
+        {
+          "line": 565,
+          "level": 3,
+          "title": "8.11.1 Step 1 · 先定义 Task Contract，再选框架"
+        },
+        {
+          "line": 613,
+          "level": 3,
+          "title": "8.11.2 Step 2 · Repository Contract：先规定怎么改，再让 Agent 改"
+        },
+        {
+          "line": 661,
+          "level": 3,
+          "title": "8.11.3 Step 3 · Architecture：按职责和失败边界拆，不按“目录看起来专业”拆"
+        },
+        {
+          "line": 704,
+          "level": 3,
+          "title": "8.11.4 Workflow 管确定性控制，Agent 管不确定判断"
+        },
+        {
+          "line": 752,
+          "level": 3,
+          "title": "8.11.5 Step 4 · Agent Contract：角色只是最小部分"
+        },
+        {
+          "line": 810,
+          "level": 3,
+          "title": "8.11.6 Step 5 · Tool：一个可独立验证的外部能力"
+        },
+        {
+          "line": 865,
+          "level": 3,
+          "title": "8.11.7 Step 6 · Skill：把验证过的任务方法固化下来"
+        },
+        {
+          "line": 901,
+          "level": 3,
+          "title": "8.11.8 Step 7 · Context 与 Memory：按信息生命周期分，不按存储技术分"
+        },
+        {
+          "line": 955,
+          "level": 3,
+          "title": "8.11.9 Step 8 · Prompt：把它当版本化配置和行为逻辑"
+        },
+        {
+          "line": 997,
+          "level": 3,
+          "title": "8.11.10 Step 9 · Test 与 Eval：分别回答“程序对不对”和“任务做得好不好”"
+        },
+        {
+          "line": 1069,
+          "level": 3,
+          "title": "8.11.11 Step 10 · Deploy / Trace / Monitor：上线后才开始获得真实证据"
+        },
+        {
+          "line": 1118,
+          "level": 3,
+          "title": "8.11.12 十步不是瀑布模型，而是一组工程交付物"
+        },
+        {
+          "line": 1169,
+          "level": 3,
+          "title": "8.11.13 推荐交付物"
+        },
+        {
+          "line": 1186,
+          "level": 3,
+          "title": "8.11.14 一张总图"
+        },
+        {
+          "line": 1233,
+          "level": 3,
+          "title": "8.11.15 Source boundary"
+        },
+        {
+          "line": 1270,
+          "level": 2,
+          "title": "8.12 Agent Architecture Selection：把“7 种架构”改写成可组合 Pattern Matrix"
+        },
+        {
+          "line": 1329,
+          "level": 3,
+          "title": "8.12.1 选型先看控制问题，而不是架构名字"
+        },
+        {
+          "line": 1358,
+          "level": 3,
+          "title": "8.12.2 Pattern 1 · Single Agent / Tool-using Agent"
+        },
+        {
+          "line": 1394,
+          "level": 3,
+          "title": "8.12.3 Pattern 2 · ReAct-style iterative loop"
+        },
+        {
+          "line": 1442,
+          "level": 3,
+          "title": "8.12.4 Pattern 3 · Plan & Execute"
+        },
+        {
+          "line": 1483,
+          "level": 3,
+          "title": "8.12.5 Pattern 4 · Multi-Agent"
+        },
+        {
+          "line": 1526,
+          "level": 3,
+          "title": "8.12.6 Pattern 5 · Router + Skill"
+        },
+        {
+          "line": 1567,
+          "level": 3,
+          "title": "8.12.7 Pattern 6 · Shared State / Blackboard-like Coordination"
+        },
+        {
+          "line": 1610,
+          "level": 3,
+          "title": "8.12.8 Pattern 7 · Explicit Graph / Workflow Orchestration"
+        },
+        {
+          "line": 1651,
+          "level": 3,
+          "title": "8.12.9 Framework 名称不要和 Pattern 混为一谈"
+        },
+        {
+          "line": 1655,
+          "level": 4,
+          "title": "LangGraph"
+        },
+        {
+          "line": 1669,
+          "level": 4,
+          "title": "Temporal"
+        },
+        {
+          "line": 1684,
+          "level": 4,
+          "title": "Prefect"
+        },
+        {
+          "line": 1692,
+          "level": 4,
+          "title": "n8n"
+        },
+        {
+          "line": 1702,
+          "level": 3,
+          "title": "8.12.10 Pattern 不是互斥的：生产系统往往组合"
+        },
+        {
+          "line": 1733,
+          "level": 3,
+          "title": "8.12.11 Selection Matrix"
+        },
+        {
+          "line": 1746,
+          "level": 3,
+          "title": "8.12.12 Architecture Selection Scorecard"
+        },
+        {
+          "line": 1765,
+          "level": 3,
+          "title": "8.12.13 推荐演进路线"
+        },
+        {
+          "line": 1803,
+          "level": 3,
+          "title": "8.12.14 Failure-driven architecture selection"
+        },
+        {
+          "line": 1835,
+          "level": 3,
+          "title": "8.12.15 Source boundary"
+        },
+        {
+          "line": 1880,
+          "level": 2,
+          "title": "8.13 Multi-Agent Conflict Control：不要用“投票”代替 Harness"
+        },
+        {
+          "line": 1920,
+          "level": 3,
+          "title": "8.13.1 为什么“少数服从多数”通常不是默认答案"
+        },
+        {
+          "line": 1974,
+          "level": 3,
+          "title": "8.13.2 “裁判 Agent”不是错，Opinion-only Judge 才危险"
+        },
+        {
+          "line": 2020,
+          "level": 3,
+          "title": "8.13.3 Conflict A · Authority Conflict：主从分歧"
+        },
+        {
+          "line": 2074,
+          "level": 3,
+          "title": "8.13.4 Context Isolation：Sub-Agent 应该带独立上下文边界"
+        },
+        {
+          "line": 2122,
+          "level": 3,
+          "title": "8.13.5 Conflict B · Quality Conflict：Worker vs Reviewer 死循环"
+        },
+        {
+          "line": 2198,
+          "level": 3,
+          "title": "8.13.6 Bounded Repair Loop：任何 Review 都必须有停止条件"
+        },
+        {
+          "line": 2240,
+          "level": 3,
+          "title": "8.13.7 Dependency Gate：先阻止不该开始的工作"
+        },
+        {
+          "line": 2279,
+          "level": 3,
+          "title": "8.13.8 Conflict C · Resource Conflict：多个 Worker 同时写共享资源"
+        },
+        {
+          "line": 2299,
+          "level": 4,
+          "title": "Layer 1 · Read parallel, write deliberately"
+        },
+        {
+          "line": 2323,
+          "level": 4,
+          "title": "Layer 2 · Explicit Ownership"
+        },
+        {
+          "line": 2350,
+          "level": 4,
+          "title": "Layer 3 · Workspace Isolation"
+        },
+        {
+          "line": 2380,
+          "level": 4,
+          "title": "Layer 4 · Compare-and-Set / stale-write rejection"
+        },
+        {
+          "line": 2420,
+          "level": 3,
+          "title": "8.13.9 DeepSeek Harness：哪些视频细节有一手依据"
+        },
+        {
+          "line": 2456,
+          "level": 3,
+          "title": "8.13.10 Cordis Reversible Effects：解决的是生命周期污染，不是观点冲突"
+        },
+        {
+          "line": 2489,
+          "level": 3,
+          "title": "8.13.11 Conflict Control Matrix"
+        },
+        {
+          "line": 2502,
+          "level": 3,
+          "title": "8.13.12 Observability：每次冲突都要能解释为什么这样解决"
+        },
+        {
+          "line": 2548,
+          "level": 3,
+          "title": "8.13.13 Eval：测试的不只是最终答案"
+        },
+        {
+          "line": 2584,
+          "level": 3,
+          "title": "8.13.14 面试回答模板"
+        },
+        {
+          "line": 2594,
+          "level": 3,
+          "title": "8.13.15 Source boundary"
+        },
+        {
+          "line": 2641,
+          "level": 2,
+          "title": "8.14 Effective Agent Harness：Simplicity、Transparency 与 ACI"
+        },
+        {
+          "line": 2685,
+          "level": 3,
+          "title": "8.14.1 Simplicity：只为已经观察到的控制问题增加复杂度"
+        },
+        {
+          "line": 2744,
+          "level": 3,
+          "title": "8.14.2 Tool Minimalism：减少语义重叠，不是机械减少 Tool 数量"
+        },
+        {
+          "line": 2792,
+          "level": 3,
+          "title": "8.14.3 Pi：Minimal Harness 的一个当前实现例"
+        },
+        {
+          "line": 2837,
+          "level": 3,
+          "title": "8.14.4 Transparency：展示可观察执行证据，不等于暴露 Hidden Chain-of-Thought"
+        },
+        {
+          "line": 2876,
+          "level": 3,
+          "title": "8.14.5 Environment Feedback：Agent 不能只靠自己的文本判断成功"
+        },
+        {
+          "line": 2922,
+          "level": 3,
+          "title": "8.14.6 ACI：把 Tool Interface 当作给模型使用的 HCI"
+        },
+        {
+          "line": 2962,
+          "level": 3,
+          "title": "8.14.7 Poka-yoke：把常见错误从 Prompt 提醒升级成 Interface Constraint"
+        },
+        {
+          "line": 3013,
+          "level": 3,
+          "title": "8.14.8 Pi edit：从实现里看 ACI 防呆"
+        },
+        {
+          "line": 3049,
+          "level": 3,
+          "title": "8.14.9 Session Transparency：原始历史、Active Context 与 Summary 不要混成一件事"
+        },
+        {
+          "line": 3097,
+          "level": 3,
+          "title": "8.14.10 Harness ≠ Feature Checklist"
+        },
+        {
+          "line": 3132,
+          "level": 3,
+          "title": "8.14.11 ACI Eval Loop：用真实 Tool Failure 改接口"
+        },
+        {
+          "line": 3191,
+          "level": 3,
+          "title": "8.14.12 12-Factor Agents：Own Prompt / Context 的正确边界"
+        },
+        {
+          "line": 3221,
+          "level": 3,
+          "title": "8.14.13 Source boundary · Effective Agent Harness / ACI"
+        },
+        {
+          "line": 3269,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/09-reliability-evaluation-observability.md",
+      "sha256": "7879fcdccdf179e851da3d4bb49d33494a57a8fbf489a37a3065f388c8653656",
+      "assessment": "定义 + 事实 + 综合：统计口径已修正；课程数字非通用阈值",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 09 · Reliability、Evaluation、Observability 与 Production Monitoring"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Reliability, Evaluation, Observability, and Production Monitoring"
+        },
+        {
+          "line": 18,
+          "level": 2,
+          "title": "9.1 Structured Outputs + Validation Gates"
+        },
+        {
+          "line": 58,
+          "level": 2,
+          "title": "9.2 Evaluation 是生命周期基础设施"
+        },
+        {
+          "line": 107,
+          "level": 2,
+          "title": "9.3 Dataset Manager"
+        },
+        {
+          "line": 155,
+          "level": 2,
+          "title": "9.4 Observability：Run、Trace、Thread"
+        },
+        {
+          "line": 159,
+          "level": 3,
+          "title": "Run"
+        },
+        {
+          "line": 163,
+          "level": 3,
+          "title": "Root Run / Child Run / Trace"
+        },
+        {
+          "line": 195,
+          "level": 3,
+          "title": "Thread"
+        },
+        {
+          "line": 217,
+          "level": 2,
+          "title": "9.5 Tags、Metadata、Feedback"
+        },
+        {
+          "line": 242,
+          "level": 2,
+          "title": "9.6 Evaluator Routing：Code / LLM / Pairwise / Human"
+        },
+        {
+          "line": 250,
+          "level": 3,
+          "title": "Code-based"
+        },
+        {
+          "line": 256,
+          "level": 3,
+          "title": "LLM-as-Judge"
+        },
+        {
+          "line": 279,
+          "level": 3,
+          "title": "Pairwise"
+        },
+        {
+          "line": 283,
+          "level": 3,
+          "title": "Human Review"
+        },
+        {
+          "line": 289,
+          "level": 2,
+          "title": "9.7 Metrics：不要压成一个平均数"
+        },
+        {
+          "line": 312,
+          "level": 2,
+          "title": "9.8 Offline + Online Evaluation"
+        },
+        {
+          "line": 340,
+          "level": 2,
+          "title": "9.9 Release Gate"
+        },
+        {
+          "line": 358,
+          "level": 2,
+          "title": "9.10 Error Analysis + Data Flywheel"
+        },
+        {
+          "line": 398,
+          "level": 2,
+          "title": "9.11 Layered RAG Evaluation"
+        },
+        {
+          "line": 407,
+          "level": 2,
+          "title": "9.12 Latency Diagnosis：先 Trace，再归因"
+        },
+        {
+          "line": 448,
+          "level": 2,
+          "title": "9.13 Production Agent Harness"
+        },
+        {
+          "line": 473,
+          "level": 2,
+          "title": "9.14 Cost per Successful Task"
+        },
+        {
+          "line": 501,
+          "level": 3,
+          "title": "Cost attribution first"
+        },
+        {
+          "line": 527,
+          "level": 2,
+          "title": "9.15 Production Monitoring：把真实流量变成 Build / Test 输入"
+        },
+        {
+          "line": 539,
+          "level": 3,
+          "title": "Batch Trace Mining"
+        },
+        {
+          "line": 554,
+          "level": 3,
+          "title": "Online Evaluation"
+        },
+        {
+          "line": 566,
+          "level": 3,
+          "title": "Automation = Filter + Sampling + Action"
+        },
+        {
+          "line": 583,
+          "level": 2,
+          "title": "9.16 User Sentiment：显式 + 推断两条证据通道"
+        },
+        {
+          "line": 602,
+          "level": 3,
+          "title": "LangSmith implementation example"
+        },
+        {
+          "line": 642,
+          "level": 3,
+          "title": "Thread-based Eval"
+        },
+        {
+          "line": 648,
+          "level": 2,
+          "title": "9.17 A/B Testing：用版本 Metadata 验证修复"
+        },
+        {
+          "line": 690,
+          "level": 2,
+          "title": "9.18 Security Monitoring：Detection ≠ Prevention"
+        },
+        {
+          "line": 712,
+          "level": 3,
+          "title": "Code-based + LLM-as-Judge"
+        },
+        {
+          "line": 720,
+          "level": 3,
+          "title": "Prompt Injection detector"
+        },
+        {
+          "line": 732,
+          "level": 3,
+          "title": "PII leakage detector"
+        },
+        {
+          "line": 751,
+          "level": 3,
+          "title": "Sampling boundary"
+        },
+        {
+          "line": 780,
+          "level": 3,
+          "title": "Severity routing"
+        },
+        {
+          "line": 800,
+          "level": 2,
+          "title": "9.19 Production Monitoring Stack：Capstone synthesis"
+        },
+        {
+          "line": 841,
+          "level": 2,
+          "title": "9.20 Production Learning Loop"
+        },
+        {
+          "line": 859,
+          "level": 2,
+          "title": "9.21 Agent Experience Learning：经验不是自动写回，而是受控晋升"
+        },
+        {
+          "line": 898,
+          "level": 3,
+          "title": "9.21.1 为什么不应该“每次任务结束就在线 Fine-tune”"
+        },
+        {
+          "line": 920,
+          "level": 3,
+          "title": "9.21.2 Fast Path 与 Slow Path"
+        },
+        {
+          "line": 942,
+          "level": 3,
+          "title": "9.21.3 Fine-tuning 不是“只适合一次性知识注入”"
+        },
+        {
+          "line": 950,
+          "level": 3,
+          "title": "9.21.4 Raw Trajectory：保存可观察证据，不依赖隐藏 CoT"
+        },
+        {
+          "line": 974,
+          "level": 3,
+          "title": "9.21.5 Trace ≠ Experience"
+        },
+        {
+          "line": 1002,
+          "level": 3,
+          "title": "9.21.6 Candidate Experience Schema"
+        },
+        {
+          "line": 1032,
+          "level": 3,
+          "title": "9.21.7 成功案例和失败案例都不能直接照抄"
+        },
+        {
+          "line": 1050,
+          "level": 3,
+          "title": "9.21.8 Promotion Router：经验应该去哪里"
+        },
+        {
+          "line": 1065,
+          "level": 3,
+          "title": "9.21.9 Case Bank 不是“全局向量库”"
+        },
+        {
+          "line": 1085,
+          "level": 3,
+          "title": "9.21.10 Experience Retrieval 的三类风险"
+        },
+        {
+          "line": 1093,
+          "level": 3,
+          "title": "9.21.11 从 Case 晋升为 Skill"
+        },
+        {
+          "line": 1111,
+          "level": 3,
+          "title": "9.21.12 有些经验最终应该退出 LLM"
+        },
+        {
+          "line": 1126,
+          "level": 3,
+          "title": "9.21.13 失败首先应该晋升为 Regression Asset"
+        },
+        {
+          "line": 1141,
+          "level": 3,
+          "title": "9.21.14 什么经验才值得进入 Training Dataset"
+        },
+        {
+          "line": 1165,
+          "level": 3,
+          "title": "9.21.15 “只训练小模型、不动底座”不是通用规则"
+        },
+        {
+          "line": 1173,
+          "level": 3,
+          "title": "9.21.16 Reflexion、ExpeL、Voyager 分别说明什么"
+        },
+        {
+          "line": 1190,
+          "level": 3,
+          "title": "9.21.17 Production Architecture"
+        },
+        {
+          "line": 1214,
+          "level": 3,
+          "title": "9.21.18 Promotion State Machine"
+        },
+        {
+          "line": 1230,
+          "level": 3,
+          "title": "9.21.19 Experience Eval"
+        },
+        {
+          "line": 1265,
+          "level": 3,
+          "title": "9.21.20 面试回答模板"
+        },
+        {
+          "line": 1269,
+          "level": 3,
+          "title": "9.21.21 Source boundary"
+        },
+        {
+          "line": 1311,
+          "level": 2,
+          "title": "Source notes"
+        },
+        {
+          "line": 1324,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 1349,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    },
+    {
+      "file": "handbook/chapters/10-serving-deployment-ai-platform.md",
+      "sha256": "89ea5819a4b6dacd0307e69f3d8b05113f5bcc08147cbc4cd1a6397dfbcc30cf",
+      "assessment": "事实 + 综合：缓存和隔离有条件；厂商性能未独立复现",
+      "headings": [
+        {
+          "line": 1,
+          "level": 1,
+          "title": "Chapter 10 · Serving、Deployment、Security 与 AI Platform"
+        },
+        {
+          "line": 2,
+          "level": 2,
+          "title": "Serving, Deployment, Security, and AI Platform"
+        },
+        {
+          "line": 26,
+          "level": 2,
+          "title": "10.1 Prefill、Decode 与 KV Cache"
+        },
+        {
+          "line": 54,
+          "level": 2,
+          "title": "10.2 Prefix KV Cache：共享的是已计算前缀，不是一个可变会话对象"
+        },
+        {
+          "line": 89,
+          "level": 2,
+          "title": "10.3 Prefix Match 必须是 token-level identity，不是语义相似"
+        },
+        {
+          "line": 129,
+          "level": 2,
+          "title": "10.4 SGLang RadixAttention 与 vLLM Automatic Prefix Caching"
+        },
+        {
+          "line": 131,
+          "level": 3,
+          "title": "SGLang · Radix-style prefix reuse"
+        },
+        {
+          "line": 146,
+          "level": 3,
+          "title": "vLLM · Automatic Prefix Caching"
+        },
+        {
+          "line": 156,
+          "level": 2,
+          "title": "10.5 Prefix Cache ≠ Semantic Cache"
+        },
+        {
+          "line": 182,
+          "level": 2,
+          "title": "10.6 Multi-Agent 怎么设计才能提高 Prefix Reuse"
+        },
+        {
+          "line": 221,
+          "level": 2,
+          "title": "10.7 Security：共享 Cache 也是隔离边界"
+        },
+        {
+          "line": 243,
+          "level": 2,
+          "title": "10.8 Serving Metrics：别只看“显存省了多少”"
+        },
+        {
+          "line": 274,
+          "level": 2,
+          "title": "10.9 面试回答模板"
+        },
+        {
+          "line": 282,
+          "level": 2,
+          "title": "10.10 Agent Sandbox：把模型能力限制在一个可证明的 Blast Radius 内"
+        },
+        {
+          "line": 316,
+          "level": 3,
+          "title": "10.10.1 Sandbox ≠ Permission Prompt"
+        },
+        {
+          "line": 345,
+          "level": 3,
+          "title": "10.10.2 Sandbox ≠ VM"
+        },
+        {
+          "line": 380,
+          "level": 2,
+          "title": "10.11 Threat Model：先定义你到底在防什么"
+        },
+        {
+          "line": 384,
+          "level": 3,
+          "title": "A. Model / Agent error"
+        },
+        {
+          "line": 394,
+          "level": 3,
+          "title": "B. Prompt injection / hostile input"
+        },
+        {
+          "line": 418,
+          "level": 3,
+          "title": "C. Untrusted code / dependency"
+        },
+        {
+          "line": 433,
+          "level": 3,
+          "title": "D. Multi-tenant escape / infrastructure abuse"
+        },
+        {
+          "line": 448,
+          "level": 2,
+          "title": "10.12 核心隔离维度"
+        },
+        {
+          "line": 450,
+          "level": 3,
+          "title": "10.12.1 Filesystem"
+        },
+        {
+          "line": 482,
+          "level": 3,
+          "title": "10.12.2 Network / Egress"
+        },
+        {
+          "line": 517,
+          "level": 3,
+          "title": "10.12.3 System calls / Kernel surface"
+        },
+        {
+          "line": 548,
+          "level": 3,
+          "title": "10.12.4 Process"
+        },
+        {
+          "line": 570,
+          "level": 3,
+          "title": "10.12.5 Resources"
+        },
+        {
+          "line": 590,
+          "level": 3,
+          "title": "10.12.6 Credentials / Secrets"
+        },
+        {
+          "line": 616,
+          "level": 3,
+          "title": "10.12.7 Lifecycle / Ephemerality"
+        },
+        {
+          "line": 647,
+          "level": 3,
+          "title": "10.12.8 Audit / Observability"
+        },
+        {
+          "line": 678,
+          "level": 2,
+          "title": "10.13 五类实现模式"
+        },
+        {
+          "line": 680,
+          "level": 3,
+          "title": "Pattern A · OS-level Process Sandbox"
+        },
+        {
+          "line": 713,
+          "level": 3,
+          "title": "Pattern B · Container / Namespace Isolation"
+        },
+        {
+          "line": 742,
+          "level": 3,
+          "title": "Pattern C · User-space Kernel / Hardened Container"
+        },
+        {
+          "line": 748,
+          "level": 3,
+          "title": "Pattern D · MicroVM / VM"
+        },
+        {
+          "line": 779,
+          "level": 3,
+          "title": "Pattern E · Constrained Runtime"
+        },
+        {
+          "line": 810,
+          "level": 2,
+          "title": "10.14 生产 Sandbox Control Plane"
+        },
+        {
+          "line": 869,
+          "level": 2,
+          "title": "10.15 Network Broker 与 Secret Broker"
+        },
+        {
+          "line": 905,
+          "level": 2,
+          "title": "10.16 代表性实现：哪些事实可以稳定写进 Handbook"
+        },
+        {
+          "line": 907,
+          "level": 3,
+          "title": "Claude Code · Local"
+        },
+        {
+          "line": 936,
+          "level": 3,
+          "title": "Claude Code · Web"
+        },
+        {
+          "line": 942,
+          "level": 3,
+          "title": "OpenAI Codex"
+        },
+        {
+          "line": 972,
+          "level": 3,
+          "title": "E2B"
+        },
+        {
+          "line": 984,
+          "level": 3,
+          "title": "CubeSandbox"
+        },
+        {
+          "line": 999,
+          "level": 3,
+          "title": "Firecracker"
+        },
+        {
+          "line": 1013,
+          "level": 3,
+          "title": "Bubblewrap"
+        },
+        {
+          "line": 1034,
+          "level": 3,
+          "title": "Sandock"
+        },
+        {
+          "line": 1042,
+          "level": 3,
+          "title": "Devin"
+        },
+        {
+          "line": 1046,
+          "level": 2,
+          "title": "10.17 不要做简单的“沙箱强弱排行榜”"
+        },
+        {
+          "line": 1077,
+          "level": 2,
+          "title": "10.18 Sandbox Security Checklist"
+        },
+        {
+          "line": 1116,
+          "level": 2,
+          "title": "10.19 面试回答模板"
+        },
+        {
+          "line": 1126,
+          "level": 2,
+          "title": "10.20 Source boundary · Agent Sandbox"
+        },
+        {
+          "line": 1179,
+          "level": 2,
+          "title": "10.21 Source boundary · Prefix Cache"
+        },
+        {
+          "line": 1220,
+          "level": 2,
+          "title": "10.22 Production Multi-Tenant Agent Runtime：Tenant Isolation 是控制面，不是 Prompt 约定"
+        },
+        {
+          "line": 1268,
+          "level": 3,
+          "title": "10.22.1 Trusted Tenant Context：Tenant 身份不能由模型决定"
+        },
+        {
+          "line": 1304,
+          "level": 3,
+          "title": "10.22.2 Authentication、Authorization、Tenant Isolation 是三件事"
+        },
+        {
+          "line": 1341,
+          "level": 3,
+          "title": "10.22.3 Isolation Surface Matrix：每个共享面都必须回答 Tenant Scope"
+        },
+        {
+          "line": 1364,
+          "level": 3,
+          "title": "10.22.4 State / Checkpoint：Thread ID 不是租户边界"
+        },
+        {
+          "line": 1399,
+          "level": 3,
+          "title": "10.22.5 Memory 与 RAG：先做授权，再构建候选集"
+        },
+        {
+          "line": 1449,
+          "level": 3,
+          "title": "10.22.6 SQL / Database：Application Filter + Storage Enforcement"
+        },
+        {
+          "line": 1482,
+          "level": 3,
+          "title": "10.22.7 Tool / MCP：Credential 必须跟 Tenant Context 绑定"
+        },
+        {
+          "line": 1514,
+          "level": 3,
+          "title": "10.22.8 Cache：Cache Key 本身就是安全设计"
+        },
+        {
+          "line": 1541,
+          "level": 3,
+          "title": "10.22.9 Async Job / Worker：Tenant Context 不能在 Queue 边界丢失"
+        },
+        {
+          "line": 1576,
+          "level": 3,
+          "title": "10.22.10 Trace / Observability：日志也会跨租户泄漏"
+        },
+        {
+          "line": 1600,
+          "level": 3,
+          "title": "10.22.11 Noisy Neighbor：Multi-Tenancy 不只是 Security"
+        },
+        {
+          "line": 1634,
+          "level": 3,
+          "title": "10.22.12 Pooled、Bridge、Silo：隔离是逐资源选择"
+        },
+        {
+          "line": 1636,
+          "level": 4,
+          "title": "Pooled"
+        },
+        {
+          "line": 1646,
+          "level": 4,
+          "title": "Silo"
+        },
+        {
+          "line": 1654,
+          "level": 4,
+          "title": "Bridge / Hybrid"
+        },
+        {
+          "line": 1667,
+          "level": 3,
+          "title": "10.22.13 Tenant Isolation Verification：要故意尝试跨租户"
+        },
+        {
+          "line": 1731,
+          "level": 3,
+          "title": "10.22.14 Cross-chapter ownership"
+        },
+        {
+          "line": 1755,
+          "level": 3,
+          "title": "10.22.15 Source boundary · Multi-Tenant Agent Runtime"
+        },
+        {
+          "line": 1793,
+          "level": 2,
+          "title": "Canonical rules"
+        },
+        {
+          "line": 1818,
+          "level": 2,
+          "title": "Verification boundary · 2026-09-28"
+        }
+      ]
+    }
+  ]
+}

@@ -37,7 +37,7 @@ Reciprocal Rank Fusion 只依赖名次：
 RRF(d) = Σ 1 / (k + rank_i(d))
 ```
 
-`k=60` 只是常见示例，不是标准答案，应该在自己的评测集上验证。
+`rank_i(d)` 从 1 开始；文档没有出现在某一路结果中，该路贡献为 0。`k` 是平滑常数，不是 Top-K；`k=60` 是常见默认值，不是标准答案，应连同每路候选窗口在自己的评测集上验证。
 
 RRF 解决的是**候选融合**，不是最终相关性证明。融合后仍可能需要 Cross-Encoder / LLM Reranker 与 Evidence Validation。
 
@@ -132,17 +132,19 @@ router_version
 capability_registry_version
 index_version
 knowledge_snapshot
+permission / ACL policy version
 ```
 
-知识库或能力注册表变化后，应通过 TTL 或版本号主动失效。
+知识库、能力注册表或权限变化后，应按版本/事件使相关缓存失效；TTL 只能界定陈旧窗口，不能代替权限撤销后的重新授权。
 
 ## 3.6 Retrieval Budget ≠ Context Budget
 
 “召回 20 个文档但 Context 放不下”不能只靠降低 TopK 解决。至少分三个独立预算：召回广度、精排候选、最终上下文容量。
 
 ```text
-Broad Retrieval (K_retrieve, protect recall)
-→ ACL / Metadata Filter + Dedup
+Authorized Candidate Space (server-enforced tenant / ACL)
+→ Broad Retrieval (K_retrieve, protect recall)
+→ Authorization Recheck / Metadata Filter + Dedup
 → Rerank (K_rerank, improve precision)
 → Coverage Selection (diversity / MMR / sub-question coverage)
 → Context Packing (K_context, explicit token budget)
@@ -289,7 +291,7 @@ Same topic?
 
 | State type | Topic switch 后 |
 |---|---|
-| user identity / tenant / permissions | retain |
+| user identity / tenant / permissions | 从可信身份上下文保留身份关联；每次访问仍按当前权限重新校验 |
 | stable profile preference | usually retain |
 | current product / document / policy | clear or re-resolve |
 | ordinal reference | clear |
@@ -408,3 +410,10 @@ Complex / conflicting history
 > **Topic changes invalidate topic-scoped state, not every form of memory.**
 
 > **Use the cheapest reliable route first.**
+
+
+## Verification boundary · 2026-09-28
+
+RRF 的 rank 从 1 开始，缺席结果贡献 0，k 不是 Top-K。检索广度预算始终在授权范围内；权限变化后缓存需失效或重新授权。会话状态与路由分层是本手册的设计建议。
+
+核对依据：[Elastic RRF](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
