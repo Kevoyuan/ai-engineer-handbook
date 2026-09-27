@@ -3266,6 +3266,912 @@ Sources:
 
 
 
+
+## 8.15 Long-Running Multi-Agent Handoff：状态、契约、检查点与恢复
+
+“多个 Agent 各自记进度，最后把结果拼起来”可以完成短小、低耦合任务，但它不是可靠的长周期协作模型。
+
+问题不在于 Agent 是否“聪明”，而在于系统缺少统一回答这些问题的地方：
+
+~~~text
+What is the current global state?
+Which task is committed as complete?
+Which artifact version is authoritative?
+Who owns the next transition?
+Which output has actually passed validation?
+What can be retried safely?
+What external side effect already happened?
+Where should execution resume after a crash?
+~~~
+
+如果这些答案只存在于每个 Agent 的局部上下文：
+
+~~~text
+Agent A local memory
+Agent B local memory
+Agent C local memory
+~~~
+
+那么长任务一旦跨进程、跨小时、跨天或发生重试，就很容易出现：
+
+~~~text
+handoff mismatch
+stale state
+duplicate execution
+lost progress
+invalid artifact propagation
+ambiguous recovery point
+~~~
+
+更稳定的架构是：
+
+~~~text
+Durable Workflow State
+        │
+        ├─ Task State Machine
+        ├─ Version / Ownership
+        ├─ Checkpoint / Event History
+        └─ Next Transition
+        │
+        ▼
+Agent A
+  → Candidate Artifact
+  → Handoff Validation
+  → Commit
+        │
+        ▼
+Agent B
+  → Candidate Artifact
+  → Handoff Validation
+  → Commit
+        │
+        ▼
+Agent C
+~~~
+
+> **Agents may be ephemeral; workflow state and validated artifacts must be durable.**
+
+### 8.15.1 “不能直接拼接”不是绝对不能，而是没有可靠性边界
+
+对于真正独立的 Map-style 子任务：
+
+~~~text
+Task 1 → Result 1
+Task 2 → Result 2
+Task 3 → Result 3
+          ↓
+deterministic merge
+~~~
+
+直接拼接可以合理。
+
+但对于存在 dependency / state transition 的接力任务：
+
+~~~text
+A output
+→ becomes B input
+→ affects C decision
+→ changes external system
+~~~
+
+“把上一段自然语言直接交给下一个 Agent”会同时混合：
+
+~~~text
+task state
+business data
+reasoning summary
+artifact
+control instruction
+error state
+~~~
+
+于是下游必须重新猜：
+
+~~~text
+which field is authoritative?
+what is complete?
+what is provisional?
+what should be retried?
+which value is stale?
+~~~
+
+因此问题不是：
+
+~~~text
+Can Agent B read Agent A's output?
+~~~
+
+而是：
+
+> **Can the runtime distinguish committed workflow state from unvalidated model output?**
+
+### 8.15.2 三种状态必须分开：Workflow State、Artifact、Agent-local Context
+
+长周期协作至少分三层：
+
+~~~text
+Workflow State
+→ 当前执行在哪里
+→ 谁拥有 task
+→ 当前 revision
+→ 哪些 transition 合法
+→ retry / approval / cancellation 状态
+
+Artifact Store
+→ 上一步实际产物
+→ immutable/versioned object
+→ lineage / checksum / validation status
+
+Agent-local Context
+→ 当前 Worker 为完成本节点所需的 prompt / retrieved context / scratch state
+~~~
+
+不要把三者都塞进一个共享 Conversation。
+
+一个可用的 Task State 可以包含：
+
+~~~text
+workflow_id
+task_id
+stage
+status
+owner
+lease_expires_at
+
+revision
+workflow_version
+schema_version
+
+input_artifact_refs
+output_artifact_refs
+
+validation_status
+retry_count
+last_error
+
+next_allowed_transitions
+updated_at
+~~~
+
+Artifact 则至少需要：
+
+~~~text
+artifact_id
+artifact_type
+version
+producer_task
+producer_agent
+dependency_refs
+storage_uri
+checksum
+schema_version
+validation_status
+created_at
+~~~
+
+这样 Agent 崩溃并不会让全局状态一起消失。
+
+### 8.15.3 Task State Machine：控制“接下来允许发生什么”
+
+生产接力流程不应是：
+
+~~~text
+A done
+→ message B
+→ B done
+→ message C
+~~~
+
+更稳健：
+
+~~~text
+INVESTIGATING
+→ ROOT_CAUSE_VALIDATED
+→ REMEDIATION_PROPOSED
+→ CHANGE_APPROVED
+→ CHANGE_EXECUTED
+→ EFFECT_VALIDATED
+→ COMPLETE
+~~~
+
+每个 transition 有明确 guard：
+
+~~~text
+current_state
+expected_revision
+required_input_artifacts
+validation_status
+permission / approval
+retry_budget
+~~~
+
+例如：
+
+~~~text
+REMEDIATION_PROPOSED
+→ CHANGE_APPROVED
+~~~
+
+只有在：
+
+~~~text
+proposal schema valid
+risk classification present
+evidence refs readable
+approval policy satisfied
+~~~
+
+时才允许提交。
+
+> **The state machine owns legal transitions; Agents propose work inside those boundaries.**
+
+### 8.15.4 Checkpoint：保存的是可恢复执行边界，不只是“当前第几步”
+
+Checkpoint 至少应该让 Runtime 恢复：
+
+~~~text
+workflow state
+task ownership / runnable set
+artifact references
+validation result
+retry counters
+approval state
+workflow / schema version
+execution metadata
+~~~
+
+但不要把 Checkpoint 理解成：
+
+~~~text
+save program counter
+→ crash
+→ continue from exact source-code line
+~~~
+
+不同 Runtime 的恢复模型不同。
+
+LangGraph 当前文档将 Checkpoint 定义为 thread graph state 的持久化 snapshot，用于 interruption resume、failure recovery、HITL 和 fault tolerance；生产环境还需要使用 persistent checkpointer，而不是 in-memory saver。
+
+Temporal 的 Durable Execution 则主要依赖 durable Event History + deterministic replay 恢复 Workflow State；Worker 崩溃后可以恢复执行，它不要求应用自己把每一步都实现成传统 snapshot。
+
+所以通用抽象应该写成：
+
+> **Persist enough durable execution evidence to reconstruct the last committed workflow state.**
+
+而不是：
+
+> “所有长任务都必须使用同一种 snapshot checkpoint。”
+
+### 8.15.5 Handoff Contract：交接的是 Typed Artifact，不是自由文本承诺
+
+一个正式 handoff 至少应定义：
+
+~~~text
+producer
+consumer
+input schema
+output schema
+artifact type
+semantic invariants
+required evidence
+validation policy
+failure policy
+version compatibility
+~~~
+
+例如 Root Cause Agent 输出：
+
+~~~json
+{
+  "incident_id": "inc_123",
+  "root_cause": "...",
+  "confidence": 0.86,
+  "evidence_refs": ["log_17", "trace_88"],
+  "affected_services": ["billing-api"],
+  "recommended_next_stage": "REMEDIATION_PROPOSAL"
+}
+~~~
+
+下游不应该依赖：
+
+~~~text
+"我已经分析完了，应该是 billing service 的问题，下一步你修一下。"
+~~~
+
+因为自然语言无法稳定承担：
+
+~~~text
+state transition
+artifact identity
+validation status
+version compatibility
+~~~
+
+> **A handoff should transfer a typed, validated artifact plus explicit workflow state—not just a message.**
+
+### 8.15.6 三层 Handoff Validation
+
+视频里提出的三层校验可以保留，并更严格地定义为：
+
+#### Layer 1 · Structural / Schema Validation
+
+验证：
+
+~~~text
+required fields
+type
+enum
+schema_version
+format
+serialization
+~~~
+
+回答：
+
+~~~text
+Can the next stage parse this artifact deterministically?
+~~~
+
+#### Layer 2 · Semantic / Invariant Validation
+
+验证：
+
+~~~text
+business range
+cross-field invariant
+policy constraint
+domain rule
+state compatibility
+~~~
+
+例如：
+
+~~~text
+confidence in [0,1]
+change risk requires approval
+service_id must belong to incident scope
+end_time >= start_time
+next_stage must be legal from current state
+~~~
+
+回答：
+
+~~~text
+Is the artifact internally and operationally meaningful?
+~~~
+
+#### Layer 3 · Referential / Integrity Validation
+
+验证：
+
+~~~text
+artifact exists
+object is readable
+checksum matches
+dependency version still exists
+evidence ref resolves
+required file / dataset is complete
+~~~
+
+回答：
+
+~~~text
+Does the claimed evidence and output actually exist in the environment?
+~~~
+
+生产上通常还会增加：
+
+#### Layer 4 · Acceptance / Outcome Validation
+
+验证：
+
+~~~text
+does the artifact actually satisfy the stage objective?
+~~~
+
+例如：
+
+~~~text
+test passes
+root cause reproduces symptom
+patch fixes failing scenario
+deployment health returns to SLO
+~~~
+
+这与 Chapter 09 的 Validator / Eval Control Plane 对接。
+
+### 8.15.7 Handoff 应采用 Validate-before-Commit
+
+一个更安全的 handoff transaction：
+
+~~~text
+1. Worker reads committed state revision N
+2. Worker executes task
+3. Worker writes candidate artifact
+4. Structural validation
+5. Semantic validation
+6. Referential / acceptance validation
+7. Commit artifact as VALIDATED
+8. Atomically transition state N → N+1
+9. Next task becomes runnable
+~~~
+
+而不是：
+
+~~~text
+Worker says "done"
+→ immediately schedule next Agent
+→ validation happens later
+~~~
+
+因为后一种做法会让 invalid result 先污染下游。
+
+可以把它理解成：
+
+~~~text
+produce
+→ validate
+→ commit
+→ publish downstream
+~~~
+
+> **Downstream Agents should consume committed artifacts, not optimistic claims of completion.**
+
+### 8.15.8 Optimistic Lock / CAS：一种并发控制，不是唯一答案
+
+视频里“状态变更用乐观锁保证并发安全”方向是合理的，但不能写成唯一方案。
+
+典型 CAS：
+
+~~~text
+read revision = 17
+
+UPDATE task
+SET state = ..., revision = 18
+WHERE task_id = ...
+  AND revision = 17
+~~~
+
+如果 affected rows = 0：
+
+~~~text
+someone else already changed state
+→ reject stale write
+→ reload / reconcile
+~~~
+
+适合：
+
+~~~text
+conflict relatively rare
+shared task board
+distributed workers
+short state mutations
+~~~
+
+但其他合法方案还包括：
+
+~~~text
+single-writer orchestrator
+transaction + row lock
+serialized queue
+database transaction
+distributed lease
+partition ownership
+workflow-engine-owned state transition
+~~~
+
+所以通用原则是：
+
+> **Shared workflow state needs an explicit concurrency model; CAS is one implementation, not the definition of multi-Agent coordination.**
+
+这与 §8.13 的 task-board revision / stale-write rejection 是同一个底层机制；本节把它放到 long-running handoff context 中。
+
+### 8.15.9 Lease / Heartbeat：长周期 Worker 还必须回答“谁现在拥有这个任务”
+
+如果任务可以跑数小时，只保存：
+
+~~~text
+status = RUNNING
+owner = agent_7
+~~~
+
+不够。
+
+如果 Agent 7 已经崩溃，系统怎么知道任务是否可以重新分配？
+
+常见做法：
+
+~~~text
+owner_id
+lease_token
+lease_expires_at
+heartbeat_at
+attempt
+~~~
+
+执行流程：
+
+~~~text
+claim task
+→ acquire lease
+→ heartbeat while executing
+→ commit / release on success
+→ lease expires on worker loss
+→ orchestrator reconciles
+→ safe retry / reassignment
+~~~
+
+要区分：
+
+~~~text
+worker process is dead
+≠
+external side effect did not happen
+~~~
+
+例如 Agent 在调用云 API 后崩溃：
+
+~~~text
+request may have succeeded
+but local acknowledgement was lost
+~~~
+
+因此重新分配前仍需要 idempotency / reconciliation。
+
+### 8.15.10 Recovery：从“最后已提交状态”恢复，而不是机械回滚
+
+视频里的：
+
+~~~text
+validation fail
+→ rollback to previous checkpoint
+→ original Agent reruns
+~~~
+
+可以作为教学直觉，但生产上需要更细。
+
+恢复目标通常是：
+
+~~~text
+find earliest invalid state/artifact
+→ preserve valid upstream work
+→ invalidate only affected downstream
+→ repair / rerun minimum scope
+~~~
+
+例如：
+
+~~~text
+A validated
+B output schema valid but evidence file missing
+C not started
+~~~
+
+不需要重跑 A。
+
+可以：
+
+~~~text
+repair B artifact reference
+or rerun B
+→ validate
+→ continue C
+~~~
+
+如果失败发生在外部副作用：
+
+~~~text
+payment
+deploy
+email
+ticket mutation
+cloud resource change
+~~~
+
+Checkpoint 本身不能“撤销现实世界”。
+
+需要：
+
+~~~text
+idempotency
+reconciliation
+compensation
+saga
+human escalation
+~~~
+
+Temporal 当前 Durable AI guidance 也把 Saga compensation 作为分布式副作用恢复模式之一。
+
+> **Checkpoint restores orchestration state; side-effect recovery requires its own transaction semantics.**
+
+### 8.15.11 Version Compatibility：跑几天的 Workflow 会跨代码版本
+
+长周期任务常见：
+
+~~~text
+Day 1
+→ workflow v12
+
+Day 3
+→ deploy workflow v13
+
+Day 5
+→ old workflow resumes
+~~~
+
+如果状态 / Artifact Schema 已变化，就可能出现：
+
+~~~text
+old checkpoint
++ new worker
+→ incompatible decode / transition
+~~~
+
+因此状态至少记录：
+
+~~~text
+workflow_version
+schema_version
+prompt_version
+tool_registry_version
+model / provider version when material
+policy_version
+~~~
+
+升级策略可以是：
+
+~~~text
+backward-compatible reader
+state migration
+workflow version pinning
+patch/version marker
+finish-old-version-first
+explicit incompatible-state escalation
+~~~
+
+Temporal 官方文档明确强调长期 Workflow 需要考虑 deterministic replay 与 Workflow code versioning / patching。
+
+> **Durability without version compatibility turns yesterday's checkpoint into tomorrow's incident.**
+
+### 8.15.12 Long-running Multi-Agent Handoff Protocol
+
+把以上机制压缩成一个 production protocol：
+
+~~~text
+ORCHESTRATOR
+    │
+    ├─ durable state
+    ├─ task DAG / state machine
+    ├─ ownership / lease
+    └─ revision
+    │
+    ▼
+WORKER / AGENT
+    │
+    ├─ reads committed inputs
+    ├─ performs bounded work
+    └─ writes candidate artifact
+    │
+    ▼
+HANDOFF GATE
+    ├─ schema
+    ├─ semantic invariant
+    ├─ referential integrity
+    └─ acceptance evidence
+    │
+    ├─ FAIL
+    │    → repair / retry / escalate
+    │
+    └─ PASS
+         → commit artifact
+         → CAS / atomic state transition
+         → checkpoint / event
+         → publish next runnable task
+~~~
+
+这个顺序特别重要：
+
+~~~text
+Candidate
+≠
+Committed Artifact
+
+Agent says done
+≠
+Workflow transition committed
+~~~
+
+### 8.15.13 自动化运维例子
+
+一个跨小时甚至跨天的 incident remediation workflow：
+
+~~~text
+Incident Created
+      ↓
+Investigation Agent
+      ↓
+Evidence Package
+      ↓ validate
+ROOT_CAUSE_VALIDATED
+      ↓
+Remediation Agent
+      ↓
+Change Proposal
+      ↓ validate + risk policy
+CHANGE_APPROVED
+      ↓
+Execution Agent
+      ↓
+Deployment / Config Change
+      ↓ reconcile external effect
+CHANGE_EXECUTED
+      ↓
+Validation Agent
+      ↓
+SLO / Test / Metric Evidence
+      ↓
+EFFECT_VALIDATED
+      ↓
+COMPLETE
+~~~
+
+每个 Stage 的责任不同：
+
+| Stage | Durable artifact | Commit gate |
+|---|---|---|
+| Investigation | evidence package | evidence resolves + root-cause invariant |
+| Root cause | diagnosis | reproducibility / evidence |
+| Remediation | change proposal | schema + risk + approval |
+| Execution | change receipt / deployment id | idempotency + reconciliation |
+| Validation | metric / test report | acceptance criteria |
+
+如果 Validation 失败：
+
+~~~text
+do not restart incident from zero
+
+diagnose earliest invalid artifact / transition
+→ remediation incorrect?
+→ execution incomplete?
+→ environment changed?
+→ validator wrong?
+~~~
+
+然后进入 bounded repair / escalation。
+
+### 8.15.14 Observability：接力系统要观测 Handoff，不只看 Agent Token
+
+至少记录：
+
+~~~text
+workflow_id
+task_id
+stage
+agent / worker
+attempt
+lease
+revision_before / after
+
+input artifact refs
+candidate artifact
+validation results
+committed artifact
+
+state_before / after
+transition reason
+
+retry / repair
+reassignment
+checkpoint / event id
+
+external side_effect id
+reconciliation result
+
+latency
+token / cost
+~~~
+
+关键指标：
+
+~~~text
+handoff_schema_failure_rate
+handoff_semantic_failure_rate
+artifact_integrity_failure_rate
+acceptance_failure_rate
+
+resume_success_rate
+mean_recovery_time
+stale_write_rejection_rate
+lease_expiry / reassignment rate
+
+duplicate_side_effect_rate
+reconciliation_failure_rate
+
+workflow_completion_rate
+time_in_stage
+cost_per_successful_workflow
+~~~
+
+长周期系统最危险的不是单个 Agent 偶尔答错，而是：
+
+~~~text
+small invalid handoff
+→ silently propagates through many stages
+→ becomes expensive late-stage failure
+~~~
+
+因此：
+
+> **Measure handoff quality at every boundary, not only final-task quality.**
+
+### 8.15.15 面试回答：从“共享进度”升级成 Durable Handoff Protocol
+
+如果面试官问：
+
+> 多个 Agent 能不能各自维护进度，然后接力跑几天，最后直接拼结果？
+
+更完整的回答是：
+
+> 如果只是多个独立 Map-style 子任务，各自输出后 deterministic merge，可以。但对于有依赖的长周期接力任务，我不会让每个 Agent 只维护自己的局部进度，也不会把自然语言结果直接传给下一个 Agent。生产上会把全局执行状态放到 durable workflow state / state machine 中，Agent 进程可以是临时的；每个阶段读取已提交 state 和 versioned input artifacts，执行后先写 candidate artifact，再经过 schema、semantic invariant、referential integrity 和必要的 acceptance validation，通过后才原子提交 artifact 和 state transition。共享状态并发可以用 revision/CAS，也可以用 single-writer workflow engine、transaction 或 lease，重点是有显式 concurrency model。Worker 崩溃时从最后 committed state 恢复；如果是外部副作用，Checkpoint 不够，还要做 idempotency、reconciliation 或 compensation。这样长周期 Multi-Agent 才能做到状态可追溯、交接可验证、失败可恢复，而且不会把上游小错误静默传播到整个链路。
+
+最短记忆：
+
+~~~text
+Durable State
++ Versioned Artifact
++ Handoff Contract
++ Validate-before-Commit
++ Concurrency Control
++ Checkpoint / Event History
++ Idempotency / Reconciliation
++ Recovery / Escalation
+~~~
+
+### 8.15.16 Source boundary · Long-Running Multi-Agent Handoff
+
+Primary input:
+
+- 用户提供的视频总结《多Agent长周期协作面试题解析》：独立 Agent 局部进度无法可靠支撑长任务接力；统一任务状态机 + Checkpoint；handoff schema；格式 / 语义 / 完整性校验；失败恢复；自动化运维示例。
+
+Source-derived ideas retained:
+
+- 长周期 Multi-Agent 需要统一任务状态；
+- Agent-local progress 不能替代全局 Workflow State；
+- 每个 Agent 的输入输出需要明确 handoff contract；
+- handoff 应做结构、语义与产物完整性校验；
+- 长任务需要持久化恢复边界；
+- 自动化运维等多阶段任务适合 durable handoff architecture。
+
+Handbook corrections / synthesis:
+
+- “不能各自维护进度并直接拼接”改写为：对独立 Map-style 子任务可以，但对 dependency-heavy long-running workflow 不可靠；
+- 状态机、Artifact Store 与 Agent-local Context 明确分层；
+- Checkpoint 抽象为“可恢复 committed execution state”，不限定为 snapshot；Temporal 等 Runtime 可以通过 Event History + replay 提供 durable execution；
+- “乐观锁保证并发安全”改写为 explicit concurrency model；revision/CAS 只是一个实现，还可以 single writer、transaction、lease、serialized queue；
+- Handoff 增加 Validate-before-Commit，避免 invalid candidate 先污染下游；
+- 三层校验扩展为 structural / semantic / referential，必要时增加 acceptance / outcome validation；
+- “校验失败回滚到上一步由原 Agent 重跑”改写成 D-I-R：找到最早失效 state/artifact，最小范围 repair / rerun / escalation；
+- Checkpoint 不等于外部副作用事务；支付、部署、邮件、云资源等需要 idempotency / reconciliation / compensation；
+- 增加长周期 Worker 的 lease / heartbeat / reassignment；
+- 增加跨天 Workflow 的 schema / workflow / prompt / tool / policy version compatibility；
+- 增加 handoff-level observability 与 reliability metrics。
+
+External verification date: 2026-09-28.
+
+Verified implementation examples:
+
+- LangGraph current Persistence docs: checkpointers persist thread graph state and support interruption resume, failure recovery and fault tolerance; in-memory saver does not survive process restart and production should use persistent persistence.
+- Temporal current Durable AI / Workflow docs: workflows can resume after Worker crashes or multi-day waits; workflow state can be recovered from durable Event History through replay; long-running workflow code requires deterministic/version-compatible evolution; Saga compensation is a pattern for external side effects.
+
+Sources:
+
+- https://docs.langchain.com/oss/python/langgraph/persistence
+- https://docs.temporal.io/ai
+- https://docs.temporal.io/tasks
+- https://docs.temporal.io/workflow-definition
+
+
 ## Verification boundary · 2026-09-28
 
 幂等 key 需要服务端实现。Reducer 合并状态，不替代分支 join；InMemorySaver 不支持进程重启恢复。DeepSeek writeScopes 是提示，不是锁；Pi / DeepSeek 的具体行为均受源码版本约束。
