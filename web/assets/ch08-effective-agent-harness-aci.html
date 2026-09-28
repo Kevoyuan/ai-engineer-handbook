@@ -54,5 +54,51 @@
     </div>
   </div>
 
+
+  <div class="bfs-canvas rv" id="fig-8-z4" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.Z4 · HARNESS EVOLUTION</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="模型越强，Harness 不一定越少：它会从“代偿”迁移到“治理”" data-i18n-en="As models get stronger, harness work does not simply disappear; it shifts from compensation to governance">模型越强，Harness 不一定越少：它会从“代偿”迁移到“治理”</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="部分旧逻辑会被 Model / Provider Runtime 吸收，但 autonomy、blast radius 和真实资源访问越大，系统越需要明确的权限、状态、成本、审计与恢复保证。" data-i18n-en="Some older scaffolding may move into the model or provider runtime, but greater autonomy, blast radius, and real-resource access increase the need for explicit permission, state, cost, audit, and recovery guarantees.">部分旧逻辑会被 Model / Provider Runtime 吸收，但 autonomy、blast radius 和真实资源访问越大，系统越需要明确的权限、状态、成本、审计与恢复保证。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-card bfs-amber">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">COMPENSATORY HARNESS</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="弥补模型能力缺口" data-i18n-en="Compensate for model capability gaps">弥补模型能力缺口</span></h2>
+          <div class="bfs-card-desc">format repair · rigid retry loops · weak-planning scaffolds · argument normalization · basic self-correction</div>
+        </div>
+        <div class="bfs-card bfs-purple">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">GOVERNANCE / RUNTIME HARNESS</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="约束更强的行动能力" data-i18n-en="Govern stronger action capability">约束更强的行动能力</span></h2>
+          <div class="bfs-card-desc">permission · sandbox · durable state · budget · timeout · audit · approval · recovery · tenant boundary</div>
+        </div>
+      </div>
+
+      <div class="bfs-flow-container" style="margin-top:14px">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">MODEL CAPABILITY ↑</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="一些补偿逻辑被模型 / SDK / Provider Runtime 吸收" data-i18n-en="Some compensating logic moves into the model, SDK, or provider runtime">一些补偿逻辑被模型 / SDK / Provider Runtime 吸收</span></h2><div class="bfs-card-desc">structured arguments · tool dispatch · handoffs · sessions · simple retry/self-correction · built-in shell/computer primitives</div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">AUTONOMY / BLAST RADIUS ↑</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="系统保证变得更重要，而不是更少" data-i18n-en="System guarantees become more important, not less">系统保证变得更重要，而不是更少</span></h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="谁能做什么、状态是否持久、成本是否受控、失败如何恢复、动作能否审计，这些都必须由 runtime contract 明确承担。" data-i18n-en="Who may do what, whether state is durable, whether cost is bounded, how failures recover, and whether actions are auditable must all be owned by an explicit runtime contract.">谁能做什么、状态是否持久、成本是否受控、失败如何恢复、动作能否审计，这些都必须由 runtime contract 明确承担。</span></div></div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="问题" data-i18n-en="Question">问题</span></th>
+          <th><span class="i18n-text" data-i18n-zh="模型能力" data-i18n-en="Model capability">模型能力</span></th>
+          <th><span class="i18n-text" data-i18n-zh="Harness 保证" data-i18n-en="Harness guarantee">Harness 保证</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="i18n-text" data-i18n-zh="能不能想出下一步？" data-i18n-en="Can it figure out the next step?">能不能想出下一步？</span></td><td>planning / reasoning</td><td>—</td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="允不允许做？" data-i18n-en="Is it allowed to do it?">允不允许做？</span></td><td>—</td><td>permission / policy / approval</td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="崩溃后还能继续吗？" data-i18n-en="Can it resume after a crash?">崩溃后还能继续吗？</span></td><td>—</td><td>state / checkpoint / reconciliation</td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="会不会无限烧钱？" data-i18n-en="Can it consume unbounded cost?">会不会无限烧钱？</span></td><td>—</td><td>budget / rate / timeout / cancellation</td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="出了问题能解释吗？" data-i18n-en="Can failures be explained and audited?">出了问题能解释吗？</span></td><td>—</td><td>observable trace / artifact / evidence</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">Model improvement removes some scaffolding; it does not remove the need for runtime guarantees.</p></div>
+      <div class="co note" style="margin-top:14px"><span class="co-t">TRACE BOUNDARY</span><p><span class="i18n-text" data-i18n-zh="记录 observable trajectory：tool calls、handoffs、guardrails、state transitions、errors、artifacts、latency/cost；不要把 private hidden Chain-of-Thought 当成 Harness 必须落盘的数据。" data-i18n-en="Trace observable trajectory—tool calls, handoffs, guardrails, state transitions, errors, artifacts, latency, and cost. Do not make private hidden chain-of-thought a required harness log.">记录 observable trajectory：tool calls、handoffs、guardrails、state transitions、errors、artifacts、latency/cost；不要把 private hidden Chain-of-Thought 当成 Harness 必须落盘的数据。</span></p></div>
+    </div>
+  </div>
+
   <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="外部核验日期：2026-09-28。来源包括 Anthropic Building Effective Agents、Pi 当前源码与 Session 文档、Anthropic claude-cookbooks、12-factor-agents，以及 OpenAI Harness Engineering。产品事实作为 implementation evidence，核心规则保持 vendor-neutral。" data-i18n-en="External verification date: 2026-09-28. Sources include Anthropic's Building Effective Agents, current Pi source and session documentation, Anthropic claude-cookbooks, 12-factor-agents, and OpenAI Harness Engineering. Product facts are implementation evidence; the core rules remain vendor-neutral.">外部核验日期：2026-09-28。来源包括 Anthropic Building Effective Agents、Pi 当前源码与 Session 文档、Anthropic claude-cookbooks、12-factor-agents，以及 OpenAI Harness Engineering。产品事实作为 implementation evidence，核心规则保持 vendor-neutral。</span></p>
 </section>

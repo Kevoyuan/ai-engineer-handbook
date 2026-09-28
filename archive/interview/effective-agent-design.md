@@ -172,6 +172,197 @@ environment?
 
 而不是统一归因成“Prompt 不够好”。
 
+
+## 如果追问：模型越来越强，Harness 还需要吗？
+
+需要，但职责会迁移。
+
+更准确的回答是：
+
+~~~text
+Weak-model era
+→ Harness compensates for weak cognition
+
+Strong-model era
+→ Harness increasingly governs powerful action
+~~~
+
+会减少的是：
+
+~~~text
+malformed tool-call repair
+rigid format retry
+simple planning scaffolds
+basic argument normalization
+some self-correction
+~~~
+
+因为这些能力可能被：
+
+~~~text
+model
+provider API
+agent SDK
+workflow runtime
+~~~
+
+吸收。
+
+但模型越强，我们通常越敢让 Agent：
+
+~~~text
+run longer
+touch production resources
+call more APIs
+modify files / databases
+coordinate with other agents
+operate with less supervision
+~~~
+
+于是这些 Harness 保证反而更重要：
+
+~~~text
+permission / policy
+sandbox / workspace isolation
+durable state / checkpoint
+budget / rate / timeout
+human approval
+side-effect control
+trace / audit
+failure recovery
+multi-tenant boundary
+~~~
+
+所以我不会问“这段 Harness 代码还要不要自己写”，而会问：
+
+> 这个系统 guarantee 现在由哪一层负责？
+
+可能是 model、SDK、workflow engine、sandbox platform，也可能是我们自己的 runtime。
+
+最终一句：
+
+> **Model improvement removes some scaffolding; it does not remove the need for runtime guarantees.**
+
+## 如果追问：Harness 是不是 LangGraph 这类框架？
+
+不是。
+
+~~~text
+Framework
+→ one implementation vehicle
+
+Harness
+→ runtime controls around model execution
+~~~
+
+Harness 可以由：
+
+~~~text
+LangGraph
+OpenAI Agents SDK
+Temporal
+custom runtime
+sandbox platform
+or a combination
+~~~
+
+共同承担。
+
+即使直接调用模型 API、完全不用 Agent Framework，只要系统自己实现：
+
+~~~text
+tool dispatch
+state
+permission
+sandbox
+budget
+retry
+trace
+approval
+recovery
+~~~
+
+这些依然是 Harness。
+
+## 如果追问：模型足够聪明以后，权限和治理能不能交给模型自己？
+
+不能把 capability 和 authority 混在一起。
+
+~~~text
+Capability
+→ can the model decide what to do?
+
+Authority
+→ is the system allowed to execute it?
+~~~
+
+模型规划能力再强，也不应该因为“判断更准”就自动获得：
+
+~~~text
+production credentials
+tenant-wide access
+unbounded token budget
+irreversible deployment permission
+right to ignore policy
+~~~
+
+所以模型越能自主行动，越需要把权限和 blast radius 写成明确 runtime boundary。
+
+## 如果追问：轨迹记录是不是把模型每一步思考都存下来？
+
+不是。
+
+生产 Trace 应记录 observable execution：
+
+~~~text
+model / prompt version
+tool call
+tool args where allowed
+tool result
+handoff
+guardrail result
+state transition
+checkpoint
+retry / error
+approval
+latency
+token / cost
+artifact / evidence
+~~~
+
+不要把 hidden Chain-of-Thought 当成 Harness 的必要日志。
+
+调试、审计和 Eval 应尽量建立在：
+
+~~~text
+observable actions
+environment results
+state transitions
+artifacts
+evidence
+~~~
+
+而不是 private reasoning internals。
+
+## 如果追问：Agent = LLM + Harness 吗？
+
+可以当面试记忆公式，但不要说成严格定义。
+
+更准确：
+
+~~~text
+Agent capability
+≈ model intelligence
++ runtime / harness guarantees
++ environment / tool access
+~~~
+
+不同产品对 Agent 边界定义不一样。
+
+面试时可以总结成：
+
+> **Model capability and Harness guarantees are complementary system dimensions, not substitutes.**
+
 ## Canonical references
 
 - Chapter 08 §8.14 · Effective Agent Harness
@@ -187,3 +378,6 @@ Sources:
 - https://github.com/earendil-works/pi
 - https://github.com/humanlayer/12-factor-agents
 - https://openai.com/index/harness-engineering/
+- https://openai.github.io/openai-agents-python/
+- https://openai.github.io/openai-agents-python/tracing/
+- https://openai.github.io/openai-agents-js/
