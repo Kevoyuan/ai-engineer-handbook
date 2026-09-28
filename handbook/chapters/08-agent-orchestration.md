@@ -4172,6 +4172,728 @@ Sources:
 - https://docs.temporal.io/workflow-definition
 
 
+
+## 8.16 Multi-Agent Consistency：一致性不是“大家说一样”，而是系统有唯一可解释的提交语义
+
+“多 Agent 如何保证结果一致？”如果只回答：
+
+~~~text
+让 Agent 互相同步消息
+→ 共享一个状态池
+→ 加锁
+→ 最后再让 Judge 看一遍
+~~~
+
+仍然不够。
+
+因为 **Consistency** 至少包含四个不同问题：
+
+~~~text
+1. State Consistency
+   → 大家基于哪个 authoritative state 做决策？
+
+2. Execution Consistency
+   → 同一个 task / side effect 会不会被重复执行？
+
+3. Artifact Consistency
+   → 哪个结果版本是真正 committed、可被下游消费的？
+
+4. Decision Consistency
+   → 多个结论冲突时，系统按什么 authority / evidence / policy 得到最终动作？
+~~~
+
+> **Multi-Agent consistency is not agreement among models; it is controlled state, execution, artifact, and decision semantics.**
+
+这四层分别对应本章已有机制：
+
+~~~text
+State
+→ §8.4 State Machine
+→ §8.13 CAS / ownership
+→ §8.15 durable workflow state
+
+Execution
+→ §8.3 idempotency / reconciliation
+→ §8.15 lease / retry / side-effect recovery
+
+Artifact
+→ §8.1 version / lineage / validation
+→ §8.15 validate-before-commit
+
+Decision
+→ §8.13 authority / verifier / escalation
+~~~
+
+本节负责把它们统一成“Consistency Model”。
+
+### 8.16.1 State Consistency：先定义谁拥有真状态
+
+一致性的第一步不是让 Agent 多聊天，而是定义：
+
+~~~text
+authoritative state owner
+read model
+write model
+version / revision
+commit semantics
+staleness policy
+~~~
+
+危险设计：
+
+~~~text
+Agent A local state = task complete
+Agent B local cache = task running
+Agent C conversation = task not started
+~~~
+
+每个 Agent 都可能“在自己的世界里正确”，但系统没有唯一事实来源。
+
+更稳健：
+
+~~~text
+Authoritative Workflow State
+        ↓
+versioned read
+        ↓
+Agent local working view
+        ↓
+proposed mutation
+        ↓
+controlled commit
+~~~
+
+Agent-local memory / cache 可以存在，但必须知道：
+
+~~~text
+local view
+≠
+authoritative committed state
+~~~
+
+状态写入可以由不同机制实现：
+
+~~~text
+single-writer orchestrator
+transactional database
+revision / CAS
+partition owner
+workflow engine
+event-sourced state machine
+serialized queue
+~~~
+
+重点不是技术名，而是：
+
+> **Every shared mutation needs a single, inspectable commit path.**
+
+### 8.16.2 “所有 Agent 都必须读最新数据”不是必要条件
+
+视频把“一致性”描述成“所有 Agent 看到最新数据”，这对于某些业务过强，也未必经济。
+
+要先问任务需要什么 consistency level：
+
+~~~text
+read-only parallel research
+→ stable snapshot may be enough
+
+independent retrieval branches
+→ slightly stale read may be acceptable
+
+financial approval / inventory decrement
+→ stronger serialization / ownership needed
+
+shared task ownership
+→ stale claim must be rejected
+
+high-risk production change
+→ current policy / permission state required
+~~~
+
+因此要区分：
+
+~~~text
+freshest possible view
+≠
+correct consistency contract
+~~~
+
+有时最好的做法反而是让一批 Worker 固定读取同一个 versioned snapshot：
+
+~~~text
+snapshot_version = 42
+
+Worker A → v42
+Worker B → v42
+Worker C → v42
+~~~
+
+这样结果更可比较，也避免执行过程中 source 不断变化导致内部不一致。
+
+> **Consistency should be specified per state boundary, not as a vague requirement that everyone always sees “the latest”.**
+
+### 8.16.3 Central Orchestrator：常见且有效，但不是唯一架构
+
+Anthropic 的 Research multi-agent system 当前使用：
+
+~~~text
+Lead / Orchestrator
+→ dynamically decomposes work
+→ spawns parallel subagents
+→ subagents return findings
+→ Lead synthesizes final result
+~~~
+
+这种架构的优势是：
+
+~~~text
+clear task ownership
+central progress view
+controlled fan-out / fan-in
+easy policy / budget enforcement
+clear synthesis point
+~~~
+
+所以对于：
+
+~~~text
+one business workflow
+one authority domain
+many bounded workers
+~~~
+
+中心化调度通常很好用。
+
+但不能把：
+
+~~~text
+production multi-agent
+=
+subagents must never communicate directly
+~~~
+
+写成通用定律。
+
+A2A v1.0 当前就是为了不同 framework / vendor 的 Agent 之间进行 interoperable communication、delegation 和 collaboration。
+
+因此更准确的规则是：
+
+> **Direct agent communication may carry information or negotiation, but authoritative state transitions and side effects still need explicit ownership and commit semantics.**
+
+也就是说：
+
+~~~text
+Agent-to-Agent message
+→ advisory / coordination signal
+
+State transition
+→ authoritative control-plane operation
+~~~
+
+两者不要混为一谈。
+
+### 8.16.4 Shared State：不是“所有 Agent 只能读”，而是写操作必须受控
+
+一种过度修正是：
+
+~~~text
+all Agents
+→ read-only shared state
+
+only master
+→ write
+~~~
+
+这是可行的 **single-writer** 架构，但不是唯一安全方案。
+
+Worker 也可以写共享状态，只要 mutation 经过明确协议，例如：
+
+~~~text
+claim_task(task_id, expected_revision)
+
+submit_artifact(
+  task_id,
+  artifact_id,
+  expected_revision
+)
+
+complete_task(
+  task_id,
+  expected_revision,
+  validation_ref
+)
+~~~
+
+而不是：
+
+~~~text
+agent directly edits arbitrary global JSON
+~~~
+
+安全边界是：
+
+~~~text
+typed mutation
++ authorization
++ validation
++ concurrency control
++ audit
+~~~
+
+所以：
+
+> **Do not prohibit all worker writes; prohibit uncontrolled shared-state mutation.**
+
+### 8.16.5 Execution Consistency：不要轻易声称 Exactly Once
+
+多 Agent 并行 + retry 下，常见执行现实更接近：
+
+~~~text
+dispatch
+→ timeout
+→ caller does not know whether worker executed
+→ retry
+~~~
+
+因此：
+
+~~~text
+message delivered once
+task started once
+business side effect happened once
+~~~
+
+是三个不同保证。
+
+DeepSeek Harness 当前 Agent Teams 文档明确描述了：
+
+~~~text
+process-local retry
+target-session de-duplication
+~~~
+
+但不声称：
+
+~~~text
+cross-process exactly once
+~~~
+
+这类边界非常重要。
+
+生产系统更常追求：
+
+~~~text
+at-least-once delivery
++
+idempotent / deduplicated execution
++
+reconciliation
+=
+effectively-once business effect
+~~~
+
+例如：
+
+~~~text
+task_id = t123
+operation_id = op456
+idempotency_key = tenant:t123:op456
+~~~
+
+Worker 重试时先问：
+
+~~~text
+has this operation already committed?
+~~~
+
+而不是无条件再执行一次。
+
+> **Exactly-once is not a prompt property; business effects need idempotency, uniqueness, or reconciliation semantics.**
+
+### 8.16.6 Lock 不是幂等，也不是一致性的默认答案
+
+锁解决的是：
+
+~~~text
+who may enter this critical section now?
+~~~
+
+幂等解决的是：
+
+~~~text
+if this operation happens again,
+does the business state remain correct?
+~~~
+
+它们不是一回事。
+
+例如：
+
+~~~text
+distributed lock acquired
+→ call payment API
+→ payment succeeds
+→ worker crashes
+→ lock expires
+→ next worker calls payment again
+~~~
+
+锁没有阻止重复副作用。
+
+常见控制要按问题选：
+
+| Problem | Better primitive |
+|---|---|
+| stale state update | revision / CAS |
+| one active owner | lease |
+| short critical DB mutation | transaction / row lock |
+| partitioned workload | ownership / partition assignment |
+| duplicate task dispatch | dedupe key |
+| duplicate business effect | idempotency / unique business key |
+| unknown remote outcome | reconciliation |
+| reversible multi-step side effect | compensation / Saga |
+
+分布式锁当然可以用，但要考虑：
+
+~~~text
+lease expiration
+dead worker
+clock / timeout
+lock contention
+deadlock
+network partition
+side effect after lock loss
+~~~
+
+> **Use locks for mutual exclusion when needed; do not use “add a distributed lock” as a substitute for a full execution-consistency model.**
+
+### 8.16.7 Artifact Consistency：结果不能“直接拼”，但也不是必须只有一个文本答案
+
+多 Agent 并行得到：
+
+~~~text
+Result A
+Result B
+Result C
+~~~
+
+不能默认：
+
+~~~text
+concat(A, B, C)
+→ final
+~~~
+
+更合理：
+
+~~~text
+candidate artifacts
+→ normalize schema
+→ deduplicate
+→ provenance check
+→ conflict detection
+→ validation / synthesis
+→ committed artifact
+~~~
+
+但“最终输出唯一准确”也不是任何 Validator 能自动保证的。
+
+尤其开放式研究、诊断、规划任务中，合理结果可能包含：
+
+~~~text
+multiple hypotheses
+uncertainty
+disagreement
+missing evidence
+conditional recommendation
+~~~
+
+因此 Validator 的目标不是强行制造一致，而是区分：
+
+~~~text
+supported agreement
+resolvable conflict
+unresolved conflict
+insufficient evidence
+policy escalation
+~~~
+
+> **A reliable system preserves meaningful disagreement until evidence or authority resolves it.**
+
+### 8.16.8 Decision Consistency：最终动作要有确定的裁决路径
+
+多 Agent 一致性最终还要回答：
+
+~~~text
+Agent A recommends action X
+Agent B recommends action Y
+What happens now?
+~~~
+
+错误答案：
+
+~~~text
+majority vote
+or
+another Judge says X
+~~~
+
+更完整：
+
+~~~text
+Conflict
+→ classify conflict type
+→ gather independent evidence
+→ apply deterministic rule where possible
+→ contextual Judge when needed
+→ authority / policy check
+→ human escalation for high-risk uncertainty
+→ committed decision
+~~~
+
+不同决策可以有不同 owner：
+
+~~~text
+technical finding
+→ specialist + verifier evidence
+
+workflow sequencing
+→ orchestrator
+
+permission
+→ policy engine
+
+financial approval
+→ authorized human / business policy
+
+final user-facing synthesis
+→ lead / synthesizer
+~~~
+
+一致性不是：
+
+~~~text
+everyone internally agrees
+~~~
+
+而是：
+
+~~~text
+same evidence + same policy + same committed state
+→ same legal resolution path
+~~~
+
+### 8.16.9 Communication Topology 与 Consistency Topology 要分开
+
+系统可能采用：
+
+~~~text
+Star
+Lead ↔ Workers
+
+Peer
+Agent A ↔ Agent B ↔ Agent C
+
+Blackboard
+Agents ↔ Shared State
+
+Hybrid
+Lead + direct specialist negotiation + shared artifacts
+~~~
+
+这些描述的是：
+
+~~~text
+who can communicate with whom
+~~~
+
+但一致性控制还要单独定义：
+
+~~~text
+who owns state?
+who can commit?
+how is stale data detected?
+how are effects deduplicated?
+how are conflicts resolved?
+what is authoritative?
+~~~
+
+因此：
+
+> **Communication topology does not define consistency semantics.**
+
+一个 peer-to-peer 系统也可以很严格；
+一个“一主多从”系统如果主 Agent 自由覆盖 state，也可以非常不一致。
+
+### 8.16.10 Four-Layer Consistency Control Plane
+
+统一架构：
+
+~~~text
+                MULTI-AGENT RUNTIME
+                        │
+        ┌───────────────┼────────────────┐
+        │               │                │
+        ▼               ▼                ▼
+   Agent / Worker   Agent / Worker   Agent / Worker
+        │               │                │
+        └──── messages / artifacts ──────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│ CONSISTENCY CONTROL PLANE                           │
+│                                                     │
+│ State                                               │
+│ → authoritative store · revision · snapshot         │
+│                                                     │
+│ Execution                                           │
+│ → task id · lease · dedupe · idempotency            │
+│                                                     │
+│ Artifact                                            │
+│ → schema · lineage · validation · commit status     │
+│                                                     │
+│ Decision                                            │
+│ → evidence · authority · policy · escalation        │
+└─────────────────────────────────────────────────────┘
+                        │
+                        ▼
+                COMMITTED OUTCOME
+~~~
+
+核心不是 Agent 之间“不交流”，而是：
+
+~~~text
+communication may be flexible
+
+commit semantics
+must be explicit
+~~~
+
+### 8.16.11 Consistency Verification：故意制造并发和错误
+
+至少测试：
+
+~~~text
+two workers claim same task
+same task delivered twice
+stale worker submits old revision
+worker crashes after remote side effect
+lock / lease expires during execution
+two agents update different state fields concurrently
+artifact references stale dependency
+two valid agents produce contradictory evidence
+Judge disagrees with deterministic verifier
+orchestrator restarts after workers completed
+direct agent message conflicts with committed state
+~~~
+
+期望行为不是“系统永远没有冲突”，而是：
+
+~~~text
+stale mutation rejected
+duplicate effect prevented / reconciled
+conflict preserved with evidence
+invalid artifact not committed
+authority path deterministic
+high-risk unresolved conflict escalated
+~~~
+
+指标：
+
+~~~text
+duplicate_task_execution_rate
+duplicate_business_effect_rate
+
+stale_read_incident_rate
+stale_write_rejection_rate
+
+artifact_conflict_rate
+invalid_artifact_commit_rate
+
+unresolved_conflict_rate
+incorrect_conflict_resolution_rate
+
+reconciliation_success_rate
+lease_reassignment_success_rate
+
+cost_per_committed_task
+~~~
+
+### 8.16.12 面试回答：从“四个机制”升级成“四层一致性”
+
+如果面试官问：
+
+> “生产级 Multi-Agent 怎么保证一致性？”
+
+可以回答：
+
+> 我不会把一致性简单等同于“Agent 互相同步消息”或者“一主多从 + 分布式锁”。我会先拆四层。第一是 State Consistency：必须有 authoritative workflow state 和明确的 mutation/commit path，Worker 可以通过 CAS、transaction、single-writer orchestrator 等方式更新，但不能各自维护多个 source of truth。第二是 Execution Consistency：多 Agent retry 天然可能重复 dispatch，所以用 task id、lease、dedupe、idempotency 和 reconciliation 控制副作用，而不是只依赖锁。第三是 Artifact Consistency：Agent 输出先是 candidate artifact，要经过 schema、semantic、integrity、acceptance validation 后才能 commit 给下游，不能直接拼接。第四是 Decision Consistency：当多个 Agent 结论冲突时，通过 evidence、deterministic verifier、authority/policy 和必要的人审得到 committed decision；一致性不是要求所有模型观点相同，而是相同状态和 policy 下有可重复的裁决路径。中心 Orchestrator 是常见实现，但不是唯一架构，Agent 之间也可以直接通信，只是 direct message 不能绕过 authoritative state 和 side-effect control。
+
+最短版：
+
+~~~text
+State
+→ one authoritative commit path
+
+Execution
+→ dedupe + idempotency + reconciliation
+
+Artifact
+→ validate before commit
+
+Decision
+→ evidence + authority + policy
+~~~
+
+> **Single-Agent quality depends heavily on model capability; Multi-Agent reliability depends heavily on coordination and commit semantics.**
+
+### 8.16.13 Source boundary · Multi-Agent Consistency
+
+Primary input:
+
+- 用户提供的视频总结《多Agent一致性问题的完整解析》：统一状态、中心调度、幂等/锁、结果校验，以及避免完全自由协作。
+
+Source-derived ideas retained:
+
+- Multi-Agent 的生产风险包括状态不同步、任务重复执行和结果冲突；
+- 系统需要 authoritative shared state；
+- 任务需要唯一标识与重复执行控制；
+- Agent 输出需要 validation / conflict handling；
+- Orchestrator-worker 是常见可落地的协调架构；
+- Agent 不应任意修改无治理的全局状态。
+
+Handbook corrections / synthesis:
+
+- “一致性”拆成 State / Execution / Artifact / Decision 四层；
+- “所有 Agent 必须看到最新状态”改写成 per-boundary consistency contract；某些并行任务使用稳定 snapshot 比追逐 latest 更可靠；
+- “中心化主 Agent 是生产唯一解”改写成常见 pattern，而不是 universal law；
+- A2A 当前生产协议说明 peer / cross-framework agent communication 本身可以是合法架构；
+- “子 Agent 禁止直接通信”改写为：direct communication 可以存在，但不能绕过 authoritative commit / policy / side-effect control；
+- “所有 Agent 只读共享状态”改写为：允许通过 typed, authorized, validated mutation API 写入，禁止 uncontrolled mutation；
+- “幂等 + 分布式锁”拆开：锁负责 mutual exclusion，幂等负责 duplicate effect correctness；
+- 不承诺 cross-process exactly-once；优先设计 at-least-once + dedupe/idempotency/reconciliation；
+- “Validator 保证最终唯一准确”改写为 conflict classification、evidence preservation、abstention / escalation；开放式任务可以保留合理分歧；
+- 把 communication topology 与 consistency topology 分开。
+
+External verification date: 2026-09-28.
+
+Verified implementation / architecture examples:
+
+- Anthropic Research multi-agent system uses an orchestrator-worker architecture with a Lead coordinating parallel subagents and synthesizing findings.
+- Anthropic Building Effective Agents documents the orchestrator-workers pattern as one workflow architecture, not the only possible multi-agent topology.
+- A2A v1.0 is a production-ready open protocol for agent-to-agent communication and collaboration across frameworks/vendors, demonstrating that direct/peer agent communication is not inherently a demo-only anti-pattern.
+- DeepSeek Harness current Agent Teams uses durable task snapshots, monotonic revision/CAS, dependencies and process-local message retry/de-duplication; its documentation explicitly does not claim cross-process exactly-once, and writeScopes are advisory rather than locks.
+
+Sources:
+
+- https://www.anthropic.com/engineering/multi-agent-research-system
+- https://www.anthropic.com/engineering/building-effective-agents
+- https://a2a-protocol.org/v1.0.0/
+- https://a2a-protocol.org/dev/blog/2026/03/12/a2a-protocol-ships-v10-production-ready-standard-for-agent-to-agent-communication/
+- https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/agent-team.md
+- https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/feature/2026-08-05-agent-teams.md
+
+
 ## Verification boundary · 2026-09-28
 
 幂等 key 需要服务端实现。Reducer 合并状态，不替代分支 join；InMemorySaver 不支持进程重启恢复。DeepSeek writeScopes 是提示，不是锁；Pi / DeepSeek 的具体行为均受源码版本约束。

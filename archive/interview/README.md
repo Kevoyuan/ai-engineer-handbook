@@ -20,3 +20,4 @@ The reusable engineering principle behind any useful interview question should b
 - [LangChain / LangGraph Interview Card](./langchain-langgraph-interview.md) — 30-second and 60–90 second answers, minimal state-machine follow-up, and checkpoint/state pitfalls.
 - [Effective Agent Design Interview Card](./effective-agent-design.md) — Simplicity, Transparency, ACI, Harness, Pi implementation boundaries, and tool-interface follow-ups.
 - [Long-Running Multi-Agent Collaboration](./long-running-multi-agent-collaboration.md) — Durable state, validated handoff, concurrency control, checkpoint recovery, leases, and side-effect reconciliation.
+- [Multi-Agent Consistency](./multi-agent-consistency.md) — State, execution, artifact, and decision consistency; locks vs idempotency; orchestration vs peer communication.
