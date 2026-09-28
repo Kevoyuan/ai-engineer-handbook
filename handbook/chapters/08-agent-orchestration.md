@@ -3218,11 +3218,402 @@ eval metadata
 
 框架可以减少样板代码，但不应该让关键行为变得不可观测。
 
-### 8.14.13 Source boundary · Effective Agent Harness / ACI
+### 8.14.13 Harness Evolution：模型变强后，Harness 从 Compensation 转向 Governance Runtime
 
-Primary input:
+“模型越来越强，Harness 会不会消失？”这个问题要先把 Harness 的职责拆成两类。
+
+#### Compensatory Harness
+
+早期模型能力不足时，Harness 经常承担：
+
+~~~text
+repair malformed tool arguments
+force rigid multi-turn loops
+patch weak planning with handcrafted branching
+retry obvious formatting mistakes
+normalize outputs the model cannot reliably structure
+~~~
+
+这些机制的目标是：
+
+~~~text
+compensate for model capability gaps
+~~~
+
+当模型原生 tool calling、structured output、planning、context handling 变强时，其中一部分确实会：
+
+~~~text
+become unnecessary
+or
+move into the model / SDK / provider runtime
+~~~
+
+因此：
+
+> **A stronger model can shrink compensatory scaffolding.**
+
+但这不等于 Harness 整体价值下降。
+
+#### Governance / Runtime Harness
+
+模型越能独立完成复杂任务，系统通常越敢让它：
+
+~~~text
+run longer
+touch more tools
+access more sensitive resources
+modify files / databases
+call external APIs
+coordinate with other agents
+operate with less human intervention
+~~~
+
+这会增加新的系统责任：
+
+~~~text
+permission isolation
+sandboxing
+durable state
+checkpoint / resume
+resource budget
+timeout / cancellation
+audit trail
+side-effect control
+multi-tenant isolation
+human approval
+failure recovery
+policy enforcement
+~~~
+
+这些问题不是“模型再聪明一点”就自然消失的。
+
+所以更准确的演进是：
+
+~~~text
+Model capability ↑
+
+Compensatory Harness
+→ tends to shrink
+
+Governance / Runtime Harness
+→ tends to become more important as autonomy / blast radius ↑
+~~~
+
+> **As model capability rises, the harness shifts from correcting weak cognition to governing powerful action.**
+
+### 8.14.14 Harness 不是 Prompt Loop，而是 Model ↔ Real World Runtime Boundary
+
+把 Harness 理解成：
+
+~~~text
+while not done:
+    call_model()
+    call_tool()
+~~~
+
+过于狭窄。
+
+生产级 Harness 更像：
+
+~~~text
+                    MODEL
+                      │
+                      ▼
+┌─────────────────────────────────────────────┐
+│ HARNESS / AGENT RUNTIME                     │
+│                                             │
+│ Context / Prompt Assembly                   │
+│ Tool Dispatch / ACI                         │
+│ State / Session / Checkpoint                │
+│ Permission / Guardrail                      │
+│ Sandbox / Workspace                         │
+│ Budget / Rate / Timeout                     │
+│ Retry / Reconciliation / Recovery           │
+│ Human Approval                              │
+│ Trace / Eval Hooks                          │
+│ Policy / Multi-tenant Boundary              │
+└─────────────────────────────────────────────┘
+                      │
+                      ▼
+            FILES · APIs · DB · WEB · OS
+~~~
+
+因此可以把 Harness 定义为：
+
+> **The runtime boundary that turns model decisions into observable, constrained, recoverable interactions with the external world.**
+
+这一定义也解释了为什么：
+
+~~~text
+framework
+≠
+harness
+~~~
+
+LangGraph、Agents SDK、Temporal、custom runtime 都可以承载 Harness 的部分职责；即使完全手写，也仍然存在 Harness。
+
+更进一步：
+
+~~~text
+Harness
+≠ one library
+≠ one agent loop
+≠ one prompt template
+
+Harness
+= the set of runtime controls around model execution
+~~~
+
+### 8.14.15 哪些职责可能被模型 / Provider Runtime “吃掉”？
+
+不要把边界固定死。
+
+以下职责可能随着模型和 provider runtime 演进而上移：
+
+~~~text
+basic tool-selection heuristics
+simple format repair
+structured argument generation
+simple planning decomposition
+some retry / self-correction
+context compaction
+built-in computer / shell interaction
+basic handoff mechanics
+~~~
+
+OpenAI 当前 Agents SDK 就已经把部分过去需要应用自己写的能力放进 runtime：
+
+~~~text
+tool execution
+handoffs
+sessions
+guardrails
+tracing
+sandbox agents
+~~~
+
+这说明“Harness 消失”的说法不准确；更常见的是：
+
+> **Harness responsibilities move across layers.**
+
+有些逻辑从 application code：
+
+~~~text
+custom retry wrapper
+custom session store
+custom tracing middleware
+~~~
+
+移动到：
+
+~~~text
+model
+provider API
+agent SDK
+workflow runtime
+sandbox platform
+~~~
+
+但系统仍然要知道：
+
+~~~text
+who owns the responsibility?
+what guarantee does it provide?
+where is the failure boundary?
+how is it observed and tested?
+~~~
+
+因此 Handbook 的设计原则不是“永远自己写 Harness”，而是：
+
+> **Own the guarantees even when you outsource the implementation.**
+
+### 8.14.16 强模型不会消除 Governance，因为 Capability 与 Authority 是两回事
+
+模型可以越来越擅长：
+
+~~~text
+planning
+tool selection
+code generation
+error recovery
+reasoning across long context
+~~~
+
+但它不应该因为“更聪明”就自动获得：
+
+~~~text
+filesystem permission
+production credential
+tenant-wide access
+unbounded token budget
+irreversible deployment authority
+permission to ignore policy
+right to overwrite durable state
+~~~
+
+要区分：
+
+~~~text
+Capability
+→ can the model figure out what to do?
+
+Authority
+→ is this execution allowed to do it?
+~~~
+
+以及：
+
+~~~text
+Competence
+→ can it perform the task well?
+
+Control
+→ can the system constrain, observe, stop, recover, and audit it?
+~~~
+
+所以：
+
+> **Stronger capability increases the need for explicit authority boundaries when the blast radius also increases.**
+
+这和操作系统类比的真正可复用部分不是“CPU 变强但 OS 没消失”的历史细节，而是：
+
+~~~text
+lower-level capability improves
+→ some compensating software disappears
+→ coordination / isolation / scheduling / governance remain system responsibilities
+~~~
+
+把它作为架构类比即可，不应当作严格的一一对应历史定律。
+
+### 8.14.17 Trace：记录 Observable Trajectory，不是“把每一步思考完整落盘”
+
+视频里的“每一步思考、工具输入输出完整落盘”需要修正。
+
+生产 Trace 应优先记录：
+
+~~~text
+run / trace id
+model / prompt version
+input / output envelope
+tool call
+tool arguments where policy permits
+tool result
+handoff
+guardrail result
+state transition
+checkpoint
+retry / error
+approval
+latency
+token / cost
+artifact / diff / evidence
+~~~
+
+OpenAI Agents SDK 当前 tracing 就把：
+
+~~~text
+LLM generations
+tool calls
+handoffs
+guardrails
+custom events
+~~~
+
+作为可观测事件。
+
+但不要把“完整隐藏思维链”变成 runtime requirement。
+
+原因包括：
+
+~~~text
+hidden CoT may not be exposed
+it may contain sensitive data
+it is not a stable public contract
+debugging should rely on observable actions / evidence
+~~~
+
+因此：
+
+> **Trace observable execution, not private reasoning internals.**
+
+这与 §8.14.4 的 Transparency 原则一致。
+
+### 8.14.18 面试回答：Harness 会不会被强模型淘汰？
+
+更成熟的回答：
+
+> 会消失的是一部分 **compensatory harness**，不会消失的是 runtime control。早期很多 Harness 代码是在弥补模型不会稳定调用工具、不会结构化输出、不会做简单 planning；随着模型和 SDK 能力增强，这些逻辑确实会被模型或 provider runtime 吃掉。但模型变强后，我们也会让 Agent 跑更长任务、调用更多工具、接触更敏感资源，所以 permission、sandbox、state/checkpoint、budget、timeout、audit、side-effect control、multi-tenant isolation、human approval 这些 governance harness 反而更重要。我的判断标准不是“这段代码还要不要自己写”，而是“这个系统保证由哪一层负责”。模型负责提出和执行智能决策，Harness 负责把这些决策变成受约束、可观察、可恢复、可审计的真实世界动作。
+
+最短版：
+
+~~~text
+Weak model era
+→ Harness compensates for cognition
+
+Strong model era
+→ Harness governs autonomy
+~~~
+
+再压缩：
+
+> **Model improvement removes some scaffolding; it does not remove the need for runtime guarantees.**
+
+### 8.14.19 “Agent = LLM + Harness”作为工程近似，而不是永恒定义
+
+视频里的：
+
+~~~text
+Agent = LLM + Harness
+~~~
+
+作为面试记忆非常有用，但不应解释成严格定义。
+
+因为不同系统对 Agent 的边界不同：
+
+~~~text
+Agent
+= model + instructions + tools
+
+or
+
+Agent
+= model + runtime + state + tools
+
+or
+
+Agent
+= one logical actor inside a larger workflow runtime
+~~~
+
+Anthropic 也明确指出行业对 “Agent” 本身存在不同定义。
+
+因此 Handbook 保留它作为工程直觉：
+
+~~~text
+Useful engineering approximation:
+
+Agent capability
+≈ Model intelligence
++ Runtime / Harness guarantees
++ Environment / Tool access
+~~~
+
+而不是：
+
+~~~text
+universal formal equation
+~~~
+
+更可靠的最终关系是：
+
+> **Model capability and Harness guarantees are complementary system dimensions, not substitutes.**
+
+### 8.14.20 Source boundary · Effective Agent Harness / ACI
+
+Primary inputs:
 
 - 用户提供的视频总结：字节面试题“如何设计像 Pi 一样优秀的 Agent”，以 Anthropic Building Effective Agents 的 Simplicity / Transparency / ACI 三原则为骨架，并使用 Pi、Claude cookbook、12-factor-agents 等作为实现参考。
+- 用户提供的完整字幕《大模型变强，Harness 还有存在必要吗》：把 Harness 演进描述为 compensatory logic 被模型吸收、governance/runtime responsibility 随更高 autonomy 增强。
 
 Source-derived ideas retained:
 
@@ -3231,27 +3622,34 @@ Source-derived ideas retained:
 - Agent 每一步从真实环境结果获得 feedback；
 - ACI / Tool Definition 需要像 HCI 一样精心设计；
 - Poka-yoke 应把重复模型错误转化为 interface constraint；
-- Anthropic SWE-bench 案例将易错 relative filepath 改为 required absolute filepath；
 - Pi 当前默认 coding tools 为 read / bash / edit / write；
 - Pi prompt 根据 enabled tools 组装相关 tool inventory / guideline；
 - Pi session 当前使用 JSONL + id / parentId tree；
-- Pi compaction 可以改变 active model context，而 raw session history 仍保留；
-- Pi edit 要求 oldText 唯一，多处 edits 对同一 original file 匹配；
-- claude-cookbooks 提供 Prompt Chaining、Orchestrator-Workers、Evaluator-Optimizer 等 Building Effective Agents reference implementations；
-- 12-factor-agents 强调 own prompts / own context window。
+- 模型能力提升会减少一部分用于弥补模型弱点的 Harness 逻辑；
+- 更长任务、更广工具权限和更高 autonomy 会引入 sandbox、state、budget、audit、recovery 等 runtime governance 问题；
+- Harness 不等同于 LangGraph 或任何一个框架；
+- Harness 是模型与真实外部环境之间的运行时控制层。
 
 Handbook corrections / synthesis:
 
 - Transparency 不解释为暴露 hidden Chain-of-Thought，而是暴露 plan、action、state transition、environment evidence 与必要的 concise reasoning summary；
+- “每一步思考完整落盘”改写为 observable execution trace，不把 private CoT 作为 logging / debugging requirement；
 - “工具越少越好”改写成减少 semantic overlap 与 choice ambiguity，而不是机械最小化 tool count；
-- 不把 Pi 当前 edit 写成“必须绝对路径”：当前源码明确支持 relative or absolute；absolute-path requirement 是 Anthropic SWE-bench tool 的具体 ACI 案例；
-- Pi 被定位为 minimal-harness implementation example，不作为通用 Agent 标准；
+- 不把 Pi 当前 edit 写成“必须绝对路径”：当前源码明确支持 relative or absolute；
 - Harness feature list 被改写成 failure-driven mechanism selection；
-- ACI 优化进入 task-set → trace → failure clustering → interface repair → regression loop；
-- 12-factor-agents 的 “own” 被解释为关键行为接口必须 inspectable / testable / versionable，而不是拒绝框架；
-- Harness 与 Model 的关系被定义为 capability 与 reliability conversion 的分工，而不是二选一。
+- Harness 演进拆成 Compensatory Harness 与 Governance / Runtime Harness；
+- 不假设某个 Harness responsibility 永远留在应用层：它可以移动到 model / provider API / SDK / workflow runtime，但系统仍需拥有 guarantee contract；
+- “模型本身解决不了”改写为更精确的 capability / authority 分离：模型能力可以提高，但权限、资源、持久化和审计属于系统控制面；
+- “Agent = LLM + Harness”保留为工程近似，不作为统一正式定义；
+- 操作系统类比只保留“补偿逻辑减少、治理责任仍存在”的架构直觉，不作为严格历史映射。
 
 External verification date: 2026-09-28.
+
+Verified current examples:
+
+- Anthropic Building Effective Agents: successful implementations favor simple composable patterns; transparency and ACI are core principles; industry definitions of “agent” vary.
+- OpenAI Harness Engineering (2026-02-11): increasing agent autonomy required investment in environment legibility, tools, enforceable architecture, automated validation, observability and feedback loops; higher capability did not eliminate harness engineering.
+- OpenAI Agents SDK current docs: the runtime manages turns, tool execution, guardrails, handoffs and sessions; tracing records model generations, tool calls, handoffs, guardrails and custom events; current TypeScript SDK also exposes sandbox agents with isolated filesystem workspaces.
 
 Sources:
 
@@ -3263,8 +3661,9 @@ Sources:
 - https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/session-format.md
 - https://github.com/humanlayer/12-factor-agents
 - https://openai.com/index/harness-engineering/
-
-
+- https://openai.github.io/openai-agents-python/
+- https://openai.github.io/openai-agents-python/tracing/
+- https://openai.github.io/openai-agents-js/
 
 
 ## 8.15 Long-Running Multi-Agent Handoff：状态、契约、检查点与恢复
