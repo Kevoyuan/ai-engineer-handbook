@@ -54,4 +54,52 @@
       <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">A reliable Multi-Agent system is not one where Agents rarely disagree; it is one where disagreement has a deterministic resolution path.</p></div>
     </div>
   </div>
+
+  <div class="bfs-canvas rv" id="fig-8-r3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.R3 · FOUR-LAYER CONSISTENCY MODEL</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="一致性不是 Agent 观点相同，而是四层都有明确提交语义" data-i18n-en="Consistency is not model agreement; each of four layers needs explicit commit semantics">一致性不是 Agent 观点相同，而是四层都有明确提交语义</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="Communication topology 可以灵活，但 State、Execution、Artifact、Decision 的 authoritative path 必须可检查、可拒绝 stale/duplicate、可审计。" data-i18n-en="Communication topology may be flexible, but the authoritative paths for state, execution, artifacts, and decisions must be inspectable, reject stale or duplicate work, and remain auditable.">Communication topology 可以灵活，但 State、Execution、Artifact、Decision 的 authoritative path 必须可检查、可拒绝 stale/duplicate、可审计。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-card bfs-blue">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">STATE CONSISTENCY</span></div>
+          <h2 class="bfs-card-title">One authoritative commit path</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="authoritative store · versioned snapshot · revision/CAS · single writer / transaction / workflow engine。重点是 local view 不等于 committed state。" data-i18n-en="authoritative store · versioned snapshot · revision/CAS · single writer / transaction / workflow engine. The key boundary is that a local view is not committed state.">authoritative store · versioned snapshot · revision/CAS · single writer / transaction / workflow engine。重点是 local view 不等于 committed state。</span></div>
+        </div>
+        <div class="bfs-card bfs-amber">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">EXECUTION CONSISTENCY</span></div>
+          <h2 class="bfs-card-title">Duplicate delivery must not mean duplicate effect</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="task id · lease · dedupe · idempotency · reconciliation。Lock 解决 mutual exclusion；幂等解决重复业务副作用，两者不能混为一谈。" data-i18n-en="task id · lease · dedupe · idempotency · reconciliation. Locks address mutual exclusion; idempotency addresses duplicate business effects. They are different guarantees.">task id · lease · dedupe · idempotency · reconciliation。Lock 解决 mutual exclusion；幂等解决重复业务副作用，两者不能混为一谈。</span></div>
+        </div>
+        <div class="bfs-card bfs-teal">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">ARTIFACT CONSISTENCY</span></div>
+          <h2 class="bfs-card-title">Candidate → Validate → Commit</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="schema · provenance · lineage · integrity · acceptance。并行结果先 normalize / conflict-detect / validate，再产生 committed artifact，而不是直接 concat。" data-i18n-en="schema · provenance · lineage · integrity · acceptance. Parallel outputs are normalized, conflict-checked, and validated before a committed artifact is produced instead of being concatenated directly.">schema · provenance · lineage · integrity · acceptance。并行结果先 normalize / conflict-detect / validate，再产生 committed artifact，而不是直接 concat。</span></div>
+        </div>
+        <div class="bfs-card bfs-purple">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">DECISION CONSISTENCY</span></div>
+          <h2 class="bfs-card-title">Evidence + Authority + Policy</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="允许合理分歧存在；deterministic verifier、contextual judge、authority matrix、policy 与 human escalation 决定 committed action。" data-i18n-en="Meaningful disagreement may remain. Deterministic verifiers, contextual judges, authority matrices, policy, and human escalation determine the committed action.">允许合理分歧存在；deterministic verifier、contextual judge、authority matrix、policy 与 human escalation 决定 committed action。</span></div>
+        </div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px"><table>
+        <thead><tr>
+          <th><span class="i18n-text" data-i18n-zh="视频里的强结论" data-i18n-en="Over-strong claim">视频里的强结论</span></th>
+          <th><span class="i18n-text" data-i18n-zh="生产级改写" data-i18n-en="Production-grade rewrite">生产级改写</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="i18n-text" data-i18n-zh="子 Agent 禁止直接通信" data-i18n-en="Subagents must never communicate directly">子 Agent 禁止直接通信</span></td><td><span class="i18n-text" data-i18n-zh="可以通信，但不能绕过 authoritative state / policy / side-effect commit path" data-i18n-en="Agents may communicate, but not bypass authoritative state, policy, or side-effect commit paths">可以通信，但不能绕过 authoritative state / policy / side-effect commit path</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="所有 Agent 必须看到最新数据" data-i18n-en="Every agent must always see the latest data">所有 Agent 必须看到最新数据</span></td><td><span class="i18n-text" data-i18n-zh="按边界定义 consistency contract；有时同一 versioned snapshot 更正确" data-i18n-en="Specify consistency per boundary; sometimes one versioned snapshot is more correct">按边界定义 consistency contract；有时同一 versioned snapshot 更正确</span></td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="加分布式锁就不会重复" data-i18n-en="A distributed lock prevents duplicates">加分布式锁就不会重复</span></td><td>lock ≠ idempotency · dedupe · reconciliation</td></tr>
+          <tr><td><span class="i18n-text" data-i18n-zh="Validator 保证唯一准确答案" data-i18n-en="A validator guarantees one uniquely correct answer">Validator 保证唯一准确答案</span></td><td><span class="i18n-text" data-i18n-zh="Validator 分类 agreement / conflict / insufficient evidence，并允许 escalation" data-i18n-en="Validators classify agreement, conflict, or insufficient evidence and may escalate">Validator 分类 agreement / conflict / insufficient evidence，并允许 escalation</span></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">Communication may be flexible; commit semantics must be explicit.</p></div>
+    </div>
+  </div>
+
 </section>
