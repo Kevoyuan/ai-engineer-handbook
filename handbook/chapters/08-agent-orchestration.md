@@ -1230,7 +1230,417 @@ Ch09
 → Test / Eval / Trace / Monitoring / Learning Loop
 ~~~
 
-### 8.11.15 Source boundary
+
+### 8.11.15 Agent Engineer Capability Stack：Business → Architecture → Reliability → Delivery
+
+把 Agent 工程师能力只理解成：
+
+~~~text
+LangChain
+LangGraph
+CrewAI
+Prompt Engineering
+~~~
+
+会把“实现工具”误当成“交付能力”。
+
+更稳定的能力模型是四层：
+
+~~~text
+1. Business Decomposition
+   → 把模糊业务问题变成 bounded task / workflow / acceptance criteria
+
+2. Runtime & Capability Architecture
+   → 设计 Tool、State、Context、Workflow、Agent、Permission 与 failure path
+
+3. Reliability & Evaluation
+   → 用 Test / Eval / Trace / Metrics / Fallback 证明系统可用
+
+4. Engineering Delivery & Iteration
+   → Version / CI/CD / Release / Rollback / Operations / Production Learning
+~~~
+
+它们不是四门独立课程，而是一条交付链：
+
+~~~text
+Business Problem
+      ↓
+Task Contract
+      ↓
+Runtime Architecture
+      ↓
+Verification / Reliability
+      ↓
+Release / Operate
+      ↓
+Production Evidence
+      └────────────→ revise earlier layer
+~~~
+
+> **Agent engineering competence is the ability to turn an ambiguous business objective into a bounded, testable, observable, operable system.**
+
+#### Capability 1 · Business Decomposition：先定义问题，再设计 Agent
+
+真实输入通常不是：
+
+~~~text
+Build an Agent.
+~~~
+
+而是：
+
+~~~text
+support cost is too high
+response time is too slow
+conversion is falling
+review workload is too large
+operations require too much manual coordination
+~~~
+
+第一步应该识别：
+
+~~~text
+business outcome
+current workflow
+decision points
+deterministic steps
+uncertain judgment
+required data / tools
+human-only decisions
+approval gates
+failure / exception paths
+success metrics
+~~~
+
+然后产出 Task Contract：
+
+~~~text
+Goal
+Input
+Output
+Boundary
+Acceptance Criteria
+Risk / Approval
+Escalation
+~~~
+
+这里不要把所有业务都强行改写成 ReAct。
+
+ReAct 只是适合某些开放式、需要多轮观察与行动的局部 decision loop：
+
+~~~text
+Observe
+→ decide action
+→ execute
+→ observe
+→ continue / stop
+~~~
+
+固定审批、明确状态转换、确定性转换更适合 Workflow / deterministic service。
+
+因此：
+
+> **Business decomposition chooses the control model; the control model should not dictate the business decomposition.**
+
+#### Capability 2 · Runtime & Capability Architecture：Tool 能力只是其中一层
+
+真正的生产架构问题包括：
+
+~~~text
+Tool / Function Contract
+→ name / schema / permission / timeout / error / idempotency
+
+Workflow
+→ order / branch / retry / fallback / stop / approval
+
+Agent
+→ uncertain decision / planning / diagnosis
+
+State
+→ current execution position / durable checkpoint
+
+Context
+→ task-relevant information now
+
+Memory
+→ curated durable information
+
+Capability Routing
+→ which Tool / Skill / Workflow is eligible?
+
+Isolation
+→ tenant / sandbox / workspace / credential boundary
+~~~
+
+Function Calling 的关键目标不是“模型永远不幻觉调用”，而是：
+
+~~~text
+make valid actions easier to express
+make invalid actions rejectable
+make failures attributable
+make execution observable
+~~~
+
+Schema 可以减少 malformed arguments，但不保证：
+
+~~~text
+semantic correctness
+authorization
+business validity
+side-effect safety
+~~~
+
+失败控制也不能只写：
+
+~~~text
+retry 3 times
+~~~
+
+而要区分：
+
+~~~text
+transient failure
+→ retry / backoff
+
+invalid argument
+→ repair / reject
+
+unauthorized
+→ fail closed / approval
+
+tool unavailable
+→ fallback / escalate
+
+unknown side-effect outcome
+→ reconcile before retry
+~~~
+
+多 Agent、Context Window、Memory、Routing 也都属于这层，但只有真实 operational boundary 出现时才增加复杂度。
+
+> **Architecture quality is visible in explicit boundaries and failure semantics, not framework count.**
+
+#### Capability 3 · Reliability & Evaluation：从“感觉不错”升级成 Evidence
+
+生产系统需要回答：
+
+~~~text
+Does the task succeed?
+Where does it fail?
+How often?
+How expensive?
+How slow?
+How risky?
+When does a human take over?
+Did the new version improve anything?
+~~~
+
+指标至少分层：
+
+~~~text
+Task
+→ task success
+→ business outcome
+→ human escalation / takeover
+
+Agent / Trajectory
+→ completion rate
+→ loop / retry
+→ redundant actions
+→ recovery success
+
+Tool
+→ selection accuracy
+→ argument validity
+→ execution failure
+→ timeout / fallback
+
+System
+→ P50 / P95 / P99 latency
+→ availability / error rate
+→ tokens
+→ total cost
+→ cost per successful task
+
+Safety / Control
+→ unauthorized action rejection
+→ approval rate
+→ rollback / incident rate
+~~~
+
+不要只优化：
+
+~~~text
+model accuracy
+or
+token cost per call
+~~~
+
+因为：
+
+~~~text
+cheap model
++ more retries
++ longer trajectories
++ lower task success
+→ can cost more per successful task
+~~~
+
+因此 Chapter 09 的核心指标仍然成立：
+
+> **Optimize cost per successful task, not price per model call.**
+
+可靠性控制还包括：
+
+~~~text
+Trace
+Alert
+Rate Limit
+Timeout
+Circuit Breaker
+Fallback
+Rollback
+Human Escalation
+Runbook
+Regression Eval
+~~~
+
+但每种机制都要对应具体 failure mode，而不是为了“生产化”机械堆组件。
+
+#### Capability 4 · Engineering Delivery：上线不是结束，而是证据开始出现
+
+一个能跑的 Agent Demo 和可长期交付的系统差异通常体现在：
+
+~~~text
+versioned prompts / models / tools / workflow
+environment separation
+CI / validation
+release gate
+canary / staged rollout where needed
+rollback
+secret / permission management
+trace / dashboard / alert
+incident diagnosis
+regression dataset
+migration compatibility
+runbook
+~~~
+
+“模型升级后旧 Prompt 依然可用”不是一个可以默认保证的目标。
+
+更准确的工程要求是：
+
+~~~text
+model / prompt / tool / workflow version
+→ run fixed regression suite
+→ compare task success / safety / latency / cost
+→ release only when gates pass
+~~~
+
+也就是说：
+
+> **Compatibility should be tested, not assumed.**
+
+业务规则变化同样应该进入：
+
+~~~text
+requirement change
+→ contract / policy / tool / workflow update
+→ test / eval
+→ preview / staging
+→ release
+→ monitor
+~~~
+
+OpenAI 当前 Harness Engineering 的经验也与这一层高度一致：当 Agent 承担更多实现工作后，人的工程职责更多转向 specification、environment design、enforceable boundaries、validation、observability 与 feedback loop。该案例依赖特定 repository / tooling investment，不应无条件外推。
+
+#### Four Capabilities ↔ Handbook
+
+~~~text
+Business Decomposition
+→ Ch00 System Framework
+→ Ch08 Task Contract / Project Lifecycle
+
+Runtime & Capability Architecture
+→ Ch06 Skills / MCP / Tools / Routing
+→ Ch07 Context / Memory
+→ Ch08 Workflow / Agent / State
+
+Reliability & Evaluation
+→ Ch09 Eval / Trace / Monitoring / Cost
+
+Engineering Delivery
+→ Ch10 Deployment / Security / AI Platform
+→ Ch08 Project Lifecycle
+~~~
+
+所以这四项不是新的知识树，而是一个**学习与面试索引**。
+
+#### Demo-to-Production Diagnostic
+
+看到一个 Agent 项目，可以快速问：
+
+| Layer | Demo-level signal | Production-level evidence |
+|---|---|---|
+| Business | “做一个客服 Agent” | Task Contract + automation boundary + human gate + KPI |
+| Architecture | model + many tools | explicit tool/state/permission/failure contracts |
+| Reliability | “我试了几个问题挺准” | versioned eval set + trace + failure slices + release gates |
+| Delivery | local run / notebook | CI/CD + versioning + rollback + monitoring + runbook |
+
+如果一个候选人只会回答：
+
+~~~text
+framework
+model
+prompt
+vector DB
+~~~
+
+面试官继续追问：
+
+~~~text
+business success?
+failure boundary?
+permission?
+task success?
+regression?
+rollback?
+production incident?
+~~~
+
+通常就会暴露工程闭环是否完整。
+
+### Interview / source framing
+
+用户提供的视频将这四层包装成“拿下 35K Agent 开发岗”的能力模型。Handbook 不保留具体薪资和“80% 开发者”等未经验证的市场统计；它保留其中可复用的工程结构。
+
+Source-derived ideas retained:
+
+- 从业务问题而非框架开始；
+- 区分自动化、人工介入、审批和异常路径；
+- Tool schema、failure handling、Multi-Agent、Context management 是架构能力的一部分；
+- Task Success、Tool Failure、Latency、Token/Cost、Human Takeover 等需要量化；
+- Trace、Alert、Rate Limit、Rollback 和 Human Fallback 是生产可靠性机制；
+- CI/CD、环境隔离、版本管理、故障排查和持续迭代决定长期交付质量；
+- 前两层偏“build”，后两层偏“operate and improve”。
+
+Handbook corrections / synthesis:
+
+- 不把业务拆解统一写成 ReAct；Workflow / deterministic service / Agent loop 按 control problem 选择；
+- Function Schema 减少格式错误，但不等于 semantic correctness 或 authorization；
+- Retry / fallback / circuit breaker 按 failure taxonomy 使用，不机械堆叠；
+- “模型升级后旧 Prompt 仍可用”改成 regression-tested compatibility；
+- “框架能力”降级为 implementation knowledge，不作为核心能力层；
+- 具体薪资与“80%”比例不进入 canonical，因为来源未提供可验证市场数据。
+
+External verification date: 2026-09-29.
+
+Sources:
+
+- https://openai.com/index/harness-engineering/
+- https://www.anthropic.com/engineering/building-effective-agents
+
+
+### 8.11.16 Source boundary
 
 Primary source:
 

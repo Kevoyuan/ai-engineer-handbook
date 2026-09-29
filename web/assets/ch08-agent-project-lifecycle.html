@@ -80,4 +80,51 @@
       </div>
     </div>
   </div>
+
+  <div class="bfs-canvas rv" id="fig-8-p3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.P3 · AGENT ENGINEER CAPABILITY STACK</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="不是会几个框架，而是能不能把业务目标交付成可运营系统" data-i18n-en="The differentiator is not framework count, but turning a business objective into an operable system">不是会几个框架，而是能不能把业务目标交付成可运营系统</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="四层能力形成一条闭环：业务定义目标，架构承载执行，可靠性提供证据，交付让系统持续演进。" data-i18n-en="Four capability layers form one loop: business defines the objective, architecture carries execution, reliability supplies evidence, and delivery keeps the system evolving.">四层能力形成一条闭环：业务定义目标，架构承载执行，可靠性提供证据，交付让系统持续演进。</span></p>
+    </div></div>
+
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-card bfs-blue">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">1 · BUSINESS</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="业务拆解与流程设计" data-i18n-en="Business decomposition & workflow design">业务拆解与流程设计</span></h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="KPI · current workflow · automation boundary · human gate · exception path · Task Contract。不要先问用什么框架，先问成功是什么。" data-i18n-en="KPI · current workflow · automation boundary · human gate · exception path · Task Contract. Ask what success means before choosing a framework.">KPI · current workflow · automation boundary · human gate · exception path · Task Contract。不要先问用什么框架，先问成功是什么。</span></div>
+        </div>
+
+        <div class="bfs-card bfs-teal">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">2 · ARCHITECTURE</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="运行时与能力架构" data-i18n-en="Runtime & capability architecture">运行时与能力架构</span></h2>
+          <div class="bfs-card-desc">Tool / schema · Workflow · Agent · State · Context · Memory · Routing · Permission · failure semantics</div>
+        </div>
+
+        <div class="bfs-card bfs-purple">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">3 · RELIABILITY</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="评估、可观测性与稳定性" data-i18n-en="Evaluation, observability & reliability">评估、可观测性与稳定性</span></h2>
+          <div class="bfs-card-desc">task success · tool failure · latency · cost/success · human escalation · trace · alert · fallback · regression gate</div>
+        </div>
+
+        <div class="bfs-card bfs-amber">
+          <div class="bfs-card-head"><span class="bfs-stage-pill">4 · DELIVERY</span></div>
+          <h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="工程交付与持续迭代" data-i18n-en="Engineering delivery & continuous iteration">工程交付与持续迭代</span></h2>
+          <div class="bfs-card-desc">versioning · CI/CD · environment separation · rollout · rollback · runbook · incident diagnosis · production learning</div>
+        </div>
+      </div>
+
+      <div class="bfs-flow-container" style="margin-top:14px">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">BUSINESS PROBLEM</span></div><h2 class="bfs-card-title">“Support cost is too high”</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先转成 bounded outcome / KPI / automation boundary。" data-i18n-en="Translate first into bounded outcomes, KPIs, and automation boundaries.">先转成 bounded outcome / KPI / automation boundary。</span></div></div>
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">SYSTEM</span></div><h2 class="bfs-card-title">Task Contract → Runtime Architecture</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="选择 Workflow / Agent / Tool / State，而不是让框架反向定义业务。" data-i18n-en="Choose workflow, agent, tools, and state; do not let the framework define the business problem backwards.">选择 Workflow / Agent / Tool / State，而不是让框架反向定义业务。</span></div></div>
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">EVIDENCE</span></div><h2 class="bfs-card-title">Eval → Trace → Release Gate</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="证明任务成功、失败位置、成本和风险，而不是“感觉还不错”。" data-i18n-en="Prove task success, failure location, cost, and risk instead of relying on intuition.">证明任务成功、失败位置、成本和风险，而不是“感觉还不错”。</span></div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">PRODUCTION LEARNING ↺</span></div><h2 class="bfs-card-title">Operate → Diagnose → Regression → Improve</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="上线后才获得真实 failure distribution；证据回流到最早错误层。" data-i18n-en="Production reveals the real failure distribution; route evidence back to the earliest incorrect layer.">上线后才获得真实 failure distribution；证据回流到最早错误层。</span></div></div>
+      </div>
+
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="能力边界" data-i18n-en="Capability boundary">能力边界</span></span><p class="say">Agent engineering competence is the ability to turn an ambiguous business objective into a bounded, testable, observable, operable system.</p></div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="版本兼容" data-i18n-en="Version compatibility">版本兼容</span></span><p><span class="i18n-text" data-i18n-zh="模型升级后 Prompt 是否仍可用，不能靠假设；固定 regression suite 后再比较 task success、safety、latency 与 cost。" data-i18n-en="Do not assume prompts remain compatible after a model upgrade; run a fixed regression suite and compare task success, safety, latency, and cost.">模型升级后 Prompt 是否仍可用，不能靠假设；固定 regression suite 后再比较 task success、safety、latency 与 cost。</span></p></div>
+    </div>
+  </div>
+
 </section>
