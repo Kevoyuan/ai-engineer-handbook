@@ -1308,6 +1308,177 @@ Sources:
 - https://developers.openai.com/api/docs/guides/model-optimization
 - https://developers.openai.com/api/docs/guides/supervised-fine-tuning
 - https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning
+## 9.22 Guardrail Evidence Gate + Behavior Observability
+
+《AI Native 研发范式实践手册》提出两个值得并入 Reliability Control Plane 的设计：**行为可观测** 与 **独立 Guardrail Evidence Gate**。
+
+### 9.22.1 System Observability vs Behavior Observability
+
+System Observability 关注：
+
+~~~text
+latency
+throughput
+resource
+error
+cost
+cache
+availability
+~~~
+
+回答“系统运行是否健康”。
+
+Behavior Observability 关注一次任务实际上如何完成：
+
+~~~text
+Session
+→ Task
+→ Trajectory
+→ Step
+   ├─ Model Call
+   ├─ Tool Call
+   ├─ Skill Execution
+   └─ State Change
+→ Outcome
+~~~
+
+回答：
+
+~~~text
+Why did the Agent act this way?
+Did it complete the task?
+Was the path reasonable?
+Which evidence supported the action?
+~~~
+
+这个层级是有用的建模方式，但不是强制的跨框架标准。它可以映射到本章已有 Run / Trace / Thread 结构。
+
+> **System telemetry tells you whether the runtime is healthy; behavior telemetry tells you whether the task trajectory was acceptable.**
+
+### 9.22.2 Trace 与 Trajectory：技术调用树 vs 任务行为语义
+
+Trace 很适合表达 parent/child span、时延、错误和依赖关系；Trajectory 更强调一个 Task 从目标到 Outcome 的语义执行历史。
+
+两者可以共享 trace context：
+
+~~~text
+Trace
+→ operational call graph
+
+Trajectory
+→ task-semantic execution record
+~~~
+
+OpenTelemetry 当前提供 GenAI semantic conventions 用于统一模型、Agent、Tool 等遥测命名；这些 GenAI conventions 仍在演进，部分内容已经迁到独立 GenAI conventions repository，不能写成完全稳定的最终标准。
+
+ATIF 当前是 Harbor Framework 的 Active RFC，用 JSON 表达完整 Agent trajectory。它是有价值的 interchange format，但不是 IETF / ISO 级正式标准。
+
+### 9.22.3 Guardrail：安全判断应绑定“规则版本 + 动作快照 + Evidence”
+
+手册给出的 Guardrail 机制比“再调用一个安全 Judge”更强，因为它把生产动作检查建模成显式协议：
+
+~~~text
+GuardrailSpec@revision
++ immutable ChangeSet@digest
++ Submission(s)
++ Evidence
+→ GuardrailRun
+→ PASS / BLOCKED / UNKNOWN
+~~~
+
+其中：
+
+- **GuardrailSpec**：版本化检查目标、判定标准和 Evidence requirement；
+- **ChangeSet**：本次准备执行动作的不可变上下文快照；
+- **Submission**：Agent 对每个 Check 提交结果与证据；
+- **GuardrailRun**：把规则版本、动作快照、递增 Evidence 与最终门控结果绑定在一起。
+
+最值得保留的规则：
+
+> **UNKNOWN must not silently become PASS.**
+
+查询失败、证据不足、环境无法解释时，应保留 UNKNOWN / abstain，而不是放宽标准继续执行。
+
+### 9.22.4 Validate-at-Commit：执行前重新检查现实世界
+
+Agent 通过检查之后，真实环境可能已经变化：
+
+~~~text
+permission changed
+resource version changed
+production state changed
+risk / policy changed
+requested action changed
+~~~
+
+因此最终 side effect 之前，Executor / Release System 还要重新校验：
+
+~~~text
+current state
+current permission
+current target
+current requested action
+replay / duplication risk
+~~~
+
+这与 §8.15 的 Validate-before-Commit、§9.9 Release Gate 和 §10 的 Policy Enforcement 是同一个原则：
+
+> **Evidence collection can be delegated; authority to commit remains with the control plane.**
+
+### 9.22.5 Role separation
+
+一个可审计 Guardrail 链路可以分成：
+
+~~~text
+Rule Owner
+→ defines check semantics
+
+Agent / Investigator
+→ gathers evidence
+
+Guardrail Runtime
+→ validates protocol + aggregates results
+
+Executor / Release System
+→ revalidates current state and commits action
+
+Source Systems
+→ provide raw logs / metrics / DB facts
+~~~
+
+Guardrail Runtime 不需要理解所有业务语义；它需要确保：规则版本固定、必需检查齐全、三态协议正确、Evidence 可引用、最终结果可追溯。
+
+### 9.22.6 Source boundary · AI Native Guardrail / Observability
+
+Primary source:
+
+- 《AI Native 研发范式实践手册》3.3.2“Guardrail - 安全生产”与 3.4“Agent 可观测”。
+
+Source-derived ideas retained:
+
+- 生产 Guardrail 应绑定规则、动作上下文与 Evidence；
+- Guardrail 采用 PASS / BLOCKED / UNKNOWN 三态；
+- GuardrailSpec、ChangeSet、Submission、Evidence、GuardrailRun 形成可追溯门控链；
+- 最终执行方在真实 side effect 前重新校验现场状态；
+- Agent 可观测需要区分 system health 与 behavior trajectory；
+- Session / Task / Trajectory / Step / Outcome 是一种行为可观测层级。
+
+Handbook corrections / synthesis:
+
+- 不把该 Guardrail 对象模型写成行业统一标准，定位为可复用 implementation pattern；
+- UNKNOWN 显式映射到 abstain / hold / escalation；
+- 把 Guardrail 与已有 Release Gate、Validation、Policy Enforcement 对齐；
+- OpenTelemetry GenAI conventions 标记为 evolving conventions；
+- ATIF 标记为 Harbor Active RFC，而不是正式标准组织发布的通用标准。
+
+External verification date: 2026-09-30.
+
+Sources:
+
+- https://opentelemetry.io/docs/concepts/semantic-conventions/
+- https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/
+- https://github.com/harbor-framework/harbor/blob/main/rfcs/0001-trajectory-format.md
+
 ## Source notes
 
 LangChain Academy 课程在本章中作为 implementation evidence，而不是通用架构定义。涉及内容包括 Reliable Agents 与 Production Monitoring 中的 observability、datasets、experiments、online evals、automations、sentiment、A/B testing、security monitoring、dashboards/alerts 和 capstone。
