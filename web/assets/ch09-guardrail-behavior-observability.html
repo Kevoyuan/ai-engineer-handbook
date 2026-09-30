@@ -1,0 +1,29 @@
+<section id="guardrail-behavior-observability" aria-labelledby="guardrail-behavior-observability-title">
+  <h2 class="sub" id="guardrail-behavior-observability-title"><span class="i18n-text" data-i18n-zh="Guardrail Evidence Gate + Behavior Observability" data-i18n-en="Guardrail Evidence Gate + Behavior Observability">Guardrail Evidence Gate + Behavior Observability</span> <small>§9.G</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="生产级 Agent 不只需要“系统是否健康”的可观测性，还需要“这次任务为什么这样执行”的行为证据；高风险动作则应绑定版本化规则、不可变动作快照和 Evidence。" data-i18n-en="Production agents need more than system-health observability. They also need behavioral evidence explaining how a task executed, while high-risk actions should bind versioned rules, immutable action snapshots, and evidence.">生产级 Agent 不只需要“系统是否健康”的可观测性，还需要“这次任务为什么这样执行”的行为证据；高风险动作则应绑定版本化规则、不可变动作快照和 Evidence。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-9-g1">
+    <div class="bfs-head"><div><span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.G1 · BEHAVIOR OBSERVABILITY</span><h2 class="bfs-title">Session → Task → Trajectory → Step → Outcome</h2></div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">SYSTEM OBSERVABILITY</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="系统运行是否健康？" data-i18n-en="Is the runtime healthy?">系统运行是否健康？</span></h2><div class="bfs-card-desc">latency · throughput · errors · resource · cost · cache · availability</div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">BEHAVIOR OBSERVABILITY</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="任务为什么这样执行？" data-i18n-en="Why did the task execute this way?">任务为什么这样执行？</span></h2><div class="bfs-card-desc">trajectory · tool choice · state change · evidence · recovery · outcome</div></div>
+      </div>
+      <div class="co note" style="margin-top:14px"><span class="co-t">TRACE vs TRAJECTORY</span><p><strong>Trace</strong> = operational call graph. <strong>Trajectory</strong> = task-semantic execution record. <span class="i18n-text" data-i18n-zh="二者可以共享 trace context，但不是同一个概念。" data-i18n-en="They can share trace context without being the same concept.">二者可以共享 trace context，但不是同一个概念。</span></p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-9-g2" style="margin-top:18px">
+    <div class="bfs-head"><div><span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.9.G2 · GUARDRAIL EVIDENCE GATE</span><h2 class="bfs-title">Spec + ChangeSet + Evidence → PASS / BLOCKED / UNKNOWN</h2></div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">RULE</span></div><h2 class="bfs-card-title">GuardrailSpec@revision</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="固定检查目标、判定标准和 Evidence requirement。" data-i18n-en="Pins check objectives, decision criteria, and evidence requirements.">固定检查目标、判定标准和 Evidence requirement。</span></div></div>
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">ACTION SNAPSHOT</span></div><h2 class="bfs-card-title">immutable ChangeSet@digest</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="把“准备执行什么”冻结成不可变上下文，防止检查对象漂移。" data-i18n-en="Freezes what is about to execute so the checked object cannot drift.">把“准备执行什么”冻结成不可变上下文，防止检查对象漂移。</span></div></div>
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">EVIDENCE</span></div><h2 class="bfs-card-title">Agent Submission(s)</h2><div class="bfs-card-desc">source · observation time · scope · result · failure reason</div></div>
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">GATE</span></div><h2 class="bfs-card-title">PASS · BLOCKED · UNKNOWN</h2><div class="bfs-card-desc"><strong>UNKNOWN ≠ PASS.</strong> <span class="i18n-text" data-i18n-zh="证据不足时 hold / escalate，不放宽标准。" data-i18n-en="Insufficient evidence should hold or escalate, not relax the standard.">证据不足时 hold / escalate，不放宽标准。</span></div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">COMMIT</span></div><h2 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="执行方重新校验当前现实状态" data-i18n-en="Executor revalidates current real-world state">执行方重新校验当前现实状态</span></h2><div class="bfs-card-desc">permission · resource version · target · action · duplicate risk</div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="权限边界" data-i18n-en="Authority boundary">权限边界</span></span><p class="say">Evidence collection can be delegated; authority to commit remains with the control plane.</p></div>
+    </div>
+  </div>
+</section>
