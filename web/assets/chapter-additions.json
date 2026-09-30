@@ -89,12 +89,20 @@
     {
       "path": "/assets/ch09-agent-experience-learning.html",
       "id": "agent-experience-learning"
+    },
+    {
+      "path": "/assets/ch09-guardrail-behavior-observability.html",
+      "id": "guardrail-behavior-observability"
     }
   ],
   "07-memory-context-engineering": [
     {
       "path": "/assets/ch07-cross-session-memory.html",
       "id": "cross-session-memory"
+    },
+    {
+      "path": "/assets/ch07-enterprise-knowledge-context.html",
+      "id": "enterprise-knowledge-context"
     }
   ],
   "10-serving-deployment-ai-platform": [
@@ -105,6 +113,10 @@
     {
       "path": "/assets/ch10-production-agent-multitenancy.html",
       "id": "production-agent-multitenancy"
+    },
+    {
+      "path": "/assets/ch10-agent-runtime-control-plane.html",
+      "id": "agent-runtime-control-plane"
     }
   ]
 }
