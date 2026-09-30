@@ -5,6 +5,19 @@
   const themeBtn = document.getElementById('themeBtn');
   const langToggle = document.getElementById('langToggle');
 
+  const tools = document.querySelector('header .tools');
+  if (tools && !tools.querySelector('.repo-tbtn')) {
+    const repoLink = document.createElement('a');
+    repoLink.className = 'tbtn repo-tbtn';
+    repoLink.href = 'https://github.com/Kevoyuan/ai-engineer-handbook';
+    repoLink.target = '_blank';
+    repoLink.rel = 'noopener noreferrer';
+    repoLink.setAttribute('aria-label', 'GitHub Repository');
+    repoLink.setAttribute('title', 'GitHub Repository');
+    repoLink.textContent = 'GH';
+    tools.insertBefore(repoLink, tools.firstChild);
+  }
+
   const textOriginal = new WeakMap();
   const attrOriginal = new WeakMap();
   let residual = {};
