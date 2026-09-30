@@ -1790,6 +1790,241 @@ Sources:
 - https://docs.pinecone.io/guides/operations/moving-to-production
 - https://docs.vllm.ai/en/latest/usage/security/
 
+## 10.23 Project Runtime Context：Repository 只是可运行项目的一部分
+
+Coding Agent 能修改正确代码，不代表任务可交付。
+
+《AI Native 研发范式实践手册》给出一个非常有价值的视角：**代码仓库是显式输入，真正让项目可运行的上下文往往散落在开发者机器、共享环境和人的经验里。**
+
+一个可复现 Project Runtime Context 至少包括：
+
+~~~text
+Repository
++ Toolchain / Runtime Version
++ Initialization / Configuration
++ Database Schema / Seed Data
++ Dependency Services
++ Network Policy / Test Doubles
++ Credentials / Identity Boundary
++ Runtime Feedback / Logs
++ Verification Commands
+~~~
+
+> **Execution environment is part of the task input.**
+
+### 10.23.1 为什么“代码已经改对”仍然会失败
+
+典型失败：
+
+~~~text
+missing env/config
+schema drift
+missing migration
+private dependency unavailable
+upstream API blocked
+mock / test-double absent
+wrong runtime version
+service not ready
+network policy mismatch
+~~~
+
+这些不是代码 patch 本身能够推断或修复的全部信息。
+
+如果开发者临时在本机补一个配置、手工跑 migration、启动 Mock Server，但这些修复没有进入项目 Runtime Context，下一个 Agent / CI Worker / Sandbox 仍会重复失败。
+
+### 10.23.2 Runtime Context 应成为可版本化 Artifact
+
+可以把运行环境定义显式化为：
+
+~~~text
+runtime image / toolchain
+env schema + safe defaults
+setup / bootstrap commands
+database baseline / migrations
+service dependencies
+network allow / deny policy
+mock / fixture definitions
+verification commands
+artifact / report paths
+resource + TTL limits
+~~~
+
+然后：
+
+~~~text
+Task
+→ instantiate versioned Runtime Context
+→ execute
+→ capture logs / artifacts
+→ verify
+→ destroy / snapshot according to policy
+~~~
+
+这与本章 Sandbox Control Plane 的区别是：
+
+~~~text
+Sandbox
+→ isolation / lifecycle / capability boundary
+
+Project Runtime Context
+→ what this specific project needs to run correctly
+~~~
+
+两者应组合，而不是互相替代。
+
+### 10.23.3 OpenSandbox：实现例
+
+手册以 OpenSandbox 为例说明 Sandbox 平台可以把 public API contract、lifecycle control plane、runtime backend、data plane、network/security plane 拆开。
+
+当前 OpenSandbox 官方仓库也描述了：统一 SDK / CLI / MCP、公开 OpenAPI contract、Docker / Kubernetes runtime、per-sandbox egress policy、Credential Vault，以及 gVisor / Kata / Firecracker 等隔离运行时。
+
+这些是当前实现事实，不是所有 Sandbox 都必须采用相同组件。
+
+## 10.24 Agent Identity & Policy：把“谁在行动、代表谁、允许什么”做成控制面
+
+当 Agent 可以查数据、调用 MCP / CLI、改文件或触发生产副作用时，传统“应用账号 + 一个 Token”往往无法表达真实委托链。
+
+一个更完整的请求身份可以拆成：
+
+~~~text
+Stable Agent Identity
+→ which logical agent / service actor?
+
+Runtime Instance Identity
+→ which concrete execution instance?
+
+Task / Delegation Context
+→ why is this action being performed?
+
+User / Service Principal
+→ on whose behalf?
+~~~
+
+> **Identity answers who is acting; policy answers what this execution is allowed to do now.**
+
+### 10.24.1 Effective Permission = 交集，而不是权限并集
+
+手册给出一个很好的最小权限公式，可抽象为：
+
+~~~text
+Effective Permission
+= User Entitlement
+∩ Agent Capability Boundary
+∩ Platform Policy
+∩ Task Delegation Scope
+∩ Runtime Constraints
+~~~
+
+用户有权限，不等于 Agent 自动继承全部权限；多 Agent delegation 时，下游 scope 应保持相同或进一步收敛。
+
+### 10.24.2 PDP / PEP / Credential Broker
+
+一个生产控制链：
+
+~~~text
+User / Task Intent
+        ↓
+Model proposes tool + args
+        ↓
+Trusted Runtime Identity
+        ↓
+PEP near execution point
+        ↕
+PDP evaluates
+identity + capability + delegation + resource + policy + current context
+        ↓
+Credential Broker
+issues / exchanges short-lived scoped credential
+        ↓
+Tool / Resource
+        ↓
+Audit + revoke / expire
+~~~
+
+角色：
+
+- **PDP (Policy Decision Point)**：做 allow / deny / require-approval 等策略判断；
+- **PEP (Policy Enforcement Point)**：靠近 Tool / Gateway / Resource 执行决策；
+- **Credential Broker**：代管长期凭据，按任务兑换短期、受限凭据。
+
+### 10.24.3 长期凭据不要进入 Agent Context
+
+对于 API Key、Cookie、数据库密码或长期会话凭证：
+
+~~~text
+model context
+agent transcript
+plugin state
+ordinary logs
+~~~
+
+都不应成为默认承载位置。
+
+更稳健：
+
+~~~text
+long-lived secret
+→ trusted broker / proxy
+→ short-lived target-bound credential
+→ injected at execution boundary
+→ stripped from response / trace where possible
+~~~
+
+这样即使 Prompt Injection 或 Agent 输出被泄漏，也不会直接暴露长期 secret。
+
+### 10.24.4 Policy 必须靠近资源再次执行
+
+模型提供的 resource id / target 只是 proposal。
+
+PEP 应依据：
+
+~~~text
+trusted principal
+actual resolved resource
+current tenant / project
+current task scope
+current policy version
+requested action
+risk / approval state
+~~~
+
+重新判断。
+
+> **The model proposes intent; the enforcement point resolves and authorizes the real resource.**
+
+这与 §10.22 的 Tenant Isolation 完全一致：模型生成的 scope 不能覆盖 trusted runtime security context。
+
+### 10.24.5 Source boundary · AI Native Runtime / Identity
+
+Primary source:
+
+- 《AI Native 研发范式实践手册》3.2“Agent 运行环境”与 3.3.1“Agent Identity & Policy”。
+
+Source-derived ideas retained:
+
+- Sandbox 需要明确生命周期、实例执行、网络访问和凭据边界；
+- Repository 之外还存在 Toolchain、配置、数据基线、依赖服务、网络和运行反馈等 Project Runtime Context；
+- Agent Identity 需要区分稳定主体、运行实例、任务上下文和用户委托；
+- 有效权限应逐级收敛；
+- PDP / PEP / Credential Broker 可以形成独立于模型的授权链；
+- 长期凭据不应进入 Agent 上下文；
+- 权限必须可撤销、可追溯，并靠近资源执行。
+
+Handbook synthesis:
+
+- 将 Project Runtime Context 与 Sandbox Isolation 分层；
+- 将手册权限公式扩展为 User × Agent × Platform × Delegation × Runtime 的交集模型；
+- 与现有 Multi-Tenant Trusted Context / Tool Credential / Secret Broker 统一；
+- OpenSandbox 只作为当前实现例，不作为通用架构标准。
+
+External verification date: 2026-09-30.
+
+Sources:
+
+- https://github.com/opensandbox-group/OpenSandbox
+- https://blog.modelcontextprotocol.io/posts/2026-07-28/
+- https://blog.modelcontextprotocol.io/posts/enterprise-managed-auth/
+
 ## Canonical rules
 
 > **Prefix caching reuses computation; semantic caching reuses an answer.**
