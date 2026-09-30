@@ -460,16 +460,73 @@ MCP or Skill?
 
 > **Which layer owns interoperability, which layer owns reusable procedure, which layer owns control flow, and which layer owns authority?**
 
-### 6.5.6 Source boundary
+### 6.5.7 CLI：执行接口，不是任务方法
 
-本节补充材料来自用户提供的视频总结《MCP 与 Skill 的使用场景》。
+AI Native 手册把 MCP、CLI 与 Skill 放在同一张能力图里，这个视角有价值，但三者不能被压成同一个抽象。
+
+~~~text
+MCP
+→ protocol-level capability discovery / invocation
+
+CLI
+→ command-oriented execution interface
+
+Skill
+→ reusable task procedure / expertise
+~~~
+
+CLI 的优势是大量现有工程工具已经具备稳定命令、退出码、stdout/stderr 和脚本组合能力；Agent Runtime 可以直接利用这些成熟接口，而不必把每个操作重新包装成一个专用 Tool。
+
+但 CLI 通常不会自动提供统一的 capability discovery、业务授权、租户隔离或任务方法。不同 CLI 的认证、参数语义、错误码和副作用边界也各不相同。
+
+因此：
+
+> **MCP and CLI expose operations; Skill explains how to use capabilities to complete a task.**
+
+是否使用 MCP、CLI 或直接 API，取决于执行边界；它们都不能替代 Host-side Authorization / Policy。
+
+### 6.5.8 Capability Eval：命中能力之后，还要测“能不能正确完成”
+
+AI Native 手册提出对 MCP / Skill 同时关注“命中率”和“成功率”，这个区分值得保留。
+
+~~~text
+Capability Hit
+→ did the Agent discover / select the right capability?
+
+Capability Success
+→ after selecting it, did execution satisfy the task contract?
+~~~
+
+生产 Eval 可以继续拆成：
+
+~~~text
+discovery / candidate recall
+selection accuracy
+argument validity
+permission correctness
+execution success
+result interpretability
+recovery success
+e2e task success
+latency / cost
+~~~
+
+这避免一个常见假象：Router Top-1 很高，但参数、权限、依赖或 Tool 输出解释失败，最终任务仍然无法完成。
+
+> **Capability selection quality and capability execution quality must be measured separately.**
+
+### 6.5.9 Source boundary
+
+本节补充材料来自用户提供的视频总结《MCP 与 Skill 的使用场景》，以及《AI Native 研发范式实践手册》3.1.3 对 MCP、Skill、CLI 与工具评测的讨论。
 
 原材料保留的核心：
 
 - MCP 适合连接外部系统 / 数据源与可复用能力服务；
 - Skill 适合固化团队内部流程、领域方法和可复用知识；
 - MCP 与 Skill 可以组合使用；
-- Skill 的按需加载可以降低不必要的上下文消耗。
+- Skill 的按需加载可以降低不必要的上下文消耗；
+- CLI 可以作为成熟工程工具的执行接口；
+- Capability Eval 应区分能力命中与实际任务成功。
 
 Handbook 做了以下校正与扩展：
 
@@ -478,7 +535,9 @@ Handbook 做了以下校正与扩展：
 - MCP 统一协议接入面，不自动统一不同后端的业务语义；
 - Progressive Disclosure 明确标记为 Agent Skills 等具体 Runtime 的实现能力，而不是所有“Skill”概念的必然属性；
 - 增加 Host-side capability retrieval / permission filtering；
-- 强化 Skill / MCP / Workflow / Authorization 四层边界。
+- 强化 Skill / MCP / Workflow / Authorization 四层边界；
+- 将 CLI 定位为 command-oriented execution surface，而不是 Skill 或统一授权协议；
+- 增加 capability discovery/selection 与 execution success 的分层评测。
 
 External verification date: 2026-09-28.
 
