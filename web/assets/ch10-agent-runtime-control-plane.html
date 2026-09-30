@@ -1,0 +1,33 @@
+<section id="agent-runtime-control-plane" aria-labelledby="agent-runtime-control-plane-title">
+  <h2 class="sub" id="agent-runtime-control-plane-title"><span class="i18n-text" data-i18n-zh="Agent Runtime Control Plane：环境上下文 + Identity / Policy" data-i18n-en="Agent Runtime Control Plane: project runtime context + identity/policy">Agent Runtime Control Plane：环境上下文 + Identity / Policy</span> <small>§10.R</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="代码仓库只是显式输入。真正可交付的 Coding Agent 还需要可复现的项目运行上下文，以及独立于模型的身份、授权和凭据控制链。" data-i18n-en="A repository is only the explicit input. Deliverable coding-agent work also requires reproducible project runtime context plus identity, authorization, and credential controls outside the model.">代码仓库只是显式输入。真正可交付的 Coding Agent 还需要可复现的项目运行上下文，以及独立于模型的身份、授权和凭据控制链。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-10-r1">
+    <div class="bfs-head"><div><span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.R1 · PROJECT RUNTIME CONTEXT</span><h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Repository 之外，还有一整层“让项目真正跑起来”的隐式上下文" data-i18n-en="Beyond the repository lies an entire implicit layer required to make the project actually run">Repository 之外，还有一整层“让项目真正跑起来”的隐式上下文</span></h2></div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">TOOLCHAIN</span></div><h2 class="bfs-card-title">runtime · build tools · plugins</h2><div class="bfs-card-desc">versioned image / setup</div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">CONFIG / DATA</span></div><h2 class="bfs-card-title">env schema · DB baseline · migrations</h2><div class="bfs-card-desc">safe defaults · fixtures · seed data</div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">DEPENDENCIES</span></div><h2 class="bfs-card-title">services · mocks · network policy</h2><div class="bfs-card-desc">allow / deny · upstream / test double</div></div>
+        <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">FEEDBACK</span></div><h2 class="bfs-card-title">logs · health · exit status</h2><div class="bfs-card-desc">structured evidence for repair</div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-card-head"><span class="bfs-stage-pill">VERIFICATION</span></div><h2 class="bfs-card-title">test · lint · integration · artifact</h2><div class="bfs-card-desc">reproducible completion evidence</div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-card-head"><span class="bfs-stage-pill">SANDBOX</span></div><h2 class="bfs-card-title">isolation · lifecycle · resource limits</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Sandbox 是边界；Runtime Context 是项目语义。" data-i18n-en="Sandbox is the boundary; runtime context is project semantics.">Sandbox 是边界；Runtime Context 是项目语义。</span></div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心原则" data-i18n-en="Core rule">核心原则</span></span><p class="say">Execution environment is part of the task input.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-10-r2" style="margin-top:18px">
+    <div class="bfs-head"><div><span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.R2 · IDENTITY / POLICY MAIN PATH</span><h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="模型提出意图，PEP / PDP / Credential Broker 决定真实执行权" data-i18n-en="The model proposes intent; PEP, PDP, and the credential broker determine real execution authority">模型提出意图，PEP / PDP / Credential Broker 决定真实执行权</span></h2></div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">IDENTITY</span></div><h2 class="bfs-card-title">user + stable agent + runtime + task delegation</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="谁在行动、代表谁、为什么行动。" data-i18n-en="Who acts, on whose behalf, and why.">谁在行动、代表谁、为什么行动。</span></div></div>
+        <div class="bfs-card bfs-teal" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">PEP</span></div><h2 class="bfs-card-title">resolve actual resource + requested action</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="靠近执行点，不直接相信模型提供的 resource id。" data-i18n-en="Enforce near execution; do not blindly trust model-provided resource identifiers.">靠近执行点，不直接相信模型提供的 resource id。</span></div></div>
+        <div class="bfs-card bfs-purple" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">PDP</span></div><h2 class="bfs-card-title">policy decision</h2><div class="bfs-card-desc">identity ∩ capability ∩ platform ∩ delegation ∩ runtime</div></div>
+        <div class="bfs-card bfs-amber" style="margin-bottom:10px"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CREDENTIAL BROKER</span></div><h2 class="bfs-card-title">short-lived · scoped · target-bound</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="长期凭据留在可信控制面，不进入 Agent Context。" data-i18n-en="Long-lived credentials stay in the trusted control plane, not agent context.">长期凭据留在可信控制面，不进入 Agent Context。</span></div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">RESOURCE</span></div><h2 class="bfs-card-title">execute + audit + revoke / expire</h2><div class="bfs-card-desc">tool · API · DB · deployment · MCP server</div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">The model proposes intent; the enforcement point resolves and authorizes the real resource.</p></div>
+    </div>
+  </div>
+</section>

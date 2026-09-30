@@ -737,6 +737,119 @@ Sources:
 - https://docs.mem0.ai/features/contextual-add
 - https://arxiv.org/abs/2307.03172
 
+## 7.11 Enterprise Knowledge Context：企业知识不是“再建一个向量库”
+
+《AI Native 研发范式实践手册》把企业知识库定位成 Agent 基础设施，而不只是一次 RAG 检索：组织概念、规则、流程、案例、关系和边界需要形成可治理、可追溯、可更新的外部知识层。
+
+一个更通用的抽象：
+
+~~~text
+Knowledge Sources
+→ Organize
+→ Process
+→ Serve
+→ Govern
+→ Agent Context
+~~~
+
+### 7.11.1 四个作用
+
+企业知识层至少承担四件事：
+
+1. **Domain World Model**：把组织概念、规则、流程、案例、关系与边界组织起来，让 Agent 理解“这里的世界是什么”。
+2. **Externalized Knowledge**：把需要更新、纠正、撤回、分级和授权的知识放在模型参数之外。
+3. **Evidence + Constraint**：不仅回答“事实是什么”，还告诉 Agent 在什么条件下可以行动、依据什么行动、何时应停止或升级人工。
+4. **Shared Auditable Memory**：不同 Agent / 系统基于同一套权威知识协作，并保留 provenance、version、owner 与 permission lineage。
+
+> **Enterprise knowledge is governed context, not merely retrieved text.**
+
+### 7.11.2 Knowledge Supply 不等于 RAG
+
+面向当前任务，知识可以通过不同通道提供：
+
+~~~text
+RAG
+→ fuzzy / semantic document evidence
+
+Structured Query / API
+→ exact current business facts
+
+Local File / Repo Search
+→ project-scoped engineering context
+
+Live Business System
+→ current status / inventory / workflow state
+~~~
+
+选择依据是数据形状、时效性、权限、可验证性和失败语义，而不是统一把所有内容向量化。
+
+### 7.11.3 Knowledge Lifecycle
+
+一个企业知识资产应至少回答：
+
+~~~text
+what is it?
+where did it come from?
+who owns it?
+who may read it?
+which version is current?
+when does it expire?
+what supersedes it?
+which other knowledge depends on it?
+~~~
+
+因此可以建立：
+
+~~~text
+Raw Source
+→ normalize / classify / relate
+→ provenance + owner + validity
+→ index / API / file bundle
+→ permission-aware retrieval
+→ usage feedback
+→ correction / supersede / retire
+~~~
+
+这与本章已有 Memory Ledger 原则一致：关键事实不能只有“相似度”，还需要来源、版本、有效期和纠错关系。
+
+### 7.11.4 OKF：一个实现例，不是企业知识的唯一格式
+
+手册引用 Open Knowledge Format（OKF）作为一种人和 Agent 都可读取的知识组织方式。当前 OKF 公开规范仍是 draft；它使用 Markdown + YAML frontmatter + index 组织 typed knowledge bundle，强调 git-friendly 和 agent-readable。
+
+这说明一种可复用方向：
+
+> **Agent-facing knowledge should be inspectable and versionable by humans as well as consumable by machines.**
+
+但企业知识治理并不依赖 OKF；数据库、知识图谱、数据目录、RAG index、API 与文件 bundle 都可以是实现载体。
+
+### 7.11.5 Source boundary · AI Native Enterprise Knowledge
+
+Primary source:
+
+- 《AI Native 研发范式实践手册》3.1.2“企业知识库”。
+
+Source-derived ideas retained:
+
+- 企业知识帮助 Agent 形成领域世界模型；
+- 知识应从模型参数中外置，以便更新、纠正、撤回、分级和授权；
+- 企业知识可以为行动提供证据与约束；
+- 知识治理需要版本、责任、权限、安全边界和使用反馈；
+- 知识供给可以通过 RAG、API / 结构化查询、本地文件检索或实时系统完成。
+
+Handbook synthesis:
+
+- 将“企业知识库”提升为 governed context layer，不限定为某种存储产品；
+- 与 Memory Ledger / Provenance / Correction 统一；
+- 将 retrieval mechanism 与 knowledge governance 分离；
+- OKF 只作为可读、可版本化知识 bundle 的实现例，不作为唯一标准。
+
+External verification date: 2026-09-30.
+
+Sources:
+
+- https://okf.md/
+- https://okf.md/spec/
+
 ## Canonical rules
 
 > **The transcript is not the state.**
