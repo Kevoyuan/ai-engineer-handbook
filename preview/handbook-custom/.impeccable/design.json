@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-01T21:22:49.580286+00:00",
+  "title": "AI Engineer Handbook Preview",
+  "extensions": {
+    "colorMeta": {
+      "light-background": {
+        "role": "neutral",
+        "displayName": "Light Background",
+        "canonical": "#f4f6f4"
+      },
+      "light-foreground": {
+        "role": "neutral",
+        "displayName": "Light Foreground",
+        "canonical": "#25352f"
+      },
+      "light-card": {
+        "role": "neutral",
+        "displayName": "Light Card",
+        "canonical": "#fdfefd"
+      },
+      "light-primary": {
+        "role": "primary",
+        "displayName": "Light Primary",
+        "canonical": "#285a47"
+      },
+      "light-primary-foreground": {
+        "role": "primary",
+        "displayName": "Light Primary Foreground",
+        "canonical": "#f7faf8"
+      },
+      "light-secondary": {
+        "role": "neutral",
+        "displayName": "Light Secondary",
+        "canonical": "#e9eeea"
+      },
+      "light-secondary-foreground": {
+        "role": "neutral",
+        "displayName": "Light Secondary Foreground",
+        "canonical": "#354c40"
+      },
+      "light-muted": {
+        "role": "neutral",
+        "displayName": "Light Muted",
+        "canonical": "#edf1ed"
+      },
+      "light-muted-foreground": {
+        "role": "neutral",
+        "displayName": "Light Muted Foreground",
+        "canonical": "#59645c"
+      },
+      "light-accent": {
+        "role": "neutral",
+        "displayName": "Light Accent",
+        "canonical": "#e5eee7"
+      },
+      "light-accent-foreground": {
+        "role": "neutral",
+        "displayName": "Light Accent Foreground",
+        "canonical": "#285a47"
+      },
+      "light-border": {
+        "role": "neutral",
+        "displayName": "Light Border",
+        "canonical": "#dce3dd"
+      },
+      "light-input": {
+        "role": "neutral",
+        "displayName": "Light Input",
+        "canonical": "#f8faf8"
+      },
+      "light-ring": {
+        "role": "neutral",
+        "displayName": "Light Ring",
+        "canonical": "#367657"
+      },
+      "light-ring-inverted": {
+        "role": "neutral",
+        "displayName": "Light Ring Inverted",
+        "canonical": "#98c7ac"
+      },
+      "dark-background": {
+        "role": "neutral",
+        "displayName": "Dark Background",
+        "canonical": "#141517"
+      },
+      "dark-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Foreground",
+        "canonical": "#e7e7e9"
+      },
+      "dark-card": {
+        "role": "neutral",
+        "displayName": "Dark Card",
+        "canonical": "#1a1b1e"
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "Dark Primary",
+        "canonical": "#a0bfaf"
+      },
+      "dark-primary-foreground": {
+        "role": "primary",
+        "displayName": "Dark Primary Foreground",
+        "canonical": "#16221c"
+      },
+      "dark-secondary": {
+        "role": "neutral",
+        "displayName": "Dark Secondary",
+        "canonical": "#242529"
+      },
+      "dark-secondary-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Secondary Foreground",
+        "canonical": "#dedee2"
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Dark Muted",
+        "canonical": "#202125"
+      },
+      "dark-muted-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Muted Foreground",
+        "canonical": "#a5a6ad"
+      },
+      "dark-accent": {
+        "role": "neutral",
+        "displayName": "Dark Accent",
+        "canonical": "#292b2e"
+      },
+      "dark-accent-foreground": {
+        "role": "neutral",
+        "displayName": "Dark Accent Foreground",
+        "canonical": "#a0bfaf"
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Dark Border",
+        "canonical": "#35363b"
+      },
+      "dark-input": {
+        "role": "neutral",
+        "displayName": "Dark Input",
+        "canonical": "#1d1e21"
+      },
+      "dark-ring": {
+        "role": "neutral",
+        "displayName": "Dark Ring",
+        "canonical": "#a0bfaf"
+      },
+      "dark-ring-inverted": {
+        "role": "neutral",
+        "displayName": "Dark Ring Inverted",
+        "canonical": "#7ba78e"
+      }
+    },
+    "shadows": [
+      {
+        "name": "dark-dialog",
+        "value": "0 24px 72px rgb(10 10 12 / 48%)",
+        "purpose": "Search dialog elevation"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "surface",
+      "kind": "card",
+      "description": "Neutral article surface",
+      "refersTo": [
+        "colors.dark-card",
+        "colors.dark-foreground"
+      ],
+      "html": "<article class=\"ds-surface\">企业检索基础</article>",
+      "css": ".ds-surface { background:var(--card);color:var(--foreground); }"
+    },
+    {
+      "name": "primary",
+      "kind": "button",
+      "description": "Selected action",
+      "refersTo": [
+        "colors.dark-primary",
+        "colors.dark-primary-foreground"
+      ],
+      "html": "<button class=\"ds-primary\">开始阅读</button>",
+      "css": ".ds-primary { background:var(--primary);color:var(--primary-foreground);border-radius:var(--radius); }"
+    },
+    {
+      "name": "secondary",
+      "kind": "text",
+      "description": "Secondary reading copy",
+      "refersTo": [
+        "colors.dark-muted-foreground"
+      ],
+      "html": "<p class=\"ds-secondary\">搜索章节与概念</p>",
+      "css": ".ds-secondary { color:var(--muted-foreground); }"
+    },
+    {
+      "name": "heading",
+      "kind": "heading",
+      "description": "Neutral chapter heading",
+      "refersTo": [
+        "colors.dark-foreground"
+      ],
+      "html": "<h2 class=\"ds-heading\">企业检索基础</h2>",
+      "css": ".ds-heading { color:var(--foreground); }"
+    },
+    {
+      "name": "divider",
+      "kind": "separator",
+      "description": "Neutral row boundary",
+      "refersTo": [
+        "colors.dark-border"
+      ],
+      "html": "<div class=\"ds-divider\">章节目录</div>",
+      "css": ".ds-divider { border-bottom:1px solid var(--border);color:var(--foreground); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Knowledge manual",
+    "overview": "Neutral reading surfaces with restrained green interaction accents.",
+    "keyCharacteristics": [
+      "Charcoal dark surfaces",
+      "Readable gray-white prose",
+      "Sparse green accents"
+    ],
+    "rules": [
+      {
+        "name": "Dark color roles",
+        "body": "Keep reading surfaces and noninteractive headings neutral; reserve green for identity, selection, links and focus.",
+        "section": "Colors"
+      }
+    ],
+    "dos": [
+      "Use semantic runtime tokens"
+    ],
+    "donts": [
+      "Tint the whole dark interface green"
+    ]
+  }
+}

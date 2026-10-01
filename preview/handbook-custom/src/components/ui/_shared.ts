@@ -1,0 +1,12 @@
+export const formFieldBase =
+  "w-full rounded-[10px] px-3 text-[13px] leading-[20px] " +
+  "border-2 border-border bg-input text-foreground " +
+  "shadow-[var(--shadow-well)] " +
+  "placeholder:text-muted-foreground " +
+  "transition-[background-color,border-color,box-shadow] duration-150 " +
+  "focus-visible:outline-none focus-visible:border-ring focus-visible:bg-card focus-visible:shadow-none " +
+  "aria-invalid:border-destructive aria-invalid:bg-card " +
+  "disabled:cursor-not-allowed disabled:opacity-50"
+
+export const formFieldSingleLine = "flex h-10 py-2"
+export const formFieldMultiLine = "flex min-h-[88px] py-2.5 resize-y"

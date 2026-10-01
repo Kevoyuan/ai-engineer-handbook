@@ -8,7 +8,7 @@ The handbook is deployed on **Vercel**:
 
 https://kevoyuan-ai-handbook.vercel.app
 
-GitHub `main` is the repository source of truth. Vercel publishes this `web/` directory after accepted changes reach `main`.
+GitHub `main` is the repository source of truth. Vercel publishes the generated `web/site/` directory after changes reach `main`. The React application source lives in `../preview/handbook-custom/`; run `npm run publish:web` there to refresh the production artifact before committing. Legacy chapter URLs redirect to the corresponding reader routes.
 
 ## Site structure
 

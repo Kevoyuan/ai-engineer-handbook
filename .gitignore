@@ -1,0 +1,26 @@
+# Promo video workspace & renders
+video-promo/
+
+# OS and Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Node & Dependencies
+node_modules/
+dist/
+
+# Local Environment
+.env
+.env*.local
+
+# Vercel
+.vercel/
+
+# Local design workspace and generated tooling caches
+.workbuddy/
+*.tsbuildinfo
+preview/handbook-custom/evidence/*.png
+preview/handbook-custom/evidence/*.jpg
+preview/handbook-custom/evidence/*.jpeg

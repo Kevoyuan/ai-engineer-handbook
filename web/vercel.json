@@ -4,17 +4,104 @@
   "trailingSlash": true,
   "headers": [
     {
+      "source": "/preview-assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
+    }
+  ],
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": "site",
+  "redirects": [
+    {
+      "source": "/chapters/02-enterprise-retrieval:ext(\\.html)?",
+      "destination": "/#read/02-enterprise-retrieval",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/03-hybrid-retrieval-query-routing:ext(\\.html)?",
+      "destination": "/#read/03-hybrid-retrieval-query-routing",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/04-rag-reliability-selective-answering:ext(\\.html)?",
+      "destination": "/#read/04-rag-reliability-selective-answering",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/05-document-pdf-rag:ext(\\.html)?",
+      "destination": "/#read/05-document-pdf-rag",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/06-skills-routing:ext(\\.html)?",
+      "destination": "/#read/06-skills-routing",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/07-memory-context-engineering:ext(\\.html)?",
+      "destination": "/#read/07-memory-context-engineering",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/08-agent-orchestration:ext(\\.html)?",
+      "destination": "/#read/08-agent-orchestration",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/09-reliability-evaluation-observability:ext(\\.html)?",
+      "destination": "/#read/09-reliability-evaluation-observability",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/10-serving-deployment-ai-platform:ext(\\.html)?",
+      "destination": "/#read/10-serving-deployment-ai-platform",
+      "permanent": false
+    },
+    {
+      "source": "/chapters/00-ai-engineer-system-framework:ext(\\.html)?",
+      "destination": "/#map",
+      "permanent": false
+    },
+    {
+      "source": "/search/:path*",
+      "destination": "/#home",
+      "permanent": false
     }
   ]
 }

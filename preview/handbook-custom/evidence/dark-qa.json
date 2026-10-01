@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "widths": [
+    390,
+    1440,
+    1728
+  ],
+  "colors": {
+    "background": "#141517",
+    "foreground": "#e7e7e9",
+    "card": "#1a1b1e",
+    "muted-foreground": "#a5a6ad",
+    "primary": "#a0bfaf",
+    "primary-foreground": "#16221c"
+  },
+  "contrast": {
+    "body": 13.944717046553171,
+    "muted": 7.099781795027192,
+    "action": 8.256715293202868
+  },
+  "errors": []
+}

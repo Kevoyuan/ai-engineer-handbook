@@ -1,0 +1,272 @@
+{
+  "rawStrictAuditPassed": false,
+  "reviewedFindings": [
+    {
+      "category": "unresolved",
+      "file": "src/components/ui/time-picker.tsx",
+      "line": 26,
+      "message": "Native date/time input is used without an explicit ownership decision.",
+      "remediation": "Record Date as native or reuse the typed/authored canonical owner.",
+      "ruleId": "ownership.native-date-undecided",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "unresolved",
+      "file": "src/components/ui/chart-area-interactive.tsx",
+      "line": 163,
+      "message": "Native select is used without an explicit ownership decision.",
+      "remediation": "Record Select/Listbox as native or reuse the authored canonical owner.",
+      "ruleId": "ownership.native-select-undecided",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "unresolved",
+      "file": "src/components/ui/chart-pie-interactive.tsx",
+      "line": 131,
+      "message": "Native select is used without an explicit ownership decision.",
+      "remediation": "Record Select/Listbox as native or reuse the authored canonical owner.",
+      "ruleId": "ownership.native-select-undecided",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "unresolved",
+      "file": "src/components/ui/native-select.tsx",
+      "line": 18,
+      "message": "Native select is used without an explicit ownership decision.",
+      "remediation": "Record Select/Listbox as native or reuse the authored canonical owner.",
+      "ruleId": "ownership.native-select-undecided",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "unresolved",
+      "file": "src/components/ui/phone-input.tsx",
+      "line": 41,
+      "message": "Native select is used without an explicit ownership decision.",
+      "remediation": "Record Select/Listbox as native or reuse the authored canonical owner.",
+      "ruleId": "ownership.native-select-undecided",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/agent-chat.tsx",
+      "line": 117,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/button-group.tsx",
+      "line": 43,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/combobox.tsx",
+      "line": 38,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/data-range-picker.tsx",
+      "line": 30,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/date-picker.tsx",
+      "line": 42,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/ix-accordion.tsx",
+      "line": 320,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/ix-dropdown.tsx",
+      "line": 302,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/multi-select.tsx",
+      "line": 51,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/records-table.tsx",
+      "line": 281,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/sidebar-nav.tsx",
+      "line": 66,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/sidebar-nav.tsx",
+      "line": 222,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/sidebar.tsx",
+      "line": 93,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "SidebarItem forwards onClick through props; all rendered instances supply a handler"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/streaming-text.tsx",
+      "line": 139,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/tool-chips.tsx",
+      "line": 208,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/main.tsx",
+      "line": 646,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "Button asChild navigation renders an anchor with a chapter/map/home href, not an actionless native button"
+    },
+    {
+      "category": "violation",
+      "file": "src/main.tsx",
+      "line": 665,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "Button asChild navigation renders an anchor with a chapter/map/home href, not an actionless native button"
+    },
+    {
+      "category": "violation",
+      "file": "src/reader.tsx",
+      "line": 300,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "Button asChild navigation renders an anchor with a chapter/map/home href, not an actionless native button"
+    },
+    {
+      "category": "violation",
+      "file": "src/reader.tsx",
+      "line": 307,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "Button asChild navigation renders an anchor with a chapter/map/home href, not an actionless native button"
+    },
+    {
+      "category": "violation",
+      "file": "src/reader.tsx",
+      "line": 322,
+      "message": "Enabled literal button has no detectable action or submit behavior.",
+      "remediation": "Connect the button to a real action, make it a submit button, or disable/remove it.",
+      "ruleId": "affordance.actionless-button",
+      "severity": "error",
+      "review": "Button asChild navigation renders an anchor with a chapter/map/home href, not an actionless native button"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/agent-chat.tsx",
+      "line": 253,
+      "message": "Application-owned form does not declare its validation owner.",
+      "remediation": "Add noValidate/novalidate and implement the canonical validation contract.",
+      "ruleId": "form.novalidate-missing",
+      "severity": "error",
+      "review": "unused generated registry example"
+    },
+    {
+      "category": "violation",
+      "file": "src/components/ui/textarea.tsx",
+      "line": 17,
+      "message": "Literal product textarea does not show evidence of the canonical resize-none rule.",
+      "remediation": "Use the shared Textarea owner or apply resize-none/resize: none with adequate height or auto-grow behavior.",
+      "ruleId": "form.textarea-resize-missing",
+      "severity": "error",
+      "review": "unused generated registry example"
+    }
+  ],
+  "runtimeEvidence": [
+    "full-interactions.json",
+    "full-a11y.json",
+    "full-sweep.json",
+    "final-state-qa.json"
+  ],
+  "limitation": "The static scanner does not resolve React Slot composition or restrict itself to imported registry components. No raw strict pass is claimed."
+}

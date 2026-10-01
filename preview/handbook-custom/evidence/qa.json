@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "checks": [
+    "search results",
+    "no results",
+    "clear search",
+    "escape closes and does not reopen",
+    "bookmark filter",
+    "bookmark persistence",
+    "locale toggle",
+    "chapter table content",
+    "390/1440/1728 no viewport overflow",
+    "dark theme",
+    "mobile menu",
+    "runtime errors"
+  ],
+  "errors": []
+}

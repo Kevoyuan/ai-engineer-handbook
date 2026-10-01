@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "checks": [
+    "section search and keyboard navigation",
+    "bookmark filter and persistence",
+    "chapter navigation, back and position restoration",
+    "text size and focus reading",
+    "locale persistence and title",
+    "architecture explorer preserved",
+    "cost simulator preserved",
+    "mobile menus, focus and Escape",
+    "search empty and clear",
+    "invalid route recovery",
+    "chapter failure and retry",
+    "slow load and stale request cancellation"
+  ],
+  "errors": []
+}

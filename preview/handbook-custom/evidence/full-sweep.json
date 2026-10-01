@@ -1,0 +1,314 @@
+{
+  "results": [
+    {
+      "width": 390,
+      "slug": "02-enterprise-retrieval",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 1672,
+      "headings": 0,
+      "grids": [
+        "305px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "03-hybrid-retrieval-query-routing",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 7955,
+      "headings": 7,
+      "grids": [
+        "281px",
+        "305px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "04-rag-reliability-selective-answering",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 2231,
+      "headings": 2,
+      "grids": []
+    },
+    {
+      "width": 390,
+      "slug": "05-document-pdf-rag",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 8082,
+      "headings": 8,
+      "grids": [
+        "305px",
+        "305px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "06-skills-routing",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 10065,
+      "headings": 5,
+      "grids": [
+        "305px",
+        "281px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "07-memory-context-engineering",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 5174,
+      "headings": 4,
+      "grids": [
+        "281px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "08-agent-orchestration",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 24768,
+      "headings": 12,
+      "grids": [
+        "305px",
+        "305px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "09-reliability-evaluation-observability",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 36531,
+      "headings": 27,
+      "grids": [
+        "305px",
+        "305px"
+      ]
+    },
+    {
+      "width": 390,
+      "slug": "10-serving-deployment-ai-platform",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 10152,
+      "headings": 11,
+      "grids": [
+        "305px",
+        "305px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "02-enterprise-retrieval",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 1672,
+      "headings": 0,
+      "grids": [
+        "161.75px 161.75px 161.75px 161.75px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "03-hybrid-retrieval-query-routing",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 7955,
+      "headings": 7,
+      "grids": [
+        "209px 209px 209px",
+        "103.828px 103.828px 103.844px 103.828px 103.828px 103.844px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "04-rag-reliability-selective-answering",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 2231,
+      "headings": 2,
+      "grids": []
+    },
+    {
+      "width": 1440,
+      "slug": "05-document-pdf-rag",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 8082,
+      "headings": 8,
+      "grids": [
+        "103.828px 103.828px 103.844px 103.828px 103.828px 103.844px",
+        "127px 127px 127px 127px 127px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "06-skills-routing",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 10065,
+      "headings": 5,
+      "grids": [
+        "161.75px 161.75px 161.75px 161.75px",
+        "119.797px 119.797px 119.797px 119.797px 119.812px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "07-memory-context-engineering",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 5174,
+      "headings": 4,
+      "grids": [
+        "119.797px 119.797px 119.797px 119.797px 119.812px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "08-agent-orchestration",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 24768,
+      "headings": 12,
+      "grids": [
+        "103.828px 103.828px 103.844px 103.828px 103.828px 103.844px",
+        "161.75px 161.75px 161.75px 161.75px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "09-reliability-evaluation-observability",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 36531,
+      "headings": 27,
+      "grids": [
+        "219.656px 219.672px 219.672px",
+        "219.656px 219.672px 219.672px"
+      ]
+    },
+    {
+      "width": 1440,
+      "slug": "10-serving-deployment-ai-platform",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 10152,
+      "headings": 11,
+      "grids": [
+        "161.75px 161.75px 161.75px 161.75px",
+        "219.656px 219.672px 219.672px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "02-enterprise-retrieval",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 1672,
+      "headings": 0,
+      "grids": [
+        "161.75px 161.75px 161.75px 161.75px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "03-hybrid-retrieval-query-routing",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 7955,
+      "headings": 7,
+      "grids": [
+        "209px 209px 209px",
+        "103.828px 103.828px 103.844px 103.828px 103.828px 103.844px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "04-rag-reliability-selective-answering",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 2231,
+      "headings": 2,
+      "grids": []
+    },
+    {
+      "width": 1728,
+      "slug": "05-document-pdf-rag",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 8082,
+      "headings": 8,
+      "grids": [
+        "103.828px 103.828px 103.844px 103.828px 103.828px 103.844px",
+        "127px 127px 127px 127px 127px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "06-skills-routing",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 10065,
+      "headings": 5,
+      "grids": [
+        "161.75px 161.75px 161.75px 161.75px",
+        "119.797px 119.797px 119.797px 119.797px 119.812px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "07-memory-context-engineering",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 5174,
+      "headings": 4,
+      "grids": [
+        "119.797px 119.797px 119.797px 119.797px 119.812px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "08-agent-orchestration",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 24768,
+      "headings": 12,
+      "grids": [
+        "103.828px 103.828px 103.844px 103.828px 103.828px 103.844px",
+        "161.75px 161.75px 161.75px 161.75px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "09-reliability-evaluation-observability",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 36531,
+      "headings": 27,
+      "grids": [
+        "219.656px 219.672px 219.672px",
+        "219.656px 219.672px 219.672px"
+      ]
+    },
+    {
+      "width": 1728,
+      "slug": "10-serving-deployment-ai-platform",
+      "overflow": false,
+      "paneOverflow": false,
+      "chars": 10152,
+      "headings": 11,
+      "grids": [
+        "161.75px 161.75px 161.75px 161.75px",
+        "219.656px 219.672px 219.672px"
+      ]
+    }
+  ],
+  "errors": []
+}

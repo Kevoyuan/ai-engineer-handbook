@@ -1,0 +1,18 @@
+{
+  "library": "iconoir",
+  "prefix": "iconoir",
+  "source": "iconify",
+  "installedAt": "2026-10-01T23:43:43.120Z",
+  "icons": [
+    "arrow-right",
+    "book",
+    "bookmark",
+    "cancel",
+    "github",
+    "half-moon",
+    "language",
+    "menu",
+    "search",
+    "sun-light"
+  ]
+}

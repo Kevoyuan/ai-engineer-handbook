@@ -1,0 +1,2676 @@
+[
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "states": [
+      "viewport-390"
+    ],
+    "findings": []
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "states": [
+      "reader-390"
+    ],
+    "findings": []
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 29,
+      "total": 29
+    },
+    "states": [
+      "viewport-1440"
+    ],
+    "findings": [
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "手册目录 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@17"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-1"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "我的收藏 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@23"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-2"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "02企业检索基础 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@28"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-3"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "03混合检索与 Query Routing measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@31"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-4"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "04RAG 可靠性与选择性回答 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@34"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-5"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "05生产级 PDF RAG measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@37"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-6"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "06Skills 与路由 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@42"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-7"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "07Memory 与上下文工程 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@45"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-8"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "08Agent 编排与内容生成 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@48"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-9"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "09可靠性、评估与可观测性 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@53"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-10"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "10推理服务、部署、安全与 AI 平台 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@56"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-11"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "在 GitHub 上查看 measures 231x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(1)@60"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-12"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "搜索手册 measures 185.83x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@69"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 185.83,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-13"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "切换深色模式 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@74"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-14"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "Switch to English measures 77.5x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@77"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 77.5,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-15"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "搜索手册 measures 928.17x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "#directory-search"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 928.17,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-16"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "BM25 measures 57.53x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@106"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 57.53,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-17"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "RAG measures 48x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@107"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 48,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-18"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "Agent measures 56.63x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@108"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 56.63,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-19"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "Memory measures 68.86x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@109"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 68.86,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-20"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "全部 measures 50x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@115"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 50,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-21"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "检索与 RAG measures 92.66x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@116"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 92.66,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-22"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "Agent measures 60.33x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@117"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 60.33,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-23"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "生产 measures 50x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@118"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 50,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-24"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "收藏 measures 50x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(5)@119"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 50,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-25"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "收藏：企业检索基础 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@133"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-26"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "收藏：混合检索与 Query Routing measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@144"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-27"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "收藏：RAG 可靠性与选择性回答 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@155"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-28"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1440",
+        "severity": "moderate",
+        "message": "收藏：生产级 PDF RAG measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@166"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-29"
+      }
+    ]
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 26,
+      "total": 26
+    },
+    "states": [
+      "reader-1440"
+    ],
+    "findings": [
+      {
+        "ruleId": "spacing/off-scale-value",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "reader-1440 uses 1 off-scale spacing value across 1 element: 52px.",
+        "fix": "Replace the measured values with the nearest project spacing token. Active scale: 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 38, 40, 48, 56, 60, 64, 72, 96, 128, 240, 264px.",
+        "elementIds": [
+          "#content"
+        ],
+        "evidence": [
+          {
+            "label": "#content padding top",
+            "value": 52,
+            "unit": "px"
+          },
+          {
+            "label": "#content padding bottom",
+            "value": 52,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-1"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "手册目录 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@17"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-2"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "我的收藏 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@23"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-3"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "02企业检索基础 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@28"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-4"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "03混合检索与 Query Routing measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@31"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-5"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "04RAG 可靠性与选择性回答 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@34"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-6"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "05生产级 PDF RAG measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@37"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-7"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "06Skills 与路由 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@42"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-8"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "07Memory 与上下文工程 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@45"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-9"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "08Agent 编排与内容生成 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@48"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-10"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "09可靠性、评估与可观测性 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@53"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-11"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "10推理服务、部署、安全与 AI 平台 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@56"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-12"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "在 GitHub 上查看 measures 231x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(1)@60"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-13"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "搜索手册 measures 185.83x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@71"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 185.83,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-14"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "切换深色模式 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@76"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-15"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "Switch to English measures 77.5x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@79"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 77.5,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-16"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "收藏章节 measures 112x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@91"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 112,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-17"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "Exact 精确匹配 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(1)@282"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-18"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "BM25 词法检索 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(2)@283"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-19"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "Dense 语义检索 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(3)@284"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-20"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "Graph 关系检索 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(4)@285"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-21"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "Metadata 元数据 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(5)@286"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-22"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "能力对比 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(6)@287"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-23"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "先授权，再语义 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(7)@288"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-24"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "关键要点 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(8)@289"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-25"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1440",
+        "severity": "moderate",
+        "message": "查看原版章节 ↗ measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(9)@292"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-26"
+      }
+    ]
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 30,
+      "total": 30
+    },
+    "states": [
+      "viewport-1728"
+    ],
+    "findings": [
+      {
+        "ruleId": "spacing/off-scale-value",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "viewport-1728 uses 2 off-scale spacing values across 2 elements: 112px, 132px.",
+        "fix": "Replace the measured values with the nearest project spacing token. Active scale: 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 38, 40, 48, 56, 60, 64, 72, 96, 128, 240, 264px.",
+        "elementIds": [
+          "#content",
+          "div:nth-of-type(1)@83"
+        ],
+        "evidence": [
+          {
+            "label": "#content margin right",
+            "value": 132,
+            "unit": "px"
+          },
+          {
+            "label": "#content margin left",
+            "value": 132,
+            "unit": "px"
+          },
+          {
+            "label": "div:nth-of-type(1)@83 row gap",
+            "value": 112,
+            "unit": "px"
+          },
+          {
+            "label": "div:nth-of-type(1)@83 column gap",
+            "value": 112,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-1"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "手册目录 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@17"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-2"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "我的收藏 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@23"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-3"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "02企业检索基础 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@28"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-4"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "03混合检索与 Query Routing measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@31"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-5"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "04RAG 可靠性与选择性回答 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@34"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-6"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "05生产级 PDF RAG measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@37"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-7"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "06Skills 与路由 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@42"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-8"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "07Memory 与上下文工程 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@45"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-9"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "08Agent 编排与内容生成 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@48"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-10"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "09可靠性、评估与可观测性 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@53"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-11"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "10推理服务、部署、安全与 AI 平台 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@56"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-12"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "在 GitHub 上查看 measures 231x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(1)@60"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-13"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "搜索手册 measures 185.83x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@69"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 185.83,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-14"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "切换深色模式 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@74"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-15"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "Switch to English measures 77.5x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@77"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 77.5,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-16"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "搜索手册 measures 952.17x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "#directory-search"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 952.17,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-17"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "BM25 measures 57.53x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@106"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 57.53,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-18"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "RAG measures 48x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@107"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 48,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-19"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "Agent measures 56.63x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@108"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 56.63,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-20"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "Memory measures 68.86x32px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@109"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 68.86,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 32,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-21"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "全部 measures 50x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@115"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 50,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-22"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "检索与 RAG measures 92.66x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@116"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 92.66,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-23"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "Agent measures 60.33x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@117"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 60.33,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-24"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "生产 measures 50x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@118"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 50,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-25"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "收藏 measures 50x36px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(5)@119"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 50,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 36,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-26"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "收藏：企业检索基础 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@133"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-27"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "收藏：混合检索与 Query Routing measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@144"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-28"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "收藏：RAG 可靠性与选择性回答 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@155"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-29"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "viewport-1728",
+        "severity": "moderate",
+        "message": "收藏：生产级 PDF RAG measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@166"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-30"
+      }
+    ]
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 26,
+      "total": 26
+    },
+    "states": [
+      "reader-1728"
+    ],
+    "findings": [
+      {
+        "ruleId": "spacing/off-scale-value",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "reader-1728 uses 2 off-scale spacing values across 1 element: 52px, 132px.",
+        "fix": "Replace the measured values with the nearest project spacing token. Active scale: 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 38, 40, 48, 56, 60, 64, 72, 96, 128, 240, 264px.",
+        "elementIds": [
+          "#content"
+        ],
+        "evidence": [
+          {
+            "label": "#content padding top",
+            "value": 52,
+            "unit": "px"
+          },
+          {
+            "label": "#content padding bottom",
+            "value": 52,
+            "unit": "px"
+          },
+          {
+            "label": "#content margin right",
+            "value": 132,
+            "unit": "px"
+          },
+          {
+            "label": "#content margin left",
+            "value": 132,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-1"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "手册目录 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@17"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-2"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "我的收藏 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@23"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-3"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "02企业检索基础 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@28"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-4"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "03混合检索与 Query Routing measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@31"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-5"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "04RAG 可靠性与选择性回答 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@34"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-6"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "05生产级 PDF RAG measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(4)@37"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-7"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "06Skills 与路由 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@42"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-8"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "07Memory 与上下文工程 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@45"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-9"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "08Agent 编排与内容生成 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@48"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-10"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "09可靠性、评估与可观测性 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@53"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-11"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "10推理服务、部署、安全与 AI 平台 measures 231x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@56"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-12"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "在 GitHub 上查看 measures 231x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(1)@60"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 231,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-13"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "搜索手册 measures 185.83x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@71"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 185.83,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-14"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "切换深色模式 measures 40x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(2)@76"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 40,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-15"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "Switch to English measures 77.5x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(3)@79"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 77.5,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-16"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "收藏章节 measures 112x40px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "button:nth-of-type(1)@91"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 112,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 40,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-17"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "Exact 精确匹配 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(1)@282"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-18"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "BM25 词法检索 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(2)@283"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-19"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "Dense 语义检索 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(3)@284"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-20"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "Graph 关系检索 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(4)@285"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-21"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "Metadata 元数据 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(5)@286"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-22"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "能力对比 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(6)@287"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-23"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "先授权，再语义 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(7)@288"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-24"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "关键要点 measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(8)@289"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-25"
+      },
+      {
+        "ruleId": "spacing/touch-target",
+        "state": "reader-1728",
+        "severity": "moderate",
+        "message": "查看原版章节 ↗ measures 184x34px, below the recommended 44x44px touch target.",
+        "fix": "Increase the interactive hit area to at least 44x44px without relying on the visible icon size.",
+        "elementIds": [
+          "a:nth-of-type(9)@292"
+        ],
+        "evidence": [
+          {
+            "label": "Width",
+            "value": 184,
+            "unit": "px"
+          },
+          {
+            "label": "Height",
+            "value": 34,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-26"
+      }
+    ]
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "states": [
+      "mobile-menu-open"
+    ],
+    "findings": []
+  },
+  {
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "states": [
+      "mobile-search-open"
+    ],
+    "findings": []
+  }
+]

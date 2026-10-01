@@ -1,0 +1,25 @@
+
+> handbook-custom-preview@0.0.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 118 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                           0.43 kB │ gzip:   0.32 kB
+dist/preview-assets/geist-mono-symbols2-wght-normal-CO5SzqOn.woff2        5.81 kB
+dist/preview-assets/geist-mono-cyrillic-ext-wght-normal-X_5orZeX.woff2    6.18 kB
+dist/preview-assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2         7.42 kB
+dist/preview-assets/geist-mono-vietnamese-wght-normal-DadHysG0.woff2      7.70 kB
+dist/preview-assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2           8.00 kB
+dist/preview-assets/geist-mono-cyrillic-wght-normal-DiZS0aHC.woff2       12.94 kB
+dist/preview-assets/geist-mono-latin-ext-wght-normal-Bwz-egvJ.woff2      14.70 kB
+dist/preview-assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2            15.08 kB
+dist/preview-assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2           16.51 kB
+dist/preview-assets/geist-mono-latin-wght-normal-XN7g48iV.woff2          23.13 kB
+dist/preview-assets/geist-latin-wght-normal-BgDaEnEv.woff2               29.40 kB
+dist/preview-assets/index-DPP3ADgN.css                                   45.38 kB │ gzip:   9.47 kB
+dist/preview-assets/search-index-IAD1U7KS.js                            308.52 kB │ gzip: 116.50 kB
+dist/preview-assets/index-Dt6Xtt_n.js                                   351.19 kB │ gzip: 110.76 kB
+✓ built in 1.09s

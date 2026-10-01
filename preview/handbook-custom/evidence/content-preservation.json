@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "chapters": [
+    {
+      "chapter": "02",
+      "preservedTextNodes": 84,
+      "supplements": 0,
+      "sectionLinksValid": 9
+    },
+    {
+      "chapter": "03",
+      "preservedTextNodes": 259,
+      "supplements": 1,
+      "sectionLinksValid": 7
+    },
+    {
+      "chapter": "04",
+      "preservedTextNodes": 61,
+      "supplements": 0,
+      "sectionLinksValid": 2
+    },
+    {
+      "chapter": "05",
+      "preservedTextNodes": 200,
+      "supplements": 1,
+      "sectionLinksValid": 8
+    },
+    {
+      "chapter": "06",
+      "preservedTextNodes": 208,
+      "supplements": 3,
+      "sectionLinksValid": 5
+    },
+    {
+      "chapter": "07",
+      "preservedTextNodes": 108,
+      "supplements": 2,
+      "sectionLinksValid": 4
+    },
+    {
+      "chapter": "08",
+      "preservedTextNodes": 116,
+      "supplements": 8,
+      "sectionLinksValid": 13
+    },
+    {
+      "chapter": "09",
+      "preservedTextNodes": 627,
+      "supplements": 8,
+      "sectionLinksValid": 28
+    },
+    {
+      "chapter": "10",
+      "preservedTextNodes": 104,
+      "supplements": 3,
+      "sectionLinksValid": 11
+    }
+  ]
+}
