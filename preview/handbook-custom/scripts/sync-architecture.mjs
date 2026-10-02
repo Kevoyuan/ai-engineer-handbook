@@ -37,6 +37,12 @@ for ident in ['system-framework', 'agent-reference']:
                 a['title'] = ch[lang]
                 nav.append(a)
             node.append(nav)
+        for el in section.select('.framework-head > small'):
+            el.decompose()
+        for el in section.select('.ae-outcome, .ae-domain, .ae-runtime, .ae-control-plane, .ae-platform, .agent-entry, .agent-zone, .agent-core, .agent-validation, .agent-control, .agent-learning, .agent-equation'):
+            el['class'] = el.get('class', []) + ['diagram-panel']
+        for el in section.select('.ae-kicker, .ae-runtime-head small, .agent-shell small'):
+            el['class'] = el.get('class', []) + ['diagram-label']
         for el in section.find_all(True):
             for attr in list(el.attrs):
                 if attr.startswith('data-i18n') or attr.startswith('on'): del el[attr]

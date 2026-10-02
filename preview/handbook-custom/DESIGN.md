@@ -110,3 +110,12 @@ Keep the installed Better Design React components and assigned Iconoir icons. Th
 - Do use green only where it signals identity or interaction.
 - Don't cover the page in green or reduce secondary-text contrast.
 - Don't introduce viewport-specific palettes or low-contrast text.
+
+
+## Architecture diagram system
+
+`src/architecture.css` is the shared visual owner for both reference diagrams. `diagram-panel` provides a neutral surface, one-pixel border, 0.75rem radius and consistent inset; `diagram-label` provides a quiet, compact role label. Content and connectivity remain generated from the original source by `scripts/sync-architecture.mjs`.
+
+Role tokens are shared across both diagrams: `--diagram-evidence` (blue), `--diagram-state` (amber), `--diagram-action` (violet), and `--diagram-control` (sage). Dark variants brighten the accents without tinting the page. Use color for role labels and restrained emphasis on execution cores, not decorative borders on every module. `--diagram-rule` owns connectors and `--diagram-inset` owns module padding.
+
+The execution sequence uses numbered circles along a continuous line. Dependencies connect laterally on wide screens; compact layouts stack the execution core and dependency groups. The Agent flow preserves vertical connections when its three planes stack. All headings and prose use the handbook sans family; monospace is reserved for numerical step identifiers. Chapter links retain focus outlines and 44px mobile targets. No diagram navigation is fixed over the content.

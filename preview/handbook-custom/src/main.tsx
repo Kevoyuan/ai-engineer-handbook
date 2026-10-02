@@ -45,6 +45,7 @@ import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import "./index.css";
 import "./handbook.css";
+import "./architecture.css";
 const groups = [
   { zh: "检索与 RAG", en: "Retrieval & RAG", range: [0, 4] },
   { zh: "Agent 工程", en: "Agent engineering", range: [4, 7] },

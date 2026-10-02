@@ -12,9 +12,6 @@ export function Architecture({ en }: { en: boolean }) {
       tabIndex={-1}
     >
       <header className="map-intro">
-        <span className="map-eyebrow">
-          AI ENGINEERING · REFERENCE ARCHITECTURE
-        </span>
         <h1>{t("架构总览", "Architecture overview")}</h1>
         <p>
           {t(
@@ -38,8 +35,8 @@ export function Architecture({ en }: { en: boolean }) {
               }
             >
               {index === 0
-                ? t("01 · 系统总框架", "01 · System framework")
-                : t("02 · Agent 运行架构", "02 · Agent runtime")}
+                ? t("系统总框架", "System framework")
+                : t("Agent 运行架构", "Agent runtime")}
             </Button>
           ))}
         </nav>
