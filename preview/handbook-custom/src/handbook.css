@@ -1292,6 +1292,11 @@ body,
   --grn: #367657;
   --pur: #725aa1;
   --red: #ac4545;
+  --code-bg: var(--background);
+  --code-ink: var(--foreground);
+  --code-key: #305e9a;
+  --code-string: #326e53;
+  --code-number: #8b5226;
   --acc: var(--primary);
   line-height: 1.9;
   overflow-wrap: anywhere;
@@ -1302,6 +1307,9 @@ body,
   --grn: #a0bfaf;
   --pur: #b5a8ce;
   --red: #db9c9c;
+  --code-key: #a6bddb;
+  --code-string: #abcbb8;
+  --code-number: #dfbd96;
 }
 .chapter-body .ch {
   padding: 0;
@@ -1471,6 +1479,19 @@ body,
   padding: 1rem;
   border-radius: 0.5rem;
   font: 0.8125em/1.8 var(--font-mono);
+}
+.chapter-body pre.code .k {
+  color: var(--code-key);
+}
+.chapter-body pre.code .s {
+  color: var(--code-string);
+}
+.chapter-body pre.code .n {
+  color: var(--code-number);
+}
+.chapter-body pre.code .c,
+.chapter-body pre.code::before {
+  color: var(--muted-foreground);
 }
 .chapter-body a {
   color: var(--primary);
