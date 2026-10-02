@@ -1291,9 +1291,7 @@ body,
   --org: #a65c24;
   --grn: #367657;
   --pur: #725aa1;
-  --red: #a33e3e;
-  --tea: #2d6b6b;
-  --amb: var(--org);
+  --red: #ac4545;
   --code-bg: var(--background);
   --code-ink: var(--foreground);
   --code-key: #305e9a;
@@ -1309,7 +1307,6 @@ body,
   --grn: #a0bfaf;
   --pur: #b5a8ce;
   --red: #db9c9c;
-  --tea: #a6c7c7;
   --code-key: #a6bddb;
   --code-string: #abcbb8;
   --code-number: #dfbd96;
