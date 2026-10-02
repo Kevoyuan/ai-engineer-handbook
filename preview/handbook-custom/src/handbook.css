@@ -1349,13 +1349,31 @@ body,
   box-shadow: none;
 }
 .chapter-body .co {
-  border-left: 3px solid var(--primary);
+  --callout-accent: var(--muted-foreground);
+}
+.chapter-body .co.must {
+  --callout-accent: var(--org);
+}
+.chapter-body .co.tip {
+  --callout-accent: var(--grn);
+}
+.chapter-body .co.pit,
+.chapter-body .co.warn {
+  --callout-accent: var(--red);
 }
 .chapter-body .co-t {
   display: block;
+  position: static !important;
   font: 600 0.9375em/1.6 var(--font-sans);
-  color: var(--foreground);
-  margin-bottom: 0.75rem;
+  font-style: normal;
+  letter-spacing: normal;
+  color: var(--callout-accent) !important;
+  background: none !important;
+  box-shadow: none !important;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0 0 0.75rem;
 }
 .chapter-body .bfs-tag {
   font: 0.6875rem/1.5 var(--font-mono);
