@@ -47,6 +47,9 @@ for chapter in chapters:
      if prop.strip().startswith('background'):value='var(--paper2)'
      elif prop.strip()=='color':value='var(--ink)'
      elif 'border' in prop:value=re.sub(r'#[0-9a-fA-F]{3,8}\b','var(--line)',value)
+    if prop.strip()=='grid-template-columns':
+     el['class']=el.get('class',[])+['document-grid']
+     prop='--document-grid-columns'
     styles.append(prop+':'+value)
    el['style']=';'.join(styles)
   if el.name=='th' and not el.has_attr('scope'):el['scope']='col'

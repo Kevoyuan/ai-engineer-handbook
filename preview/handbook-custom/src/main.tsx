@@ -132,6 +132,43 @@ function App() {
       document.querySelector(".workspace")?.scrollTo({ top: 0 });
   }, [page, chapterIndex]);
   const [focus, setFocus] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
+    read("handbook-sidebar-collapsed", false),
+  );
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "sidebar-collapsed",
+      sidebarCollapsed,
+    );
+    save("handbook-sidebar-collapsed", sidebarCollapsed);
+  }, [sidebarCollapsed]);
+  useEffect(() => {
+    const timers = new Map<HTMLElement, ReturnType<typeof setTimeout>>();
+    const reveal = (event: Event) => {
+      const element =
+        event.target instanceof HTMLElement
+          ? event.target
+          : (document.scrollingElement as HTMLElement | null);
+      if (!element) return;
+      element.dataset.scrolling = "true";
+      clearTimeout(timers.get(element));
+      timers.set(
+        element,
+        setTimeout(() => {
+          delete element.dataset.scrolling;
+          timers.delete(element);
+        }, 1000),
+      );
+    };
+    document.addEventListener("scroll", reveal, true);
+    return () => {
+      document.removeEventListener("scroll", reveal, true);
+      for (const [element, timer] of timers) {
+        clearTimeout(timer);
+        delete element.dataset.scrolling;
+      }
+    };
+  }, []);
   const [filter, setFilter] = useState(() =>
       location.hash.split("/")[0] === "#home"
         ? location.hash.split("/")[1] || "all"
@@ -350,10 +387,32 @@ function App() {
       >
         {notice}
       </div>
-      <div className="desktop-nav">{nav}</div>
+      <div className="desktop-nav" id="desktop-chapter-nav">
+        {nav}
+      </div>
       <div className="workspace">
         <header className="topbar">
           <div className="top-location">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="desktop-sidebar-toggle"
+              onClick={() => setSidebarCollapsed((value) => !value)}
+              aria-controls="desktop-chapter-nav"
+              aria-expanded={!sidebarCollapsed}
+              aria-label={
+                sidebarCollapsed
+                  ? t("展开侧边栏", "Expand sidebar")
+                  : t("收起侧边栏", "Collapse sidebar")
+              }
+              title={
+                sidebarCollapsed
+                  ? t("展开侧边栏", "Expand sidebar")
+                  : t("收起侧边栏", "Collapse sidebar")
+              }
+            >
+              <MenuIcon />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

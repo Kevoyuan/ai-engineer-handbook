@@ -1933,3 +1933,95 @@ button[data-variant="default"] {
     padding: 1rem 0 0;
   }
 }
+
+/* Keep article navigation icons separate from full-width technical SVGs. */
+.chapter-body .reader-bottom svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+}
+.chapter-body .document-grid {
+  grid-template-columns: var(--document-grid-columns);
+  min-width: 0;
+}
+.top-actions > :is(button, a) {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+@media (max-width: 640px) {
+  .chapter-body .document-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Auto-hidden scrollbar chrome retains its gutter to avoid layout shifts. */
+* {
+  scrollbar-color: transparent transparent;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-color: transparent;
+}
+*[data-scrolling="true"],
+*:focus-visible {
+  scrollbar-color: var(--muted-foreground) transparent;
+}
+*[data-scrolling="true"]::-webkit-scrollbar-thumb,
+*:focus-visible::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-color: transparent;
+}
+@media (hover: hover) and (pointer: fine) {
+  *:hover {
+    scrollbar-color: var(--muted-foreground) transparent;
+  }
+  *:hover::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-color: transparent;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--foreground);
+  }
+}
+@media (forced-colors: active) {
+  * {
+    scrollbar-color: auto;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: CanvasText;
+  }
+}
+.desktop-sidebar-toggle {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+@media (min-width: 768px) {
+  .sidebar-collapsed .desktop-nav {
+    display: none;
+  }
+  .sidebar-collapsed .workspace {
+    margin-left: 0;
+  }
+}
+@media (max-width: 767px) {
+  .desktop-sidebar-toggle {
+    display: none;
+  }
+}
+.focus-reading .desktop-sidebar-toggle {
+  display: none;
+}
+.search-button {
+  padding-block: 0;
+}
+.entry-search-trigger {
+  min-height: 2.75rem;
+}
+@media (max-width: 767px) {
+  .chapter-link {
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "status": "DONE_WITH_CONCERNS",
+  "matrixStates": 264,
+  "widths": [
+    375,
+    390,
+    768,
+    1024,
+    1440,
+    1728
+  ],
+  "pages": 11,
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "locales": [
+    "zh",
+    "en"
+  ],
+  "runtimeErrors": [],
+  "layoutFailures": [],
+  "overlayStates": 16,
+  "contentPreservation": {
+    "passed": true,
+    "chapters": [
+      {
+        "chapter": "02",
+        "preservedTextNodes": 84,
+        "supplements": 0,
+        "sectionLinksValid": 9
+      },
+      {
+        "chapter": "03",
+        "preservedTextNodes": 259,
+        "supplements": 1,
+        "sectionLinksValid": 7
+      },
+      {
+        "chapter": "04",
+        "preservedTextNodes": 61,
+        "supplements": 0,
+        "sectionLinksValid": 2
+      },
+      {
+        "chapter": "05",
+        "preservedTextNodes": 200,
+        "supplements": 1,
+        "sectionLinksValid": 8
+      },
+      {
+        "chapter": "06",
+        "preservedTextNodes": 208,
+        "supplements": 3,
+        "sectionLinksValid": 5
+      },
+      {
+        "chapter": "07",
+        "preservedTextNodes": 108,
+        "supplements": 2,
+        "sectionLinksValid": 4
+      },
+      {
+        "chapter": "08",
+        "preservedTextNodes": 116,
+        "supplements": 8,
+        "sectionLinksValid": 13
+      },
+      {
+        "chapter": "09",
+        "preservedTextNodes": 627,
+        "supplements": 8,
+        "sectionLinksValid": 28
+      },
+      {
+        "chapter": "10",
+        "preservedTextNodes": 104,
+        "supplements": 3,
+        "sectionLinksValid": 11
+      }
+    ]
+  },
+  "sidebarScrollbar": {
+    "passed": true,
+    "checks": [
+      "collapse and expand desktop sidebar",
+      "collapsed preference persists across reload",
+      "article scrollbar reveals during scroll and hides after idle",
+      "mobile drawer stays independent",
+      "hidden gutters retain stable layout"
+    ]
+  },
+  "fixes": [
+    "Article pagination SVG no longer inherits full-width diagram sizing",
+    "Inline document grids stack on small screens",
+    "GitHub and diagram navigation targets meet mobile 44px size",
+    "Homepage search hit area fills its search field",
+    "Desktop navigation can collapse and persists locally",
+    "Scrollbar chrome is transparent at rest and revealed by scroll, hover or keyboard focus"
+  ],
+  "acceptedFindings": [
+    "Article right inset intentionally reserves scrollbar clearance; active TOC indent intentionally marks current location. Geometric symmetry heuristic cannot infer these purposes.",
+    "Desktop-only compact topic links and TOC entries retain their existing mouse-oriented density; mobile interactive controls retain 44px targets."
+  ],
+  "limitations": [
+    "Chromium desktop and mobile emulation, not native Safari or real-device testing.",
+    "English layout checked by DOM geometry and complete canonical text comparison; screenshot contact sheets focus on Chinese.",
+    "No Pretext rewrite: this request audits and repairs the existing React handbook rather than creating standalone HTML."
+  ]
+}
