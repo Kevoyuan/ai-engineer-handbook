@@ -1,6 +1,6 @@
 # Complete handbook design preview
 
-A standalone redesign covering all 9 chapters, 26 registered supplementary diagrams, 87 searchable sections, the chapter directory, saved chapters, and a knowledge map. The reader includes direct section links, previous/next navigation, text-size controls and focus reading. Chinese/English and light/neutral-charcoal dark themes are persisted locally.
+A standalone redesign covering all 9 chapters, 26 registered supplementary diagrams, 87 searchable sections, the chapter directory, saved chapters, and the original system and Agent reference architecture diagrams. The reader includes direct section links, previous/next navigation, text-size controls and focus reading. Chinese/English and light/neutral-charcoal dark themes are persisted locally.
 
 Run `npm install`, `npm run build`, then `npx vite preview --host 0.0.0.0 --port 4180`. The complete preview runs independently of the original content server. The production artifact is `web/site/`. Run `npm run publish:web` after source changes and commit the generated artifact with its source; Vercel serves this directory without a remote build. Original `web/chapters` and `web/assets` remain the content-generation inputs.
 

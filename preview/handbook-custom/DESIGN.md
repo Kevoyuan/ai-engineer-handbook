@@ -96,7 +96,7 @@ Distinguish surfaces through neutral tones and thin borders. Reserve the large d
 Use the existing 0.625rem base radius and component variants; retain established row and input shapes.
 
 ## Components
-The complete edition covers the directory, a three-path knowledge map, every chapter and registered supplement, section search, bookmarks, and local reading preferences. The bounded application shell has one vertical content scroller per route: catalog, knowledge map, or article. Wide comparison tables and code own their horizontal scrolling.
+The complete edition covers the directory, the system framework and Agent reference architecture, every chapter and registered supplement, section search, bookmarks, and local reading preferences. Desktop uses one bounded content scroller per route. On phones, the toolbar and route content scroll together. The architecture overview preserves the original execution core, domain connections, control plane, feedback loop and platform foundation; module links open the corresponding chapters. Wide comparison tables and code own their horizontal scrolling.
 
 Runtime ownership is Model B: `src/handbook.css` owns semantic light/dark tokens; `src/index.css` maps them into Tailwind utilities; installed shared components consume those utilities. `src/content-base.css` is generated topology CSS with scoped selectors. The article adapter maps legacy `--paper`, `--ink`, `--mut`, `--line` into the same semantic tokens. Inline literal colors in derived content are normalized by the generator. DESIGN frontmatter mirrors runtime palette values.
 
