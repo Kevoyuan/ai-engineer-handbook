@@ -1390,6 +1390,12 @@ body,
   padding: 0;
   margin: 0 0 0.75rem;
 }
+@media (max-width: 640px) {
+  .chapter-body .co {
+    padding: 1rem !important;
+    margin: 1.5rem 0 !important;
+  }
+}
 .chapter-body .bfs-tag {
   font: 0.6875rem/1.5 var(--font-mono);
   color: var(--muted-foreground);
