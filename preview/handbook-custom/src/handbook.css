@@ -1467,10 +1467,13 @@ body,
 }
 .chapter-body th,
 .chapter-body td {
+  min-width: 8rem;
   padding: 0.875rem 1rem;
   border: 0;
   border-bottom: 1px solid var(--border);
   white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
   color: var(--foreground);
   vertical-align: top;
 }
