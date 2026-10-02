@@ -10,6 +10,14 @@ const exists = absolutePath => fs.existsSync(absolutePath);
 const read = absolutePath => fs.readFileSync(absolutePath, 'utf8');
 const fail = message => errors.push(message);
 
+let deploymentRoot = webRoot;
+try {
+  const config = JSON.parse(read(path.join(webRoot, 'vercel.json')));
+  deploymentRoot = path.resolve(webRoot, config.outputDirectory ?? '.');
+} catch (error) {
+  fail(`Cannot resolve deployment root from web/vercel.json: ${error.message}`);
+}
+
 const canonicalChapters = [
   '00-ai-engineer-system-framework.md',
   '02-enterprise-retrieval.md',
@@ -177,8 +185,15 @@ const resolveLocalReference = (file, rawValue) => {
   if (!value || isExternalReference(value)) return null;
 
   let target;
-  if (value.startsWith('/')) target = path.join(webRoot, value.slice(1));
-  else target = path.resolve(path.dirname(file), value);
+  if (value.startsWith('/')) {
+    // Built pages use the deployed root; legacy source pages still use web/.
+    const relative = path.relative(deploymentRoot, file);
+    const isDeployedPage = !path.isAbsolute(relative)
+      && relative !== '..'
+      && !relative.startsWith(`..${path.sep}`);
+    const referenceRoot = isDeployedPage ? deploymentRoot : webRoot;
+    target = path.join(referenceRoot, value.slice(1));
+  } else target = path.resolve(path.dirname(file), value);
 
   if (value.endsWith('/')) target = path.join(target, 'index.html');
   return target;
