@@ -1543,6 +1543,10 @@ body,
 .chapter-body input {
   accent-color: var(--primary);
 }
+.chapter-body .ev:hover i {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
 .chapter-body label {
   cursor: pointer;
 }
