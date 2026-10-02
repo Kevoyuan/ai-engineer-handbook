@@ -2097,3 +2097,61 @@ button[data-variant="default"] {
   color: var(--accent-foreground);
   border-radius: var(--radius);
 }
+
+/* Concept teaching: motion communicates the selected stage, never delays reading. */
+.concept-slot { margin: 2rem 0; }
+.chapter-body .concept-demo { padding: 1.5rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card); color: var(--foreground); scroll-margin-top: 1rem; font-size: 1rem; }
+.chapter-body .concept-heading h3 { margin: 0; font-size: 1.25rem; line-height: 1.5; font-weight: 650; color: var(--foreground); }
+.chapter-body .concept-heading p { margin: .5rem 0 1.5rem; color: var(--muted-foreground); font-size: .875rem; line-height: 1.65; }
+.concept-examples { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+.concept-demo button { min-height: 44px; }
+.concept-examples button { border: 1px solid transparent; }
+.concept-examples button[aria-pressed="true"] { border-color: var(--border); color: var(--foreground); }
+.concept-input { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: baseline; padding: 1rem; background: var(--background); border-radius: .625rem; }
+.concept-input > span, .concept-outcome > span { color: var(--muted-foreground); font-size: .8125rem; }
+.chapter-body .concept-input p { margin: 0; font-size: .9375rem; line-height: 1.6; }
+.concept-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; margin: 1.5rem 0; }
+.concept-node-wrap { min-width: 0; position: relative; }
+.concept-node { display: flex; flex-direction: column; gap: .5rem; justify-content: center; align-items: flex-start; position: relative; width: 100%; min-height: 132px; padding: 1rem; border: 1px solid var(--border); border-radius: .625rem; background: var(--background); color: var(--foreground); text-align: left; }
+.concept-node[data-current="true"] { border-color: var(--primary); background: var(--accent); }
+.concept-node:hover { border-color: var(--primary); }
+.concept-node:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.concept-node strong { font-weight: 650; font-size: .9375rem; }
+.concept-node > span { color: var(--muted-foreground); font-size: .8125rem; line-height: 1.5; }
+.concept-node .concept-node-status { font-size: .75rem; }
+.concept-node[data-current="true"] .concept-node-status { color: var(--primary); }
+.concept-node-marker { position: absolute; left: -1px; top: 25%; bottom: 25%; width: 3px; border-radius: 2px; background: var(--primary); }
+.concept-connector { position: absolute; display: grid; place-items: center; width: 2rem; height: 2rem; right: -2rem; top: calc(50% - 1rem); color: var(--muted-foreground); }
+.concept-connector svg { width: 1rem; height: 1rem; }
+.concept-packet { position: absolute; width: .5rem; height: .5rem; border-radius: 50%; background: var(--primary); }
+.concept-loop { display: flex; gap: .75rem; align-items: center; border-bottom: 1px solid var(--border); padding: 0 0 1rem; margin-top: -.5rem; font-size: .8125rem; color: var(--muted-foreground); }
+.concept-loop > span { font-size: 1.5rem; }
+.concept-loop[data-return="true"] { color: var(--primary); }
+.concept-explanation { min-height: 120px; padding: 1rem 0; }
+.chapter-body .concept-explanation h4 { margin: 0 0 .5rem; font-size: 1rem; font-weight: 650; line-height: 1.5; color: var(--foreground); }
+.chapter-body .concept-explanation p { margin: 0; font-size: .9375rem; line-height: 1.75; color: var(--muted-foreground); max-width: 75ch; }
+.concept-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .5rem 0 1rem; }
+.concept-transport { display: flex; flex-wrap: wrap; gap: .5rem; }
+.concept-position { font-size: .8125rem; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.concept-outcome { display: flex; gap: .75rem; flex-wrap: wrap; align-items: baseline; border-top: 1px solid var(--border); padding-top: 1rem; }
+.concept-outcome strong { font-size: .875rem; font-weight: 600; }
+.chapter-body .concept-takeaway { margin: .75rem 0 0; font-size: .8125rem; line-height: 1.65; color: var(--muted-foreground); }
+@media (prefers-reduced-motion: no-preference) { .concept-demo button { transition: transform 160ms ease-out; } .concept-demo button:active:not(:disabled) { transform: scale(.98); } }
+@container (max-width: 767px) {
+  .chapter-body .concept-demo { padding: 1rem; }
+  .concept-flow { grid-template-columns: 1fr; gap: 2rem; }
+  .concept-node { min-height: 96px; display: grid; grid-template-columns: 1fr auto; gap: .5rem 1rem; }
+  .concept-node .concept-node-status { grid-column: 1 / -1; }
+  .concept-node > span:not(.concept-node-status):not(.concept-node-marker) { text-align: right; }
+  .concept-connector { right: calc(50% - 1rem); top: auto; bottom: -2rem; transform: rotate(90deg); }
+  .concept-explanation { min-height: 160px; }
+  .concept-input { grid-template-columns: 1fr; gap: .5rem; }
+}
+.concept-examples { align-items: center; gap: 1rem; }
+.concept-examples label { font-size: .875rem; color: var(--muted-foreground); }
+.concept-examples select { min-height: 44px; max-width: 100%; padding: .5rem 2rem .5rem .75rem; border: 1px solid var(--border); border-radius: .625rem; background: var(--background); color: var(--foreground); font: inherit; font-size: .875rem; }
+.concept-examples select:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.concept-transport button { min-width: 44px; padding: .5rem 1rem; }
+.concept-examples select { padding-inline: 2rem; }
+.chapter-body .concept-node { min-height: 132px; }
+@container (max-width: 767px) { .chapter-body .concept-node { min-height: 96px; } }

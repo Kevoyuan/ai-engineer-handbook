@@ -9,6 +9,7 @@
     "sync-content": "python3 scripts/sync-content.py && node scripts/sync-diagram-styles.mjs && node scripts/sync-architecture.mjs",
     "test:ui": "node evidence/full-interactions.cjs",
     "test:a11y": "node evidence/a11y.cjs",
+    "test:concepts": "node evidence/concept-diagrams.cjs",
     "publish:web": "node scripts/publish-web.mjs"
   },
   "dependencies": {

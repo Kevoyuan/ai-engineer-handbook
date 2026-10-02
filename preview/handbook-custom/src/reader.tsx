@@ -1,4 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Component,
+  lazy,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,6 +17,41 @@ import {
 } from "@/components/ui/dialog";
 import { BookIcon, BookmarkIcon, ArrowRightIcon } from "@/components/icons";
 import chapters from "./chapters.json";
+const ConceptDiagram = lazy(() =>
+  import("./concept-diagrams").then((module) => ({
+    default: module.ConceptDiagram,
+  })),
+);
+const hasConceptDiagram = (slug: string) =>
+  [
+    "03-hybrid-retrieval-query-routing",
+    "04-rag-reliability-selective-answering",
+    "08-agent-orchestration",
+  ].includes(slug);
+class DiagramBoundary extends Component<
+  { en: boolean; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div className="empty" role="alert">
+        <p>
+          {this.props.en
+            ? "Interactive diagram could not load. The article remains available."
+            : "交互图解暂时无法加载，正文仍可阅读。"}
+        </p>
+        <Button variant="outline" onClick={() => location.reload()}>
+          {this.props.en ? "Reload" : "重新加载"}
+        </Button>
+      </div>
+    );
+  }
+}
 type Section = { id: string; zh: string; en: string };
 type ChapterContent = {
   zh: string;
@@ -71,6 +115,7 @@ export function Reader({
       : pane.current;
   }
   const [data, setData] = useState<ChapterContent | null>(null),
+    [diagramReady, setDiagramReady] = useState(false),
     [error, setError] = useState(false),
     [attempt, setAttempt] = useState(0),
     [tocOpen, setTocOpen] = useState(false),
@@ -81,6 +126,7 @@ export function Reader({
   useEffect(() => {
     const controller = new AbortController();
     setData(null);
+    setDiagramReady(false);
     setError(false);
     fetch("/content/" + chapter.slug + ".json", { signal: controller.signal })
       .then((r) => {
@@ -122,6 +168,7 @@ export function Reader({
       else scrollPane()?.scrollTo({ top: 0 });
     };
     restore();
+    const restoreFrame = requestAnimationFrame(restore);
     const w = window as unknown as { initHandbookInteractions?: () => void };
     w.initHandbookInteractions?.();
     const onHash = () => {
@@ -129,7 +176,10 @@ export function Reader({
       if (id) jump(decodeSection(id));
     };
     window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    return () => {
+      cancelAnimationFrame(restoreFrame);
+      window.removeEventListener("hashchange", onHash);
+    };
   }, [data, en, chapter.slug, mobile]);
   useEffect(() => {
     try {
@@ -220,6 +270,16 @@ export function Reader({
               >
                 {focus ? t("退出专注", "Exit focus") : t("专注阅读", "Focus")}
               </Button>
+              {hasConceptDiagram(chapter.slug) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={!diagramReady}
+                  onClick={() => jump("concept-demo")}
+                >
+                  {t("交互图解", "Interactive diagram")}
+                </Button>
+              )}
             </div>
             <Button
               variant="ghost"
@@ -264,6 +324,19 @@ export function Reader({
               key={chapter.slug + (en ? "en" : "zh")}
               dangerouslySetInnerHTML={{ __html: html }}
             />
+          )}
+          {data && !error && hasConceptDiagram(chapter.slug) && (
+            <DiagramBoundary key={chapter.slug + en} en={en}>
+              <Suspense fallback={null}>
+                <ConceptDiagram
+                  key={chapter.slug + en}
+                  slug={chapter.slug}
+                  en={en}
+                  pane={pane}
+                  onReady={setDiagramReady}
+                />
+              </Suspense>
+            </DiagramBoundary>
           )}
           {data && !error && (
             <nav
