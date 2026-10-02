@@ -241,7 +241,7 @@ p {
 }
 .crumb-slash {
   padding: 0 8px;
-  color: var(--border);
+  color: var(--muted-foreground);
 }
 .header-search {
   margin-right: 12px;
