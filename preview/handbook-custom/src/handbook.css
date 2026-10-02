@@ -1346,6 +1346,10 @@ body,
   opacity: 1;
   transform: none;
 }
+.chapter-body .document-role-fill {
+  background: color-mix(in srgb, var(--document-role) 12%, var(--paper2));
+  color: var(--foreground);
+}
 .chapter-body .co,
 .chapter-body .bfs-canvas,
 .chapter-body .arch-canvas {

@@ -47,6 +47,10 @@ for chapter in chapters:
      if prop.strip().startswith('background'):value='var(--paper2)'
      elif prop.strip()=='color':value='var(--ink)'
      elif 'border' in prop:value=re.sub(r'#[0-9a-fA-F]{3,8}\b','var(--line)',value)
+    # Keep semantic role fills legible after their original white text is adapted.
+    if prop.strip() in ('background','background-color') and re.fullmatch(r'\s*var\(--(?:blu|org|grn|pur|red|tea|amb)\)\s*',value):
+     el['class']=el.get('class',[])+['document-role-fill']
+     prop='--document-role'
     if prop.strip()=='grid-template-columns':
      el['class']=el.get('class',[])+['document-grid']
      prop='--document-grid-columns'
