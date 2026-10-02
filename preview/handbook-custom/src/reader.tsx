@@ -304,18 +304,6 @@ export function Reader({
           )}
         </div>
       </article>
-      <nav className="toc" aria-label={t("本页目录", "On this page")}>
-        <h2>{t("本页目录", "On this page")}</h2>
-        {data?.sections.map(sectionLink)}
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (pane.current) pane.current.scrollTo({ top: 0 });
-          }}
-        >
-          {t("回到顶部 ↑", "Back to top ↑")}
-        </Button>
-      </nav>
       <Dialog open={tocOpen} onOpenChange={setTocOpen}>
         <DialogContent
           closeLabel={t("关闭", "Close")}
@@ -329,6 +317,15 @@ export function Reader({
             )}
           </DialogDescription>
           <nav>{data?.sections.map(sectionLink)}</nav>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setTocOpen(false);
+              scrollPane()?.scrollTo({ top: 0 });
+            }}
+          >
+            {t("回到顶部", "Back to top")}
+          </Button>
         </DialogContent>
       </Dialog>
     </main>

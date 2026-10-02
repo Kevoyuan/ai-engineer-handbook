@@ -2025,3 +2025,16 @@ button[data-variant="default"] {
     gap: 1rem;
   }
 }
+
+/* On-page navigation opens on demand and reserves no article column. */
+.reader-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+.reader-toc-button {
+  display: inline-flex;
+}
+.reader-toc-dialog nav a[aria-current="location"] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-radius: var(--radius);
+}
