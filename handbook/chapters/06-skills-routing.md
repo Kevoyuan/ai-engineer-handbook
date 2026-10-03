@@ -799,6 +799,10 @@ new turn
 
 然后再用轻量 classifier、embedding similarity、small model 或 deterministic scoring 判断常规意图。
 
+语义示例路由可以按 `state-resolved request → embedding → labeled route examples → aggregate by route → top-1 + runner-up margin → gate` 实现。每条 Route 应包含正例、hard negatives 和邻近意图；相似度不足或候选冲突时保留 CLARIFY / NO_MATCH。相似度不是“该意图正确的概率”，阈值必须按 embedding 版本、业务数据与错误代价验证。关键词命中也要检查否定、引用、实体和上下文，例如“不要退款，只查订单”不能只因出现“退款”就转退款路径。
+
+检索已标注示例作为 few-shot context 是可评测的优化方法。训练/示例库、校准集与最终测试集应隔离，并按模板、用户或时间去重划分；不能把测试题或近重复答案放回示例库。
+
 这和 Chapter 07 的原则一致：
 
 > **The transcript is not the state.**
@@ -831,6 +835,17 @@ permission availability
 ~~~
 
 具体阈值必须从真实流量和 Eval Set 校准，而不是复制固定数字。
+
+| Signal | 能说明什么 | 不能直接说明什么 |
+|---|---|---|
+| self-reported confidence | 模型生成的自评文本 | 经验证的正确概率 |
+| embedding similarity | 与路由示例的接近程度 | 意图后验概率 |
+| token logprobs | 特定 prompt / tokenization 下标签 token 的条件概率 | 自动校准的业务准确率 |
+| typed decision probabilities | 预定义候选上的模型分布 | 分布变化后仍可靠的校准或执行授权 |
+
+使用 logprobs 前先核对 model / endpoint / reasoning mode 是否支持；多 token 标签要比较完整标签序列的条件分数，不能只取首 token 或把截断的 top-logprobs 当作完整候选分布。即使候选归一化，也需在留出集上检查 reliability diagram、ECE / Brier、每类 precision / recall，以及 risk–coverage（自动处理覆盖率与错误风险）的取舍。
+
+Jev 的 `confidence` 尤其不能当成 selected-option probability，详见 §6.10.4。低分且缺少用户信息时问一个带具体选项的问题，例如“申请退款还是查询订单？”；模型不确定但信息完整时可升级模型或人工。明确超出范围时返回 NO_MATCH。
 
 > **A routing cascade is only reliable if uncertainty has somewhere to go.**
 
@@ -892,6 +907,19 @@ LLM proposes
 ~~~
 
 > **Do not use an LLM merely to emit an intent label when the real task requires a structured execution plan.**
+
+#### OpenAI Agents SDK：handoff 的实现边界
+
+这是框架实现例，不是意图路由的唯一架构。Python SDK 可以通过 `Agent(..., handoffs=[refund_agent, order_agent])` 暴露接收 Agent；triage agent 是示例中的分诊角色名，不是必需的特殊类。handoff 在模型侧表现为工具，默认名称按 Agent 名称归一化，例如 `Refund Agent → transfer_to_refund_agent`；默认描述为 `Handoff to the {agent.name} agent to handle the request.` 后接 `handoff_description`。`handoff()` 支持 name / description override，名称和模板不是不可变协议。
+
+清晰描述要写适用范围、排除范围和相邻意图的边界，但质量还取决于 state、candidate set、model、policy 与 eval。handoff 仍由模型选择工具；包装成工具不会自动消除 LLM 延迟或保证准确率。小而清晰的能力集合可以直接做模型路由，规模或混淆度增长时再引入候选检索与分层治理。
+
+| SDK pattern | 控制权 | 合适任务 |
+|---|---|---|
+| handoff | 转移给接收 Agent，接手当前分支 | specialist 接着与用户处理退款 |
+| agent as tool | manager 保留最终回复责任 | specialist 返回一个有界分析结果 |
+
+默认 handoff 会传递对话历史；按数据边界筛选/脱敏，而不是把历史当授权。Python `input_type` 约束的是转交 metadata，不替代接收 Agent 主输入，也不动态选择目的地。`is_enabled` 控制可见候选；依赖已解析参数的授权应在 `on_handoff` 开始处检查，并在拒绝时抛出失败，不能正常返回后仍转交。跨 Agent 的业务权限仍由 Host Policy 执行，见 §6.3 / §6.6。
 
 ### 6.9.5 Intent Routing ≠ Capability Routing ≠ Authorization
 
@@ -984,7 +1012,15 @@ human_escalation_rate
 
 > **Optimize routing for task success under latency, cost, and risk constraints—not for a single classifier score.**
 
-### 6.9.8 Failure taxonomy
+### 6.9.8 Recovery、Multi-intent 与 Failure taxonomy
+
+接收 Agent 发现任务超出范围时，应返回结构化 `OUT_OF_SCOPE + reason + unresolved_goal` 或使用显式配置的 return handoff；SDK 不会自动把所有超范围请求送回 triage。Host 维护 `handoff_count`、总 turn / latency budget 和已访问的 `(agent, goal, state_version)`；同一状态无进展地重复转交或预算耗尽时停止循环，转 CLARIFY / ESCALATE。授权失败直接保留拒绝结果，不能换 Agent 绕过 Policy。
+
+多意图要区分“用户同时要求两件事”与“模型分不清是哪件事”：前者按业务优先级、风险和依赖拆成 MULTI_CAPABILITY plan（例如先查订单，再验证退款资格），后者反问。只有确认独立且授权允许的任务才并行；存在顺序或副作用冲突时串行或澄清。
+
+意图数量增长时可采用 §6.2 的 soft hierarchy / Top-M domains。是否分层应由候选召回、混淆矩阵、上下文成本和维护负担决定；“20 个”不是通用技术阈值。每类 precision / recall、混淆对、低置信、多意图、否定和无匹配请求应进入路由评测。
+
+Failure taxonomy:
 
 ~~~text
 rule_conflict
@@ -997,6 +1033,8 @@ planner_failure
 unauthorized_route
 tool_execution_failure
 result_validation_failure
+handoff_loop / handoff_budget_exhausted
+multi_intent_priority_conflict
 ~~~
 
 修复应落在最早错误层：
@@ -1032,7 +1070,11 @@ Handbook 做了以下工程化扩展：
 - 增加 calibration、traffic-share、latency、cost、task-success 与 failure taxonomy；
 - 把 LLM 层限定为 structured planning / action proposal，而不是自由执行。
 
-外部核对（2026-09-23）：
+补充来源：用户提供的《Agent 意图路由核心设计方案》（2026-10-03）。本轮沿用现有 cascade，只补 semantic example routing、confidence signal 边界、SDK handoff、multi-intent 和 bounded recovery；MCP / Skill 定义仍由 §6.5 单独拥有。
+
+原材料中的“准确性全看 handoff_description”“超过 20 个意图必须分层”和“检索示例让准确率从 71% 到 93%”缺少适用条件或可复现证据，已改成工程假设与验证方法，未作为通用性能结论。官方核验与产品状态见 [2026-10-03 source audit](../verification/2026-10-03-intent-routing.md)。
+
+外部核对（2026-09-23；以下 SDK / 产品项于 2026-10-03 补核）：
 
 - LangChain / LangGraph 当前官方 Learn 与 Thinking in LangGraph 文档继续把 routing、shared state、显式 transitions 与可定制 workflow 作为核心 orchestration primitive；这与本节的 state-aware cascade 一致。
 - OpenAI Structured Outputs / Function Calling: models can produce schema-constrained structured outputs and tool arguments; this supports typed action proposals but does not replace application authorization.
@@ -1157,9 +1199,22 @@ human review for high-risk cases
 
 如果候选答案无法提前定义，或者任务的核心产物本身就是文章、代码、报告、计划，那么把它硬塞进 System-One primitive 反而会丢失必要表达能力。
 
-### 6.10.4 Benchmark / vendor boundary
+### 6.10.4 Confidence、Benchmark 与 Product boundary
 
-截至 2026-09-23，Jev 仍处于 early access。TypeSafe 官方公开材料报告了其在 System-One-shaped workflows 上显著更低的 latency / cost，并展示了并行 decision sampling；这些数字是**厂商在其特定 workflow 与评测设置下的结果**，不能直接外推成“所有业务都快两个数量级”或固定 SLA。
+官方核验日期：2026-10-03。Jev 官网与发布文仍提供 early access 入口。TypeSafe 报告 70–500 ms 响应范围，并说明公开 eval 通常从美国西海岸访问服务；这是 vendor observation，未在本次维护中独立复现，不是地域无关的 P95 或 SLA。工作流 benchmark 也不能当成用户业务的绝对正确率。
+
+当前 TypeSafe 文档区分 `probabilities` 与 `confidence`。Choice 的 confidence 是候选概率相对均匀分布的归一化集中度：
+
+~~~text
+confidence = (p_max - 1/n) / (1 - 1/n)
+3 candidates: p_max = 0.6 → confidence = 0.4
+~~~
+
+它不是经验正确率；Score 的 confidence 还使用有序等级的距离，Noul 没有单独 confidence 字段。“报 90% confidence 就有 90% 正确率”应删除。概率校准是同一分布上的群体统计性质，需要本地留出集和分片验证，不是单次决定的保证。
+
+OpenAI Decisions API 的存在可由 2026-09-29 官方 DevDay recap 核实：使用 Luna，对 text/image context 和预定义答案做封闭决策，发布时为 limited preview。此次未找到可核验的公开 endpoint contract 或“150 ms”官方性能依据，也没有核实广泛开放；只保留有限预览的实现例，不提供猜测接口、不把第三方同名站点当 OpenAI 文档，更不假设其 schema 与 Jev 相同。
+
+模型名称方面，Anthropic 官方已列出 Claude Sonnet 5.5 与 Claude Opus 5.5，并将 Sonnet 定位为较快、较低成本的补充。它们可作为按任务难度升级的当期例子，但“简单/困难”分界仍应由自己的 eval 决定，不能从名称推导固定路由准确率或延迟。主设计保持 model-agnostic。
 
 工程选型应自己验证：
 
@@ -1189,7 +1244,7 @@ Handbook 对其做了以下工程化整理：
 - 将选型标准归结为 **closed decision vs open generation / reasoning**；
 - 保留 confidence、fallback、authorization、evaluation 与 human review 边界。
 
-官方核对日期：2026-09-23。
+官方核对日期：2026-10-03（公开来源核验，未进行 live inference benchmark）。
 
 Sources:
 
@@ -1197,6 +1252,13 @@ Sources:
 - https://docs.typesafe.ai/introduction
 - https://api.typesafe.ai/docs
 - https://evals.typesafe.ai/
+- https://docs.typesafe.ai/confidence
+- https://openai.github.io/openai-agents-python/handoffs/
+- https://openai.github.io/openai-agents-python/ref/handoffs/
+- https://developers.openai.com/api/docs/guides/agents/orchestration
+- https://developers.openai.com/api/docs/guides/latest-model
+- https://openai.com/index/devday-2026-recap/
+- https://www.anthropic.com/claude-sonnet-5-5
 
 
 ## Verification boundary · 2026-09-28
