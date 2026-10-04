@@ -1,5 +1,11 @@
 [
   {
+    "slug": "01-model-api-context-foundations",
+    "number": "01",
+    "zh": "Model / API / Context 基础",
+    "en": "Model / API / Context Foundations"
+  },
+  {
     "slug": "02-enterprise-retrieval",
     "number": "02",
     "zh": "企业检索基础",
