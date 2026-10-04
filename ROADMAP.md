@@ -17,7 +17,7 @@
 ## Phase 3 — Build the complete core knowledge spine
 
 - [x] Add system-level `00 AI Engineering System Framework`
-- [ ] Add Chapter 01: Model / API / Context Foundations
+- [x] Add Chapter 01: Model / API / Context Foundations
   - model selection by capability, modality, latency, cost, privacy and hosting constraints
   - prompting / structured outputs / tool-use baseline
   - adaptation decision path: prompt/context/retrieval vs fine-tuning / PEFT / LoRA
@@ -45,7 +45,7 @@
 
 ## Coverage rule
 
-The current 02–10 edition is strongest in **production Applied AI / RAG / Agent Engineering**, with Chapter 10 beginning the Serving / Platform layer. Do not claim complete Model Engineering / AI Platform coverage until Chapter 01 and the remaining Chapter 10 platform sections are complete.
+The current 01–10 edition now includes the Model / API / Context foundation plus the production Applied AI / RAG / Agent spine. Broader AI Platform coverage is still incomplete until the remaining Chapter 10 serving, deployment, and security-platform sections are complete.
 
 The durable system map is:
 
