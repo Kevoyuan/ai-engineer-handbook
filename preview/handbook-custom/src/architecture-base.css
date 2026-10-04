@@ -1,8 +1,771 @@
 /* Derived from the original system and Agent reference diagrams. */
 
-.architecture-overview :where(.system-framework),.architecture-overview :where(.agent-reference){max-width:1120px;margin:74px auto;padding:0 24px}.architecture-overview :where(.framework-head){max-width:780px;margin-bottom:28px}.architecture-overview :where(.framework-head small){letter-spacing:.22em;color:var(--blu);font:700 11px/1 ui-monospace,monospace}.architecture-overview :where(.framework-head h2){margin:16px 0;font:800 clamp(30px,4vw,48px)/1.18 Georgia,Noto Serif SC,serif}.architecture-overview :where(.framework-head p){color:var(--mut);max-width:76ch}.architecture-overview :where(.scope-note){display:grid;gap:12px}.architecture-overview :where(.scope-row){border-bottom:1px solid var(--line);padding-bottom:12px}.architecture-overview :where(.scope-row:last-child){border-bottom:0;padding-bottom:0}.architecture-overview :where(.scope-row b){display:block;color:var(--ink);font-weight:800}.architecture-overview :where(.scope-row span){color:var(--mut);font-size:13px;line-height:1.55}.architecture-overview :where(.scope-row small){letter-spacing:.14em;color:var(--blu);font:700 9.5px/1.4 ui-monospace,monospace;display:block;margin-bottom:6px}
-.architecture-overview :where(.ae-map){border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:24px 0 20px}.architecture-overview :where(.ae-outcome){position:relative;width:min(420px,72%);margin:0 auto 38px;text-align:center;padding:13px 18px 15px;border-top:2px solid var(--org);border-bottom:1px solid var(--line);background:var(--paper)}.architecture-overview :where(.ae-outcome:after){content:"";position:absolute;left:50%;bottom:-39px;height:39px;border-left:1px solid var(--line2)}.architecture-overview :where(.ae-outcome:before){content:"▼";position:absolute;left:50%;bottom:-45px;transform:translateX(-50%);color:var(--blu);font:800 10px/1 ui-monospace,monospace}.architecture-overview :where(.ae-kicker){display:block;color:var(--blu);letter-spacing:.16em;font:800 9px/1.4 ui-monospace,monospace;margin-bottom:7px}.architecture-overview :where(.ae-outcome b){display:block;font-size:15px}.architecture-overview :where(.ae-outcome span){display:block;color:var(--mut);font-size:11px;margin-top:4px}.architecture-overview :where(.ae-core-grid){display:grid;grid-template-columns:minmax(0,.9fr) minmax(330px,1.55fr) minmax(0,.9fr);gap:48px;align-items:stretch}.architecture-overview :where(.ae-side){display:grid;align-content:center;gap:26px}.architecture-overview :where(.ae-domain){position:relative;padding:15px 16px 16px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--paper2) 76%,transparent);min-height:136px}.architecture-overview :where(.ae-domain h3){margin:0 0 9px;font-size:14px;line-height:1.35}.architecture-overview :where(.ae-domain ul){list-style:none;margin:0;padding:0;color:var(--mut);font-size:10.5px;line-height:1.7}.architecture-overview :where(.ae-domain li){display:inline}.architecture-overview :where(.ae-domain li+li:before){content:" · ";color:var(--line2)}.architecture-overview :where(.ae-domain .ae-edge){position:absolute;top:50%;color:var(--blu);white-space:nowrap;letter-spacing:.08em;font:800 8.5px/1 ui-monospace,monospace}.architecture-overview :where(.ae-left .ae-domain:after),.architecture-overview :where(.ae-right .ae-domain:before){content:"";position:absolute;top:50%;width:48px;border-top:1px solid var(--line2)}.architecture-overview :where(.ae-left .ae-domain:after){right:-48px}.architecture-overview :where(.ae-right .ae-domain:before){left:-48px}.architecture-overview :where(.ae-left .ae-edge){right:-44px;transform:translate(100%,-50%)}.architecture-overview :where(.ae-right .ae-edge){left:-44px;transform:translate(-100%,-50%)}.architecture-overview :where(.ae-knowledge){border-left:3px solid var(--blu)}.architecture-overview :where(.ae-state){border-left:3px solid var(--org)}.architecture-overview :where(.ae-capabilities){border-right:3px solid var(--pur)}.architecture-overview :where(.ae-orchestration){border-right:3px solid var(--grn)}.architecture-overview :where(.ae-runtime){position:relative;border:1px solid var(--line2);border-top:3px solid var(--blu);background:var(--paper);padding:16px 20px 18px;min-height:410px}.architecture-overview :where(.ae-runtime-head){display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:6px}.architecture-overview :where(.ae-runtime-head strong){font-size:16px}.architecture-overview :where(.ae-runtime-head small){color:var(--mut);letter-spacing:.12em;font:700 8.5px/1.3 ui-monospace,monospace}.architecture-overview :where(.ae-runtime-path){position:relative;padding:5px 0}.architecture-overview :where(.ae-runtime-path:before){content:"";position:absolute;left:17px;top:24px;bottom:27px;border-left:1px solid var(--line2)}.architecture-overview :where(.ae-stage){position:relative;display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;min-height:52px;padding:7px 0}.architecture-overview :where(.ae-stage i){position:relative;z-index:2;width:34px;height:24px;display:grid;place-items:center;background:var(--paper);border:1px solid var(--line2);color:var(--blu);font:800 8.5px/1 ui-monospace,monospace;font-style:normal}.architecture-overview :where(.ae-stage div){min-width:0}.architecture-overview :where(.ae-stage b){display:block;font-size:12.5px;line-height:1.3}.architecture-overview :where(.ae-stage span){display:block;color:var(--mut);font-size:10px;line-height:1.4;margin-top:2px}.architecture-overview :where(.ae-stage:not(:last-child):after){content:"▼";position:absolute;left:13px;bottom:-6px;color:var(--line2);font:800 8px/1 ui-monospace,monospace}.architecture-overview :where(.ae-runtime-loop){border-top:1px dashed var(--line2);padding-top:10px;margin-top:6px;color:var(--mut);text-align:center;letter-spacing:.08em;font:800 8.5px/1.5 ui-monospace,monospace}.architecture-overview :where(.ae-control-plane){position:relative;margin-top:34px;border-top:2px solid var(--blu);border-bottom:1px solid var(--line);display:grid;grid-template-columns:180px 1fr;background:var(--paper);min-height:86px}.architecture-overview :where(.ae-control-plane:before){content:"↑ GOVERN / OBSERVE";position:absolute;left:50%;top:-26px;transform:translateX(-50%);color:var(--blu);background:var(--bg);padding:2px 7px;letter-spacing:.12em;font:800 8.5px/1 ui-monospace,monospace}.architecture-overview :where(.ae-plane-label){padding:15px 18px;border-right:1px solid var(--line)}.architecture-overview :where(.ae-plane-label b){display:block;font-size:13px}.architecture-overview :where(.ae-plane-label span){display:block;color:var(--mut);font-size:10px;margin-top:4px}.architecture-overview :where(.ae-plane-items){display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch}.architecture-overview :where(.ae-plane-items span){display:grid;place-items:center;text-align:center;padding:12px 8px;color:var(--ink);font-size:10px;line-height:1.35}.architecture-overview :where(.ae-plane-items span+span){border-left:1px solid var(--line)}.architecture-overview :where(.ae-feedback){position:relative;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:17px 10px 15px;color:var(--mut);letter-spacing:.07em;font:800 8.5px/1.5 ui-monospace,monospace}.architecture-overview :where(.ae-feedback b){color:var(--org);font:800 12px/1 ui-monospace,monospace}.architecture-overview :where(.ae-feedback .ae-return){color:var(--blu)}.architecture-overview :where(.ae-platform){position:relative;border-top:3px solid var(--line2);border-bottom:1px solid var(--line);padding:15px 18px 16px;background:var(--paper2)}.architecture-overview :where(.ae-platform:before){content:"FOUNDATION";position:absolute;right:16px;top:13px;color:var(--mut);letter-spacing:.16em;font:800 8px/1 ui-monospace,monospace}.architecture-overview :where(.ae-platform b){display:block;font-size:12.5px;padding-right:90px}.architecture-overview :where(.ae-platform span){display:block;color:var(--mut);font-size:10.5px;line-height:1.55;margin-top:5px}.architecture-overview :where(.framework-legend){color:var(--mut);font-size:12px;margin-top:15px}.architecture-overview :where(.framework-legend strong){color:var(--ink)}
-.architecture-overview :where(.agent-reference){margin-top:44px}.architecture-overview :where(.agent-shell){border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:18px 0}.architecture-overview :where(.agent-entry),.architecture-overview :where(.agent-validation),.architecture-overview :where(.agent-control),.architecture-overview :where(.agent-learning){border:1px solid var(--line);background:var(--paper);padding:14px 18px;margin:10px 0}.architecture-overview :where(.agent-entry),.architecture-overview :where(.agent-validation){text-align:center}.architecture-overview :where(.agent-entry small),.architecture-overview :where(.agent-validation small),.architecture-overview :where(.agent-control small),.architecture-overview :where(.agent-learning small),.architecture-overview :where(.agent-zone small),.architecture-overview :where(.agent-core small){display:block;color:var(--blu);letter-spacing:.14em;font:700 9.5px/1.35 ui-monospace,monospace;margin-bottom:6px}.architecture-overview :where(.agent-entry b),.architecture-overview :where(.agent-validation b),.architecture-overview :where(.agent-control b),.architecture-overview :where(.agent-learning b),.architecture-overview :where(.agent-zone b),.architecture-overview :where(.agent-core b){display:block;color:var(--ink);font-weight:800}.architecture-overview :where(.agent-entry span),.architecture-overview :where(.agent-validation span),.architecture-overview :where(.agent-control span),.architecture-overview :where(.agent-learning span),.architecture-overview :where(.agent-zone span),.architecture-overview :where(.agent-core span){display:block;color:var(--mut);font-size:12px;line-height:1.5;margin-top:5px}.architecture-overview :where(.agent-runtime){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr) minmax(0,1fr);gap:10px;align-items:stretch}.architecture-overview :where(.agent-zone),.architecture-overview :where(.agent-core){border:1px solid var(--line);background:var(--paper2);padding:16px;min-width:0}.architecture-overview :where(.agent-core){background:var(--paper);border-top:3px solid var(--org)}.architecture-overview :where(.agent-zone:first-child){border-top:3px solid var(--blu)}.architecture-overview :where(.agent-zone:last-child){border-top:3px solid var(--pur)}.architecture-overview :where(.agent-mini){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}.architecture-overview :where(.agent-mini i){font-style:normal;border:1px solid var(--line);background:var(--paper);padding:7px 5px;text-align:center;color:var(--ink);font:700 9px/1.25 ui-monospace,monospace}.architecture-overview :where(.agent-branch){display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.architecture-overview :where(.agent-branch i){font-style:normal;border:1px solid var(--line);padding:8px;text-align:center;color:var(--ink);font:700 9px/1.3 ui-monospace,monospace}.architecture-overview :where(.agent-loopline){border-top:1px dashed var(--line2);border-bottom:1px dashed var(--line2);padding:8px 4px;margin-top:10px;text-align:center;color:var(--mut);font:700 9px/1.35 ui-monospace,monospace}.architecture-overview :where(.agent-validation){border-left:4px solid var(--grn)}.architecture-overview :where(.agent-control){border-left:4px solid var(--blu)}.architecture-overview :where(.agent-learning){border-left:4px solid var(--org)}.architecture-overview :where(.agent-equation){border:1px solid var(--line2);padding:15px 18px;margin-top:14px;background:transparent}.architecture-overview :where(.agent-equation b){display:block;color:var(--ink);font-size:13px}.architecture-overview :where(.agent-equation code){display:block;margin-top:7px;white-space:normal;color:var(--mut);font-size:11px;line-height:1.55}.architecture-overview :where(.agent-map){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.architecture-overview :where(.agent-map span){border-top:1px solid var(--line);padding-top:7px;color:var(--mut);font-size:10.5px;line-height:1.4}.architecture-overview :where(.agent-map strong){display:block;color:var(--ink);font-size:10.5px;margin-bottom:2px}
-@media (width<=1080px){.architecture-overview :where(.ae-core-grid){grid-template-columns:minmax(0,.8fr) minmax(300px,1.45fr) minmax(0,.8fr);gap:34px}.architecture-overview :where(.ae-left .ae-domain:after),.architecture-overview :where(.ae-right .ae-domain:before){width:34px}.architecture-overview :where(.ae-left .ae-domain:after){right:-34px}.architecture-overview :where(.ae-right .ae-domain:before){left:-34px}.architecture-overview :where(.ae-left .ae-edge),.architecture-overview :where(.ae-right .ae-edge){display:none}.architecture-overview :where(.ae-plane-items){grid-template-columns:repeat(3,minmax(0,1fr))}.architecture-overview :where(.ae-plane-items span:nth-child(4)){border-left:0;border-top:1px solid var(--line)}.architecture-overview :where(.ae-plane-items span:nth-child(n+5)){border-top:1px solid var(--line)}}
-@media (width<=900px){.architecture-overview :where(.system-framework),.architecture-overview :where(.agent-reference){margin:52px auto;padding:0}.architecture-overview :where(.framework-head h2){font-size:24px}.architecture-overview :where(.framework-head p){font-size:13px}.architecture-overview :where(.scope-row span){font-size:12px}.architecture-overview :where(.ae-map){padding-top:18px}.architecture-overview :where(.ae-outcome){width:100%;text-align:left;margin-bottom:30px}.architecture-overview :where(.ae-outcome:after),.architecture-overview :where(.ae-outcome:before){display:none}.architecture-overview :where(.ae-core-grid){grid-template-columns:1fr;gap:16px}.architecture-overview :where(.ae-runtime){order:1;min-height:auto}.architecture-overview :where(.ae-left){order:2;grid-template-columns:1fr 1fr;gap:12px}.architecture-overview :where(.ae-right){order:3;grid-template-columns:1fr 1fr;gap:12px}.architecture-overview :where(.ae-domain){min-height:auto}.architecture-overview :where(.ae-left .ae-domain:after),.architecture-overview :where(.ae-right .ae-domain:before){display:none}.architecture-overview :where(.ae-domain .ae-edge){display:block;position:static;transform:none;margin-top:10px;color:var(--blu)}.architecture-overview :where(.ae-control-plane){grid-template-columns:1fr;margin-top:26px}.architecture-overview :where(.ae-control-plane:before){content:"↑ CONTROL / FEEDBACK";top:-22px}.architecture-overview :where(.ae-plane-label){border-right:0;border-bottom:1px solid var(--line)}.architecture-overview :where(.ae-plane-items){grid-template-columns:repeat(3,minmax(0,1fr))}.architecture-overview :where(.ae-feedback){justify-content:flex-start;padding-left:0;padding-right:0}.architecture-overview :where(.ae-platform:before){position:static;display:block;margin-bottom:7px}.architecture-overview :where(.ae-platform b){padding-right:0}.architecture-overview :where(.agent-runtime),.architecture-overview :where(.agent-map){grid-template-columns:1fr}.architecture-overview :where(.agent-reference){margin-top:34px}.architecture-overview :where(.agent-mini){grid-template-columns:1fr 1fr 1fr}.architecture-overview :where(.agent-branch){grid-template-columns:1fr 1fr}.architecture-overview :where(.agent-map span){font-size:11px}}
-@media (width<=560px){.architecture-overview :where(.ae-left),.architecture-overview :where(.ae-right){grid-template-columns:1fr}.architecture-overview :where(.ae-plane-items){grid-template-columns:1fr 1fr}.architecture-overview :where(.ae-plane-items span:nth-child(3)),.architecture-overview :where(.ae-plane-items span:nth-child(5)){border-left:0}.architecture-overview :where(.ae-plane-items span:nth-child(n+3)){border-top:1px solid var(--line)}.architecture-overview :where(.ae-feedback){display:grid;grid-template-columns:1fr auto}.architecture-overview :where(.ae-feedback b){justify-self:center}.architecture-overview :where(.ae-runtime){padding:14px}.architecture-overview :where(.ae-runtime-head){display:block}.architecture-overview :where(.ae-runtime-head small){display:block;margin-top:5px}.architecture-overview :where(.ae-stage){grid-template-columns:34px 1fr}.architecture-overview :where(.agent-mini),.architecture-overview :where(.agent-branch){grid-template-columns:1fr}.architecture-overview :where(.agent-entry span),.architecture-overview :where(.agent-validation span),.architecture-overview :where(.agent-control span),.architecture-overview :where(.agent-learning span),.architecture-overview :where(.agent-zone span),.architecture-overview :where(.agent-core span){font-size:11px}.architecture-overview :where(.agent-equation code){font-size:10.5px}}
+.architecture-overview :where(.system-framework),
+.architecture-overview :where(.agent-reference) {
+  max-width: 1120px;
+  margin: 74px auto;
+  padding: 0 24px;
+}
+.architecture-overview :where(.framework-head) {
+  max-width: 780px;
+  margin-bottom: 28px;
+}
+.architecture-overview :where(.framework-head small) {
+  letter-spacing: 0.22em;
+  color: var(--blu);
+  font:
+    700 11px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.framework-head h2) {
+  margin: 16px 0;
+  font:
+    800 clamp(30px, 4vw, 48px)/1.18 Georgia,
+    Noto Serif SC,
+    serif;
+}
+.architecture-overview :where(.framework-head p) {
+  color: var(--mut);
+  max-width: 76ch;
+}
+.architecture-overview :where(.scope-note) {
+  display: grid;
+  gap: 12px;
+}
+.architecture-overview :where(.scope-row) {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+.architecture-overview :where(.scope-row:last-child) {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.architecture-overview :where(.scope-row b) {
+  display: block;
+  color: var(--ink);
+  font-weight: 800;
+}
+.architecture-overview :where(.scope-row span) {
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.architecture-overview :where(.scope-row small) {
+  letter-spacing: 0.14em;
+  color: var(--blu);
+  font:
+    700 9.5px/1.4 ui-monospace,
+    monospace;
+  display: block;
+  margin-bottom: 6px;
+}
+.architecture-overview :where(.ae-map) {
+  border-top: 1px solid var(--line2);
+  border-bottom: 1px solid var(--line2);
+  padding: 24px 0 20px;
+}
+.architecture-overview :where(.ae-outcome) {
+  position: relative;
+  width: min(420px, 72%);
+  margin: 0 auto 38px;
+  text-align: center;
+  padding: 13px 18px 15px;
+  border-top: 2px solid var(--org);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.architecture-overview :where(.ae-outcome:after) {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -39px;
+  height: 39px;
+  border-left: 1px solid var(--line2);
+}
+.architecture-overview :where(.ae-outcome:before) {
+  content: "▼";
+  position: absolute;
+  left: 50%;
+  bottom: -45px;
+  transform: translateX(-50%);
+  color: var(--blu);
+  font:
+    800 10px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-kicker) {
+  display: block;
+  color: var(--blu);
+  letter-spacing: 0.16em;
+  font:
+    800 9px/1.4 ui-monospace,
+    monospace;
+  margin-bottom: 7px;
+}
+.architecture-overview :where(.ae-outcome b) {
+  display: block;
+  font-size: 15px;
+}
+.architecture-overview :where(.ae-outcome span) {
+  display: block;
+  color: var(--mut);
+  font-size: 11px;
+  margin-top: 4px;
+}
+.architecture-overview :where(.ae-core-grid) {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(330px, 1.55fr) minmax(0, 0.9fr);
+  gap: 48px;
+  align-items: stretch;
+}
+.architecture-overview :where(.ae-side) {
+  display: grid;
+  align-content: center;
+  gap: 26px;
+}
+.architecture-overview :where(.ae-domain) {
+  position: relative;
+  padding: 15px 16px 16px;
+  border-top: 1px solid var(--line2);
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper2) 76%, transparent);
+  min-height: 136px;
+}
+.architecture-overview :where(.ae-domain h3) {
+  margin: 0 0 9px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.architecture-overview :where(.ae-domain ul) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--mut);
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+.architecture-overview :where(.ae-domain li) {
+  display: inline;
+}
+.architecture-overview :where(.ae-domain li + li:before) {
+  content: " · ";
+  color: var(--line2);
+}
+.architecture-overview :where(.ae-domain .ae-edge) {
+  position: absolute;
+  top: 50%;
+  color: var(--blu);
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+  font:
+    800 8.5px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-left .ae-domain:after),
+.architecture-overview :where(.ae-right .ae-domain:before) {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 48px;
+  border-top: 1px solid var(--line2);
+}
+.architecture-overview :where(.ae-left .ae-domain:after) {
+  right: -48px;
+}
+.architecture-overview :where(.ae-right .ae-domain:before) {
+  left: -48px;
+}
+.architecture-overview :where(.ae-left .ae-edge) {
+  right: -44px;
+  transform: translate(100%, -50%);
+}
+.architecture-overview :where(.ae-right .ae-edge) {
+  left: -44px;
+  transform: translate(-100%, -50%);
+}
+.architecture-overview :where(.ae-knowledge) {
+  border-left: 3px solid var(--blu);
+}
+.architecture-overview :where(.ae-state) {
+  border-left: 3px solid var(--org);
+}
+.architecture-overview :where(.ae-capabilities) {
+  border-right: 3px solid var(--pur);
+}
+.architecture-overview :where(.ae-orchestration) {
+  border-right: 3px solid var(--grn);
+}
+.architecture-overview :where(.ae-runtime) {
+  position: relative;
+  border: 1px solid var(--line2);
+  border-top: 3px solid var(--blu);
+  background: var(--paper);
+  padding: 16px 20px 18px;
+  min-height: 410px;
+}
+.architecture-overview :where(.ae-runtime-head) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+}
+.architecture-overview :where(.ae-runtime-head strong) {
+  font-size: 16px;
+}
+.architecture-overview :where(.ae-runtime-head small) {
+  color: var(--mut);
+  letter-spacing: 0.12em;
+  font:
+    700 8.5px/1.3 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-runtime-path) {
+  position: relative;
+  padding: 5px 0;
+}
+.architecture-overview :where(.ae-runtime-path:before) {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 24px;
+  bottom: 27px;
+  border-left: 1px solid var(--line2);
+}
+.architecture-overview :where(.ae-stage) {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 10px;
+  align-items: center;
+  min-height: 52px;
+  padding: 7px 0;
+}
+.architecture-overview :where(.ae-stage i) {
+  position: relative;
+  z-index: 2;
+  width: 34px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  border: 1px solid var(--line2);
+  color: var(--blu);
+  font:
+    800 8.5px/1 ui-monospace,
+    monospace;
+  font-style: normal;
+}
+.architecture-overview :where(.ae-stage div) {
+  min-width: 0;
+}
+.architecture-overview :where(.ae-stage b) {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+.architecture-overview :where(.ae-stage span) {
+  display: block;
+  color: var(--mut);
+  font-size: 10px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.architecture-overview :where(.ae-stage:not(:last-child):after) {
+  content: "▼";
+  position: absolute;
+  left: 13px;
+  bottom: -6px;
+  color: var(--line2);
+  font:
+    800 8px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-runtime-loop) {
+  border-top: 1px dashed var(--line2);
+  padding-top: 10px;
+  margin-top: 6px;
+  color: var(--mut);
+  text-align: center;
+  letter-spacing: 0.08em;
+  font:
+    800 8.5px/1.5 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-control-plane) {
+  position: relative;
+  margin-top: 34px;
+  border-top: 2px solid var(--blu);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  background: var(--paper);
+  min-height: 86px;
+}
+.architecture-overview :where(.ae-control-plane:before) {
+  content: "↑ GOVERN / OBSERVE";
+  position: absolute;
+  left: 50%;
+  top: -26px;
+  transform: translateX(-50%);
+  color: var(--blu);
+  background: var(--bg);
+  padding: 2px 7px;
+  letter-spacing: 0.12em;
+  font:
+    800 8.5px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-plane-label) {
+  padding: 15px 18px;
+  border-right: 1px solid var(--line);
+}
+.architecture-overview :where(.ae-plane-label b) {
+  display: block;
+  font-size: 13px;
+}
+.architecture-overview :where(.ae-plane-label span) {
+  display: block;
+  color: var(--mut);
+  font-size: 10px;
+  margin-top: 4px;
+}
+.architecture-overview :where(.ae-plane-items) {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: stretch;
+}
+.architecture-overview :where(.ae-plane-items span) {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 12px 8px;
+  color: var(--ink);
+  font-size: 10px;
+  line-height: 1.35;
+}
+.architecture-overview :where(.ae-plane-items span + span) {
+  border-left: 1px solid var(--line);
+}
+.architecture-overview :where(.ae-feedback) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 17px 10px 15px;
+  color: var(--mut);
+  letter-spacing: 0.07em;
+  font:
+    800 8.5px/1.5 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-feedback b) {
+  color: var(--org);
+  font:
+    800 12px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-feedback .ae-return) {
+  color: var(--blu);
+}
+.architecture-overview :where(.ae-platform) {
+  position: relative;
+  border-top: 3px solid var(--line2);
+  border-bottom: 1px solid var(--line);
+  padding: 15px 18px 16px;
+  background: var(--paper2);
+}
+.architecture-overview :where(.ae-platform:before) {
+  content: "FOUNDATION";
+  position: absolute;
+  right: 16px;
+  top: 13px;
+  color: var(--mut);
+  letter-spacing: 0.16em;
+  font:
+    800 8px/1 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.ae-platform b) {
+  display: block;
+  font-size: 12.5px;
+  padding-right: 90px;
+}
+.architecture-overview :where(.ae-platform span) {
+  display: block;
+  color: var(--mut);
+  font-size: 10.5px;
+  line-height: 1.55;
+  margin-top: 5px;
+}
+.architecture-overview :where(.framework-legend) {
+  color: var(--mut);
+  font-size: 12px;
+  margin-top: 15px;
+}
+.architecture-overview :where(.framework-legend strong) {
+  color: var(--ink);
+}
+.architecture-overview :where(.agent-reference) {
+  margin-top: 44px;
+}
+.architecture-overview :where(.agent-shell) {
+  border-top: 1px solid var(--line2);
+  border-bottom: 1px solid var(--line2);
+  padding: 18px 0;
+}
+.architecture-overview :where(.agent-entry),
+.architecture-overview :where(.agent-validation),
+.architecture-overview :where(.agent-control),
+.architecture-overview :where(.agent-learning) {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 14px 18px;
+  margin: 10px 0;
+}
+.architecture-overview :where(.agent-entry),
+.architecture-overview :where(.agent-validation) {
+  text-align: center;
+}
+.architecture-overview :where(.agent-entry small),
+.architecture-overview :where(.agent-validation small),
+.architecture-overview :where(.agent-control small),
+.architecture-overview :where(.agent-learning small),
+.architecture-overview :where(.agent-zone small),
+.architecture-overview :where(.agent-core small) {
+  display: block;
+  color: var(--blu);
+  letter-spacing: 0.14em;
+  font:
+    700 9.5px/1.35 ui-monospace,
+    monospace;
+  margin-bottom: 6px;
+}
+.architecture-overview :where(.agent-entry b),
+.architecture-overview :where(.agent-validation b),
+.architecture-overview :where(.agent-control b),
+.architecture-overview :where(.agent-learning b),
+.architecture-overview :where(.agent-zone b),
+.architecture-overview :where(.agent-core b) {
+  display: block;
+  color: var(--ink);
+  font-weight: 800;
+}
+.architecture-overview :where(.agent-entry span),
+.architecture-overview :where(.agent-validation span),
+.architecture-overview :where(.agent-control span),
+.architecture-overview :where(.agent-learning span),
+.architecture-overview :where(.agent-zone span),
+.architecture-overview :where(.agent-core span) {
+  display: block;
+  color: var(--mut);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 5px;
+}
+.architecture-overview :where(.agent-runtime) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+.architecture-overview :where(.agent-zone),
+.architecture-overview :where(.agent-core) {
+  border: 1px solid var(--line);
+  background: var(--paper2);
+  padding: 16px;
+  min-width: 0;
+}
+.architecture-overview :where(.agent-core) {
+  background: var(--paper);
+  border-top: 3px solid var(--org);
+}
+.architecture-overview :where(.agent-zone:first-child) {
+  border-top: 3px solid var(--blu);
+}
+.architecture-overview :where(.agent-zone:last-child) {
+  border-top: 3px solid var(--pur);
+}
+.architecture-overview :where(.agent-mini) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 12px;
+}
+.architecture-overview :where(.agent-mini i) {
+  font-style: normal;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 7px 5px;
+  text-align: center;
+  color: var(--ink);
+  font:
+    700 9px/1.25 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.agent-branch) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 12px 0;
+}
+.architecture-overview :where(.agent-branch i) {
+  font-style: normal;
+  border: 1px solid var(--line);
+  padding: 8px;
+  text-align: center;
+  color: var(--ink);
+  font:
+    700 9px/1.3 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.agent-loopline) {
+  border-top: 1px dashed var(--line2);
+  border-bottom: 1px dashed var(--line2);
+  padding: 8px 4px;
+  margin-top: 10px;
+  text-align: center;
+  color: var(--mut);
+  font:
+    700 9px/1.35 ui-monospace,
+    monospace;
+}
+.architecture-overview :where(.agent-validation) {
+  border-left: 4px solid var(--grn);
+}
+.architecture-overview :where(.agent-control) {
+  border-left: 4px solid var(--blu);
+}
+.architecture-overview :where(.agent-learning) {
+  border-left: 4px solid var(--org);
+}
+.architecture-overview :where(.agent-equation) {
+  border: 1px solid var(--line2);
+  padding: 15px 18px;
+  margin-top: 14px;
+  background: transparent;
+}
+.architecture-overview :where(.agent-equation b) {
+  display: block;
+  color: var(--ink);
+  font-size: 13px;
+}
+.architecture-overview :where(.agent-equation code) {
+  display: block;
+  margin-top: 7px;
+  white-space: normal;
+  color: var(--mut);
+  font-size: 11px;
+  line-height: 1.55;
+}
+.architecture-overview :where(.agent-map) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.architecture-overview :where(.agent-map span) {
+  border-top: 1px solid var(--line);
+  padding-top: 7px;
+  color: var(--mut);
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+.architecture-overview :where(.agent-map strong) {
+  display: block;
+  color: var(--ink);
+  font-size: 10.5px;
+  margin-bottom: 2px;
+}
+@media (width<=1080px) {
+  .architecture-overview :where(.ae-core-grid) {
+    grid-template-columns: minmax(0, 0.8fr) minmax(300px, 1.45fr) minmax(
+        0,
+        0.8fr
+      );
+    gap: 34px;
+  }
+  .architecture-overview :where(.ae-left .ae-domain:after),
+  .architecture-overview :where(.ae-right .ae-domain:before) {
+    width: 34px;
+  }
+  .architecture-overview :where(.ae-left .ae-domain:after) {
+    right: -34px;
+  }
+  .architecture-overview :where(.ae-right .ae-domain:before) {
+    left: -34px;
+  }
+  .architecture-overview :where(.ae-left .ae-edge),
+  .architecture-overview :where(.ae-right .ae-edge) {
+    display: none;
+  }
+  .architecture-overview :where(.ae-plane-items) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .architecture-overview :where(.ae-plane-items span:nth-child(4)) {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .architecture-overview :where(.ae-plane-items span:nth-child(n + 5)) {
+    border-top: 1px solid var(--line);
+  }
+}
+@media (width<=900px) {
+  .architecture-overview :where(.system-framework),
+  .architecture-overview :where(.agent-reference) {
+    margin: 52px auto;
+    padding: 0;
+  }
+  .architecture-overview :where(.framework-head h2) {
+    font-size: 24px;
+  }
+  .architecture-overview :where(.framework-head p) {
+    font-size: 13px;
+  }
+  .architecture-overview :where(.scope-row span) {
+    font-size: 12px;
+  }
+  .architecture-overview :where(.ae-map) {
+    padding-top: 18px;
+  }
+  .architecture-overview :where(.ae-outcome) {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 30px;
+  }
+  .architecture-overview :where(.ae-outcome:after),
+  .architecture-overview :where(.ae-outcome:before) {
+    display: none;
+  }
+  .architecture-overview :where(.ae-core-grid) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .architecture-overview :where(.ae-runtime) {
+    order: 1;
+    min-height: auto;
+  }
+  .architecture-overview :where(.ae-left) {
+    order: 2;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .architecture-overview :where(.ae-right) {
+    order: 3;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .architecture-overview :where(.ae-domain) {
+    min-height: auto;
+  }
+  .architecture-overview :where(.ae-left .ae-domain:after),
+  .architecture-overview :where(.ae-right .ae-domain:before) {
+    display: none;
+  }
+  .architecture-overview :where(.ae-domain .ae-edge) {
+    display: block;
+    position: static;
+    transform: none;
+    margin-top: 10px;
+    color: var(--blu);
+  }
+  .architecture-overview :where(.ae-control-plane) {
+    grid-template-columns: 1fr;
+    margin-top: 26px;
+  }
+  .architecture-overview :where(.ae-control-plane:before) {
+    content: "↑ CONTROL / FEEDBACK";
+    top: -22px;
+  }
+  .architecture-overview :where(.ae-plane-label) {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .architecture-overview :where(.ae-plane-items) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .architecture-overview :where(.ae-feedback) {
+    justify-content: flex-start;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .architecture-overview :where(.ae-platform:before) {
+    position: static;
+    display: block;
+    margin-bottom: 7px;
+  }
+  .architecture-overview :where(.ae-platform b) {
+    padding-right: 0;
+  }
+  .architecture-overview :where(.agent-runtime),
+  .architecture-overview :where(.agent-map) {
+    grid-template-columns: 1fr;
+  }
+  .architecture-overview :where(.agent-reference) {
+    margin-top: 34px;
+  }
+  .architecture-overview :where(.agent-mini) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .architecture-overview :where(.agent-branch) {
+    grid-template-columns: 1fr 1fr;
+  }
+  .architecture-overview :where(.agent-map span) {
+    font-size: 11px;
+  }
+}
+@media (width<=560px) {
+  .architecture-overview :where(.ae-left),
+  .architecture-overview :where(.ae-right) {
+    grid-template-columns: 1fr;
+  }
+  .architecture-overview :where(.ae-plane-items) {
+    grid-template-columns: 1fr 1fr;
+  }
+  .architecture-overview :where(.ae-plane-items span:nth-child(3)),
+  .architecture-overview :where(.ae-plane-items span:nth-child(5)) {
+    border-left: 0;
+  }
+  .architecture-overview :where(.ae-plane-items span:nth-child(n + 3)) {
+    border-top: 1px solid var(--line);
+  }
+  .architecture-overview :where(.ae-feedback) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+  .architecture-overview :where(.ae-feedback b) {
+    justify-self: center;
+  }
+  .architecture-overview :where(.ae-runtime) {
+    padding: 14px;
+  }
+  .architecture-overview :where(.ae-runtime-head) {
+    display: block;
+  }
+  .architecture-overview :where(.ae-runtime-head small) {
+    display: block;
+    margin-top: 5px;
+  }
+  .architecture-overview :where(.ae-stage) {
+    grid-template-columns: 34px 1fr;
+  }
+  .architecture-overview :where(.agent-mini),
+  .architecture-overview :where(.agent-branch) {
+    grid-template-columns: 1fr;
+  }
+  .architecture-overview :where(.agent-entry span),
+  .architecture-overview :where(.agent-validation span),
+  .architecture-overview :where(.agent-control span),
+  .architecture-overview :where(.agent-learning span),
+  .architecture-overview :where(.agent-zone span),
+  .architecture-overview :where(.agent-core span) {
+    font-size: 11px;
+  }
+  .architecture-overview :where(.agent-equation code) {
+    font-size: 10.5px;
+  }
+}
