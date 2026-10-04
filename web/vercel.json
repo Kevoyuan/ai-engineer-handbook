@@ -63,6 +63,11 @@
   "outputDirectory": "site",
   "redirects": [
     {
+      "source": "/chapters/01-model-api-context-foundations:ext(\\.html)?",
+      "destination": "/#read/01-model-api-context-foundations",
+      "permanent": false
+    },
+    {
       "source": "/chapters/02-enterprise-retrieval:ext(\\.html)?",
       "destination": "/#read/02-enterprise-retrieval",
       "permanent": false
