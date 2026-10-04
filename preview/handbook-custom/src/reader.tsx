@@ -26,6 +26,8 @@ const hasConceptDiagram = (slug: string) =>
   [
     "03-hybrid-retrieval-query-routing",
     "04-rag-reliability-selective-answering",
+    "06-skills-routing",
+    "07-memory-context-engineering",
     "08-agent-orchestration",
   ].includes(slug);
 class DiagramBoundary extends Component<

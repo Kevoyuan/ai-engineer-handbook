@@ -8,6 +8,8 @@ const base = process.env.HANDBOOK_URL || "http://localhost:4180/";
 const routes = [
   "03-hybrid-retrieval-query-routing",
   "04-rag-reliability-selective-answering",
+  // Skills now has a terminal simulator, covered by learning-interactions and bento/check.
+  "07-memory-context-engineering",
   "08-agent-orchestration",
 ];
 fs.mkdirSync(out, { recursive: true });

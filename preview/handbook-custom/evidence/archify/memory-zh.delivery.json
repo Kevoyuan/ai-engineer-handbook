@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/diagrams/memory-zh.json",
+  "output": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/public/diagrams/memory-zh.html",
+  "specification": {
+    "sha256": "5567e595b0739e88a16c45bf4ecd431efb9601265a5b1f24a3dcafc0dbfdd2be",
+    "bytes": 3575
+  },
+  "artifact": {
+    "sha256": "a8818ba97ce15fbce5b9b654b21d7895c94a74713b329f5408bd7baaa6f32829",
+    "bytes": 711098
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "home": {
+    "status": "completed",
+    "score": 95,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 1,
+      "total": 1
+    },
+    "findings": [
+      {
+        "ruleId": "spacing/off-scale-value",
+        "state": "home-1728",
+        "severity": "moderate",
+        "message": "home-1728 uses 1 off-scale spacing value across 1 element: 112px.",
+        "fix": "Replace the measured values with the nearest project spacing token. Active scale: 4, 6, 7, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 60, 64, 72, 96, 128px.",
+        "elementIds": [
+          "theme-1"
+        ],
+        "evidence": [
+          {
+            "label": "theme-1 row gap",
+            "value": 112,
+            "unit": "px"
+          },
+          {
+            "label": "theme-1 column gap",
+            "value": 112,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-1"
+      }
+    ]
+  },
+  "reader": {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": []
+  },
+  "map": {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": []
+  },
+  "simulator": {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": []
+  },
+  "search": {
+    "status": "completed",
+    "score": 95,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 1,
+      "total": 1
+    },
+    "findings": [
+      {
+        "ruleId": "spacing/off-scale-value",
+        "state": "search-1728",
+        "severity": "moderate",
+        "message": "search-1728 uses 1 off-scale spacing value across 1 element: 112px.",
+        "fix": "Replace the measured values with the nearest project spacing token. Active scale: 4, 6, 7, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 60, 64, 72, 96, 128px.",
+        "elementIds": [
+          "theme-1"
+        ],
+        "evidence": [
+          {
+            "label": "theme-1 row gap",
+            "value": 112,
+            "unit": "px"
+          },
+          {
+            "label": "theme-1 column gap",
+            "value": 112,
+            "unit": "px"
+          }
+        ],
+        "id": "spacing-1"
+      }
+    ]
+  }
+}

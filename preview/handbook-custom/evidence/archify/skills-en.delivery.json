@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/diagrams/skills-en.json",
+  "output": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/public/diagrams/skills-en.html",
+  "specification": {
+    "sha256": "4e6fcd98236eb87bb42423bddc041fbe004657166c62e136c2d9fd94e5f35e9c",
+    "bytes": 3497
+  },
+  "artifact": {
+    "sha256": "11096f4991c86bb3c3e1acae479a5612b62b383d81739e59404f634bf88f491e",
+    "bytes": 711874
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

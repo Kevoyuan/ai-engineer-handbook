@@ -10,9 +10,11 @@
     "test:ui": "node evidence/full-interactions.cjs",
     "test:a11y": "node evidence/a11y.cjs",
     "test:concepts": "node evidence/concept-diagrams.cjs",
+    "test:learning": "node evidence/learning-interactions.cjs",
     "publish:web": "node scripts/publish-web.mjs"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.9",
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@radix-ui/react-accordion": "^1.2.20",

@@ -76,12 +76,24 @@ jobs:
           };
 
           const issues = [];
+          // Standalone Chinese documents have no English-mode toggle. Keep
+          // their declared language checked; audit skills-en.html normally.
+          const chineseDocuments = new Set([
+            'web/site/diagrams/skills-zh.html',
+            'web/site/diagrams/memory-zh.html',
+          ]);
           const checkEnglish = (file, kind, value) => {
             if (HAN.test(value) || CJK_PUNCT.test(value)) issues.push({file, kind, value});
           };
 
           for (const file of files.sort()) {
             const source = fs.readFileSync(file, 'utf8');
+            if (chineseDocuments.has(file)) {
+              if (!/<html\b[^>]*\blang="zh-CN"/i.test(source)) {
+                issues.push({file, kind: 'standalone-document-language', value: 'Expected zh-CN'});
+              }
+              continue;
+            }
 
             for (const m of source.matchAll(/data-i18n-en="([^"]*)"/g)) {
               checkEnglish(file, 'data-i18n-en', normalizePunctuation(decode(m[1])));

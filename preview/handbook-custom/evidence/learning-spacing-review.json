@@ -1,0 +1,18 @@
+{
+  "status": "completed",
+  "summary": {
+    "critical": 0,
+    "serious": 0,
+    "moderate": 0,
+    "total": 0
+  },
+  "score": 100,
+  "capturedWidths": [
+    390,
+    1440,
+    1728
+  ],
+  "findings": [],
+  "scope": "Rendered skill simulation and expanded practice; meaningful peer groups; 390/1440/1728",
+  "note": "Geometry review does not replace screenshot or interaction review."
+}

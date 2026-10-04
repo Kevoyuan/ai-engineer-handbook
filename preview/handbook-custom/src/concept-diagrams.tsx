@@ -12,24 +12,17 @@ import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "@/components/icons";
-
-type Copy = [string, string];
-type Frame = { node: number; title: Copy; text: Copy };
-type Example = { label: Copy; input: Copy; route: Copy; frames: Frame[] };
-type Lesson = {
-  anchor: string;
-  title: Copy;
-  intro: Copy;
-  nodes: Copy[];
-  examples: Example[];
-  takeaway: Copy;
-};
+import { extraLessons, type Copy, type Frame, type Lesson } from "./learning-content";
+import { KnowledgeCheck, SkillContextInspector } from "./learning-interactions";
+import { ArchifyOverview } from "./archify-overview";
+import { SkillSimulator } from "./skill-simulator";
 const f = (node: number, title: Copy, text: Copy): Frame => ({
   node,
   title,
   text,
 });
 const lessons: Record<string, Lesson> = {
+  ...extraLessons,
   "03-hybrid-retrieval-query-routing": {
     anchor: "dg2-query-routing",
     title: [
@@ -522,7 +515,10 @@ export const ConceptDiagram = memo(function ConceptDiagram({
     if (!anchor) return;
     const slot = document.createElement("div");
     slot.className = "concept-slot";
-    anchor.after(slot);
+    // A heading anchors a whole semantic section; keep the exercise after it.
+    const section = anchor.closest("section");
+    if (extraLessons[slug] && section && section !== pane.current) section.after(slot);
+    else anchor.after(slot);
     setHost(slot);
     return () => slot.remove();
   }, [lesson, pane, en]);
@@ -561,6 +557,10 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
             ["支持 / 冲突", "Support / Conflict"],
             ["回答 / 拒答", "Answer / Abstain"],
           ]
+        : lesson.anchor === "capability-architecture-title"
+          ? [["摘要 / 候选", "Summary / Candidate"], ["权限 / 输入", "Access / Inputs"], ["SKILL.md", "SKILL.md"], ["工具 / 验证", "Tools / Validation"]]
+        : lesson.anchor === "cross-session-memory-title"
+          ? [["类型 / 来源", "Type / Source"], ["用户 / 项目", "User / Project"], ["冲突 / 版本", "Conflict / Version"], ["相关 / 有效", "Relevant / Valid"]]
         : [
             ["目标 / 验收", "Goal / Criteria"],
             ["工具 / 权限", "Tool / Permission"],
@@ -620,6 +620,7 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
     setPlaying(false);
     setStep(next);
   };
+  if (lesson.anchor === "capability-architecture-title") return <SkillSimulator lesson={lesson} en={en} rootRef={root} />;
   return (
     <section
       ref={root}
@@ -632,6 +633,7 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
         <h3 id="concept-title">{t(lesson.title)}</h3>
         <p>{t(lesson.intro)}</p>
       </header>
+      <ArchifyOverview anchor={lesson.anchor} en={en} />
       <div className="concept-examples">
         <label htmlFor="concept-example">
           {en ? "Choose an example" : "选择示例"}
@@ -777,11 +779,15 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
           {last ? (en ? " · Complete" : " · 完成") : ""}
         </span>
       </div>
+      {lesson.anchor === "capability-architecture-title" && (
+        <SkillContextInspector key={"skill-" + example} example={example} step={step} en={en} />
+      )}
       <div className="concept-outcome">
         <span>{en ? "This example ends with" : "本例最终走向"}</span>
         <strong>{t(scenario.route)}</strong>
       </div>
       <p className="concept-takeaway">{t(lesson.takeaway)}</p>
+      <KnowledgeCheck key={"quiz-" + example} anchor={lesson.anchor} en={en} />
     </section>
   );
 }

@@ -39,8 +39,23 @@ Search, mobile navigation, and mobile section navigation use the installed Radix
 
 Scrollbars retain their gutters while their thumbs stay transparent at rest. Scrolling reveals the thumb for one second; pointer hover and keyboard focus also reveal it. Forced-colors retains native visible scrollbars. The desktop sidebar can be hidden and restored using the top-left navigation button; the local collapsed preference does not affect the mobile navigation dialog. Reduced motion suppresses animation. Dark mode uses neutral reading surfaces; filled-button text comes from the semantic on-primary token. On phones the workspace is one scrolling page: toolbar, introduction, search, filters, chapter list and architecture entry all scroll together. Reader headings and controls also scroll with the article; section jumps use the workspace as their scroll owner. Desktop keeps its bounded content panes. At narrow widths the sidebar becomes a navigation dialog, the TOC is a section dialog at every width, comparison tables scroll internally, and complex experiment panels stack at their available content width.
 
+## Article learning interactions
+
+Chapters 03, 04, 06, 07 and 08 expose the existing interactive-diagram shortcut. Chapter 06 adds three illustrative skill-routing scenarios with inspectable summary, instruction and reference layers; input or authorization failures never display a simulated tool execution. Chapter 07 adds preference, superseded-knowledge and permission-memory scenarios. These examples derive from the canonical chapters and do not issue model or file requests.
+
+Each of the five diagrams has an optional two-question practice panel. Installed Collapsible, RadioGroup and Tabs primitives own disclosure and keyboard behavior. Checking an answer shows an explanation; selecting another answer clears stale feedback. Advancing or restarting clears the selection and focuses the question. Changing the diagram example resets practice. Answers remain in memory and are never persisted, logged or put in URLs. Theme, locale, direct section links, manual stepping and reduced-motion behavior follow the existing reader contract.
+
+Run `npm run test:learning` for scenario boundaries, correct/incorrect feedback, keyboard behavior, canonical content preservation and automated accessibility at 390, 1440 and 1728 in both locales and themes. Reports default to `/tmp/handbook-learning-audit`; `LEARNING_AUDIT_DIR` overrides that path. `LEARNING_CAPTURE_SCRIPT` supplies the Better Design spacing capture script. `npm run test:concepts` covers the node diagrams, including chapter 07. Chapter 06 now uses `node evidence/bento/check.cjs` for its terminal simulator.
+
 ## Verification and migration boundary
 
 The reviewed redesign is published as `web/site/`; its application source remains in `preview/handbook-custom`. Legacy chapter URLs redirect to the shared reader. Browser tests cover all chapters and representative theme/locale, desktop/mobile, keyboard, loading/error/retry and experimental-control states. Existing generated component registry demos are retained but are not imported into product routes.
 
 The on-page contents never reserves a right-hand column. The reader toolbar opens the shared section dialog on desktop and mobile; current-section highlighting, section jumps and return-to-top remain available.
+
+
+## Skills simulation controls
+
+The supplied terminal reference replaces chapter 06's node-card player with a terminal/context split view. Scenario tabs reset running work and practice, and clear previous logs. Send starts an explicitly simulated 5-phase run; pause preserves the current transcript; single-step advances without a timer; reset clears the run. Missing inputs and authorization failures terminate at phase 2. A reset has no real-world effect. The component cancels stale timers on reset, scenario changes and unmount, and pauses when hidden or outside the visible reading area. Reduced motion keeps all controls usable and removes spatial animation.
+
+Internal-context content is an authored teaching model, not private model reasoning. Input token and cache figures are illustrative; the cost panel states that there are no real API calls. Full original context-layer descriptions remain behind a disclosure. Archify viewer links open a new tab and disclose that behavior. Memory's English reader labels its current Chinese-only visualization explicitly.
