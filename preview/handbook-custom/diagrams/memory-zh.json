@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Memory：从历史记录到有效上下文",
+    "locale": "zh-CN",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "task",
+      "label": "当前任务"
+    },
+    {
+      "id": "read",
+      "label": "受治理的读取"
+    },
+    {
+      "id": "boundary",
+      "label": "排除与更新"
+    }
+  ],
+  "mainPath": [
+    "query",
+    "scope",
+    "recall",
+    "validity",
+    "context",
+    "response"
+  ],
+  "nodes": [
+    {
+      "id": "query",
+      "lane": "task",
+      "col": 0,
+      "type": "frontend",
+      "label": "当前请求",
+      "sublabel": "任务目标与当前约束",
+      "width": 160
+    },
+    {
+      "id": "scope",
+      "lane": "read",
+      "col": 1,
+      "type": "security",
+      "label": "访问过滤",
+      "sublabel": "租户 · 用户 · 资源范围",
+      "width": 160
+    },
+    {
+      "id": "recall",
+      "lane": "read",
+      "col": 2,
+      "type": "database",
+      "label": "召回记忆",
+      "sublabel": "相关性 · 时效 · 质量",
+      "width": 160
+    },
+    {
+      "id": "validity",
+      "lane": "read",
+      "col": 3,
+      "type": "security",
+      "label": "有效性检查",
+      "sublabel": "来源 · 版本 · 冲突",
+      "width": 160
+    },
+    {
+      "id": "context",
+      "lane": "read",
+      "col": 4,
+      "type": "backend",
+      "label": "构造上下文",
+      "sublabel": "只保留有效且相关的信息",
+      "width": 160
+    },
+    {
+      "id": "response",
+      "lane": "task",
+      "col": 5,
+      "type": "backend",
+      "label": "服务当前任务",
+      "sublabel": "遵循本次明确要求",
+      "width": 160
+    },
+    {
+      "id": "denied",
+      "lane": "boundary",
+      "col": 1,
+      "type": "security",
+      "label": "阻止越权读取",
+      "sublabel": "不召回，也不泄漏存在性",
+      "width": 160
+    },
+    {
+      "id": "stale",
+      "lane": "boundary",
+      "col": 3,
+      "type": "database",
+      "label": "排除失效记忆",
+      "sublabel": "核对新来源，或说明缺口",
+      "width": 160
+    }
+  ],
+  "edges": [
+    {
+      "id": "read-0",
+      "from": "query",
+      "to": "scope",
+      "label": "识别范围",
+      "role": "main"
+    },
+    {
+      "id": "read-1",
+      "from": "scope",
+      "to": "recall",
+      "label": "已授权候选",
+      "role": "main"
+    },
+    {
+      "id": "read-2",
+      "from": "recall",
+      "to": "validity",
+      "label": "核对来源",
+      "role": "main"
+    },
+    {
+      "id": "read-3",
+      "from": "validity",
+      "to": "context",
+      "label": "检查通过",
+      "role": "main"
+    },
+    {
+      "id": "read-4",
+      "from": "context",
+      "to": "response",
+      "label": "预算内注入",
+      "role": "main"
+    },
+    {
+      "id": "scope-denied",
+      "from": "scope",
+      "to": "denied",
+      "label": "无权限",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "validity-stale",
+      "from": "validity",
+      "to": "stale",
+      "label": "失效或冲突",
+      "role": "branch",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "记忆不是更长的聊天记录",
+      "items": [
+        "长期保存仍需要来源、范围、有效期和版本。"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "记忆不能授予权限",
+      "items": [
+        "历史权限记录必须向可信授权系统重新核对。"
+      ]
+    }
+  ]
+}

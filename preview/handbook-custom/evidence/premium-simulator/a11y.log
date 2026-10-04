@@ -1,0 +1,116 @@
+
+> handbook-custom-preview@0.0.0 test:a11y
+> node evidence/a11y.cjs
+
+[
+  {
+    "route": "#home",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#map",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/02-enterprise-retrieval",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/03-hybrid-retrieval-query-routing",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/04-rag-reliability-selective-answering",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/05-document-pdf-rag",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/06-skills-routing",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/07-memory-context-engineering",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/08-agent-orchestration",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/09-reliability-evaluation-observability",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/10-serving-deployment-ai-platform",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#home",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#map",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/02-enterprise-retrieval",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/03-hybrid-retrieval-query-routing",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/04-rag-reliability-selective-answering",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/05-document-pdf-rag",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/06-skills-routing",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/07-memory-context-engineering",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/08-agent-orchestration",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/09-reliability-evaluation-observability",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/10-serving-deployment-ai-platform",
+    "dark": false,
+    "violations": []
+  }
+]

@@ -7,6 +7,10 @@
 @source "./components/ui/dialog.tsx";
 @source "./components/ui/sidebar.tsx";
 @source "./components/ui/table.tsx";
+@source "./components/ui/tabs.tsx";
+@source "./components/ui/radio-group.tsx";
+@source "./learning-interactions.tsx";
+@source "./archify-overview.tsx";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -194,3 +198,9 @@
 }
 
 @layer base;
+
+@source "./skill-simulator.tsx";
+@source "./components/ui/ix-onboarding-stepper-underline.tsx";
+@source "./components/ui/ix-onboarding-stepper-types.ts";
+
+@source "./components/ui/badge.tsx";

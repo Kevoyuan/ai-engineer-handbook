@@ -1,0 +1,128 @@
+[
+  {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": [],
+    "capturedWidths": [
+      390,
+      1440,
+      1728
+    ],
+    "states": [
+      {
+        "name": "simulator-idle-390",
+        "viewport": {
+          "width": 390,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      },
+      {
+        "name": "simulator-idle-1440",
+        "viewport": {
+          "width": 1440,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      },
+      {
+        "name": "simulator-idle-1728",
+        "viewport": {
+          "width": 1728,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      }
+    ]
+  },
+  {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": [],
+    "capturedWidths": [
+      390,
+      1440,
+      1728
+    ],
+    "states": [
+      {
+        "name": "simulator-focused-390",
+        "viewport": {
+          "width": 390,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      },
+      {
+        "name": "simulator-focused-1440",
+        "viewport": {
+          "width": 1440,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      },
+      {
+        "name": "simulator-focused-1728",
+        "viewport": {
+          "width": 1728,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      }
+    ]
+  },
+  {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": [],
+    "capturedWidths": [
+      390,
+      1440,
+      1728
+    ],
+    "states": [
+      {
+        "name": "simulator-loaded-390",
+        "viewport": {
+          "width": 390,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      },
+      {
+        "name": "simulator-loaded-1440",
+        "viewport": {
+          "width": 1440,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      },
+      {
+        "name": "simulator-loaded-1728",
+        "viewport": {
+          "width": 1728,
+          "height": 1000,
+          "devicePixelRatio": 1
+        }
+      }
+    ]
+  }
+]

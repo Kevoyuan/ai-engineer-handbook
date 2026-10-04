@@ -10,6 +10,8 @@ https://kevoyuan-ai-handbook.vercel.app
 
 GitHub `main` is the repository source of truth. Vercel publishes the generated `web/site/` directory after changes reach `main`. The React application source lives in `../preview/handbook-custom/`; run `npm run publish:web` there to refresh the production artifact before committing. Legacy chapter URLs redirect to the corresponding reader routes.
 
+Publishing also runs `sync-diagram-csp.mjs`. The main application retains its existing script policy; standalone diagram paths permit only the exact verified inline script hashes and their font stylesheet/load handler. Rebuild before committing diagram updates so their hashes stay synchronized. The English audit checks the standalone English export; the two explicitly Chinese document exports are checked for their declared `zh-CN` language rather than treated as English-toggle pages.
+
 ## Site structure
 
 ```text

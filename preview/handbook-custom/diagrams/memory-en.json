@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Memory: from stored history to valid context",
+    "locale": "en",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "task",
+      "label": "Current task"
+    },
+    {
+      "id": "read",
+      "label": "Governed retrieval"
+    },
+    {
+      "id": "boundary",
+      "label": "Exclusion and refresh"
+    }
+  ],
+  "mainPath": [
+    "query",
+    "scope",
+    "recall",
+    "validity",
+    "context",
+    "response"
+  ],
+  "nodes": [
+    {
+      "id": "query",
+      "lane": "task",
+      "col": 0,
+      "type": "frontend",
+      "label": "Current request",
+      "sublabel": "Goal and constraints",
+      "width": 160
+    },
+    {
+      "id": "scope",
+      "lane": "read",
+      "col": 1,
+      "type": "security",
+      "label": "Access filter",
+      "sublabel": "Tenant · user · ACL",
+      "width": 160
+    },
+    {
+      "id": "recall",
+      "lane": "read",
+      "col": 2,
+      "type": "database",
+      "label": "Recall memory",
+      "sublabel": "Relevance and quality",
+      "width": 160
+    },
+    {
+      "id": "validity",
+      "lane": "read",
+      "col": 3,
+      "type": "security",
+      "label": "Validity check",
+      "sublabel": "Source · version · conflict",
+      "width": 160
+    },
+    {
+      "id": "context",
+      "lane": "read",
+      "col": 4,
+      "type": "backend",
+      "label": "Build context",
+      "sublabel": "Valid, relevant facts",
+      "width": 160
+    },
+    {
+      "id": "response",
+      "lane": "task",
+      "col": 5,
+      "type": "backend",
+      "label": "Serve the task",
+      "sublabel": "Current instructions",
+      "width": 160
+    },
+    {
+      "id": "denied",
+      "lane": "boundary",
+      "col": 1,
+      "type": "security",
+      "label": "Block unauthorized reads",
+      "sublabel": "Excluded before recall",
+      "width": 160
+    },
+    {
+      "id": "stale",
+      "lane": "boundary",
+      "col": 3,
+      "type": "database",
+      "label": "Exclude stale memory",
+      "sublabel": "Refresh or state gaps",
+      "width": 160
+    }
+  ],
+  "edges": [
+    {
+      "id": "read-0",
+      "from": "query",
+      "to": "scope",
+      "label": "Scope",
+      "role": "main"
+    },
+    {
+      "id": "read-1",
+      "from": "scope",
+      "to": "recall",
+      "label": "Authorized",
+      "role": "main"
+    },
+    {
+      "id": "read-2",
+      "from": "recall",
+      "to": "validity",
+      "label": "Validate",
+      "role": "main"
+    },
+    {
+      "id": "read-3",
+      "from": "validity",
+      "to": "context",
+      "label": "Valid",
+      "role": "main"
+    },
+    {
+      "id": "read-4",
+      "from": "context",
+      "to": "response",
+      "label": "Assemble",
+      "role": "main"
+    },
+    {
+      "id": "scope-denied",
+      "from": "scope",
+      "to": "denied",
+      "label": "Denied",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "validity-stale",
+      "from": "validity",
+      "to": "stale",
+      "label": "Stale / conflict",
+      "role": "branch",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Memory is not a longer chat log",
+      "items": [
+        "Persistent information still needs provenance, scope and validity."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Memory cannot grant access",
+      "items": [
+        "Recheck permissions; never retrieve unauthorized memory or reveal its existence."
+      ]
+    }
+  ]
+}

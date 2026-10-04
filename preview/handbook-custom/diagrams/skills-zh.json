@@ -1,0 +1,174 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Skill：从任务意图到受控执行",
+    "locale": "zh-CN",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "intent",
+      "label": "发现能力"
+    },
+    {
+      "id": "runtime",
+      "label": "受控执行"
+    },
+    {
+      "id": "support",
+      "label": "边界与资料"
+    }
+  ],
+  "mainPath": [
+    "request",
+    "candidates",
+    "gate",
+    "instructions",
+    "tool",
+    "evidence"
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "lane": "intent",
+      "col": 0,
+      "type": "frontend",
+      "label": "用户任务",
+      "sublabel": "目标 · 输入 · 范围",
+      "width": 160
+    },
+    {
+      "id": "candidates",
+      "lane": "intent",
+      "col": 1,
+      "type": "backend",
+      "label": "候选技能",
+      "sublabel": "摘要检索与排序",
+      "width": 160
+    },
+    {
+      "id": "gate",
+      "lane": "runtime",
+      "col": 2,
+      "type": "security",
+      "label": "决策门",
+      "sublabel": "权限 · 风险 · 输入 · 审批",
+      "width": 160
+    },
+    {
+      "id": "instructions",
+      "lane": "runtime",
+      "col": 3,
+      "type": "backend",
+      "label": "加载 Skill",
+      "sublabel": "相关指令进入上下文",
+      "width": 160
+    },
+    {
+      "id": "tool",
+      "lane": "runtime",
+      "col": 4,
+      "type": "messagebus",
+      "label": "调用 Tool",
+      "sublabel": "在授权范围内操作",
+      "width": 160
+    },
+    {
+      "id": "evidence",
+      "lane": "runtime",
+      "col": 5,
+      "type": "database",
+      "label": "验证结果",
+      "sublabel": "保留来源与执行证据",
+      "width": 160
+    },
+    {
+      "id": "stop",
+      "lane": "support",
+      "col": 2,
+      "type": "security",
+      "label": "澄清或退出",
+      "sublabel": "缺少输入 · 未授权 · 无匹配",
+      "width": 160
+    },
+    {
+      "id": "references",
+      "lane": "support",
+      "col": 3,
+      "type": "database",
+      "label": "参考资料",
+      "sublabel": "按需读取，保持版本边界",
+      "width": 160
+    }
+  ],
+  "edges": [
+    {
+      "id": "flow-0",
+      "from": "request",
+      "to": "candidates",
+      "label": "检索摘要",
+      "role": "main"
+    },
+    {
+      "id": "flow-1",
+      "from": "candidates",
+      "to": "gate",
+      "label": "检查边界",
+      "role": "main"
+    },
+    {
+      "id": "flow-2",
+      "from": "gate",
+      "to": "instructions",
+      "label": "通过",
+      "role": "main"
+    },
+    {
+      "id": "flow-3",
+      "from": "instructions",
+      "to": "tool",
+      "label": "按指令调用",
+      "role": "main"
+    },
+    {
+      "id": "flow-4",
+      "from": "tool",
+      "to": "evidence",
+      "label": "核验输出",
+      "role": "main"
+    },
+    {
+      "id": "gate-stop",
+      "from": "gate",
+      "to": "stop",
+      "label": "不满足条件",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "load-reference",
+      "from": "instructions",
+      "to": "references",
+      "label": "需要细节时",
+      "role": "branch",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Skill 定义方法",
+      "items": [
+        "指令组织任务步骤，Tool 执行具体操作。"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "匹配不代表授权",
+      "items": [
+        "权限来自可信授权系统，不能由技能文本授予。"
+      ]
+    }
+  ]
+}

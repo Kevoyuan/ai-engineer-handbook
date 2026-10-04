@@ -105,7 +105,8 @@ for (const chapter of chapters) {
   else if (!exists(path.join(chapterDir, semanticFile))) fail(`Web chapter ${chapter.slug} maps to missing handbook/chapters/${semanticFile}`);
 }
 
-const extractIds = source => [...source.matchAll(/\bid\s*=\s*["']([^"']+)["']/gi)].map(match => match[1]);
+// Attribute names such as data-edge-id are metadata, not DOM IDs.
+const extractIds = source => [...source.matchAll(/(?<![\w:-])id\s*=\s*["']([^"']+)["']/gi)].map(match => match[1]);
 const assertUniqueIds = (label, sources) => {
   const seen = new Map();
   for (const {origin, source} of sources) {

@@ -1,0 +1,35 @@
+{
+  "idle": {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": []
+  },
+  "focused": {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": []
+  },
+  "loaded": {
+    "status": "completed",
+    "score": 100,
+    "summary": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "total": 0
+    },
+    "findings": []
+  }
+}

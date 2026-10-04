@@ -1,7 +1,7 @@
 ---
 name: AI Engineer Handbook
 description: A knowledge manual for focused learning and quick reference
-last_updated: "2026-10-03"
+last_updated: "2026-10-04"
 status: "active"
 colors:
   primary: "#285a47"
@@ -20,20 +20,25 @@ colors:
   light-input: "#f8faf8"
   light-ring: "#367657"
   light-ring-inverted: "#98c7ac"
-  dark-background: "#141517"
-  dark-foreground: "#e7e7e9"
-  dark-card: "#1a1b1e"
-  dark-primary: "#a0bfaf"
-  dark-primary-foreground: "#16221c"
-  dark-secondary: "#242529"
-  dark-secondary-foreground: "#dedee2"
-  dark-muted: "#202125"
-  dark-muted-foreground: "#a5a6ad"
-  dark-accent: "#292b2e"
-  dark-accent-foreground: "#a0bfaf"
-  dark-border: "#35363b"
-  dark-input: "#1d1e21"
-  dark-ring: "#a0bfaf"
+  dark-background: "#171a1c"
+  dark-foreground: "#e4e7e5"
+  dark-card: "#202427"
+  dark-popover: "#2b3034"
+  dark-success: "#a9c5b5"
+  dark-warning: "#d9ba86"
+  dark-destructive: "#e1a19b"
+  dark-destructive-foreground: "#291b1a"
+  dark-primary: "#b3cabb"
+  dark-primary-foreground: "#19241e"
+  dark-secondary: "#2b3135"
+  dark-secondary-foreground: "#e0e4e2"
+  dark-muted: "#272d30"
+  dark-muted-foreground: "#adb5b8"
+  dark-accent: "#303937"
+  dark-accent-foreground: "#c6d9cd"
+  dark-border: "#373f43"
+  dark-input: "#1b2023"
+  dark-ring: "#b3cabb"
   dark-ring-inverted: "#7ba78e"
 typography:
   body:
@@ -91,6 +96,12 @@ Apply targeted evolution rather than a new visual direction. Design variance 5, 
 ## Colors
 Dark mode uses neutral charcoal surfaces, gray-white headings and body text, and gray secondary text. Use green sparingly for the brand mark, selected controls, links and focus. Never tint reading backgrounds, chapter headings, diagrams or borders green by default. The light palette keeps its established identity; secondary text is slightly darker to maintain AA contrast on secondary surfaces. Semantic aliases in the stylesheet govern components.
 
+## Whole-site dark refinement
+
+The 2026-10-04 user correction applies to the whole website, including directory, saved chapters, search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry graphite surfaces: navigation #171a1c, header/input #1b2023, reading #202427, secondary #2b3135 and popover #2b3034. Soft gray-green text and muted sage actions retain the existing identity. Elevation uses neutral dark shadows and a restrained top rim. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
+
+Gain: clearer reading and consistent surface hierarchy across routes. Cost: lighter charcoal surfaces reduce the former deep-black appearance. Light-theme tokens and content are preserved. The terminal has a named dark variant that follows the same graphite material with a quiet peach primary action. Pretext prepare/layout reserve simulator explanation heights after fonts load; native wrapping stays visible and widths are remeasured on resize. No new permission or billing behavior is introduced.
+
 ## Typography
 Use Geist Variable with Chinese system fallbacks for prose, Geist Mono Variable for code. Preserve the existing readable article measure and heading hierarchy. Noninteractive headings stay neutral in dark mode.
 
@@ -135,7 +146,11 @@ Code keys, strings and numbers use theme-specific syntax tokens from `preview/ha
 
 ## Interactive concept diagrams
 
-Use interaction when it explains a decision, evidence relationship or feedback loop. Current examples are Query Routing (chapter 03), RAG evidence gates (04) and bounded Agent loops (08). Place each teaching module beside the relevant original figure, retaining the full static diagram and article. A toolbar shortcut takes readers directly to the module.
+Use interaction when it explains a decision, evidence relationship or feedback loop. Current examples are Query Routing (chapter 03), RAG evidence gates (04), progressive skill loading and authorization gates (06), governed memory retrieval (07) and bounded Agent loops (08). Place each teaching module beside the relevant original figure or after its owning section, retaining the full static diagram and article. A toolbar shortcut takes readers directly to the module.
+
+Skill examples expose summary, instruction and reference layers through installed Tabs. Label loaded and unloaded states explicitly; inspection must not load a layer. Failed input or permission gates keep full instructions unloaded and tool execution blocked. These are illustrative sequences, not a universal runtime contract. Memory examples distinguish preferences, superseded facts and historical permission records; memory never grants authorization.
+
+Each diagram includes an optional two-question practice panel, using installed Collapsible and RadioGroup components. Give explanations for correct and incorrect answers, clear stale feedback on answer changes, and focus the next question after advancing. Do not save answers. Keep option rows at least 48px high, action buttons at least 44px high, and reserve feedback space to limit layout jumps. Explicitly register these component sources with Tailwind's scoped source list.
 
 Each module has one labelled example selector, a connected node diagram, one current explanation, playback controls and a concise takeaway. Label examples as illustrative; do not imply real tool execution or invent confidence scores, benchmark results or business policies. Preserve authorization, version, failure and stopping boundaries even in simplified diagrams.
 
@@ -182,3 +197,16 @@ The implementation and prior verification scope are recorded in [the concept dia
 Role tokens are shared across both diagrams: `--diagram-evidence` (blue), `--diagram-state` (amber), `--diagram-action` (violet), and `--diagram-control` (sage). Dark variants brighten the accents without tinting the page. Use color for role labels and restrained emphasis on execution cores, not decorative borders on every module. `--diagram-rule` owns connectors and `--diagram-inset` owns module padding.
 
 The execution sequence uses numbered circles along a continuous line. Dependencies connect laterally on wide screens; compact layouts stack the execution core and dependency groups. The Agent flow preserves vertical connections when its three planes stack. All headings and prose use the handbook sans family; monospace is reserved for numerical step identifiers. Chapter links retain focus outlines and 44px mobile targets. No diagram navigation is fixed over the content.
+
+
+## Skills terminal simulator
+
+The requested bento terminal style owns chapter 06's teaching simulator only. Its charcoal, black terminal, terracotta action, mono metadata and asymmetric 1:2 panes follow the supplied visual reference; the reader retains Interior components and Iconoir icons. `skill-simulator.tsx` is the single editable React source, including scoped styling. Installed Button, Tabs, onboarding underline indicator and Collapsible/RadioGroup practice primitives own controls and keyboard behavior. The 5-stage rail describes a running teaching workflow, not a dashboard overview.
+
+The premium polish retains this direction: a 30px serif title, 14px sans-serif explanations, and monospace logs and metadata distinguish reading from execution. Scoped `--sim-*` tokens own the charcoal canvas (#101112), recessed terminal (#0b0c0d), panel (#191b1e), raised surface (#202326), and terracotta primary action (#d97757). Semantic aliases feed the existing primitives; Badge owns the live state indicator. Scenario tabs use a quieter warm selected surface so the send action remains primary. The idle terminal previews the actual selected request. Status and stage count live in the context title bar, with the latest context message emphasized. Below 760px of available content width, panes stack to preserve readable type at the cost of a longer page. Review evidence for this refinement lives in `preview/handbook-custom/evidence/premium-simulator/`.
+
+Run, pause, single-step, reset and scenario switching control a bounded simulation. Missing-input and unauthorized scenarios stop after the boundary check; no instructions, references or tool results are injected afterward. Token figures and cache states are explicit demo values; no model billing, actual reasoning trace, real files or granted permissions are implied. Reduced motion removes visual animation and smooth scrolling while preserving explicitly requested timed playback and manual stepping. The nested panes are intentionally reserved for accumulating logs, as in the supplied reference. On narrow content widths they stack.
+
+Archify workflow specifications live in `preview/handbook-custom/diagrams/`. Delivered HTML owns standalone diagram layout and viewer behavior; do not hand-edit it. Inline PNGs and SVGs are native exports of that exact checked HTML. Chapter 06 places the map behind its full-context disclosure; chapter 07 keeps its overview. Archify's independent delivery, browser and image review receipts live in `evidence/archify/`. The English Memory candidate failed readability after two focused repairs and is not published; the English reader explicitly labels its Chinese diagram fallback.
+
+Before/after 390 and 1440 captures, a 1728 capture, runtime and accessibility checks, and measured spacing for the simulator live in `preview/handbook-custom/evidence/bento/`. `test:learning` covers all five lesson chapters and source-to-render canonical article preservation; `test:concepts` covers the four node diagrams. The terminal simulator additionally uses `node evidence/bento/check.cjs`.

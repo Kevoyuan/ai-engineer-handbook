@@ -1,0 +1,43 @@
+{
+  "delivered": [
+    {
+      "diagram_type": "workflow",
+      "output": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/public/diagrams/skills-zh.html",
+      "specification_sha256": "3d0c2adfe806a33371a80b10d0ced0f40824341a4f2acf198e4f526381a24c65",
+      "artifact_sha256": "91f2e924a3a90f39d9417622ac577feab6202f273536e68df3c7da4d497f065e",
+      "validation": "9/9 showcase, 0 errors, 0 warnings",
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "correction_rounds": 1,
+      "perceptual_review": "Image-capable review of light/dark endpoint screenshots; separate from automated visual-check receipt.",
+      "exports": "Native PNG light/dark and SVG; trusted HTML unchanged."
+    },
+    {
+      "diagram_type": "workflow",
+      "output": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/public/diagrams/skills-en.html",
+      "specification_sha256": "4e6fcd98236eb87bb42423bddc041fbe004657166c62e136c2d9fd94e5f35e9c",
+      "artifact_sha256": "11096f4991c86bb3c3e1acae479a5612b62b383d81739e59404f634bf88f491e",
+      "validation": "9/9 showcase, 0 errors, 0 warnings",
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "correction_rounds": 2,
+      "perceptual_review": "Image-capable review of light/dark endpoint screenshots; separate from automated visual-check receipt.",
+      "exports": "Native PNG light/dark and SVG; trusted HTML unchanged."
+    },
+    {
+      "diagram_type": "workflow",
+      "output": "/Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/public/diagrams/memory-zh.html",
+      "specification_sha256": "5567e595b0739e88a16c45bf4ecd431efb9601265a5b1f24a3dcafc0dbfdd2be",
+      "artifact_sha256": "a8818ba97ce15fbce5b9b654b21d7895c94a74713b329f5408bd7baaa6f32829",
+      "validation": "9/9 showcase, 0 errors, 0 warnings",
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "correction_rounds": 1,
+      "perceptual_review": "Image-capable review of light/dark endpoint screenshots; separate from automated visual-check receipt.",
+      "exports": "Native PNG light/dark and SVG; trusted HTML unchanged."
+    }
+  ],
+  "not_delivered": {
+    "memory-en": "Desktop readability failed after two focused repairs. No HTML published; English reader explicitly labels Chinese fallback."
+  }
+}

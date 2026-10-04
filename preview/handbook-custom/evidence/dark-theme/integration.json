@@ -1,0 +1,110 @@
+[
+  {
+    "en": false,
+    "width": 390,
+    "scenario": 0,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 390,
+    "scenario": 1,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 390,
+    "scenario": 2,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 1440,
+    "scenario": 0,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 1440,
+    "scenario": 1,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 1440,
+    "scenario": 2,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 1728,
+    "scenario": 0,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 1728,
+    "scenario": 1,
+    "status": "passed"
+  },
+  {
+    "en": false,
+    "width": 1728,
+    "scenario": 2,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 390,
+    "scenario": 0,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 390,
+    "scenario": 1,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 390,
+    "scenario": 2,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 1440,
+    "scenario": 0,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 1440,
+    "scenario": 1,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 1440,
+    "scenario": 2,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 1728,
+    "scenario": 0,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 1728,
+    "scenario": 1,
+    "status": "passed"
+  },
+  {
+    "en": true,
+    "width": 1728,
+    "scenario": 2,
+    "status": "passed"
+  }
+]

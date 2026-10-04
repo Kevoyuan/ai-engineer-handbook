@@ -1,0 +1,16 @@
+
+> handbook-custom-preview@0.0.0 test:ui
+> node evidence/full-interactions.cjs
+
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert(await p.locator('.chapter-body').evaluate(e=>e.scrollTop)>1000)
+
+    at /Volumes/SSD/Projects/Code/ai-engineer-handbook/preview/handbook-custom/evidence/full-interactions.cjs:4:668 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
