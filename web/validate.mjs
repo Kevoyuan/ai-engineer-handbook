@@ -20,6 +20,7 @@ try {
 
 const canonicalChapters = [
   '00-ai-engineer-system-framework.md',
+  '01-model-api-context-foundations.md',
   '02-enterprise-retrieval.md',
   '03-hybrid-retrieval-query-routing.md',
   '04-rag-reliability-selective-answering.md',
@@ -88,6 +89,7 @@ try {
 
 const chapterSlugs = new Set(chapters.map(chapter => chapter.slug));
 const semanticByWebSlug = {
+  '01-model-api-context-foundations': '01-model-api-context-foundations.md',
   '02-enterprise-retrieval': '02-enterprise-retrieval.md',
   '03-hybrid-retrieval-query-routing': '03-hybrid-retrieval-query-routing.md',
   '04-rag-reliability-selective-answering': '04-rag-reliability-selective-answering.md',
