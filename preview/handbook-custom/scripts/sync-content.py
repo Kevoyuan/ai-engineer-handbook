@@ -68,7 +68,8 @@ for chapter in chapters:
   zh=el.get_text(' ',strip=True);en=translated.get('data-i18n-en') if translated else residual.get(zh,zh)
   toc.append({'id':id,'zh':zh,'en':en})
  for i,table in enumerate(main.select('table')):
-  if i==0 and slug==chapters[0]['slug']:table['id']='comparison';toc.append({'id':'comparison','zh':'能力对比','en':'Comparison'})
+  if table.get('id')=='comparison' and not any(section['id']=='comparison' for section in toc):
+   toc.append({'id':'comparison','zh':'能力对比','en':'Comparison'})
   if not table.parent.get('class') or 'tw' not in table.parent.get('class',[]):
    wrap=body.new_tag('div',attrs={'class':'tw'});table.wrap(wrap)
  for i,lab in enumerate(main.select('[data-architecture-explorer],[data-cost-simulator]')):
