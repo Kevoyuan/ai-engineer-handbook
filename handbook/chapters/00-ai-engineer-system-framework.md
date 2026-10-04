@@ -151,19 +151,19 @@ MCP、LangGraph、LangSmith、模型 pricing、provider token subtype、SDK API 
 
 ## 5. 当前真正缺的核心知识
 
-### Gap A · Model Selection & Adaptation
+### Gap A · Model Selection & Adaptation → Chapter 01 foundation established
 
-至少应覆盖：
+Chapter 01 已补齐基础层：
 
 ```text
-Model capability / modality / context / structured output
-→ quality / latency / cost / privacy / hosting constraints
-→ prompt / few-shot / tool use baseline
-→ fine-tuning / PEFT / LoRA when justified
-→ eval before and after adaptation
+Generation / Transformer / Tokenization / Context / Sampling
+→ Embeddings / Hallucination / Structured Output
+→ Prompt vs RAG vs Fine-tuning
+→ PEFT / LoRA / QLoRA / Quantization / Distillation
+→ Model Selection / Latency / Caching / Migration Eval
 ```
 
-Fine-tuning 不是默认第一步；它应该与 prompt/context/tool design 和 retrieval 一起按 failure mode 决策。
+这一 gap 的 **foundation 已关闭**。后续仍可按需要深化训练数据工程、distributed training、advanced post-training 与 provider-specific adaptation，但这些扩展不再阻塞 01–10 durable spine。
 
 ### Gap B · Inference Serving
 
@@ -215,7 +215,7 @@ Security 应成为 cross-cutting control plane，而不是某一章最后的注�
 
 ```text
 00  AI Engineering System Framework            ← global map, not a normal chapter
-01  Model / API / Context Foundations           ← missing
+01  Model / API / Context Foundations           ← active
 02  Enterprise Retrieval Foundations
 03  Hybrid Retrieval & Query Routing
 04  RAG Reliability & Selective Answering
@@ -258,6 +258,6 @@ Primary/current references used for this audit:
 
 ## Verification boundary · 2026-09-28
 
-本章系统分层与 Strong 评级属于编辑判断，不是行业标准或实测认证。Ch10 已是活动章节；完整 Model/Adaptation、部署生命周期和容量工程仍未覆盖。
+本章系统分层与 Strong 评级属于编辑判断，不是行业标准或实测认证。Chapter 01 已于 2026-10-04 建立 Model / API / Context foundation；更深的训练基础设施、完整部署生命周期和容量工程仍可继续扩展。
 
 核对依据：[MCP 2026-07-28](https://blog.modelcontextprotocol.io/posts/2026-07-28/)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
