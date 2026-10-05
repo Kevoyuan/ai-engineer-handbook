@@ -6,6 +6,73 @@
 
 ## How to use this card
 
+## Four-beat answer pattern
+
+For most fundamentals questions:
+
+~~~text
+1. Definition
+   What is it?
+
+2. Mechanism
+   What actually happens?
+
+3. Production consequence
+   What changes latency / cost / quality / security?
+
+4. Decision rule
+   When would I choose A vs B?
+~~~
+
+A weak answer usually stops after Definition.
+
+## Fast recall
+
+~~~text
+Generation
+→ tokenize → prefill → logits → decode one token → repeat
+
+Context
+→ advertised capacity ≠ usable task context ≠ useful evidence capacity
+
+Sampling
+→ Temperature reshapes the distribution; Top-p truncates candidate mass
+→ temperature 0 ≠ truth ≠ software-level determinism
+
+Embeddings
+→ normalized vectors: dot product = cosine
+→ semantic similarity ≠ factual / operational / authorization equivalence
+
+Structured Output
+→ schema-valid ≠ semantically correct ≠ authorized
+
+Prompt / RAG / Fine-tuning
+→ Prompt: instructions / examples
+→ RAG / Context: changing external knowledge
+→ Tool / API: authoritative current state / computation
+→ Fine-tuning: repeated learned behavior
+
+Adaptation
+→ SFT: imitate target responses
+→ LoRA: low-rank parameter updates
+→ QLoRA: LoRA over quantized frozen base
+→ classic RLHF: reward model + policy optimization
+→ DPO: direct preference-pair objective
+→ original GRPO: group-relative reward advantage without a separate critic
+
+Cost / Latency
+→ TTFT = queue + routing + input work + prefill
+→ Decode latency = output generation
+→ optimize total cost per successful task
+
+Model selection
+→ Task Contract first
+→ quality floor + modality + context + tools/schema + latency + throughput + cost + privacy + hosting + lifecycle
+~~~
+
+**Key line:** A strong interview answer connects mechanism to a production consequence and then to a decision rule.
+
+
 For each question:
 
 ~~~text

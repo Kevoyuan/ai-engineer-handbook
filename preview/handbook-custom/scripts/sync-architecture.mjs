@@ -18,8 +18,16 @@ from pathlib import Path
 import json, sys
 source = BeautifulSoup(Path(sys.argv[1]).read_text(), 'html.parser')
 chapters = json.loads(Path(sys.argv[2]).read_text())
+chapter_by_slug = {chapter['slug']: chapter for chapter in chapters}
 sections = []
-links = {'.ae-knowledge': [1,2,3,4], '.ae-state': [6], '.ae-capabilities': [5], '.ae-orchestration': [7], '.ae-plane-label': [8], '.ae-platform': [0,9]}
+links = {
+    '.ae-knowledge': ['02-enterprise-retrieval', '03-hybrid-retrieval-query-routing', '04-rag-reliability-selective-answering', '05-document-pdf-rag'],
+    '.ae-state': ['07-memory-context-engineering'],
+    '.ae-capabilities': ['06-skills-routing'],
+    '.ae-orchestration': ['08-agent-orchestration'],
+    '.ae-plane-label': ['09-reliability-evaluation-observability'],
+    '.ae-platform': ['01-model-api-context-foundations', '10-serving-deployment-ai-platform']
+}
 for ident in ['system-framework', 'agent-reference']:
     versions = {}
     for lang in ['zh', 'en']:
@@ -30,8 +38,8 @@ for ident in ['system-framework', 'agent-reference']:
             node = section.select_one(selector)
             if node is None: continue
             nav = section.new_tag('nav', attrs={'class':'architecture-chapter-links', 'aria-label':'Related chapters' if lang == 'en' else '相关章节'})
-            for index in indices:
-                ch = chapters[index]
+            for slug in indices:
+                ch = chapter_by_slug[slug]
                 a = section.new_tag('a', href='#read/' + ch['slug'])
                 a.string = ('CH ' if lang == 'en' else '第 ') + ch['number'] + ('' if lang == 'en' else ' 章') + ' ↗'
                 a['title'] = ch[lang]
@@ -69,9 +77,23 @@ css.walkRules((rule) => {
     declaration.important = false;
   });
 });
-fs.writeFileSync(
-  project + "src/architecture-base.css",
+const architectureCssPath = project + "src/architecture-base.css";
+const generatedCss =
   "/* Derived from the original system and Agent reference diagrams. */\n" +
-    css.toString(),
-);
+  css.toString();
+const formatInsensitiveCss = (value) =>
+  value
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\s+/g, "")
+    .replace(/;}/g, "}")
+    .replace(/(^|[^0-9])0\.(\d+)/g, "$1.$2");
+const currentCss = fs.existsSync(architectureCssPath)
+  ? fs.readFileSync(architectureCssPath, "utf8")
+  : "";
+if (
+  !currentCss ||
+  formatInsensitiveCss(currentCss) !== formatInsensitiveCss(generatedCss)
+) {
+  fs.writeFileSync(architectureCssPath, generatedCss);
+}
 console.log("Synced system and Agent reference architectures.");

@@ -13,6 +13,7 @@ The canonical structure is now:
 ```text
 handbook/chapters/
 ├── 00-ai-engineer-system-framework.md
+├── 01-model-api-context-foundations.md
 ├── 02-enterprise-retrieval.md
 ├── 03-hybrid-retrieval-query-routing.md
 ├── 04-rag-reliability-selective-answering.md
@@ -24,7 +25,7 @@ handbook/chapters/
 └── 10-serving-deployment-ai-platform.md
 ```
 
-Chapter 01 remains planned work. Chapter 10 is now active with inference-serving coverage and will expand incrementally.
+Chapter 01 is now active. Chapter 10 remains active with inference-serving coverage and continues expanding incrementally.
 
 ## Source-of-truth rule
 
