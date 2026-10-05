@@ -1,0 +1,37 @@
+name: Validate legacy branch consolidation
+
+on:
+  push:
+    branches:
+      - merge/legacy-branches-2026-10-05
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: merge/legacy-branches-2026-10-05
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: preview/handbook-custom/package-lock.json
+      - run: python3 -m pip install beautifulsoup4
+      - working-directory: preview/handbook-custom
+        run: npm ci
+      - name: Run canonical sync
+        working-directory: preview/handbook-custom
+        run: npm run sync-content
+      - name: Ensure architecture sync is idempotent
+        run: |
+          git diff --exit-code -- preview/handbook-custom/src/architecture-base.css
+          git diff --exit-code -- preview/handbook-custom/src/architecture-content.json
+      - name: Build preview
+        working-directory: preview/handbook-custom
+        run: npm run build
+      - name: Validate published handbook structure
+        run: node web/validate.mjs
