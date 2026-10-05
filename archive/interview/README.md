@@ -23,3 +23,4 @@ The reusable engineering principle behind any useful interview question should b
 - [Multi-Agent Consistency](./multi-agent-consistency.md) — State, execution, artifact, and decision consistency; locks vs idempotency; orchestration vs peer communication.
 - [Agent Engineer Capability Stack](./agent-engineer-capability-stack.md) — Business decomposition, runtime architecture, reliability/evaluation, and engineering delivery; separates durable skills from salary/marketing framing.
 - [FDE LLM & GenAI · 52-Question Coverage Map](./fde-llm-genai-52-question-map.md) — independent answer skeletons, traps, and canonical chapter ownership for the public FDEInterviews LLM/GenAI question bank.
+- [Agent Cancellation / Interruption / Steering](./agent-cancellation-steering.md) — hierarchical cancellation scopes, process-tree termination, interrupted-tool truth states, transcript repair, and steering/follow-up semantics.
