@@ -58,6 +58,10 @@
     {
       "path": "/assets/ch08-long-running-multi-agent-handoff.html",
       "id": "long-running-multi-agent-handoff"
+    },
+    {
+      "path": "/assets/ch08-cancellation-steering.html",
+      "id": "agent-cancellation-steering"
     }
   ],
   "09-reliability-evaluation-observability": [
