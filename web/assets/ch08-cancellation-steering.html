@@ -1,0 +1,82 @@
+<section id="agent-cancellation-steering" aria-labelledby="agent-cancellation-steering-title">
+  <h2 class="sub" id="agent-cancellation-steering-title"><span class="i18n-text" data-i18n-zh="Cancellation、Interruption 与 Steering：停止的是 Runtime，不是 UI" data-i18n-en="Cancellation, Interruption, and Steering: stop the runtime, not just the UI">Cancellation、Interruption 与 Steering：停止的是 Runtime，不是 UI</span> <small>§8.T</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="用户点停止之后，真正需要回答的是：哪些工作属于这次 run、取消信号传到哪里、已经开始的副作用处于什么状态、会话协议如何修复，以及新输入是 Cancel、Steer 还是 Follow-up。" data-i18n-en="After the user presses stop, the runtime must answer which work belongs to this run, how cancellation propagates, what state already-started side effects are in, how the conversation protocol is repaired, and whether new input means cancel, steer, or follow up.">用户点停止之后，真正需要回答的是：哪些工作属于这次 run、取消信号传到哪里、已经开始的副作用处于什么状态、会话协议如何修复，以及新输入是 Cancel、Steer 还是 Follow-up。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-8-t1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.T1 · CANCELLATION SCOPE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Cancel 是层级 Runtime Signal，不是一个全局 Boolean" data-i18n-en="Cancellation is a hierarchical runtime signal, not a global boolean">Cancel 是层级 Runtime Signal，不是一个全局 Boolean</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="父 scope 取消时终止 owned descendants；单个 child 的取消不应无条件杀掉 siblings 或整个 session。" data-i18n-en="Cancelling a parent scope stops owned descendants; cancelling one child should not automatically kill siblings or the whole session.">父 scope 取消时终止 owned descendants；单个 child 的取消不应无条件杀掉 siblings 或整个 session。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue" style="margin-bottom:12px">
+          <div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">ROOT · RUN SCOPE</span></div>
+          <h2 class="bfs-card-title">Cancel Request → Stop New Work</h2>
+          <div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="用户取消、Timeout、Policy、Supersession 或 Host Shutdown 都可以触发 scope，但 reason 必须保留。" data-i18n-en="User cancellation, timeout, policy, supersession, or host shutdown may trigger the scope, but the reason must be preserved.">用户取消、Timeout、Policy、Supersession 或 Host Shutdown 都可以触发 scope，但 reason 必须保留。</span></div>
+        </div>
+        <div class="bfs-grid bfs-g4">
+          <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">MODEL</span></div><h2 class="bfs-card-title">Stream / Retry / Backoff</h2><div class="bfs-card-desc">abortable request · retry wait · compaction · next model call</div></div>
+          <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">TOOLS</span></div><h2 class="bfs-card-title">Tool Batch / Tool Child</h2><div class="bfs-card-desc">dispatch boundary · per-tool child signal · no new calls after cancel</div></div>
+          <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">OS / REMOTE JOB</span></div><h2 class="bfs-card-title">Owned Execution Tree</h2><div class="bfs-card-desc">process group · container job · browser session · remote cancel handle</div></div>
+          <div class="bfs-card bfs-emerald"><div class="bfs-card-head"><span class="bfs-stage-pill">SUBTASK</span></div><h2 class="bfs-card-title">Foreground vs Detached</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Foreground 通常继承 parent；Background 必须有独立 lifetime 与 cancel handle。" data-i18n-en="Foreground work usually inherits the parent; background work needs an explicit independent lifetime and cancel handle.">Foreground 通常继承 parent；Background 必须有独立 lifetime 与 cancel handle。</span></div></div>
+        </div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="核心规则" data-i18n-en="Core rule">核心规则</span></span><p class="say">Every blocking boundary must either accept cancellation directly or race against a cancellation signal.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-t2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.T2 · INTERRUPTED TOOL TRUTH MODEL</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="中断后先判断 Tool 执行到哪，再决定是否 Retry" data-i18n-en="After interruption, determine how far the tool executed before deciding to retry">中断后先判断 Tool 执行到哪，再决定是否 Retry</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g4">
+        <div class="bfs-card bfs-blue"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">NOT STARTED</span></div><h2 class="bfs-card-title">Rejected / Cancelled Before Run</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="没有副作用，可以给协议补 cancelled/rejected result，再重新决策。" data-i18n-en="No side effect occurred; repair the protocol with a cancelled/rejected result and make a new decision.">没有副作用，可以给协议补 cancelled/rejected result，再重新决策。</span></div></div>
+        <div class="bfs-card bfs-amber"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">STARTED · ABORTED</span></div><h2 class="bfs-card-title">Partial / Unknown Effect</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="工具已经开始，不能声称“没执行”；需要检查文件、进程、远端系统或业务状态。" data-i18n-en="The tool started, so the runtime cannot claim it never ran; inspect files, processes, remote systems, or business state.">工具已经开始，不能声称“没执行”；需要检查文件、进程、远端系统或业务状态。</span></div></div>
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">RESULT LOST</span></div><h2 class="bfs-card-title">Completed? Ack Missing</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="远端动作可能已提交但本地没拿到结果；先 reconcile，禁止 blind retry。" data-i18n-en="The remote action may have committed even though the local result was lost; reconcile before any retry.">远端动作可能已提交但本地没拿到结果；先 reconcile，禁止 blind retry。</span></div></div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">COMPLETED</span></div><h2 class="bfs-card-title">Trusted Result Available</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="有完整、可信的 result，正常提交给 conversation / workflow state。" data-i18n-en="A complete trustworthy result is available and can be committed into conversation or workflow state normally.">有完整、可信的 result，正常提交给 conversation / workflow state。</span></div></div>
+      </div>
+      <div class="co warn" style="margin-top:14px"><span class="co-t">SIDE-EFFECT BOUNDARY</span><p><strong>Cancellation changes control flow; it does not retroactively erase side effects.</strong></p></div>
+      <div class="co note" style="margin-top:14px"><span class="co-t">TRANSCRIPT REPAIR</span><p><span class="i18n-text" data-i18n-zh="补齐 tool_result 是为了恢复 provider protocol；synthetic result 必须写真实 execution state，不能为了让下一轮 API 接受就伪造“没有执行”。" data-i18n-en="Synthetic tool results repair the provider protocol. They must encode the real execution state rather than falsely claiming no execution merely to make the next API request valid.">补齐 tool_result 是为了恢复 provider protocol；synthetic result 必须写真实 execution state，不能为了让下一轮 API 接受就伪造“没有执行”。</span></p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-t3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.T3 · USER CONTROL SEMANTICS</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Cancel、Steer、Follow-up 不是同一个“用户又发消息了”" data-i18n-en="Cancel, steer, and follow-up are not the same event">Cancel、Steer、Follow-up 不是同一个“用户又发消息了”</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-rose"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">CANCEL</span></div><h2 class="bfs-card-title">Terminate Current Scope</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="停止新工作 → 终止 owned execution → reconcile → repair protocol → quiescent。" data-i18n-en="Stop new work → terminate owned execution → reconcile → repair protocol → become quiescent.">停止新工作 → 终止 owned execution → reconcile → repair protocol → quiescent。</span></div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">STEER</span></div><h2 class="bfs-card-title">Change Next Decision</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="当前 action/result protocol 到达安全边界后注入；已经发生的 Tool / side effect 仍然要进入下一次决策。" data-i18n-en="Inject at a safe action/result boundary; already-observed tool work and side effects still belong in the next decision.">当前 action/result protocol 到达安全边界后注入；已经发生的 Tool / side effect 仍然要进入下一次决策。</span></div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">FOLLOW-UP</span></div><h2 class="bfs-card-title">Queue After Completion</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="当前 run 完成 pending work 后再启动新的要求，适合“做完这个，再做那个”。" data-i18n-en="Start the new request only after the current run finishes its pending work—useful for 'after this, do that.'">当前 run 完成 pending work 后再启动新的要求，适合“做完这个，再做那个”。</span></div></div>
+      </div>
+      <div class="bfs-flow-container" style="margin-top:14px">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">SAFE INJECTION BOUNDARY</span></div><h2 class="bfs-card-title">tool_use → tool_result → steering → next model call</h2><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="不要把普通用户消息任意插进尚未闭合的 Tool 协议单元；先让 action/result correlation 变成 coherent state。" data-i18n-en="Do not inject arbitrary user messages into an unresolved tool protocol unit; first restore a coherent action/result state.">不要把普通用户消息任意插进尚未闭合的 Tool 协议单元；先让 action/result correlation 变成 coherent state。</span></div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="最终原则" data-i18n-en="Final rule">最终原则</span></span><p class="say">Cancellation is complete only when the execution scope is quiescent and its state is trustworthy.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-8-t4" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.8.T4 · CANCELLATION LIFECYCLE</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="UI 可以先显示 Cancelling，但 Runtime 不能立刻标成 CANCELLED" data-i18n-en="The UI may show Cancelling immediately, but the runtime should not mark the run CANCELLED yet">UI 可以先显示 Cancelling，但 Runtime 不能立刻标成 CANCELLED</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">RUNNING</span></div><h2 class="bfs-card-title">Work Is Active</h2></div>
+        <div class="bfs-card bfs-amber" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">CANCEL_REQUESTED</span></div><h2 class="bfs-card-title">Stop Launching New Work</h2></div>
+        <div class="bfs-card bfs-purple" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">TERMINATING</span></div><h2 class="bfs-card-title">Abort Requests · Stop Tools · Kill Owned Jobs</h2></div>
+        <div class="bfs-card bfs-teal" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">RECONCILING</span></div><h2 class="bfs-card-title">Repair Transcript · Verify Side Effects</h2></div>
+        <div class="bfs-card bfs-emerald" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">QUIESCENT</span></div><h2 class="bfs-card-title">CANCELLED / FAILED / HUMAN ACTION</h2></div>
+      </div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="两种延迟" data-i18n-en="Two latencies">两种延迟</span></span><p><code>cancel_ack_latency</code> <span class="i18n-text" data-i18n-zh="衡量 UI/Runtime 多快接受取消；" data-i18n-en="measures how fast the runtime acknowledges cancellation; ">衡量 UI/Runtime 多快接受取消；</span><code>cancel_to_quiescence_latency</code> <span class="i18n-text" data-i18n-zh="衡量真正停止并恢复可信状态需要多久。" data-i18n-en="measures how long it takes to actually stop and return to trustworthy state.">衡量真正停止并恢复可信状态需要多久。</span></p></div>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:18px"><span class="i18n-text" data-i18n-zh="外部核验日期：2026-10-06。OpenAI Codex 当前源码使用层级 CancellationToken，并在一次性 exec cancellation 时对 process group 先 terminate、等待 50ms grace period、再强制 kill；Pi 当前官方文档把 abort / steer / follow-up 分成不同控制语义；Anthropic 当前 Tool Use 文档要求 tool_use / tool_result 协议完整，TypeScript SDK 的 BetaToolRunner 支持 AbortSignal。上述均是 implementation evidence，通用规则保持 vendor-neutral。" data-i18n-en="External verification date: 2026-10-06. Current OpenAI Codex source uses hierarchical CancellationToken values and, for one-shot exec cancellation, terminates the process group, waits a 50ms grace period, then force-kills remaining members. Current Pi documentation separates abort, steer, and follow-up semantics. Anthropic's current Tool Use documentation requires a complete tool_use/tool_result protocol, and its TypeScript BetaToolRunner supports AbortSignal. These are implementation evidence; the durable rules remain vendor-neutral.">外部核验日期：2026-10-06。OpenAI Codex 当前源码使用层级 CancellationToken，并在一次性 exec cancellation 时对 process group 先 terminate、等待 50ms grace period、再强制 kill；Pi 当前官方文档把 abort / steer / follow-up 分成不同控制语义；Anthropic 当前 Tool Use 文档要求 tool_use / tool_result 协议完整，TypeScript SDK 的 BetaToolRunner 支持 AbortSignal。上述均是 implementation evidence，通用规则保持 vendor-neutral。</span></p>
+</section>
