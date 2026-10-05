@@ -81,43 +81,19 @@ const architectureCssPath = project + "src/architecture-base.css";
 const generatedCss =
   "/* Derived from the original system and Agent reference diagrams. */\n" +
   css.toString();
-const normalizeSelector = (value) => value
-  .replace(/\s+/g, " ")
-  .replace(/\s*([,+>~])\s*/g, "$1")
-  .trim();
-const normalizeValue = (value) => value
-  .replace(/\s+/g, " ")
-  .replace(/\s*,\s*/g, ",")
-  .replace(/(^|[^0-9])0\.(\d+)/g, "$1.$2")
-  .trim();
-const semanticNode = (node) => {
-  if (node.type === "comment") return null;
-  if (node.type === "decl") {
-    return ["decl", node.prop, normalizeValue(node.value), Boolean(node.important)];
-  }
-  if (node.type === "rule") {
-    return [
-      "rule",
-      normalizeSelector(node.selector),
-      (node.nodes || []).map(semanticNode).filter(Boolean),
-    ];
-  }
-  if (node.type === "atrule") {
-    return [
-      "atrule",
-      node.name,
-      normalizeValue(node.params || ""),
-      (node.nodes || []).map(semanticNode).filter(Boolean),
-    ];
-  }
-  return [node.type, normalizeValue(node.toString())];
-};
-const semanticCss = (value) =>
-  JSON.stringify(postcss.parse(value).nodes.map(semanticNode).filter(Boolean));
+const formatInsensitiveCss = (value) =>
+  value
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\s+/g, "")
+    .replace(/;}/g, "}")
+    .replace(/(^|[^0-9])0\.(\d+)/g, "$1.$2");
 const currentCss = fs.existsSync(architectureCssPath)
   ? fs.readFileSync(architectureCssPath, "utf8")
   : "";
-if (!currentCss || semanticCss(currentCss) !== semanticCss(generatedCss)) {
+if (
+  !currentCss ||
+  formatInsensitiveCss(currentCss) !== formatInsensitiveCss(generatedCss)
+) {
   fs.writeFileSync(architectureCssPath, generatedCss);
 }
 console.log("Synced system and Agent reference architectures.");
