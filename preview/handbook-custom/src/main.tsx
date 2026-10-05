@@ -47,11 +47,16 @@ import "./index.css";
 import "./handbook.css";
 import "./architecture.css";
 const groups = [
-  { zh: "检索与 RAG", en: "Retrieval & RAG", range: [0, 4] },
-  { zh: "Agent 工程", en: "Agent engineering", range: [4, 7] },
-  { zh: "评估与生产", en: "Evaluation & production", range: [7, 9] },
+  { zh: "模型基础", en: "Model foundations", range: [0, 1] },
+  { zh: "检索与 RAG", en: "Retrieval & RAG", range: [1, 5] },
+  { zh: "Agent 工程", en: "Agent engineering", range: [5, 8] },
+  { zh: "评估与生产", en: "Evaluation & production", range: [8, 10] },
 ];
 const descriptions = [
+  [
+    "理解 Generation、Token、Context、Sampling、Embedding、Adaptation 与模型迁移。",
+    "Understand generation, tokens, context, sampling, embeddings, adaptation, and model migration.",
+  ],
   [
     "理解 Exact、BM25、Dense、Graph 与元数据过滤的边界。",
     "Understand Exact, BM25, Dense, Graph and metadata filtering.",
@@ -90,6 +95,9 @@ const descriptions = [
   ],
 ];
 const terms = [
+  "Tokenization",
+  "Context Window",
+  "Structured Output",
   "BM25",
   "Hybrid Search",
   "Query Routing",

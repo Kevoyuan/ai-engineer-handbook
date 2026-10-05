@@ -8,7 +8,7 @@ This repository focuses on reusable AI engineering knowledge rather than intervi
 
 ## Core knowledge spine
 
-1. Model / API / Context Foundations *(planned)*
+1. Model / API / Context Foundations
 2. Enterprise Retrieval
 3. Hybrid Retrieval & Query Routing
 4. RAG Reliability & Selective Answering
@@ -43,6 +43,7 @@ The currently active semantic modules are:
 
 ```text
 handbook/chapters/00-ai-engineer-system-framework.md
+handbook/chapters/01-model-api-context-foundations.md
 handbook/chapters/02-enterprise-retrieval.md
 handbook/chapters/03-hybrid-retrieval-query-routing.md
 handbook/chapters/04-rag-reliability-selective-answering.md
@@ -54,7 +55,7 @@ handbook/chapters/09-reliability-evaluation-observability.md
 handbook/chapters/10-serving-deployment-ai-platform.md
 ```
 
-The public web edition now contains chapters 02–10. Chapter 01 remains a roadmap gap; Chapter 10 has started with inference serving / KV and prefix-cache engineering and will expand into deployment, security operations, and AI platform concerns.
+The public web edition now contains chapters 01–10. Chapter 01 covers model/API/context foundations, adaptation decisions, structured output, latency/caching, and model migration; Chapter 10 continues to expand serving, deployment, security operations, and AI platform concerns.
 
 ## Source-of-truth model
 

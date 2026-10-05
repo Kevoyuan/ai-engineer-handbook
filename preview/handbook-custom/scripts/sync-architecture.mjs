@@ -19,7 +19,7 @@ import json, sys
 source = BeautifulSoup(Path(sys.argv[1]).read_text(), 'html.parser')
 chapters = json.loads(Path(sys.argv[2]).read_text())
 sections = []
-links = {'.ae-knowledge': [0,1,2,3], '.ae-state': [5], '.ae-capabilities': [4], '.ae-orchestration': [6], '.ae-plane-label': [7], '.ae-platform': [8]}
+links = {'.ae-knowledge': [1,2,3,4], '.ae-state': [6], '.ae-capabilities': [5], '.ae-orchestration': [7], '.ae-plane-label': [8], '.ae-platform': [0,9]}
 for ident in ['system-framework', 'agent-reference']:
     versions = {}
     for lang in ['zh', 'en']:
