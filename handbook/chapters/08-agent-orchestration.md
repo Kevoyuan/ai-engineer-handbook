@@ -5703,6 +5703,795 @@ Sources:
 - https://github.com/deepseek-ai/deepseek-harness/blob/master/.agents/notes/implemented/feature/2026-08-05-agent-teams.md
 
 
+
+## 8.17 Cancellation、Interruption 与 Steering：停止的是 Runtime，不是 UI
+
+面试里问：
+
+> “用户中途取消，Agent 任务怎么停下来？”
+
+如果只回答：
+
+~~~text
+close stream
+or
+disconnect HTTP request
+~~~
+
+不够。
+
+因为用户看到的 token stream 只是执行路径中的一个表面：
+
+~~~text
+User / UI
+   ↓
+Model stream
+   ↓
+Agent loop
+   ↓
+Tool dispatch
+   ↓
+Shell / browser / API / DB
+   ↓
+Child process / subagent / background task
+~~~
+
+停止 UI 输出并不能自动证明：
+
+~~~text
+model request stopped
+tool stopped
+child process stopped
+side effect did not happen
+subagent stopped
+retry timer stopped
+session history remains valid
+~~~
+
+因此更准确的定义是：
+
+> **Cancellation is a runtime control-plane event that must propagate through the execution tree and end in a reconciled state.**
+
+### 8.17.1 Cancel ≠ Disconnect
+
+先区分三个概念：
+
+~~~text
+Disconnect
+→ consumer no longer receives output
+
+Cancel
+→ runtime requests current work to stop
+
+Quiescence
+→ no owned work from the cancelled scope is still making progress
+~~~
+
+它们不是一回事。
+
+危险路径：
+
+~~~text
+browser closes SSE
+→ UI stops
+→ shell keeps running
+→ child process keeps port open
+→ API side effect completes
+→ next turn assumes nothing happened
+~~~
+
+Anthropic 当前 API billing guidance 还明确说明：如果客户端在一个本来会成功的 API 调用中途 disconnect / timeout，仍可能产生费用。
+
+因此：
+
+> **Stopping visible output is not a reliable cancellation contract and is not necessarily a cost boundary.**
+
+### 8.17.2 Cancellation Scope：用层级信号，不要用全局 Boolean
+
+一个生产 Agent 通常需要 cancellation tree：
+
+~~~text
+Run Cancellation Scope
+        │
+        ├─ Model Request
+        │    └─ stream / retry / backoff
+        │
+        ├─ Tool Batch
+        │    ├─ Tool A
+        │    ├─ Tool B
+        │    └─ Tool C
+        │
+        ├─ Shell Invocation
+        │    └─ Process Group / Job
+        │
+        └─ Foreground Subtask / Subagent
+~~~
+
+理想语义：
+
+~~~text
+cancel parent
+→ descendants cancel
+
+cancel one child
+→ siblings and parent may continue
+~~~
+
+为什么不建议：
+
+~~~text
+global isCancelled = true
+~~~
+
+因为它通常只是 passive state：
+
+~~~text
+network request already awaiting
+sleep / backoff already waiting
+tool blocked on I/O
+subagents running concurrently
+~~~
+
+不会因为 Boolean 改了就自动被唤醒。
+
+更稳健的 primitive 是可等待、可传播、可组合的 cancellation signal / token：
+
+~~~text
+JavaScript / TypeScript
+→ AbortSignal / AbortController
+
+Rust async runtimes
+→ CancellationToken-like primitive
+
+Java
+→ interrupt / Future.cancel(true) + cooperative checks
+~~~
+
+关键不在语言名，而在：
+
+> **Every blocking boundary must either accept cancellation directly or race against a cancellation signal.**
+
+OpenAI Codex 当前源码大量使用 tokio_util::sync::CancellationToken，并通过 child_token() 把 task / sampling request / tool execution 放进层级 cancellation scope。
+
+Anthropic TypeScript SDK 当前 BetaToolRunner 也支持 AbortSignal，并把 signal 同时传给 API request 与 tool run context。
+
+### 8.17.3 Cooperative Cancellation：Loop 必须在 Safe Point 主动响应
+
+信号传播只是第一步。
+
+如果执行逻辑从不观察 cancellation：
+
+~~~text
+signal.cancel()
+→ nothing checks it
+→ work continues
+~~~
+
+所以 Agent Loop 需要明确 safe points：
+
+~~~text
+before model request
+during model stream
+before tool dispatch
+while awaiting tool
+between retry attempts
+during backoff / sleep
+before launching next subtask
+before starting next loop iteration
+before post-processing / compaction
+~~~
+
+典型抽象：
+
+~~~text
+loop:
+  check_cancel()
+
+  response = call_model(cancel_scope)
+
+  check_cancel()
+
+  for tool_call in response.tools:
+      check_cancel()
+      result = run_tool(tool_call, child_scope)
+
+  check_cancel()
+
+  decide_continue_or_stop()
+~~~
+
+这里的“检查”不一定是轮询 Boolean，也可以是：
+
+~~~text
+select(cancelled(), work())
+Promise.race([abort, work])
+abortable fetch / stream
+interruptible wait
+runtime-native cancellation
+~~~
+
+Java 的 Future.cancel(true) 也是同一类思想：它请求中断正在执行的任务，但 task / blocking API 是否响应 interrupt 仍取决于实现。
+
+> **Cancellation is cooperative until the runtime reaches a boundary it can forcibly terminate.**
+
+### 8.17.4 Tool Cancellation：停止 Shell 要考虑整个 Process Tree
+
+Tool 已经进入 OS 之后，Agent-level token 还不等于进程已经停止。
+
+例如：
+
+~~~text
+bash -lc "npm run dev"
+        ↓
+npm
+        ↓
+node server
+        ↓
+worker / watcher
+~~~
+
+只杀最外层 shell 可能留下 descendants。
+
+因此 process-owning Tool 应明确：
+
+~~~text
+process group / job ownership
+child-process containment
+graceful termination policy
+forced termination policy
+stdout / stderr drain
+reaping
+detached-process semantics
+~~~
+
+Unix 上常见策略：
+
+~~~text
+send SIGTERM to owned process group
+→ short grace period
+→ if still alive:
+   SIGKILL process group
+→ reap
+~~~
+
+但这不是所有 runtime 的固定参数。
+
+OpenAI Codex 当前 exec.rs 是一个具体 implementation evidence：
+
+~~~text
+Cancellation
+→ terminate_process_group(...)
+→ wait up to 50 ms
+→ kill_process_group(...) if needed
+~~~
+
+其源码还特别处理了 descendants 继续持有 stdout / stderr pipe 导致 drain hang 的问题。
+
+因此通用原则不是：
+
+~~~text
+"always wait 50 ms"
+~~~
+
+而是：
+
+> **Own the process tree, terminate the owned scope, and make the graceful-to-forceful escalation policy explicit.**
+
+Windows、container runtime、remote sandbox、browser session、Kubernetes Job 等会有不同 primitive。
+
+### 8.17.5 Cancelled Tool 的关键问题：它到底执行到哪一步？
+
+取消之后最危险的错误是直接写：
+
+~~~text
+"tool did not run"
+~~~
+
+真实状态至少要区分：
+
+| Execution state | Meaning | Retry policy |
+|---|---|---|
+| NOT_STARTED / REJECTED | 工具未开始执行 | 通常可以安全重新决策 |
+| STARTED_ABORTED | 已经开始，途中被终止 | 先判断 partial side effect |
+| COMPLETED_RESULT_LOST | 外部动作可能完成，但本地没有可信 result | 先 reconcile，禁止 blind retry |
+| COMPLETED | 有完整 result | 按正常路径继续 |
+
+例如：
+
+~~~text
+write file
+→ process killed after write but before acknowledgement
+
+HTTP POST
+→ server committed
+→ connection cancelled before response
+
+deploy command
+→ child process spawned
+→ parent interrupted
+~~~
+
+此时：
+
+~~~text
+local cancellation
+≠
+external rollback
+~~~
+
+这与 §8.15 / §8.16 的 side-effect semantics 是同一个原则：
+
+~~~text
+unknown remote outcome
+→ reconcile before retry
+~~~
+
+> **Cancellation changes control flow; it does not retroactively erase side effects.**
+
+Anthropic Claude Code 的公开 issue 也暴露了这个边界：当前有人报告 mid-execution interrupt 被呈现为 “user-rejected / did not run”，而 issue 同时指出 harness 内部其实区分 interrupted / cancelled。因此 Handbook 不把“中断 = 未执行”当成正确通用语义。
+
+### 8.17.6 Transcript Repair：补齐 Protocol，不要伪造事实
+
+Tool-using API 往往有 message grammar。
+
+Anthropic 当前 Tool Use 文档明确要求：对应 tool_use 的 tool_result 必须按协议紧随其后；缺失时会出现类似：
+
+~~~text
+tool_use ids were found without tool_result blocks immediately after
+~~~
+
+所以用户中断时，不能只把网络断掉然后把半截 transcript 原样留给下一轮。
+
+需要两个层次：
+
+~~~text
+Audit History
+→ 保留真实发生过什么
+
+Active Model Context
+→ 满足 provider protocol
+→ 不把不完整 / misleading history 继续喂给模型
+~~~
+
+一个更安全的 repair protocol：
+
+~~~text
+for each unresolved tool call:
+    determine execution state
+
+    NOT_STARTED
+    → synthesize cancelled / rejected tool result
+
+    STARTED_ABORTED
+    → synthesize interrupted result
+    → mark side_effect = partial_or_unknown
+
+    COMPLETED_RESULT_LOST
+    → reconcile external state
+    → reconstruct trustworthy result if possible
+
+then:
+    restore protocol-valid conversation
+    attach cancellation reason
+    continue only after state is coherent
+~~~
+
+这里最重要的不是“必须补一句固定文案”，而是：
+
+> **Repair protocol structure without lying about execution reality.**
+
+如果选择不把 partial assistant response 继续放进 active context，也不应该因此删除 audit history。
+
+这与 §8.14 的原则一致：
+
+~~~text
+raw history
+≠ active model context
+≠ UI transcript
+~~~
+
+### 8.17.7 Cancellation State Machine：不要从 RUNNING 直接跳 CANCELLED
+
+一个生产 cancellation lifecycle 可以是：
+
+~~~text
+RUNNING
+   ↓ user / timeout / policy / superseded input
+CANCEL_REQUESTED
+   ↓
+STOP_NEW_WORK
+   ↓
+TERMINATING
+   ↓
+RECONCILING
+   ├─ no uncertain effect
+   │    ↓
+   │  CANCELLED
+   │
+   └─ uncertain / partial effect
+        ↓
+      NEEDS_RECONCILIATION
+        ↓
+      CANCELLED / FAILED / HUMAN_ACTION
+~~~
+
+关键 invariant：
+
+~~~text
+after CANCEL_REQUESTED:
+→ do not launch new model/tool/subtask work in that scope
+
+before CANCELLED:
+→ owned work is quiescent
+→ transcript is protocol-valid
+→ uncertain side effects are surfaced
+~~~
+
+因此：
+
+> **“Cancel acknowledged” and “run is safely quiescent” are different events.**
+
+UI 可以立即显示：
+
+~~~text
+Cancelling…
+~~~
+
+但只有 runtime 完成 termination / reconciliation 后，才能把状态标记为稳定的 CANCELLED。
+
+### 8.17.8 Foreground vs Background：Cancellation Scope 要跟 Ownership 对齐
+
+不是所有 descendants 都应该无条件跟着 parent 停。
+
+需要先定义 ownership：
+
+~~~text
+Foreground child
+→ exists only to complete this run
+→ usually inherits parent cancellation
+
+Detached / Background task
+→ intentionally outlives current turn
+→ needs independent lifetime + explicit handle
+
+External durable job
+→ survives local process
+→ cancel through remote job API, not local PID
+~~~
+
+因此：
+
+~~~text
+parent cancellation
+≠ kill every process on the machine
+~~~
+
+而是：
+
+~~~text
+cancel all work owned by this cancellation scope
+~~~
+
+如果允许 background task：
+
+~~~text
+job_id
+owner
+lifetime
+cancel_handle
+status
+output / log
+reconciliation semantics
+~~~
+
+必须显式存在。
+
+视频里关于 Claude Code “foreground subagent 跟主任务取消、background subagent 独立”的说法可以作为产品行为提示，但公开稳定文档不足以把其内部 signal topology 写成 universal contract；Handbook 保留的是 ownership-based lifetime principle。
+
+### 8.17.9 Cancel、Steer、Follow-up 是三种不同的 User Control
+
+用户在 Agent 工作时继续输入，不一定是在取消。
+
+至少区分：
+
+~~~text
+CANCEL
+→ stop current owned execution path
+
+STEER
+→ keep the run alive
+→ alter the next decision boundary
+
+FOLLOW-UP
+→ let current run finish
+→ enqueue new work after idle / completion
+~~~
+
+这三者不应共用一个“新消息来了”逻辑。
+
+#### Steering
+
+典型语义：
+
+~~~text
+user sends correction
+→ queue steering message
+→ current protocol unit reaches a safe boundary
+→ inject message
+→ next model call sees correction
+~~~
+
+为什么通常不能任意“马上插入”：
+
+~~~text
+assistant tool_use
+→ pending tool execution
+→ required tool_result correlation
+~~~
+
+中间随意插一条普通用户消息，可能破坏 provider 的 action-result grammar，或者让模型看到 logically incomplete turn。
+
+Pi 当前官方文档明确区分：
+
+~~~text
+steer
+→ current assistant turn + its tool calls finish
+→ before next model call inject message
+
+followUp
+→ only after current run has no pending work
+~~~
+
+Pi RPC 还把 abort 独立成第三个 command。
+
+所以：
+
+> **Steering changes the next decision; cancellation terminates the current execution scope.**
+
+### 8.17.10 Steering 也需要一致性边界
+
+即使不取消，Steering 也不能假装刚才发生的工具动作不存在。
+
+例如：
+
+~~~text
+User:
+"把服务部署到 staging"
+
+Agent:
+deploy(staging) started
+
+User steering:
+"等等，改成 production"
+~~~
+
+危险做法：
+
+~~~text
+inject immediately
+→ model acts as if staging never started
+→ deploy production too
+~~~
+
+正确流程：
+
+~~~text
+finish / interrupt current protocol unit
+→ observe real staging outcome
+→ record result
+→ inject steering message
+→ next decision uses latest committed evidence
+~~~
+
+所以：
+
+> **Steering is a context-control mechanism, not a transaction rollback mechanism.**
+
+### 8.17.11 Timeout、Cancellation、Supersession 要分开记录
+
+这些终止原因可能走相似技术路径，但语义不同：
+
+~~~text
+USER_CANCELLED
+→ 用户明确要求停止
+
+TIMEOUT
+→ runtime deadline exceeded
+
+POLICY_CANCELLED
+→ permission / safety / budget gate stopped execution
+
+SUPERSEDED
+→ newer user instruction makes current planned work obsolete
+
+SHUTDOWN
+→ host / worker is terminating
+
+UPSTREAM_CANCELLED
+→ parent workflow cancelled
+~~~
+
+不要统一写成：
+
+~~~text
+error = cancelled
+~~~
+
+因为 recovery policy 不同：
+
+~~~text
+timeout
+→ maybe retry
+
+user_cancel
+→ usually wait for user
+
+policy_cancel
+→ fail closed / approval
+
+superseded
+→ steer / replace pending plan
+
+shutdown
+→ durable checkpoint / reassignment
+~~~
+
+### 8.17.12 Observability：取消成功要能被测量
+
+至少 Trace：
+
+~~~text
+run_id
+cancel_scope_id
+parent_scope_id
+cancel_reason
+cancel_requested_at
+cancel_ack_at
+quiescent_at
+
+inflight_model_request
+inflight_tools
+inflight_subagents
+owned_process_group / remote_job_id
+
+tool_execution_state
+side_effect_state
+reconciliation_result
+
+synthetic_tool_result
+transcript_repair
+
+steering_queue_depth
+followup_queue_depth
+steering_delivered_at
+~~~
+
+关键指标：
+
+~~~text
+cancel_ack_latency
+cancel_to_quiescence_latency
+orphan_process_rate
+orphan_remote_job_rate
+
+post_cancel_new_work_rate
+unknown_side_effect_rate
+reconciliation_success_rate
+duplicate_effect_after_cancel_rate
+
+protocol_repair_failure_rate
+steering_delivery_latency
+steering_applied_before_next_model_call_rate
+~~~
+
+测试不要只测按钮。
+
+故意制造：
+
+~~~text
+cancel during model stream
+cancel before tool starts
+cancel during file write
+cancel after remote POST commit but before response
+cancel shell with grandchildren
+cancel during retry sleep
+cancel parent with two child tasks
+cancel only one child
+steer during parallel tool batch
+follow-up while run is still active
+host crash during cancellation
+~~~
+
+### 8.17.13 面试回答：从“停止按钮”升级成 Cancellation Protocol
+
+如果面试官问：
+
+> “用户中途取消，Agent 任务怎么停下来？”
+
+可以回答：
+
+> 我不会把取消等同于断开 SSE 或停止 UI 输出。生产里会给一次 Agent run 建一个层级 cancellation scope，模型流、重试、Tool、前台 Sub-agent 和本地执行任务都拿 child signal/token；父 scope 取消时先停止发起新步骤，所有可中断的 await 都要响应 cancellation。Shell 这类 OS Tool 还要拥有自己的 process group 或 job boundary，不能只杀最外层 shell；通常先 graceful terminate，再在 grace period 后 force kill，具体策略按 runtime 定义。取消后最重要的是区分 Tool 到底是未开始、执行中被打断，还是已经完成但 result 丢失，因为 cancellation 不能撤销已经发生的外部副作用；未知结果要先 reconciliation，再决定是否 retry。同时修复 conversation protocol，给 unresolved tool call 补上真实语义的 interrupted/cancelled result，不能谎称“没执行”。如果用户不是要停，而只是补充要求，我会用 steering queue，在当前 tool/action-result protocol 到达安全边界后、下一次模型调用前注入；follow-up 则等当前 run 完成后再执行。这样 cancellation、side-effect recovery、conversation validity 和 user steering 才是一个完整的 runtime contract。
+
+最短记忆：
+
+~~~text
+Cancel
+= propagate signal
++ stop new work
++ terminate owned execution
++ reconcile side effects
++ repair protocol
++ reach quiescence
+
+Steer
+= queue correction
++ inject at safe boundary
++ next decision sees it
+
+Follow-up
+= enqueue after run completion
+~~~
+
+> **Cancellation is complete only when the execution scope is quiescent and its state is trustworthy.**
+
+### 8.17.14 Source boundary · Cancellation / Interruption / Steering
+
+Primary input:
+
+- 用户提供的视频完整文本《用户中途取消，Agent 任务怎么停下来？》：取消信号传播、Agent Loop 主动检查、进程树终止、Sub-agent cancellation、tool result 补齐、Pi steering/follow-up queue。
+
+Source-derived ideas retained:
+
+- 断开请求不等于 Agent 已停止；
+- cancellation 应层层向 Model / Tool / Sub-agent 传播；
+- Agent loop 需要在执行边界主动响应 cancellation；
+- shell tool 需要考虑子进程 / 进程组；
+- 中断后会话不能留下 orphaned tool call；
+- 用户补充要求与真正取消应分成不同控制路径；
+- steering 在下一次 model decision 前注入，follow-up 在当前工作结束后执行。
+
+Handbook corrections / synthesis:
+
+- 把“取消”定义为 runtime control-plane event，而不是 UI 行为；
+- 增加 Disconnect / Cancel / Quiescence 三层语义；
+- 全局 Boolean 改写为可传播、可等待、可组合的 cancellation scope；
+- “杀进程组”改写为 owned execution tree / job containment；不同 OS、sandbox、remote runtime 可以使用不同 primitive；
+- Codex 的 50 ms grace period 只作为当前实现例，不写成行业参数；
+- 不采纳“被打断的 Tool 一定没执行”的表述，增加 NOT_STARTED / STARTED_ABORTED / COMPLETED_RESULT_LOST / COMPLETED；
+- Transcript repair 必须补齐 provider protocol，但 synthetic result 必须反映真实 execution uncertainty；
+- partial assistant output 是否进入 active model context 与 audit history 分离；
+- background work 按 ownership / lifetime contract 决定是否继承 cancellation，不把某个产品内部 signal topology 当通用定律；
+- steering 不等于 rollback；已经发生的 tool / side effect 仍需 observe / reconcile；
+- 增加 cancellation state machine、reason taxonomy、observability 与 chaos-style tests。
+
+External verification date: 2026-10-06.
+
+Verified implementation / protocol evidence:
+
+- Anthropic current Tool Use docs: tool_use 与对应 tool_result 有严格相邻 / 关联要求，缺失会导致 request formatting error。
+- Anthropic current TypeScript SDK BetaToolRunner: supports cancellation via AbortSignal and passes the signal into both API requests and tool run methods.
+- Anthropic Help Center current billing guidance: a client disconnect / timeout during an API call that was on track to succeed can still be charged.
+- OpenAI Codex current source: uses tokio_util::sync::CancellationToken, derives child tokens throughout task / sampling / tool execution, and on exec cancellation currently sends process-group termination, waits a 50 ms grace period, then force-kills remaining process-group members.
+- Pi current official docs: abort() is separate from steer() and followUp(); steering is delivered after the current assistant turn and tool calls, before the next LLM call; follow-up is delivered after the current run finishes pending work.
+
+Not promoted to stable canonical product contracts:
+
+- 视频关于 Claude Code 内部 AbortController topology、foreground/background sub-agent signal ownership、以及具体 keybinding behavior 的细节没有足够稳定的一手公开 API contract 支撑；它们只作为 source-derived implementation observations，不作为 vendor-neutral rule。
+- Claude Code current public issue reports show mid-execution interruption semantics are still evolving; therefore the Handbook does not encode a fixed “interrupted tool = user rejected / never executed” rule.
+
+Sources:
+
+- https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use
+- https://github.com/anthropics/anthropic-sdk-typescript/blob/main/helpers.md
+- https://support.anthropic.com/en/articles/8114526-how-will-i-be-billed
+- https://github.com/openai/codex/blob/main/codex-rs/core/src/exec.rs
+- https://github.com/openai/codex/blob/main/codex-rs/core/src/tasks/mod.rs
+- https://github.com/openai/codex/blob/main/codex-rs/core/src/session/turn.rs
+- https://github.com/openai/codex/blob/main/codex-rs/utils/pty/src/process_group.rs
+- https://pi.dev/docs/latest/rpc-commands
+- https://pi.dev/docs/latest/sdk
+- https://pi.dev/docs/latest/how-pi-works
+
 ## Verification boundary · 2026-09-28
 
 幂等 key 需要服务端实现。Reducer 合并状态，不替代分支 join；InMemorySaver 不支持进程重启恢复。DeepSeek writeScopes 是提示，不是锁；Pi / DeepSeek 的具体行为均受源码版本约束。
