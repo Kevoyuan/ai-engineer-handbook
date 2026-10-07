@@ -97,7 +97,7 @@ Avoid generic documentation-site patterns, SaaS dashboard cards, glassmorphism, 
 
 Runtime tokens live in `preview/handbook-custom/src/handbook.css`; the published build lives in `web/site`. Routes, deep section anchors, bilingual content, technical meaning, diagrams, search, bookmarks, and accessibility behavior remain durable product contracts unless explicitly revised together with `UX-CONTRACT.md`.
 
-The redesign is phased. Phase 1 establishes the Atlas home, shell language, palette, and navigation vocabulary while retaining the proven Reader behavior. Reader, Search, and Notebook then adopt the same system vocabulary incrementally rather than through a big-bang rewrite.
+The redesign is phased, but the first cohesive increment now covers all four mental surfaces: Atlas establishes the Knowledge Spine, Reader exposes section trace and reading progress in the existing shell, Search behaves as a ranked local Knowledge Command, and Notebook presents saved chapters as a return surface. Later increments may add concept entities and section-level saves, but they must extend this system rather than introduce a second visual language.
 
 ## Colors
 Light mode uses a pale mineral canvas (`#f4f6f3`), near-white reading surfaces (`#fcfdfc`), dark green-black ink (`#18211d`), and restrained gray-green secondary text. The primary `#2f6850` is a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state.
@@ -108,7 +108,7 @@ Semantic colors are allowed when they encode engineering meaning such as evidenc
 
 ## Whole-site dark refinement
 
-The 2026-10-04 user correction applies to the whole website, including directory, saved chapters, search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry graphite surfaces: navigation #171a1c, header/input #1b2023, reading #202427, secondary #2b3135 and popover #2b3034. Soft gray-green text and muted sage actions retain the existing identity. Elevation uses neutral dark shadows and a restrained top rim. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
+The whole-site dark refinement applies to Atlas, Notebook, Search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry the Atlas graphite surfaces: navigation/canvas #141718, header/input #181c1d, reading #1b1f20, secondary #262c2a and popover #222728. Soft gray-green text and muted sage actions retain the existing identity. Elevation uses neutral dark shadows and a restrained top rim. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
 
 Gain: clearer reading and consistent surface hierarchy across routes. Cost: lighter charcoal surfaces reduce the former deep-black appearance. Light-theme tokens and content are preserved. The terminal has a named dark variant that follows the same graphite material with a quiet peach primary action. Pretext prepare/layout reserve simulator explanation heights after fonts load; native wrapping stays visible and widths are remeasured on resize. No new permission or billing behavior is introduced.
 
@@ -137,13 +137,17 @@ Controls and topology nodes use restrained radii. The base radius remains `0.625
 The Knowledge Spine uses circles, fine connector rules, chapter indices, and aligned text rather than decorative badges. Avoid pill-shaped labels except where a true compact control or status requires them. Spacing continues to use the established 4/8/12/16/24/32/40/48/64/96/128px rhythm.
 
 ## Components
-The complete edition covers the directory, the system framework and Agent reference architecture, every chapter and registered supplement, section search, bookmarks, and local reading preferences. Desktop uses one bounded content scroller per route. On phones, the toolbar and route content scroll together. The architecture overview preserves the original execution core, domain connections, control plane, feedback loop and platform foundation; module links open the corresponding chapters. Wide comparison tables and code own their horizontal scrolling.
+The complete edition covers Atlas, Notebook, the system framework and Agent reference architecture, every chapter and registered supplement, ranked section search, bookmarks, and local reading preferences. Desktop uses one bounded content scroller per route. On phones, the toolbar and route content scroll together. The architecture overview preserves the original execution core, domain connections, control plane, feedback loop and platform foundation; module links open the corresponding chapters. Wide comparison tables and code own their horizontal scrolling.
 
 Runtime ownership is Model B: `preview/handbook-custom/src/handbook.css` owns semantic light/dark tokens; `preview/handbook-custom/src/index.css` maps them into Tailwind utilities; installed shared components consume those utilities. `preview/handbook-custom/src/content-base.css` is generated topology CSS with scoped selectors. The article adapter maps legacy `--paper`, `--ink`, `--mut`, `--line` into the same semantic tokens. Inline literal colors in derived content are normalized by the generator. DESIGN frontmatter mirrors runtime palette values.
 
 Technical diagrams retain native, trusted document markup as a compatibility variant so their registered topology, bilingual content, and interactive labs remain complete. Diagram colors express technical roles sparingly; chapter surfaces and noninteractive headings remain neutral.
 
-Keep the installed Better Design React components and assigned Iconoir icons. Theme semantic tokens instead of introducing per-component palettes. Search, chapter filters, bookmarks and theme toggle retain their current behavior.
+Reader orientation belongs in the existing shell rather than a reserved TOC column. Desktop topbar context may show chapter, current section, and rounded reading percentage with a two-pixel progress trace; mobile reduces this to the chapter context plus the progress trace. Focus mode must keep an always-reachable exit in the topbar.
+
+Search is a command surface, not a result-card gallery. Results remain flat, show chapter index and match language, identify the best deterministic match, and highlight literal match text with the accent token rather than a yellow marker.
+
+Keep the installed Better Design React components and assigned Iconoir icons. Theme semantic tokens instead of introducing per-component palettes. Search keeps its IME-safe keyboard contract while using deterministic relevance ranking and match-language snippets. Bookmarks and theme toggle retain their persistence behavior. The old category-filter toolbar is intentionally removed from Atlas; the system view always shows the full four-layer spine, while `#home/saved` is the Notebook surface.
 
 ## Do's and Don'ts
 - Do keep prose and noninteractive headings gray-white in dark mode.
