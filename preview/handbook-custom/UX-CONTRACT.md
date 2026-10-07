@@ -15,11 +15,19 @@ Date, select/listbox and table selection are not used by the rendered product. U
 
 ## Navigation and route document title policy
 
-`#home/{filter}` owns chapter-filter state; `#map` owns the system and Agent reference architecture diagrams; `#read/{chapter-slug}/{section-id}` owns reading destinations. `#read` remains a compatibility route for chapter 02. The native browser Back button restores destinations. Titles follow the active Chinese/English locale and name the current chapter or page.
+`#home` and `#home/all` own the Atlas system view; `#home/saved` owns Notebook. Legacy `#home/{group-index}` links may resolve to the Atlas rather than preserving the old filter UI. `#map` owns the system and Agent reference architecture diagrams; `#read/{chapter-slug}/{section-id}` owns reading destinations. `#read` remains a compatibility route for chapter 02. The native browser Back button restores destinations. Titles follow the active Chinese/English locale and name Atlas, Notebook, System architecture, or the current chapter.
 
-Every chapter uses the same reader. Previous/next chapter navigation lives at the end of the scrollable article and does not reserve a fixed bottom bar. Menu links, directory links, map links, search results and previous/next navigation enter this reader. All 9 chapters are available; no ordinary reading action routes to the legacy shell. Article data loads per chapter with AbortController cancellation and a localized pending/error/retry region. An unknown chapter has a recovery screen and a contents link.
+Every chapter uses the same reader. Previous/next chapter navigation lives at the end of the scrollable article and does not reserve a fixed bottom bar. Menu links, directory links, map links, search results and previous/next navigation enter this reader. All 10 chapters are available; no ordinary reading action routes to the legacy shell. Article data loads per chapter with AbortController cancellation and a localized pending/error/retry region. An unknown chapter has a recovery screen and a contents link.
 
 Architecture navigation scrolls to either complete diagram within the page. Related-chapter links inside system modules open the shared chapter reader. Architecture content and topology are derived from the original `web/index.html` via `scripts/sync-architecture.mjs`.
+
+## Atlas, Notebook, and system orientation
+
+Atlas is the primary home surface. It presents all four engineering layers in one Knowledge Spine: Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production. Chapters are represented as connected nodes rather than isolated cards. Interactive chapters may expose a quiet lab affordance, but the chapter link remains the primary action.
+
+Notebook is the saved-knowledge surface backed by the existing local chapter-bookmark state. Phase 1 keeps bookmarks chapter-scoped; section and concept saves are future behavior and must not be implied as already available. Atlas and Notebook share the same chapter routes, locale, theme, and bookmark operations.
+
+The architecture route remains a separate full-system view. Atlas may summarize or link to it, but must not duplicate the full topology or create a competing architecture source of truth.
 
 ## Content and lookup
 
@@ -37,7 +45,7 @@ Focus reading hides persistent sidebar/table-of-contents chrome and preserves th
 
 Search, mobile navigation, and mobile section navigation use the installed Radix Dialog owner with names, Escape, focus trapping, and focus restoration. Buttons and links retain native roles. Current chapter/section are exposed with aria-current; bookmark/focus selection use aria-pressed. An explicit skip link reaches the content region.
 
-Scrollbars retain their gutters while their thumbs stay transparent at rest. Scrolling reveals the thumb for one second; pointer hover and keyboard focus also reveal it. Forced-colors retains native visible scrollbars. The desktop sidebar can be hidden and restored using the top-left navigation button; the local collapsed preference does not affect the mobile navigation dialog. Reduced motion suppresses animation. Dark mode uses neutral reading surfaces; filled-button text comes from the semantic on-primary token. On phones the workspace is one scrolling page: toolbar, introduction, search, filters, chapter list and architecture entry all scroll together. Reader headings and controls also scroll with the article; section jumps use the workspace as their scroll owner. Desktop keeps its bounded content panes. At narrow widths the sidebar becomes a navigation dialog, the TOC is a section dialog at every width, comparison tables scroll internally, and complex experiment panels stack at their available content width.
+Scrollbars retain their gutters while their thumbs stay transparent at rest. Scrolling reveals the thumb for one second; pointer hover and keyboard focus also reveal it. Forced-colors retains native visible scrollbars. The desktop sidebar can be hidden and restored using the top-left navigation button; the local collapsed preference does not affect the mobile navigation dialog. Reduced motion suppresses animation. Dark mode uses neutral reading surfaces; filled-button text comes from the semantic on-primary token. On phones the workspace is one scrolling page: toolbar, Atlas introduction, search, Knowledge Spine, Notebook, and architecture entry all scroll together. Reader headings and controls also scroll with the article; section jumps use the workspace as their scroll owner. Desktop keeps its bounded content panes. At narrow widths the sidebar becomes a navigation dialog, the TOC is a section dialog at every width, comparison tables scroll internally, and complex experiment panels stack at their available content width.
 
 ## Article learning interactions
 
