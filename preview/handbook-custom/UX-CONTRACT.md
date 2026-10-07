@@ -33,7 +33,7 @@ The architecture route remains a separate full-system view. Atlas may summarize 
 
 Canonical technical meanings, text, diagram topology, node order, and bilingual labels remain owned by the source handbook. The preview derives complete chapter and registered fragment content. Tables remain tables and horizontal comparison/code scrolling is keyboard reachable. Section search is a local transient dialog, so its editing query is intentionally not persisted in the URL; selected results are shareable chapter/section routes.
 
-Search supports IME text entry; composition never activates Enter navigation or shortcuts. ArrowDown enters the result links; Tab navigates normally and Enter opens a result. Search has loading, failure/retry, no-results and clear states. Search data is lazy-loaded; it does not issue remote requests on each keystroke.
+Search supports IME text entry; composition never activates Enter navigation or shortcuts. ArrowDown enters the result links; Tab navigates normally and Enter opens a result. Results use deterministic local relevance ranking: exact and prefix title matches outrank title contains, which outrank body matches; the active locale receives a modest ranking preference without hiding valid cross-language matches. Snippets come from the language that actually matched when the active-language body does not contain the query. The first result is identified as the best match, and visible match text may be highlighted without changing the underlying result text. Search has loading, failure/retry, no-results and clear states. Search data is lazy-loaded; it does not issue remote requests on each keystroke.
 
 ## Reading preferences and bookmarks
 
