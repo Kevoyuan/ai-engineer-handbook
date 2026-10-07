@@ -419,6 +419,24 @@ function App() {
     if (searchOpen && indexStatus === "idle") loadSearchIndex();
   }, [searchOpen]);
   useEffect(() => () => searchRequest.current?.abort(), []);
+  const conceptResults = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return concepts
+      .map((concept) => {
+        const current = (en ? concept.name : concept.zh).toLowerCase();
+        const other = (en ? concept.zh : concept.name).toLowerCase();
+        const exact = current === q || other === q;
+        const starts = current.startsWith(q) || other.startsWith(q);
+        const contains = current.includes(q) || other.includes(q);
+        return {
+          concept,
+          score: exact ? 300 : starts ? 220 : contains ? 160 : 0,
+        };
+      })
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }, [query, en]);
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
@@ -1035,7 +1053,7 @@ function App() {
           <div className="search-results" aria-live="polite">
             {query.trim() && indexStatus === "ready" && (
               <p className="result-count">
-                {t("匹配段落", "Matching sections")} · {results.length}
+                {t("匹配结果", "Matching results")} · {conceptResults.length + results.length}
               </p>
             )}
             {indexStatus === "loading" ? (
@@ -1059,9 +1077,36 @@ function App() {
                 <Button onClick={loadSearchIndex}>{t("重试", "Retry")}</Button>
               </div>
             ) : query.trim() ? (
-              results.length ? (
+              conceptResults.length || results.length ? (
                 <>
-                  {" "}
+                  {conceptResults.map(({ concept }) => (
+                    <a
+                      className="result result-concept"
+                      key={"concept-" + concept.slug}
+                      href={"#concept/" + concept.slug}
+                      onClick={() => setSearchOpen(false)}
+                    >
+                      <span className="result-index" aria-hidden="true">
+                        CON
+                      </span>
+                      <span className="result-copy">
+                        <span className="result-meta">
+                          <span>CONCEPT</span>
+                          <span>{concept.group}</span>
+                        </span>
+                        <strong>
+                          {highlightSearchMatch(
+                            en ? concept.name : concept.zh,
+                            query,
+                          )}
+                        </strong>
+                        <span>
+                          {en ? concept.summaryEn : concept.summaryZh}
+                        </span>
+                      </span>
+                      <ArrowRightIcon />
+                    </a>
+                  ))}
                   {results.slice(0, resultLimit).map((r, i) => {
                     const snippet = searchSnippet(
                       r,
