@@ -183,19 +183,6 @@ const descriptions = [
     "Explore serving, caching, isolation and production control planes.",
   ],
 ];
-const terms = [
-  "Tokenization",
-  "Context Window",
-  "Structured Output",
-  "BM25",
-  "Hybrid Search",
-  "Query Routing",
-  "RAG",
-  "Memory",
-  "Agent",
-  "Evaluation",
-  "KV Cache",
-];
 function read<T>(key: string, fallback: T): T {
   try {
     return JSON.parse(localStorage.getItem(key) || "null") ?? fallback;
