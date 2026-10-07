@@ -565,17 +565,13 @@ function App() {
             </Button>
             {page === "reader" && chapters[chapterIndex] ? (
               <>
-                <span className="top-reader-chapter">
-                  {chapters[chapterIndex].number} ·{" "}
-                  {en ? chapters[chapterIndex].en : chapters[chapterIndex].zh}
-                </span>
-                {readingContext.sectionTitle && (
-                  <>
-                    <span className="crumb-slash">/</span>
-                    <span className="top-reader-section">
-                      {readingContext.sectionTitle}
-                    </span>
-                  </>
+                {readingContext.sectionTitle ? (
+                  <span className="top-reader-section">
+                    <span className="top-section-mark" aria-hidden="true">§</span>
+                    {readingContext.sectionTitle}
+                  </span>
+                ) : (
+                  <span className="top-reader-mode">{t("阅读", "Reader")}</span>
                 )}
                 <span className="top-reading-percent">
                   {readingContext.progress}%
