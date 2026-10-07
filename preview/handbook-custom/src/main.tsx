@@ -213,10 +213,13 @@ function App() {
           : "home",
   );
   const [chapterIndex, setChapterIndex] = useState(currentChapter);
+  const [conceptSlug, setConceptSlug] = useState(() =>
+    location.hash.startsWith("#concept/") ? location.hash.split("/")[1] || "" : "",
+  );
   useEffect(() => {
     if (matchMedia("(max-width: 767px)").matches)
       document.querySelector(".workspace")?.scrollTo({ top: 0 });
-  }, [page, chapterIndex]);
+  }, [page, chapterIndex, conceptSlug]);
   const [focus, setFocus] = useState(false);
   const [readingContext, setReadingContext] = useState<ReadingContext>({
     sectionId: "",
@@ -313,6 +316,11 @@ function App() {
               : "home",
       );
       setChapterIndex(currentChapter());
+      setConceptSlug(
+        location.hash.startsWith("#concept/")
+          ? location.hash.split("/")[1] || ""
+          : "",
+      );
       if (location.hash.startsWith("#home"))
         setFilter(location.hash.split("/")[1] || "all");
       setMenu(false);
@@ -342,7 +350,7 @@ function App() {
     setMenu(false);
   };
   const activeConcept =
-    page === "concept" ? conceptBySlug(location.hash.split("/")[1] || "") : undefined;
+    page === "concept" ? conceptBySlug(conceptSlug) : undefined;
   useEffect(() => {
     const title =
       page === "reader"
@@ -444,7 +452,7 @@ function App() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarItem
-            active={page === "home" && filter !== "saved"}
+            active={(page === "home" && filter !== "saved") || page === "concept"}
             onClick={() => {
               location.hash = "home/all";
             }}
