@@ -37,6 +37,62 @@ type SearchEntry = {
   textEn: string;
   href: string;
 };
+
+function scoreSearchField(
+  value: string,
+  query: string,
+  exact: number,
+  starts: number,
+  contains: number,
+) {
+  const normalized = value.toLowerCase();
+  if (normalized === query) return exact;
+  if (normalized.startsWith(query)) return starts;
+  const index = normalized.indexOf(query);
+  return index < 0 ? 0 : contains + Math.max(0, 12 - Math.floor(index / 24));
+}
+
+function scoreSearchEntry(entry: SearchEntry, query: string, en: boolean) {
+  const currentTitle = en ? entry.titleEn : entry.titleZh;
+  const otherTitle = en ? entry.titleZh : entry.titleEn;
+  const currentText = en ? entry.textEn : entry.textZh;
+  const otherText = en ? entry.textZh : entry.textEn;
+  return (
+    scoreSearchField(currentTitle, query, 140, 118, 92) +
+    scoreSearchField(otherTitle, query, 118, 98, 76) +
+    scoreSearchField(currentText, query, 0, 0, 46) +
+    scoreSearchField(otherText, query, 0, 0, 30)
+  );
+}
+
+function searchSnippet(entry: SearchEntry, query: string, en: boolean) {
+  const current = en ? entry.textEn : entry.textZh;
+  const other = en ? entry.textZh : entry.textEn;
+  const currentIndex = current.toLowerCase().indexOf(query);
+  const otherIndex = other.toLowerCase().indexOf(query);
+  const useOther = currentIndex < 0 && otherIndex >= 0;
+  const source = useOther ? other : current;
+  const index = useOther ? otherIndex : currentIndex;
+  const start = Math.max(0, (index < 0 ? 0 : index) - 42);
+  const body = source.slice(start, start + 176).trim();
+  return {
+    text: (start > 0 ? "…" : "") + body + (start + 176 < source.length ? "…" : ""),
+    locale: useOther ? (en ? "ZH" : "EN") : en ? "EN" : "ZH",
+  };
+}
+
+function highlightSearchMatch(text: string, query: string) {
+  const q = query.trim();
+  const index = text.toLowerCase().indexOf(q.toLowerCase());
+  if (!q || index < 0) return text;
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + q.length)}</mark>
+      {text.slice(index + q.length)}
+    </>
+  );
+}
 import { Reader, chapterHref, currentChapter, type ReadingContext } from "./reader";
 import { Architecture } from "./architecture";
 import "./content-base.css";
@@ -357,14 +413,15 @@ function App() {
   useEffect(() => () => searchRequest.current?.abort(), []);
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return q
-      ? searchIndex.filter((x) =>
-          (x.titleZh + " " + x.titleEn + " " + x.textZh + " " + x.textEn)
-            .toLowerCase()
-            .includes(q),
-        )
-      : [];
-  }, [query, searchIndex]);
+    if (!q) return [];
+    return searchIndex
+      .map((entry) => ({
+        ...entry,
+        score: scoreSearchEntry(entry, q, en),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || a.href.localeCompare(b.href));
+  }, [query, searchIndex, en]);
   const search = (q = "") => {
     setQuery(q);
     setSearchOpen(true);
@@ -890,32 +947,45 @@ function App() {
               results.length ? (
                 <>
                   {" "}
-                  {results.slice(0, resultLimit).map((r, i) => (
-                    <a
-                      className="result"
-                      key={r.href + i}
-                      href={r.href}
-                      onClick={() => setSearchOpen(false)}
-                    >
-                      <BookIcon />
-                      <span>
-                        <strong>{en ? r.titleEn : r.titleZh}</strong>
-                        <span>
-                          {(en ? r.textEn : r.textZh)
-                            .slice(
-                              Math.max(
-                                0,
-                                (en ? r.textEn : r.textZh)
-                                  .toLowerCase()
-                                  .indexOf(query.toLowerCase()) - 25,
-                              ),
-                            )
-                            .slice(0, 120)}
+                  {results.slice(0, resultLimit).map((r, i) => {
+                    const snippet = searchSnippet(
+                      r,
+                      query.trim().toLowerCase(),
+                      en,
+                    );
+                    const visibleTitle = en ? r.titleEn : r.titleZh;
+                    const chapterNumber =
+                      visibleTitle.match(/^\d+/)?.[0] ||
+                      r.href.match(/#read\/(\d+)/)?.[1] ||
+                      "—";
+                    return (
+                      <a
+                        className={i === 0 ? "result result-best" : "result"}
+                        key={r.href + i}
+                        href={r.href}
+                        onClick={() => setSearchOpen(false)}
+                      >
+                        <span className="result-index" aria-hidden="true">
+                          {chapterNumber}
                         </span>
-                      </span>
-                      <ArrowRightIcon />
-                    </a>
-                  ))}
+                        <span className="result-copy">
+                          <span className="result-meta">
+                            <span>{snippet.locale}</span>
+                            {i === 0 && (
+                              <span>{t("最佳匹配", "Best match")}</span>
+                            )}
+                          </span>
+                          <strong>
+                            {highlightSearchMatch(visibleTitle, query)}
+                          </strong>
+                          <span>
+                            {highlightSearchMatch(snippet.text, query)}
+                          </span>
+                        </span>
+                        <ArrowRightIcon />
+                      </a>
+                    );
+                  })}
                   {results.length > resultLimit && (
                     <Button
                       variant="outline"
