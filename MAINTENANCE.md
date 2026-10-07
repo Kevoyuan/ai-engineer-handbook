@@ -1,20 +1,22 @@
-# AI Engineer Handbook Maintenance Workflow
+# AI Engineering Atlas Maintenance Workflow
 
-This document is the canonical operating procedure for maintaining this repository.
+This document is the canonical operating procedure for maintaining the repository.
 
-The goal is to keep durable engineering knowledge, presentation, validation, version control, and deployment in one reproducible workflow so maintenance does not depend on chat history or a particular maintainer's memory.
+The goal is to keep semantic knowledge, presentation, generated content, application behavior, validation, version control, and deployment in one reproducible workflow so maintenance does not depend on chat history or a particular maintainer's memory.
 
 ## Source-of-truth hierarchy
 
 Use this order when deciding what to trust:
 
 1. **GitHub `main`** — current repository state and version history.
-2. **`handbook/chapters/*.md`** — canonical semantic knowledge, one module per chapter.
-3. **`DESIGN.md`** — presentation, diagram, responsive, and interaction contract.
-4. **`web/`** — derived interactive presentation of handbook knowledge.
-5. **Vercel** — delivery layer for preview and production deployment.
+2. **`handbook/chapters/*.md`** — canonical technical meaning, one active semantic owner per chapter.
+3. **`DESIGN.md`** — visual, diagram, responsive, and presentation contract.
+4. **`preview/handbook-custom/UX-CONTRACT.md`** — observable application behavior.
+5. **`preview/handbook-custom/`** — React application source and content-derivation logic.
+6. **`web/site/`** — generated deployment artifact.
+7. **Vercel** — preview and production delivery.
 
-`handbook/ai_engineer_handbook.md` is a compatibility index only. A local HTML export, old conversation, standalone supplement, or generated artifact is never the primary source of truth.
+`web/chapters/*`, registered fragments, generated JSON, standalone exports, old conversations, and legacy aggregate manuscripts can be derivation inputs or compatibility artifacts, but they are never independent semantic sources of truth.
 
 ## Canonical workflow
 
@@ -23,28 +25,34 @@ new article / paper / engineering lesson
         ↓
 inspect latest GitHub main
         ↓
-identify the owning canonical chapter
+identify owning canonical chapter
         ↓
 research + verify
         ↓
 handbook/chapters/<chapter>.md
 semantic merge first
         ↓
-decide text / diagram / table / interaction
+choose prose / table / diagram / interaction
         ↓
-DESIGN.md contract
+DESIGN.md + UX-CONTRACT.md when behavior changes
         ↓
-web/ implementation
+update derived chapter presentation / registered fragments as needed
         ↓
-i18n + search + structural + responsive QA
+npm run sync-content
         ↓
-feature branch
+preview/handbook-custom React source + generated content
         ↓
-pull request
+npm run build + interaction/accessibility checks
         ↓
-CI + Vercel Preview
+npm run publish:web
         ↓
-merge to main
+web/site generated artifact
+        ↓
+feature branch + pull request
+        ↓
+preview build + structural audit + English audit + Vercel Preview
+        ↓
+merge main
         ↓
 Vercel production deployment
         ↓
@@ -56,37 +64,40 @@ production smoke check
 Before editing:
 
 - read the latest relevant canonical chapter;
-- inspect related web fragments and source notes already represented in the chapter;
+- inspect related presentation fragments and web chapter material already representing the concept;
 - check whether the concept already exists under different terminology;
-- read `DESIGN.md` before changing presentation or interaction;
-- do not start from a stale local HTML export or legacy aggregate manuscript.
+- read `DESIGN.md` before presentation changes;
+- read `UX-CONTRACT.md` before route, search, Reader, Notebook, focus, bookmark, or other interaction changes;
+- do not start from a stale local export or legacy aggregate manuscript.
 
-The first question is not “where should this text be appended?” It is:
+The first question is:
 
-> What knowledge already exists, which chapter owns it, and what semantic gap does this source actually fill?
+> What knowledge already exists, which canonical chapter owns it, and what semantic gap does this source actually fill?
 
 ## 2. Research and verify
 
 For each new source, distinguish explicitly between:
 
-- **source fact** — directly supported by the article, paper, course, repository, or documentation;
+- **source fact** — directly supported by the source;
 - **handbook synthesis** — reusable engineering abstraction derived from the source;
-- **implementation example** — framework- or vendor-specific behavior that should not be mistaken for a universal architecture rule;
-- **uncertain / time-sensitive claim** — something that should be verified against current primary documentation before inclusion.
+- **implementation example** — framework- or vendor-specific behavior;
+- **uncertain / time-sensitive claim** — something that requires current primary-source verification.
 
-When a source gives a product-specific limit, API name, workflow, or benchmark, preserve that provenance. Do not silently turn it into a general system-design law.
+When a source provides a product-specific API, workflow, limit, benchmark, model name, or protocol behavior, preserve provenance. Do not silently turn it into a universal rule.
+
+Verification notes may appear in the Reader when they materially bound a claim, but internal authoring markers or build notes must never appear as reader content.
 
 ## 3. Semantic merge before presentation
 
-`handbook/chapters/*.md` owns meaning.
+`handbook/chapters/*.md` owns technical meaning.
 
-Do not create a new peer supplement merely because a source introduces a new label. First decide whether the material:
+Do not create a peer supplement merely because a source introduces a new label. Decide whether the material:
 
 - adds a genuinely new concept;
 - deepens an existing concept;
 - corrects an existing claim;
 - provides a better implementation example;
-- belongs as a source note inside the owning chapter;
+- belongs as a source/verification note in the owning chapter;
 - is interview-only material that belongs under `archive/interview/`.
 
 Prefer the smallest appropriate semantic home.
@@ -96,17 +107,17 @@ Prefer the smallest appropriate semantic home.
 - One active chapter has one canonical semantic file.
 - Avoid duplicate explanations across chapter files.
 - Preserve cross-chapter canonical rules.
-- Keep framework-specific details under general engineering principles.
+- Keep framework-specific detail under general engineering principles.
 - Separate architecture from product implementation.
 - Preserve trade-offs, failure modes, metrics, control boundaries, and production implications.
 - A production bad case is not automatically a regression test; curation and reproducibility are required.
-- If a framework-specific source is useful, preserve its provenance in a source note inside the canonical chapter instead of creating a second semantic owner.
+- Concept pages may index and summarize canonical sources but must never become a second technical owner.
 
-## 4. Decide the right presentation form
+## 4. Decide the presentation form
 
 Only after the semantic merge, decide how the concept should be presented.
 
-Use the **root `DESIGN.md`** as the only design contract. Do not create a second `web/DESIGN.md` shadow specification.
+Use root `DESIGN.md` as the only visual contract.
 
 | Knowledge structure | Preferred presentation |
 |---|---|
@@ -116,89 +127,157 @@ Use the **root `DESIGN.md`** as the only design contract. Do not create a second
 | State transition | state machine / state patch flow |
 | Architecture | layered system diagram |
 | Branch / join orchestration | explicit topology |
-| Dense reference material | prose + table, not decorative cards |
-| Optional explanation | expandable reference note only when core meaning remains visible |
+| Dense reference material | prose + table |
+| Cross-chapter concept | Concept index + canonical source trail |
+| Optional explanation | disclosure only when core meaning stays visible |
 
-Diagrams express knowledge structure; they are not decoration.
+Diagrams and structural UI must express real knowledge relationships rather than decorate the page.
 
-## 5. Implement in `web/`
+## 5. Implement through the current application pipeline
 
-The web layer is derived from handbook semantics.
+The current UI source is `preview/handbook-custom/`. The deployed artifact is `web/site/`.
 
-Requirements:
+### Content path
 
-- preserve Chinese / English semantic equivalence;
-- reuse existing visual tokens and diagram grammar;
-- do not introduce a new visual system for one source;
-- do not hide core content behind interactions;
-- preserve technical node order, control boundaries, and failure semantics;
-- keep vendor names clearly labeled as examples when appropriate.
+Current chapter presentation inputs and registered fragments are transformed into bilingual Reader/search payloads by:
 
-### Dynamic chapter fragments
+```text
+preview/handbook-custom/scripts/sync-content.py
+```
 
-Runtime chapter fragments are registered once in:
+Run from `preview/handbook-custom/`:
+
+```bash
+npm run sync-content
+```
+
+Use this after chapter/presentation content changes.
+
+### UI path
+
+Modify React/CSS/interaction code under:
+
+```text
+preview/handbook-custom/src/
+```
+
+Keep behavior aligned with `UX-CONTRACT.md` and visual choices aligned with `DESIGN.md`.
+
+### Publishing path
+
+A successful source build does **not** update production output.
+
+Before a production-facing merge, run:
+
+```bash
+npm run publish:web
+```
+
+This rebuilds the app and replaces:
+
+```text
+web/site/
+```
+
+with the current production artifact. Vercel serves `web/site/` because `web/vercel.json` configures `outputDirectory: "site"`.
+
+## 6. Generated content hygiene
+
+Internal authoring comments are not reader content.
+
+The content-sync generator must:
+
+- remove HTML comments before locale conversion;
+- skip BeautifulSoup `Comment` nodes during English transformation;
+- reject leaked visible separator markers such as `===== CH7 =====`;
+- keep preview payloads and published payloads equivalent.
+
+Never fix a generation leak by editing `preview/handbook-custom/public/content/*.json` or `web/site/content/*.json` by hand. Fix the generator or source presentation and regenerate.
+
+This prevents comments such as:
+
+```html
+<!-- ======================= CH7 ======================= -->
+```
+
+from becoming visible Reader text after locale conversion.
+
+## 7. Dynamic chapter fragments
+
+Runtime supplemental presentation fragments are registered once in:
 
 ```text
 web/assets/chapter-additions.json
 ```
 
-`app.js`, `search.js`, and `rebuild.mjs` consume the same manifest. Do not add a fragment path independently to multiple JavaScript files.
+The fragment manifest is a presentation registry, not a semantic source. Every fragment must map back to meaning already owned by the corresponding canonical chapter.
 
-The fragment manifest is a **presentation registry**, not a semantic source. Every fragment must map back to meaning already owned by the corresponding canonical chapter.
+Do not register the same fragment independently in multiple scripts.
 
-## 6. QA before merge
-
-At minimum validate:
+## 8. QA before merge
 
 ### Content
 
-- canonical meaning lives in the owning `handbook/chapters/*.md` file;
-- source facts remain distinguishable from handbook synthesis;
+- canonical meaning lives in the owning `handbook/chapters/*.md`;
+- source facts remain distinguishable from synthesis;
+- Concept summaries remain grounded in linked canonical sections;
 - no accidental duplicate semantic owner;
+- no leaked authoring comments or internal separators;
 - no broken chapter numbering or navigation.
 
 ### i18n
 
-- new visible content has valid English equivalents where the site is bilingual;
+- visible bilingual content has valid equivalents;
 - English mode contains no unintended Chinese leakage;
-- terminology remains semantically equivalent across languages.
+- Chinese and English remain semantically equivalent;
+- locale conversion does not expose comments or build metadata.
 
 ### Search
 
-- new content is discoverable by handbook search;
-- dynamic fragments are registered in `chapter-additions.json`;
-- build-time and runtime search use the same fragment registry.
+- new content is discoverable;
+- Concept matches behave according to `UX-CONTRACT.md`;
+- dynamic fragments are registered once;
+- generated search indexes are refreshed when content changes.
 
-### Structural QA
+### React application
 
-Run:
+From `preview/handbook-custom/`:
 
-```text
-node web/validate.mjs
+```bash
+npm run build
+npm run test:ui
+npm run test:a11y
+npm run test:concepts
+npm run test:learning
 ```
 
-The structural audit checks canonical chapter coverage, manifest integrity, duplicate IDs across base pages + injected fragments, and broken local asset/page references.
+Run the tests relevant to the changed surface at minimum; substantial UI changes should exercise the full set.
 
-### JavaScript
+### Repository / published structure
 
-Run syntax checks for maintained scripts (`app.js`, `search.js`, `rebuild.mjs`, `validate.mjs`, interaction scripts).
+From repository root:
+
+```bash
+node web/validate.mjs
+node --check web/rebuild.mjs
+```
 
 ### Responsive
 
-Validate the breakpoints defined in `DESIGN.md`, especially narrow mobile widths. There must be no page-level horizontal overflow. Wide tables may scroll inside their own container.
+Validate the widths defined in `DESIGN.md`, especially 390, 768, 1440, and 1728px. There must be no page-level horizontal overflow. Wide tables and code may scroll within their own containers.
 
-## 7. Git workflow
+## 9. Git workflow
 
 ```text
 main
   ↓
 feature branch
   ↓
-commits
+focused commits
   ↓
 pull request
   ↓
-review diff
+review source + generated diff
   ↓
 CI + Vercel Preview
   ↓
@@ -207,7 +286,7 @@ merge
 main
 ```
 
-Use a focused branch name such as:
+Use focused branch names such as:
 
 ```text
 content/<topic>
@@ -217,25 +296,66 @@ refactor/<topic>
 web/<topic>
 ```
 
-Before merging, confirm that the diff contains only intended files and automated checks pass.
+Generated artifacts are expected when the production build changes, but inspect them intentionally rather than treating them as noise.
 
-## 8. CI and preview gates
+## 10. CI and preview gates
 
-A pull request is ready only when applicable checks are green, including:
+A pull request is ready only when applicable checks are green:
 
-- English-language audit;
-- repository structural audit;
-- Vercel Preview deployment.
+- **Handbook preview build** — compiles the React source;
+- **English language audit**;
+- **Repository structural audit**;
+- **Vercel Preview**.
 
-A green preview proves deployment completed; it does not replace semantic review or visual inspection.
+These gates answer different questions. A green React build proves source compilation; it does not prove `web/site` was refreshed. A green Vercel deployment proves the committed artifact deployed; it does not replace semantic, visual, or interaction review.
 
-## 9. Merge and production verification
+## 11. Merge and production verification
 
 After merge:
 
 1. confirm `main` points to the expected merge commit;
 2. confirm Vercel production deployment succeeds;
 3. verify the stable handbook URL loads;
-4. smoke-check the changed chapter, language toggle, search, and responsive presentation when affected.
+4. smoke-check the changed route/chapter;
+5. check language switching when content changed;
+6. check search when indexed content changed;
+7. check narrow responsive layout when UI changed;
+8. confirm generated-content fixes are present in production, not only in preview source.
 
 The maintenance task is complete only after production delivery is verified.
+
+## 12. Fast path by change type
+
+### Semantic/content change
+
+```text
+edit canonical chapter
+→ update derived presentation if required
+→ npm run sync-content
+→ validate generated content/search
+→ npm run build
+→ npm run publish:web
+→ PR / CI / preview
+```
+
+### React UI-only change
+
+```text
+edit preview/handbook-custom/src
+→ update DESIGN.md / UX-CONTRACT.md if durable behavior changed
+→ npm run build + relevant browser tests
+→ npm run publish:web
+→ PR / CI / preview
+```
+
+### Generator bug
+
+```text
+fix sync/publish generator
+→ regenerate outputs
+→ verify preview and web/site
+→ add regression guard
+→ PR / CI / preview
+```
+
+Always fix derivation bugs at their source rather than patching generated output.

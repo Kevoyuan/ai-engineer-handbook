@@ -57,9 +57,18 @@ Each of the five diagrams has an optional two-question practice panel. Installed
 
 Run `npm run test:learning` for scenario boundaries, correct/incorrect feedback, keyboard behavior, canonical content preservation and automated accessibility at 390, 1440 and 1728 in both locales and themes. Reports default to `/tmp/handbook-learning-audit`; `LEARNING_AUDIT_DIR` overrides that path. `LEARNING_CAPTURE_SCRIPT` supplies the Better Design spacing capture script. `npm run test:concepts` covers the node diagrams, including chapter 07. Chapter 06 now uses `node evidence/bento/check.cjs` for its terminal simulator.
 
+
+## Generated content boundary
+
+Reader HTML and search payloads are generated presentation data. Internal authoring comments, separator markers, build notes, and other maintainer-only annotations are never user-facing content.
+
+`scripts/sync-content.py` removes HTML comments before locale transformation and ignores BeautifulSoup `Comment` nodes during English conversion. Generated content must fail synchronization if a visible internal separator such as `===== CH7 =====` leaks into either locale.
+
+Generated JSON under `public/content/` and the published copies under `web/site/content/` must not be hand-edited to hide a leak. Repair the derivation step and regenerate the outputs so preview and production remain equivalent.
+
 ## Verification and migration boundary
 
-The reviewed redesign is published as `web/site/`; its application source remains in `preview/handbook-custom`. Legacy chapter URLs redirect to the shared reader. Pull requests that touch the React preview or `DESIGN.md` must compile the preview through `.github/workflows/preview-build.yml`; the older repository audits do not substitute for this build gate. Browser tests cover all chapters and representative theme/locale, desktop/mobile, keyboard, loading/error/retry and experimental-control states. Existing generated component registry demos are retained but are not imported into product routes.
+The reviewed Atlas is published as `web/site/`; its application source remains in `preview/handbook-custom`. Legacy chapter URLs redirect to the shared reader. Pull requests that touch the React preview or `DESIGN.md` must compile the preview through `.github/workflows/preview-build.yml`; the older repository audits do not substitute for this build gate. A successful preview build verifies source compilation only; production-facing changes must also refresh `web/site/` with `npm run publish:web` before merge. Browser tests cover all chapters and representative theme/locale, desktop/mobile, keyboard, loading/error/retry and experimental-control states. Existing generated component registry demos are retained but are not imported into product routes.
 
 The on-page contents never reserves a right-hand column. The reader toolbar opens the shared section dialog on desktop and mobile; current-section highlighting, section jumps and return-to-top remain available. Reader scroll state also drives a lightweight shell trace. The top bar must not repeat the full chapter title while that title is already present in the Reader heading; it shows the current section (or a neutral Reader label while section data is unavailable) plus rounded reading percentage. Mobile keeps this compact trace and a two-pixel progress line without adding persistent navigation chrome.
 

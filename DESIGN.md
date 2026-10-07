@@ -97,7 +97,7 @@ Avoid generic documentation-site patterns, SaaS dashboard cards, glassmorphism, 
 
 Runtime tokens live in `preview/handbook-custom/src/handbook.css`; the published build lives in `web/site`. Routes, deep section anchors, bilingual content, technical meaning, diagrams, search, bookmarks, and accessibility behavior remain durable product contracts unless explicitly revised together with `UX-CONTRACT.md`.
 
-The redesign is phased, but the first cohesive increment now covers all four mental surfaces: Atlas establishes the Knowledge Spine, Reader exposes section trace and reading progress in the existing shell, Search behaves as a ranked local Knowledge Command, and Notebook presents saved chapters as a return surface. Later increments may add concept entities and section-level saves, but they must extend this system rather than introduce a second visual language.
+The first cohesive Atlas system now covers all four primary surfaces plus the connective Concept Layer: Atlas establishes the Knowledge Spine, Reader exposes current-section trace and reading progress in the existing shell, Search behaves as a ranked local Knowledge Command, Notebook presents saved chapters as a return surface, and Concept routes connect canonical sources across chapters. Future work may extend concept coverage or add section/concept-level saves, but it must extend this system rather than introduce a second visual language.
 
 ## Colors
 Light mode uses a pale mineral canvas (`#f4f6f3`), near-white reading surfaces (`#fcfdfc`), dark green-black ink (`#18211d`), and restrained gray-green secondary text. The primary `#2f6850` is a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state.
@@ -143,13 +143,23 @@ Runtime ownership is Model B: `preview/handbook-custom/src/handbook.css` owns se
 
 Technical diagrams retain native, trusted document markup as a compatibility variant so their registered topology, bilingual content, and interactive labs remain complete. Diagram colors express technical roles sparingly; chapter surfaces and noninteractive headings remain neutral.
 
-Reader orientation belongs in the existing shell rather than a reserved TOC column. Desktop topbar context may show chapter, current section, and rounded reading percentage with a two-pixel progress trace; mobile reduces this to the chapter context plus the progress trace. Focus mode must keep an always-reachable exit in the topbar.
+Reader orientation belongs in the existing shell rather than a reserved TOC column. The full chapter title belongs to the Reader heading and must not be duplicated in the topbar. Desktop topbar context shows the current section (or a neutral Reader label while section data is unavailable) plus rounded reading percentage and a two-pixel progress trace; mobile keeps the compact trace without adding a second navigation layer. Focus mode must keep an always-reachable exit in the topbar.
 
 Search is a command surface, not a result-card gallery. Results remain flat, show chapter index and match language, identify the best deterministic match, and highlight literal match text with the accent token rather than a yellow marker.
 
 Concept pages are indexes, not essays. Use one large concept name, one concise source-grounded summary, one canonical entry, a flat source trail, and a narrow related-concepts rail. Do not wrap each source in a card. Concept summaries may restate canonical chapter claims but must not introduce technical claims that are absent from their linked sources.
 
 Keep the installed Better Design React components and assigned Iconoir icons. Theme semantic tokens instead of introducing per-component palettes. Search keeps its IME-safe keyboard contract while using deterministic relevance ranking and match-language snippets. Bookmarks and theme toggle retain their persistence behavior. The old category-filter toolbar is intentionally removed from Atlas; the system view always shows the full four-layer spine, while `#home/saved` is the Notebook surface.
+
+
+
+## Generated content hygiene
+
+Generated reader payloads are presentation outputs, not authoring surfaces. Internal HTML comments, separator markers, build notes, and other author-only annotations must never become visible Reader text.
+
+The content-sync pipeline must remove HTML comments before locale transformation. Locale conversion must explicitly ignore comment nodes rather than treating them as ordinary text. Generated output must fail validation if an internal chapter separator such as `===== CH7 =====` becomes visible.
+
+This rule applies to both `preview/handbook-custom/public/content/` and the published `web/site/content/` artifact. Fix leaks in the generator, not by hand-editing generated JSON.
 
 ## Do's and Don'ts
 - Do keep prose and noninteractive headings gray-white in dark mode.

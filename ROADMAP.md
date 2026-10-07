@@ -7,12 +7,15 @@
 - [x] Move interview-specific material to a secondary archive model
 - [x] Add a general design contract
 
-## Phase 2 — Stabilize the current web edition
+## Phase 2 — Stabilize the web delivery pipeline
 
-- [x] Publish the handbook as a multipage `web/` site rather than a single exported HTML artifact
-- [x] Rename interview-first product copy to AI Engineer Handbook
-- [x] Preserve the technical content, diagrams, bilingual mode, theme, search and responsive behavior
-- [x] Keep historical interview/reference material outside the core 02–09 technical chapter navigation
+- [x] Move away from a single exported HTML artifact
+- [x] Preserve technical content, diagrams, bilingual mode, theme, search and responsive behavior
+- [x] Keep historical interview/reference material outside the core technical navigation
+- [x] Establish `preview/handbook-custom/` as the React application source
+- [x] Establish `web/site/` as the generated Vercel deployment artifact
+- [x] Add a React preview build gate for pull requests
+- [x] Document that `npm run publish:web` is required to refresh the deployable artifact
 
 ## Phase 3 — Build the complete core knowledge spine
 
@@ -42,6 +45,21 @@
 - [ ] Add browser-based responsive regression checks at the DESIGN.md validation widths
 - [ ] Add lightweight visual regression coverage for the architecture diagrams
 - [ ] Add a generated aggregate/export pipeline if a single-file manuscript is needed again
+
+
+
+## Phase 5 — AI Engineering Atlas product model
+
+- [x] Reframe the UI from a conventional handbook shell into the AI Engineering Atlas
+- [x] Add the four-layer Knowledge Spine: Model → Retrieval & RAG → Agent → Production
+- [x] Add dedicated Atlas, Reader, Search / Knowledge Command, and Notebook surfaces
+- [x] Add source-grounded Concept routes that connect canonical sections across chapters
+- [x] Add concept-first deterministic local search ranking and bilingual match-aware snippets
+- [x] Add Reader current-section trace, reading progress, and always-reachable Focus exit
+- [x] Prevent the Reader topbar from duplicating the full chapter title already shown in the page heading
+- [x] Strip internal HTML comments before locale transforms and reject leaked `===== CHn =====` markers
+- [ ] Extend Notebook from chapter-level saves to section/concept-level saves
+- [ ] Expand Concept coverage and relationship visualization without creating a second semantic source
 
 ## Coverage rule
 
