@@ -36,17 +36,23 @@ handbook/chapters/*.md
     concepts · architecture · trade-offs · failure modes · metrics · rules · source notes
 
 DESIGN.md
-  = presentation contract
+  = visual / presentation contract
+
+preview/handbook-custom/UX-CONTRACT.md
+  = observable application behavior
+
+preview/handbook-custom/
+  = React Atlas source + content sync / search generation
 
 web/
-  = derived presentation
-    HTML · diagrams · interactions · bilingual runtime · search · responsive UI
+  = derived presentation inputs + generated production artifact
+    web/site/ is the deployable output
 
 Vercel
   = delivery
 ```
 
-If Markdown and `web/` disagree on **technical meaning**, re-check the original source/evidence and reconcile toward the canonical chapter. If they differ only in visual organization, `web/` owns the presentation decision.
+If Markdown and the rendered product disagree on **technical meaning**, re-check the original source/evidence and reconcile toward the canonical chapter. Visual organization follows `DESIGN.md`; observable interaction behavior follows `UX-CONTRACT.md`. Generated JSON and `web/site/` must be regenerated rather than hand-edited.
 
 ## Active chapters
 
@@ -74,9 +80,11 @@ research / verify
 → separate source facts from handbook synthesis
 → merge reusable meaning into that chapter
 → keep framework/vendor behavior clearly labeled
-→ update web presentation only after semantics are stable
-→ validate i18n / search / responsive / structural QA
-→ feature branch → PR → CI + Preview → merge → production verify
+→ update derived presentation only after semantics are stable
+→ npm run sync-content
+→ validate React / i18n / search / responsive / structural QA
+→ npm run publish:web
+→ feature branch → PR → CI + Vercel Preview → merge → production verify
 ```
 
 Do not create a new semantic supplement next to an existing canonical chapter merely because a source uses different terminology. Add a separate file only when it has an independent long-lived ownership boundary.
