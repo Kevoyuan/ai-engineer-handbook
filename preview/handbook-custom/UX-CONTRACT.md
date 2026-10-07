@@ -39,7 +39,7 @@ Search supports IME text entry; composition never activates Enter navigation or 
 
 Locale, theme, text size and bookmarks are saved only in the current browser. Bookmarks are immediate and reversible, with one shared status live region. If persistence is unavailable, the current visit remains usable and the storage issue is stated honestly. No account/sync promise is made. Reading positions are neither saved nor restored; the directory has no continue-reading entry.
 
-Focus reading hides persistent sidebar/table-of-contents chrome and preserves the same content, search, page navigation and reading controls. It has an explicit exit button. Chapters open at the beginning unless the URL specifies a section destination.
+Focus reading hides persistent sidebar/table-of-contents chrome and preserves the same content, search, page navigation and reading controls. It has an explicit exit button in the Reader controls and a second always-reachable exit action in the top bar while focus mode is active. Chapters open at the beginning unless the URL specifies a section destination.
 
 ## Accessibility and responsive behavior
 
@@ -59,7 +59,7 @@ Run `npm run test:learning` for scenario boundaries, correct/incorrect feedback,
 
 The reviewed redesign is published as `web/site/`; its application source remains in `preview/handbook-custom`. Legacy chapter URLs redirect to the shared reader. Browser tests cover all chapters and representative theme/locale, desktop/mobile, keyboard, loading/error/retry and experimental-control states. Existing generated component registry demos are retained but are not imported into product routes.
 
-The on-page contents never reserves a right-hand column. The reader toolbar opens the shared section dialog on desktop and mobile; current-section highlighting, section jumps and return-to-top remain available.
+The on-page contents never reserves a right-hand column. The reader toolbar opens the shared section dialog on desktop and mobile; current-section highlighting, section jumps and return-to-top remain available. Reader scroll state also drives a lightweight shell trace: desktop shows chapter, current section, and rounded reading percentage in the existing top bar, while mobile keeps the chapter context and a two-pixel progress line without adding persistent navigation chrome.
 
 
 ## Skills simulation controls
