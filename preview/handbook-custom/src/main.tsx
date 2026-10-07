@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Dialog,
   DialogContent,
@@ -38,8 +37,65 @@ type SearchEntry = {
   textEn: string;
   href: string;
 };
-import { Reader, chapterHref, currentChapter } from "./reader";
+
+function scoreSearchField(
+  value: string,
+  query: string,
+  exact: number,
+  starts: number,
+  contains: number,
+) {
+  const normalized = value.toLowerCase();
+  if (normalized === query) return exact;
+  if (normalized.startsWith(query)) return starts;
+  const index = normalized.indexOf(query);
+  return index < 0 ? 0 : contains + Math.max(0, 12 - Math.floor(index / 24));
+}
+
+function scoreSearchEntry(entry: SearchEntry, query: string, en: boolean) {
+  const currentTitle = en ? entry.titleEn : entry.titleZh;
+  const otherTitle = en ? entry.titleZh : entry.titleEn;
+  const currentText = en ? entry.textEn : entry.textZh;
+  const otherText = en ? entry.textZh : entry.textEn;
+  return (
+    scoreSearchField(currentTitle, query, 140, 118, 92) +
+    scoreSearchField(otherTitle, query, 118, 98, 76) +
+    scoreSearchField(currentText, query, 62, 54, 46) +
+    scoreSearchField(otherText, query, 42, 36, 30)
+  );
+}
+
+function searchSnippet(entry: SearchEntry, query: string, en: boolean) {
+  const current = en ? entry.textEn : entry.textZh;
+  const other = en ? entry.textZh : entry.textEn;
+  const currentIndex = current.toLowerCase().indexOf(query);
+  const otherIndex = other.toLowerCase().indexOf(query);
+  const useOther = currentIndex < 0 && otherIndex >= 0;
+  const source = useOther ? other : current;
+  const index = useOther ? otherIndex : currentIndex;
+  const start = Math.max(0, (index < 0 ? 0 : index) - 42);
+  const body = source.slice(start, start + 176).trim();
+  return {
+    text: (start > 0 ? "…" : "") + body + (start + 176 < source.length ? "…" : ""),
+    locale: useOther ? (en ? "ZH" : "EN") : en ? "EN" : "ZH",
+  };
+}
+
+function highlightSearchMatch(text: string, query: string) {
+  const q = query.trim();
+  const index = text.toLowerCase().indexOf(q.toLowerCase());
+  if (!q || index < 0) return text;
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + q.length)}</mark>
+      {text.slice(index + q.length)}
+    </>
+  );
+}
+import { Reader, chapterHref, currentChapter, type ReadingContext } from "./reader";
 import { Architecture } from "./architecture";
+import { concepts, conceptBySlug } from "./concepts";
 import "./content-base.css";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
@@ -47,11 +103,44 @@ import "./index.css";
 import "./handbook.css";
 import "./architecture.css";
 const groups = [
-  { zh: "模型基础", en: "Model foundations", range: [0, 1] },
-  { zh: "检索与 RAG", en: "Retrieval & RAG", range: [1, 5] },
-  { zh: "Agent 工程", en: "Agent engineering", range: [5, 8] },
-  { zh: "评估与生产", en: "Evaluation & production", range: [8, 10] },
+  {
+    id: "model",
+    label: "MODEL",
+    zh: "模型基础",
+    en: "Model foundations",
+    descriptionZh: "理解模型、API 与上下文的基本约束。",
+    descriptionEn: "Understand the constraints of models, APIs, and context.",
+    range: [0, 1],
+  },
+  {
+    id: "retrieval",
+    label: "RETRIEVAL",
+    zh: "检索与 RAG",
+    en: "Retrieval & RAG",
+    descriptionZh: "从检索路径进入可靠、可追溯的知识系统。",
+    descriptionEn: "Move from retrieval paths to reliable, traceable knowledge systems.",
+    range: [1, 5],
+  },
+  {
+    id: "agent",
+    label: "AGENT",
+    zh: "Agent 工程",
+    en: "Agent engineering",
+    descriptionZh: "组织工具、记忆与执行循环，让智能行为可控。",
+    descriptionEn: "Coordinate tools, memory, and execution loops into controlled behavior.",
+    range: [5, 8],
+  },
+  {
+    id: "production",
+    label: "PRODUCTION",
+    zh: "评估与生产",
+    en: "Evaluation & production",
+    descriptionZh: "用评估、观测与平台能力把系统送进生产。",
+    descriptionEn: "Move systems into production with evaluation, observability, and platform controls.",
+    range: [8, 10],
+  },
 ];
+const interactiveChapterNumbers = new Set(["03", "04", "06", "07", "08"]);
 const descriptions = [
   [
     "理解 Generation、Token、Context、Sampling、Embedding、Adaptation 与模型迁移。",
@@ -94,19 +183,6 @@ const descriptions = [
     "Explore serving, caching, isolation and production control planes.",
   ],
 ];
-const terms = [
-  "Tokenization",
-  "Context Window",
-  "Structured Output",
-  "BM25",
-  "Hybrid Search",
-  "Query Routing",
-  "RAG",
-  "Memory",
-  "Agent",
-  "Evaluation",
-  "KV Cache",
-];
 function read<T>(key: string, fallback: T): T {
   try {
     return JSON.parse(localStorage.getItem(key) || "null") ?? fallback;
@@ -130,16 +206,37 @@ function App() {
   const [page, setPage] = useState(() =>
     location.hash.startsWith("#read")
       ? "reader"
-      : location.hash === "#map"
-        ? "map"
-        : "home",
+      : location.hash.startsWith("#concept/")
+        ? "concept"
+        : location.hash === "#map"
+          ? "map"
+          : "home",
   );
   const [chapterIndex, setChapterIndex] = useState(currentChapter);
+  const [conceptSlug, setConceptSlug] = useState(() =>
+    location.hash.startsWith("#concept/") ? location.hash.split("/")[1] || "" : "",
+  );
   useEffect(() => {
     if (matchMedia("(max-width: 767px)").matches)
       document.querySelector(".workspace")?.scrollTo({ top: 0 });
-  }, [page, chapterIndex]);
+  }, [page, chapterIndex, conceptSlug]);
   const [focus, setFocus] = useState(false);
+  const [readingContext, setReadingContext] = useState<ReadingContext>({
+    sectionId: "",
+    sectionTitle: "",
+    progress: 0,
+    sectionIndex: 0,
+    sectionCount: 0,
+  });
+  useEffect(() => {
+    setReadingContext({
+      sectionId: "",
+      sectionTitle: "",
+      progress: 0,
+      sectionIndex: 0,
+      sectionCount: 0,
+    });
+  }, [chapterIndex, en]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     read("handbook-sidebar-collapsed", false),
   );
@@ -212,11 +309,18 @@ function App() {
       setPage(
         location.hash.startsWith("#read")
           ? "reader"
-          : location.hash === "#map"
-            ? "map"
-            : "home",
+          : location.hash.startsWith("#concept/")
+            ? "concept"
+            : location.hash === "#map"
+              ? "map"
+              : "home",
       );
       setChapterIndex(currentChapter());
+      setConceptSlug(
+        location.hash.startsWith("#concept/")
+          ? location.hash.split("/")[1] || ""
+          : "",
+      );
       if (location.hash.startsWith("#home"))
         setFilter(location.hash.split("/")[1] || "all");
       setMenu(false);
@@ -245,6 +349,8 @@ function App() {
     location.hash = chapterHref(i);
     setMenu(false);
   };
+  const activeConcept =
+    page === "concept" ? conceptBySlug(conceptSlug) : undefined;
   useEffect(() => {
     const title =
       page === "reader"
@@ -253,18 +359,24 @@ function App() {
             ? chapters[chapterIndex].en
             : chapters[chapterIndex].zh
           : t("找不到章节", "Chapter not found")
-        : page === "map"
-          ? t("知识地图", "Knowledge map")
-          : filter === "saved"
-            ? t("我的收藏", "Saved chapters")
-            : t("手册目录", "Contents");
+        : page === "concept"
+          ? activeConcept
+            ? en
+              ? activeConcept.name
+              : activeConcept.zh
+            : t("找不到概念", "Concept not found")
+          : page === "map"
+            ? t("系统架构", "System architecture")
+            : filter === "saved"
+              ? t("笔记", "Notebook")
+              : t("知识图谱", "Atlas");
     document.title =
-      title + " · " + t("AI 工程手册", "AI Engineering Handbook");
+      title + " · " + t("AI 工程图谱", "AI Engineering Atlas");
     document.documentElement.classList.toggle(
       "focus-reading",
       focus && page === "reader",
     );
-  }, [page, chapterIndex, en, filter, focus]);
+  }, [page, chapterIndex, en, filter, focus, activeConcept]);
   const toggleSave = (slug: string) => {
     const next = saved.includes(slug)
       ? saved.filter((x) => x !== slug)
@@ -307,16 +419,35 @@ function App() {
     if (searchOpen && indexStatus === "idle") loadSearchIndex();
   }, [searchOpen]);
   useEffect(() => () => searchRequest.current?.abort(), []);
+  const conceptResults = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return concepts
+      .map((concept) => {
+        const current = (en ? concept.name : concept.zh).toLowerCase();
+        const other = (en ? concept.zh : concept.name).toLowerCase();
+        const exact = current === q || other === q;
+        const starts = current.startsWith(q) || other.startsWith(q);
+        const contains = current.includes(q) || other.includes(q);
+        return {
+          concept,
+          score: exact ? 300 : starts ? 220 : contains ? 160 : 0,
+        };
+      })
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }, [query, en]);
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return q
-      ? searchIndex.filter((x) =>
-          (x.titleZh + " " + x.titleEn + " " + x.textZh + " " + x.textEn)
-            .toLowerCase()
-            .includes(q),
-        )
-      : [];
-  }, [query, searchIndex]);
+    if (!q) return [];
+    return searchIndex
+      .map((entry) => ({
+        ...entry,
+        score: scoreSearchEntry(entry, q, en),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score || a.href.localeCompare(b.href));
+  }, [query, searchIndex, en]);
   const search = (q = "") => {
     setQuery(q);
     setSearchOpen(true);
@@ -329,21 +460,23 @@ function App() {
             <BookIcon />
           </span>
           <span>
-            {t("AI 工程手册", "AI Engineering")}
-            <span className="brand-en">Engineering Handbook</span>
+            {t("AI 工程图谱", "AI Engineering Atlas")}
+            <span className="brand-en">
+              {t("工程知识系统", "Engineering knowledge system")}
+            </span>
           </span>
         </a>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarItem
-            active={page === "home" && filter !== "saved"}
+            active={(page === "home" && filter !== "saved") || page === "concept"}
             onClick={() => {
               location.hash = "home/all";
             }}
           >
             <BookIcon />
-            {t("手册目录", "Contents")}
+            {t("知识图谱", "Atlas")}
           </SidebarItem>
           <SidebarItem
             active={page === "home" && filter === "saved"}
@@ -352,7 +485,7 @@ function App() {
             }}
           >
             <BookmarkIcon />
-            {t("我的收藏", "Saved chapters")}
+            {t("笔记", "Notebook")}
             {saved.length > 0 && (
               <span className="ml-auto">{saved.length}</span>
             )}
@@ -378,7 +511,7 @@ function App() {
       </SidebarContent>
       <SidebarFooter>
         <a href="#map" className="preview-caption">
-          {t("知识地图", "Knowledge map")}
+          {t("系统架构", "System architecture")}
         </a>
       </SidebarFooter>
     </Sidebar>
@@ -430,33 +563,57 @@ function App() {
             >
               <MenuIcon />
             </Button>
-            <span>
-              {page === "home"
-                ? t("手册目录", "Contents")
-                : page === "map"
-                  ? t("知识地图", "Knowledge map")
-                  : chapters[chapterIndex]
-                    ? en
-                      ? chapters[chapterIndex].en
-                      : chapters[chapterIndex].zh
-                    : t("找不到章节", "Chapter not found")}
-            </span>
-            {page === "reader" && (
+            {page === "reader" && chapters[chapterIndex] ? (
               <>
-                <span className="crumb-slash">/</span>
-                <span>{chapters[chapterIndex]?.number}</span>
+                {readingContext.sectionTitle ? (
+                  <span className="top-reader-section">
+                    <span className="top-section-mark" aria-hidden="true">§</span>
+                    {readingContext.sectionTitle}
+                  </span>
+                ) : (
+                  <span className="top-reader-mode">{t("阅读", "Reader")}</span>
+                )}
+                <span className="top-reading-percent">
+                  {readingContext.progress}%
+                </span>
               </>
+            ) : (
+              <span>
+                {page === "home"
+                  ? filter === "saved"
+                    ? t("笔记", "Notebook")
+                    : t("知识图谱", "Atlas")
+                  : page === "concept"
+                    ? activeConcept
+                      ? en
+                        ? activeConcept.name
+                        : activeConcept.zh
+                      : t("找不到概念", "Concept not found")
+                    : page === "map"
+                      ? t("系统架构", "System architecture")
+                      : t("找不到章节", "Chapter not found")}
+              </span>
             )}
           </div>
           <div className="top-actions">
+            {page === "reader" && focus && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="top-focus-exit"
+                onClick={() => setFocus(false)}
+              >
+                {t("退出专注", "Exit focus")}
+              </Button>
+            )}
             <Button
               variant="ghost"
               className="header-search"
-              aria-label={t("搜索手册", "Search handbook")}
+              aria-label={t("搜索知识系统", "Search the atlas")}
               onClick={() => search()}
             >
               <SearchIcon />
-              <span>{t("搜索手册", "Search handbook")}</span>
+              <span>{t("搜索图谱", "Search atlas")}</span>
               <kbd>⌘ K</kbd>
             </Button>
             <Button
@@ -492,223 +649,328 @@ function App() {
               </a>
             </Button>
           </div>
+          {page === "reader" && (
+            <div className="reading-progress-line" aria-hidden="true">
+              <span style={{ width: readingContext.progress + "%" }} />
+            </div>
+          )}
         </header>
         {page === "home" ? (
-          <main id="content" className="directory" tabIndex={-1}>
-            <div className="intro">
-              <div className="intro-title">
-                <h1>
-                  {t("把知识串起来，", "Connect the concepts.")}
-                  <span>{t("把系统做扎实。", "Build reliable systems.")}</span>
-                </h1>
-                <p>
-                  {t(
-                    "从检索到 Agent，从原理到生产。一本随时翻开的 AI 工程手册。",
-                    "From retrieval to agents, from fundamentals to production. Your AI engineering reference.",
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="entry-search">
-              <div className="search-button">
-                <SearchIcon />
-                <button
-                  type="button"
-                  className="entry-search-trigger"
-                  onClick={() => search()}
-                  aria-label={t("搜索手册", "Search handbook")}
-                >
-                  <span>
+          filter === "saved" ? (
+            <main id="content" className="notebook-page" tabIndex={-1}>
+              <div className="notebook-shell">
+                <header className="notebook-header">
+                  <p className="atlas-eyebrow">NOTEBOOK / SAVED KNOWLEDGE</p>
+                  <h1>{t("笔记", "Notebook")}</h1>
+                  <p>
                     {t(
-                      "搜索概念、方法或工程问题…",
-                      "Search concepts, methods or engineering questions…",
+                      "把需要反复查阅的章节留在这里。目前收藏以章节为单位。",
+                      "Keep the chapters you return to here. Saved items are currently chapter-level.",
                     )}
-                  </span>
-                </button>
-                <kbd>⌘ K</kbd>
-              </div>
-              <div className="popular">
-                <span>{t("常用", "Topics")}</span>
-                {["BM25", "RAG", "Agent", "Memory"].map((q) => (
-                  <Button
-                    variant="link"
-                    size="sm"
-                    key={q}
-                    onClick={() => search(q)}
-                  >
-                    {q}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <section
-              className="catalog"
-              aria-label={t("章节目录", "Chapter directory")}
-            >
-              <div className="catalog-toolbar">
-                <h2>
-                  {t("知识目录", "Chapters")}
-                  <span>09</span>
-                </h2>
-                <ToggleGroup
-                  className="chapter-filters"
-                  type="single"
-                  value={filter}
-                  onValueChange={(v) => {
-                    if (v) {
-                      setFilter(v);
-                      location.hash = "home/" + v;
-                    }
-                  }}
-                  aria-label={t("筛选章节", "Filter chapters")}
-                >
-                  <ToggleGroupItem value="all">
-                    {t("全部", "All")}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="0">
-                    {t("检索与 RAG", "Retrieval")}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="1">Agent</ToggleGroupItem>
-                  <ToggleGroupItem value="2">
-                    {t("生产", "Production")}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="saved">
-                    {t("收藏", "Saved")}
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </div>
-              <div
-                className="catalog-scroll"
-                key={filter}
-                tabIndex={0}
-                role="region"
-                aria-label={t("章节列表", "Chapter list")}
-              >
-                {filter === "saved" && saved.length === 0 ? (
-                  <div className="empty">
+                  </p>
+                </header>
+                {saved.length === 0 ? (
+                  <div className="empty notebook-empty">
                     <BookmarkIcon />
-                    <h3>
-                      {t("把常查的章节留在这里", "Keep useful chapters here")}
-                    </h3>
+                    <h3>{t("还没有收藏", "Nothing saved yet")}</h3>
                     <p>
                       {t(
-                        "点击章节旁的收藏按钮，下次查阅更方便。",
-                        "Save a chapter using its bookmark button.",
+                        "在 Atlas 或 Reader 中收藏章节，它会出现在这里。",
+                        "Save a chapter from the Atlas or Reader and it will appear here.",
                       )}
                     </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setFilter("all");
-                        location.hash = "home/all";
-                      }}
-                    >
-                      {t("浏览全部章节", "Browse all chapters")}
+                    <Button asChild variant="outline">
+                      <a href="#home/all">{t("返回 Atlas", "Back to Atlas")}</a>
                     </Button>
                   </div>
                 ) : (
-                  groups.map((g, gi) => {
-                    const list = chapters
-                      .slice(...(g.range as [number, number]))
-                      .filter(
-                        (c) => filter !== "saved" || saved.includes(c.slug),
+                  <div className="notebook-groups">
+                    {groups.map((g) => {
+                      const list = chapters
+                        .slice(...(g.range as [number, number]))
+                        .filter((ch) => saved.includes(ch.slug));
+                      if (!list.length) return null;
+                      return (
+                        <section className="notebook-group" key={g.id}>
+                          <header>
+                            <span>{g.label}</span>
+                            <h2>{en ? g.en : g.zh}</h2>
+                          </header>
+                          <div>
+                            {list.map((ch) => {
+                              const i = chapters.indexOf(ch);
+                              return (
+                                <div className="notebook-row" key={ch.slug}>
+                                  <a href={chapterHref(i)}>
+                                    <span>{ch.number}</span>
+                                    <strong>{en ? ch.en : ch.zh}</strong>
+                                  </a>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="is-saved"
+                                    onClick={() => toggleSave(ch.slug)}
+                                    aria-label={t(
+                                      `取消收藏 ${ch.zh}`,
+                                      `Remove ${ch.en} from notebook`,
+                                    )}
+                                  >
+                                    <BookmarkIcon />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </section>
                       );
-                    if (
-                      (filter !== "all" &&
-                        filter !== "saved" &&
-                        filter !== String(gi)) ||
-                      !list.length
-                    )
-                      return null;
-                    return (
-                      <div className="chapter-group" key={g.en}>
-                        <div className="group-heading">
-                          <h3>{en ? g.en : g.zh}</h3>
-                          <span>
-                            {t(
-                              ["建立知识基础", "组织智能行为", "让系统可信赖"][
-                                gi
-                              ],
-                              [
-                                "Build the foundations",
-                                "Coordinate intelligent behavior",
-                                "Make systems dependable",
-                              ][gi],
-                            )}
-                          </span>
-                        </div>
-                        <div className="chapter-list">
-                          {list.map((ch) => {
-                            const i = chapters.indexOf(ch);
-                            return (
-                              <div className="chapter-row" key={ch.slug}>
-                                <a
-                                  className="chapter-link"
-                                  href={chapterHref(i)}
-                                >
-                                  <span className="chapter-number">
-                                    {ch.number}
-                                  </span>
-                                  <span className="chapter-copy">
-                                    <span className="chapter-title">
-                                      {en ? ch.en : ch.zh}
-                                    </span>
-                                    <span className="chapter-description">
-                                      {descriptions[i][en ? 1 : 0]}
-                                    </span>
-                                  </span>
-                                  <ArrowRightIcon className="chapter-arrow" />
-                                </a>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className={
-                                    saved.includes(ch.slug) ? "is-saved" : ""
-                                  }
-                                  aria-pressed={saved.includes(ch.slug)}
-                                  aria-label={
-                                    (saved.includes(ch.slug)
-                                      ? t("取消收藏：", "Unsave: ")
-                                      : t("收藏：", "Save: ")) +
-                                    (en ? ch.en : ch.zh)
-                                  }
-                                  onClick={() => toggleSave(ch.slug)}
-                                >
-                                  <BookmarkIcon />
-                                </Button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })
+                    })}
+                  </div>
                 )}
               </div>
-            </section>
-            <section className="reference">
-              <div>
-                <h2>
-                  {t(
-                    "先看全貌，再深入细节",
-                    "See the system, then the details",
-                  )}
-                </h2>
-                <p>
-                  {t(
-                    "通过系统总框架和 Agent 参考架构，理解知识之间的关系。",
-                    "Explore the system framework and agent reference architecture.",
-                  )}
-                </p>
+            </main>
+          ) : (
+            <main id="content" className="atlas-page" tabIndex={-1}>
+              <div className="atlas-shell">
+                <header className="atlas-intro">
+                  <p className="atlas-eyebrow">AI ENGINEERING / SYSTEM MAP</p>
+                  <h1>
+                    {t(
+                      "把 AI 工程当作一个系统来理解。",
+                      "Understand AI engineering as a system.",
+                    )}
+                  </h1>
+                  <p className="atlas-lede">
+                    {t(
+                      "不是按顺序翻完十章，而是看清模型、检索、Agent 与生产系统之间为什么会连在一起。",
+                      "Do not just read ten chapters in order. See why models, retrieval, agents, and production systems connect.",
+                    )}
+                  </p>
+                  <div className="atlas-search">
+                    <div className="search-button">
+                      <SearchIcon />
+                      <button
+                        type="button"
+                        className="entry-search-trigger"
+                        onClick={() => search()}
+                        aria-label={t("搜索知识系统", "Search the atlas")}
+                      >
+                        <span>
+                          {t(
+                            "搜索概念、方法或工程问题…",
+                            "Search concepts, methods, or engineering questions…",
+                          )}
+                        </span>
+                      </button>
+                      <kbd>⌘ K</kbd>
+                    </div>
+                    <div className="popular">
+                      <span>{t("快速定位", "Quick find")}</span>
+                      {["BM25", "RAG", "Agent", "Memory"].map((q) => (
+                        <Button
+                          variant="link"
+                          size="sm"
+                          key={q}
+                          onClick={() => search(q)}
+                        >
+                          {q}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="atlas-meta" aria-label={t("图谱概览", "Atlas overview")}>
+                    <span><strong>{chapters.length}</strong>{t(" 章", " chapters")}</span>
+                    <span><strong>{groups.length}</strong>{t(" 个系统层", " system layers")}</span>
+                    <span><strong>{interactiveChapterNumbers.size}</strong>{t(" 个交互实验", " interactive labs")}</span>
+                  </div>
+                </header>
+
+                <div className="atlas-layout">
+                  <section
+                    className="atlas-spine"
+                    aria-label={t("AI 工程知识主干", "AI engineering knowledge spine")}
+                  >
+                    {groups.map((g, gi) => (
+                      <section className="atlas-group" key={g.id}>
+                        <header className="atlas-group-heading">
+                          <span className="atlas-group-index">
+                            {String(gi + 1).padStart(2, "0")} / {g.label}
+                          </span>
+                          <h2>{en ? g.en : g.zh}</h2>
+                          <p>{en ? g.descriptionEn : g.descriptionZh}</p>
+                        </header>
+                        <div className="atlas-nodes">
+                          {chapters
+                            .slice(...(g.range as [number, number]))
+                            .map((ch) => {
+                              const i = chapters.indexOf(ch);
+                              const interactive = interactiveChapterNumbers.has(ch.number);
+                              return (
+                                <div className="atlas-node-row" key={ch.slug}>
+                                  <a className="atlas-node" href={chapterHref(i)}>
+                                    <span className="atlas-node-marker" aria-hidden="true" />
+                                    <span className="atlas-node-number">{ch.number}</span>
+                                    <span className="atlas-node-copy">
+                                      <strong>{en ? ch.en : ch.zh}</strong>
+                                      <span>{descriptions[i][en ? 1 : 0]}</span>
+                                      {interactive && (
+                                        <span className="atlas-node-lab">
+                                          ↳ {t("交互图解", "Interactive lab")}
+                                        </span>
+                                      )}
+                                    </span>
+                                    <ArrowRightIcon />
+                                  </a>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={saved.includes(ch.slug) ? "is-saved" : ""}
+                                    onClick={() => toggleSave(ch.slug)}
+                                    aria-label={
+                                      saved.includes(ch.slug)
+                                        ? t(`取消收藏 ${ch.zh}`, `Remove ${ch.en} from notebook`)
+                                        : t(`收藏 ${ch.zh}`, `Save ${ch.en} to notebook`)
+                                    }
+                                  >
+                                    <BookmarkIcon />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </section>
+                    ))}
+                  </section>
+
+                  <aside className="atlas-inspector">
+                    <div className="atlas-inspector-block">
+                      <span className="atlas-eyebrow">SYSTEM / 00</span>
+                      <h2>{t("先看系统，再看章节", "See the system before the chapters")}</h2>
+                      <p>
+                        {t(
+                          "架构总览把执行核心、控制面、反馈环和平台基础放在同一张图里。",
+                          "The architecture overview connects the execution core, control plane, feedback loop, and platform foundation.",
+                        )}
+                      </p>
+                      <a href="#map" className="atlas-text-link">
+                        {t("打开系统架构", "Open system architecture")}
+                        <ArrowRightIcon />
+                      </a>
+                    </div>
+                    <div className="atlas-inspector-block">
+                      <span className="atlas-eyebrow">CONCEPT / INDEX</span>
+                      <div className="atlas-concept-index">
+                        {concepts.map((concept) => (
+                          <a href={"#concept/" + concept.slug} key={concept.slug}>
+                            <span>{concept.group}</span>
+                            <strong>{en ? concept.name : concept.zh}</strong>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="atlas-inspector-block">
+                      <span className="atlas-eyebrow">READ / TRACE / RETURN</span>
+                      <p>
+                        {t(
+                          "Atlas 负责定位关系，Reader 负责深读，Search 负责即时查证，Notebook 负责回来复习。",
+                          "Atlas reveals relationships, Reader supports depth, Search retrieves evidence, and Notebook keeps what you return to.",
+                        )}
+                      </p>
+                    </div>
+                  </aside>
+                </div>
               </div>
-              <Button asChild variant="outline">
-                <a href="#map">
-                  {t("打开架构总览", "Open architecture overview")}
-                  <ArrowRightIcon />
+            </main>
+          )
+        ) : page === "concept" ? (
+          activeConcept ? (
+            <main id="content" className="concept-page" tabIndex={-1}>
+              <div className="concept-shell">
+                <a className="concept-back" href="#home/all">
+                  <span aria-hidden="true">←</span>
+                  {t("返回 Atlas", "Back to Atlas")}
                 </a>
+                <header className="concept-header">
+                  <div>
+                    <p className="atlas-eyebrow">
+                      CONCEPT / {activeConcept.group}
+                    </p>
+                    <h1>{en ? activeConcept.name : activeConcept.zh}</h1>
+                    <p className="concept-name-secondary">
+                      {en ? activeConcept.zh : activeConcept.name}
+                    </p>
+                  </div>
+                  <p className="concept-summary">
+                    {en ? activeConcept.summaryEn : activeConcept.summaryZh}
+                  </p>
+                </header>
+
+                <section className="concept-primary">
+                  <span className="atlas-eyebrow">
+                    {t("核心入口", "PRIMARY SOURCE")}
+                  </span>
+                  <a href={activeConcept.primaryHref}>
+                    <span className="concept-primary-mark" aria-hidden="true" />
+                    <span>
+                      <strong>{t("进入核心章节", "Open canonical section")}</strong>
+                      <span>{activeConcept.primaryHref.replace("#read/", "")}</span>
+                    </span>
+                    <ArrowRightIcon />
+                  </a>
+                </section>
+
+                <div className="concept-grid">
+                  <section className="concept-sources">
+                    <header>
+                      <span className="atlas-eyebrow">
+                        {t("知识出现在哪里", "SOURCE TRAIL")}
+                      </span>
+                      <h2>{t("跨章节来源", "Across the handbook")}</h2>
+                    </header>
+                    <div>
+                      {activeConcept.sources.map((source, index) => (
+                        <a href={source.href} key={source.href}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <strong>{en ? source.labelEn : source.labelZh}</strong>
+                          <ArrowRightIcon />
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+
+                  <aside className="concept-related">
+                    <span className="atlas-eyebrow">
+                      {t("关联概念", "RELATED CONCEPTS")}
+                    </span>
+                    <div>
+                      {activeConcept.related.map((slug) => {
+                        const related = conceptBySlug(slug);
+                        if (!related) return null;
+                        return (
+                          <a href={"#concept/" + related.slug} key={related.slug}>
+                            <span>{related.group}</span>
+                            <strong>{en ? related.name : related.zh}</strong>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </aside>
+                </div>
+              </div>
+            </main>
+          ) : (
+            <main id="content" className="empty">
+              <h1>{t("找不到概念", "Concept not found")}</h1>
+              <p>
+                {t(
+                  "这个概念还没有进入 Atlas 索引。",
+                  "This concept is not in the Atlas index yet.",
+                )}
+              </p>
+              <Button asChild>
+                <a href="#home/all">{t("返回 Atlas", "Back to Atlas")}</a>
               </Button>
-            </section>
-          </main>
+            </main>
+          )
         ) : page === "map" ? (
           <Architecture en={en} />
         ) : chapterIndex < 0 ? (
@@ -733,6 +995,7 @@ function App() {
             toggle={() => toggleSave(chapters[chapterIndex].slug)}
             focus={focus}
             setFocus={setFocus}
+            onReadingContext={setReadingContext}
           />
         )}
       </div>
@@ -741,7 +1004,7 @@ function App() {
           closeLabel={t("关闭", "Close")}
           className="search-dialog"
         >
-          <DialogTitle>{t("搜索手册", "Search the handbook")}</DialogTitle>
+          <DialogTitle>{t("搜索知识系统", "Search the atlas")}</DialogTitle>
           <DialogDescription>
             {t(
               "查找全部章节与图解，直接跳到相关段落。",
@@ -786,7 +1049,7 @@ function App() {
           <div className="search-results" aria-live="polite">
             {query.trim() && indexStatus === "ready" && (
               <p className="result-count">
-                {t("匹配段落", "Matching sections")} · {results.length}
+                {t("匹配结果", "Matching results")} · {conceptResults.length + results.length}
               </p>
             )}
             {indexStatus === "loading" ? (
@@ -810,35 +1073,83 @@ function App() {
                 <Button onClick={loadSearchIndex}>{t("重试", "Retry")}</Button>
               </div>
             ) : query.trim() ? (
-              results.length ? (
+              conceptResults.length || results.length ? (
                 <>
-                  {" "}
-                  {results.slice(0, resultLimit).map((r, i) => (
+                  {conceptResults.map(({ concept }, conceptIndex) => (
                     <a
-                      className="result"
-                      key={r.href + i}
-                      href={r.href}
+                      className={
+                        conceptIndex === 0
+                          ? "result result-concept result-best"
+                          : "result result-concept"
+                      }
+                      key={"concept-" + concept.slug}
+                      href={"#concept/" + concept.slug}
                       onClick={() => setSearchOpen(false)}
                     >
-                      <BookIcon />
-                      <span>
-                        <strong>{en ? r.titleEn : r.titleZh}</strong>
+                      <span className="result-index" aria-hidden="true">
+                        CON
+                      </span>
+                      <span className="result-copy">
+                        <span className="result-meta">
+                          <span>CONCEPT</span>
+                          <span>{concept.group}</span>
+                        </span>
+                        <strong>
+                          {highlightSearchMatch(
+                            en ? concept.name : concept.zh,
+                            query,
+                          )}
+                        </strong>
                         <span>
-                          {(en ? r.textEn : r.textZh)
-                            .slice(
-                              Math.max(
-                                0,
-                                (en ? r.textEn : r.textZh)
-                                  .toLowerCase()
-                                  .indexOf(query.toLowerCase()) - 25,
-                              ),
-                            )
-                            .slice(0, 120)}
+                          {en ? concept.summaryEn : concept.summaryZh}
                         </span>
                       </span>
                       <ArrowRightIcon />
                     </a>
                   ))}
+                  {results.slice(0, resultLimit).map((r, i) => {
+                    const snippet = searchSnippet(
+                      r,
+                      query.trim().toLowerCase(),
+                      en,
+                    );
+                    const visibleTitle = en ? r.titleEn : r.titleZh;
+                    const chapterNumber =
+                      visibleTitle.match(/^\d+/)?.[0] ||
+                      r.href.match(/#read\/(\d+)/)?.[1] ||
+                      "—";
+                    return (
+                      <a
+                        className={
+                          conceptResults.length === 0 && i === 0
+                            ? "result result-best"
+                            : "result"
+                        }
+                        key={r.href + i}
+                        href={r.href}
+                        onClick={() => setSearchOpen(false)}
+                      >
+                        <span className="result-index" aria-hidden="true">
+                          {chapterNumber}
+                        </span>
+                        <span className="result-copy">
+                          <span className="result-meta">
+                            <span>{snippet.locale}</span>
+                            {i === 0 && (
+                              <span>{t("最佳匹配", "Best match")}</span>
+                            )}
+                          </span>
+                          <strong>
+                            {highlightSearchMatch(visibleTitle, query)}
+                          </strong>
+                          <span>
+                            {highlightSearchMatch(snippet.text, query)}
+                          </span>
+                        </span>
+                        <ArrowRightIcon />
+                      </a>
+                    );
+                  })}
                   {results.length > resultLimit && (
                     <Button
                       variant="outline"
@@ -861,15 +1172,16 @@ function App() {
                 </div>
               )
             ) : (
-              <div className="suggestions">
-                <p>{t("按主题查阅", "Explore a topic")}</p>
-                {terms.map((term) => (
-                  <Button
-                    variant="outline"
-                    key={term}
-                    onClick={() => setQuery(term)}
-                  >
-                    {term}
+              <div className="suggestions command-concepts">
+                <p>{t("按概念进入", "Explore a concept")}</p>
+                {concepts.map((concept) => (
+                  <Button asChild variant="outline" key={concept.slug}>
+                    <a
+                      href={"#concept/" + concept.slug}
+                      onClick={() => setSearchOpen(false)}
+                    >
+                      {en ? concept.name : concept.zh}
+                    </a>
                   </Button>
                 ))}
               </div>

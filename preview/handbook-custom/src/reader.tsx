@@ -55,6 +55,13 @@ class DiagramBoundary extends Component<
   }
 }
 type Section = { id: string; zh: string; en: string };
+export type ReadingContext = {
+  sectionId: string;
+  sectionTitle: string;
+  progress: number;
+  sectionIndex: number;
+  sectionCount: number;
+};
 type ChapterContent = {
   zh: string;
   en: string;
@@ -91,6 +98,7 @@ export function Reader({
   toggle,
   focus,
   setFocus,
+  onReadingContext,
 }: {
   index: number;
   en: boolean;
@@ -98,6 +106,7 @@ export function Reader({
   toggle: () => void;
   focus: boolean;
   setFocus: (value: boolean) => void;
+  onReadingContext?: (value: ReadingContext) => void;
 }) {
   const t = (zh: string, e: string) => (en ? e : zh);
   const chapter = chapters[index];
@@ -122,6 +131,7 @@ export function Reader({
     [attempt, setAttempt] = useState(0),
     [tocOpen, setTocOpen] = useState(false),
     [active, setActive] = useState(""),
+    [progress, setProgress] = useState(0),
     [size, setSize] = useState(() =>
       readPreference("handbook-reading-size", 16),
     );
@@ -130,6 +140,8 @@ export function Reader({
     setData(null);
     setDiagramReady(false);
     setError(false);
+    setActive("");
+    setProgress(0);
     fetch("/content/" + chapter.slug + ".json", { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error("Chapter unavailable");
@@ -206,6 +218,12 @@ export function Reader({
           current = s.id;
       }
       setActive(current);
+      const maxScroll = Math.max(1, el.scrollHeight - el.clientHeight);
+      const nextProgress = Math.max(
+        0,
+        Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)),
+      );
+      setProgress((value) => (value === nextProgress ? value : nextProgress));
     };
     el.addEventListener("scroll", update, { passive: true });
     update();
@@ -213,6 +231,21 @@ export function Reader({
       el.removeEventListener("scroll", update);
     };
   }, [data, chapter.slug, mobile]);
+  useEffect(() => {
+    if (!data || !onReadingContext) return;
+    const sectionIndex = Math.max(
+      0,
+      data.sections.findIndex((section) => section.id === active),
+    );
+    const section = data.sections[sectionIndex];
+    onReadingContext({
+      sectionId: active,
+      sectionTitle: section ? (en ? section.en : section.zh) : "",
+      progress,
+      sectionIndex,
+      sectionCount: data.sections.length,
+    });
+  }, [active, progress, data, en, onReadingContext]);
   const sectionLink = (s: Section) => (
     <a
       key={s.id}
@@ -232,8 +265,16 @@ export function Reader({
         <div className="reader-heading">
           <div className="reader-eyebrow">
             <span>
-              {t("第 " + chapter.number + " 章", "Chapter " + chapter.number)}
+              {chapter.number} /{" "}
+              {index < 1
+                ? "MODEL"
+                : index < 5
+                  ? "RETRIEVAL"
+                  : index < 8
+                    ? "AGENT"
+                    : "PRODUCTION"}
             </span>
+            <span>{t("深度阅读", "DEEP READ")}</span>
           </div>
           <h1>{en ? chapter.en : chapter.zh}</h1>
           <div className="reader-actions">
