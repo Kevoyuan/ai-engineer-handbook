@@ -1,12 +1,13 @@
 """Derive the complete preview from canonical web chapters, including registered supplements."""
 from pathlib import Path
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup, Comment
 import json,re,shutil
 root=Path(__file__).resolve().parents[3]; project=Path(__file__).resolve().parents[1]; web=root/'web'
 chapters=json.loads((web/'chapters.json').read_text()); additions=json.loads((web/'assets/chapter-additions.json').read_text()); residual=json.loads((web/'assets/i18n-residuals.json').read_text()); search=[]; report=[]
 def english(soup):
  for el in soup.select('[data-i18n-en]'): el.clear();el.append(el['data-i18n-en'])
  for text in list(soup.find_all(string=True)):
+  if isinstance(text, Comment):continue
   if text.parent.name in ['style','script'] or text.parent.has_attr('data-i18n-en'):continue
   value=str(text)
   for k in sorted(residual,key=len,reverse=True):
@@ -29,6 +30,10 @@ for chapter in chapters:
    for node in reversed(nodes):lead.insert_after(node)
   else:
    for node in nodes:main.append(node)
+ # Internal authoring comments are not reader content. Remove them before locale transforms
+ # so BeautifulSoup never turns markers such as <!-- CH7 --> into visible English text.
+ for comment in main.find_all(string=lambda node: isinstance(node, Comment)):
+  comment.extract()
  # Keep trusted document structure and topology; remove executables and dead navigation.
  for el in main.find_all(True):
   for attr in list(el.attrs):
@@ -82,6 +87,10 @@ for chapter in chapters:
  positions={el.get('id'):i for i,el in enumerate(main.find_all(True)) if el.get('id')}
  toc.sort(key=lambda section:positions[section['id']])
  zh=str(main);en=str(english(BeautifulSoup(zh,'html.parser')))
+ for locale,html in [('zh',zh),('en',en)]:
+  visible=BeautifulSoup(html,'html.parser').get_text(' ',strip=True)
+  if re.search(r'=+\s*CH\d+\s*=+',visible):
+   raise RuntimeError(f'{slug} {locale}: internal chapter marker leaked into visible content')
  payload={'zh':zh,'en':en,'sections':toc,'supplements':[x['id'] for x in additions.get(slug,[])]}
  (project/'public/content'/f'{slug}.json').write_text(json.dumps(payload,ensure_ascii=False))
  # Section-level index enables direct lookup rather than chapter-only results.
