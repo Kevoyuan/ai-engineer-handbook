@@ -1079,9 +1079,13 @@ function App() {
             ) : query.trim() ? (
               conceptResults.length || results.length ? (
                 <>
-                  {conceptResults.map(({ concept }) => (
+                  {conceptResults.map(({ concept }, conceptIndex) => (
                     <a
-                      className="result result-concept"
+                      className={
+                        conceptIndex === 0
+                          ? "result result-concept result-best"
+                          : "result result-concept"
+                      }
                       key={"concept-" + concept.slug}
                       href={"#concept/" + concept.slug}
                       onClick={() => setSearchOpen(false)}
@@ -1120,7 +1124,11 @@ function App() {
                       "—";
                     return (
                       <a
-                        className={i === 0 ? "result result-best" : "result"}
+                        className={
+                          conceptResults.length === 0 && i === 0
+                            ? "result result-best"
+                            : "result"
+                        }
                         key={r.href + i}
                         href={r.href}
                         onClick={() => setSearchOpen(false)}
