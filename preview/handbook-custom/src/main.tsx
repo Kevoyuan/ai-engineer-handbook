@@ -60,8 +60,8 @@ function scoreSearchEntry(entry: SearchEntry, query: string, en: boolean) {
   return (
     scoreSearchField(currentTitle, query, 140, 118, 92) +
     scoreSearchField(otherTitle, query, 118, 98, 76) +
-    scoreSearchField(currentText, query, 0, 0, 46) +
-    scoreSearchField(otherText, query, 0, 0, 30)
+    scoreSearchField(currentText, query, 62, 54, 46) +
+    scoreSearchField(otherText, query, 42, 36, 30)
   );
 }
 
