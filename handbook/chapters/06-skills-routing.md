@@ -1199,7 +1199,115 @@ human review for high-risk cases
 
 如果候选答案无法提前定义，或者任务的核心产物本身就是文章、代码、报告、计划，那么把它硬塞进 System-One primitive 反而会丢失必要表达能力。
 
-### 6.10.4 Confidence、Benchmark 与 Product boundary
+### 6.10.4 三问选择法：Code、Decision Model 还是 Generative LLM？
+
+“closed decision” 还不够，因为很多封闭问题根本不需要模型。
+
+更稳健的选型顺序是：
+
+~~~text
+Q1. 输出空间能否在 inference 前定义？
+    ├─ No
+    │   → Generative LLM / planner
+    │
+    └─ Yes
+        ↓
+Q2. 判断能否用确定性规则可靠计算？
+    ├─ Yes
+    │   → deterministic code
+    │
+    └─ No
+        ↓
+Q3. 是否需要模糊语义判断 / 概率性判断？
+        ├─ Yes
+        │   → decision model / classifier / scorer
+        │
+        └─ No
+            → ordinary software logic
+~~~
+
+因此：
+
+~~~text
+finite answer space
+≠
+decision model required
+~~~
+
+真正的 Jev-shaped task 更接近：
+
+> **Predefined output space + fuzzy semantic judgment + software needs a typed decision.**
+
+例如：
+
+~~~text
+"amount > 1000?"
+→ code
+
+"这条退款请求是否像欺诈?"
+→ decision model
+
+"解释为什么这条请求可疑，并写调查摘要"
+→ generative LLM
+~~~
+
+这个三问法也能避免另一个常见错误：把权限和硬约束交给模型。
+
+~~~text
+"is this action semantically risky?"
+→ model judgment can help
+
+"is this user allowed to execute it?"
+→ deterministic authorization / policy
+~~~
+
+所以：
+
+> **Use code for deterministic truth, decision models for fuzzy bounded judgment, and generative LLMs for open-ended work.**
+
+### 6.10.5 Parallel sampling 的边界：并行的是独立判断，不是整个 Workflow
+
+TypeSafe 当前资料强调 Jev 可以在一次 query 中并行回答多个 typed questions。这个优势在下列形状最明显：
+
+~~~text
+same state
+├─ intent?
+├─ risk?
+├─ urgency?
+└─ needs_review?
+~~~
+
+这些判断都直接读取同一份 state，不依赖彼此的输出。
+
+但如果任务是：
+
+~~~text
+A. 先根据上下文生成一个候选方案
+        ↓
+B. 再判断方案是否满足约束
+        ↓
+C. 再根据 B 的结果决定下一步
+~~~
+
+那么依赖图仍然是串行的。
+
+因此：
+
+> **Parallel decision sampling removes unnecessary token-by-token generation; it does not remove true data dependencies in the workflow.**
+
+工程上先画 dependency graph：
+
+~~~text
+independent judgments
+→ batch / parallelize
+
+dependent judgments
+→ preserve causal order
+~~~
+
+不要为了追求“一次回答所有问题”而把后一个 decision 所需的前置 evidence 省掉。
+
+### 6.10.6 Confidence、Benchmark 与 Product boundary
 
 官方核验日期：2026-10-03。Jev 官网与发布文仍提供 early access 入口。TypeSafe 报告 70–500 ms 响应范围，并说明公开 eval 通常从美国西海岸访问服务；这是 vendor observation，未在本次维护中独立复现，不是地域无关的 P95 或 SLA。工作流 benchmark 也不能当成用户业务的绝对正确率。
 
@@ -1231,9 +1339,9 @@ failure slices
 
 尤其要把“输出永远合法”与“输出足够正确”分别评估。
 
-### 6.10.5 Source boundary
+### 6.10.7 Source boundary
 
-本节的触发材料来自用户提供的视频总结，核心观点是：Jev 面向预定义闭环决策，适合与传统 LLM 形成 System-One + System-Two 分工。
+本节最初由用户提供的视频总结触发；2026-10-07 又核对了 AI Engineering 的《Jev vs LLM Clearly Explained》。两份材料的共同核心是：Jev 面向预定义闭环决策，适合与传统 LLM 形成 System-One + System-Two 分工。后者进一步强调了 open-output vs bounded-decision 的对比，以及 decision model 在 agent harness 中用于 routing / gating / progress / completion checks 的位置。
 
 Handbook 对其做了以下工程化整理：
 
@@ -1241,13 +1349,15 @@ Handbook 对其做了以下工程化整理：
 - 将 Noul / Choice / Score 视为 typed decision primitives；
 - 明确 **type safety ≠ semantic correctness**；
 - 把厂商 benchmark 与可复用架构原则分开；
-- 将选型标准归结为 **closed decision vs open generation / reasoning**；
+- 将选型标准从 **closed decision vs open generation / reasoning** 进一步细化为 **deterministic code vs fuzzy bounded decision vs open generation**；
+- 明确 parallel sampling 只消除独立 decision 的不必要串行生成，不消除 workflow 的真实数据依赖；
 - 保留 confidence、fallback、authorization、evaluation 与 human review 边界。
 
-官方核对日期：2026-10-03（公开来源核验，未进行 live inference benchmark）。
+官方核对日期：2026-10-07（公开来源核验，未进行 live inference benchmark）。AI Engineering 文中的 Jev latency / price / speed 数字来自 TypeSafe 官方公开材料，Handbook 将其视为 vendor-reported evidence，不升级为跨地区 SLA 或独立 benchmark。
 
 Sources:
 
+- https://aiengineering.beehiiv.com/p/jev-vs-llm-clearly-explained
 - https://typesafe.ai/blog/introducing-system-one-models-and-jev
 - https://docs.typesafe.ai/introduction
 - https://api.typesafe.ai/docs
