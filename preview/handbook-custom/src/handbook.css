@@ -2471,6 +2471,7 @@ body {
 .atlas-node-row > button {
   width: 2.75rem;
   min-width: 2.75rem;
+  min-height: 2.75rem;
   align-self: center;
   color: var(--muted-foreground);
 }
