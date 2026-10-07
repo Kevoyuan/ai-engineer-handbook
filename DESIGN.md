@@ -120,7 +120,7 @@ A future IBM Plex Sans / IBM Plex Mono migration is acceptable only when the fon
 Article headings remain neutral. Do not create “AI-looking” display typography. Hierarchy should come from scale, weight, spacing, and system labels rather than ornamental type.
 
 ## Layout
-The product has four mental surfaces: **Atlas** for system orientation, **Reader** for deep learning, **Search** for immediate retrieval, and **Notebook** for returning to saved knowledge. Existing hash routes may continue to back these surfaces during migration.
+The product has four primary mental surfaces: **Atlas** for system orientation, **Reader** for deep learning, **Search** for immediate retrieval, and **Notebook** for returning to saved knowledge. **Concept** is a connective entity layer between Atlas and Reader rather than a fifth top-level destination. Existing hash routes may continue to back these surfaces during migration.
 
 The Atlas home begins with the system itself, not a marketing hero. Its dominant composition is a Knowledge Spine grouped into Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production. Chapters render as nodes on a trace, with descriptions and optional interactive-lab affordances. A secondary inspector may summarize architecture or counts, but it must remain flat and subordinate to the spine.
 
@@ -146,6 +146,8 @@ Technical diagrams retain native, trusted document markup as a compatibility var
 Reader orientation belongs in the existing shell rather than a reserved TOC column. Desktop topbar context may show chapter, current section, and rounded reading percentage with a two-pixel progress trace; mobile reduces this to the chapter context plus the progress trace. Focus mode must keep an always-reachable exit in the topbar.
 
 Search is a command surface, not a result-card gallery. Results remain flat, show chapter index and match language, identify the best deterministic match, and highlight literal match text with the accent token rather than a yellow marker.
+
+Concept pages are indexes, not essays. Use one large concept name, one concise source-grounded summary, one canonical entry, a flat source trail, and a narrow related-concepts rail. Do not wrap each source in a card. Concept summaries may restate canonical chapter claims but must not introduce technical claims that are absent from their linked sources.
 
 Keep the installed Better Design React components and assigned Iconoir icons. Theme semantic tokens instead of introducing per-component palettes. Search keeps its IME-safe keyboard contract while using deterministic relevance ranking and match-language snippets. Bookmarks and theme toggle retain their persistence behavior. The old category-filter toolbar is intentionally removed from Atlas; the system view always shows the full four-layer spine, while `#home/saved` is the Notebook surface.
 
