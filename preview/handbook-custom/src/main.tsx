@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Dialog,
   DialogContent,
@@ -47,11 +46,44 @@ import "./index.css";
 import "./handbook.css";
 import "./architecture.css";
 const groups = [
-  { zh: "模型基础", en: "Model foundations", range: [0, 1] },
-  { zh: "检索与 RAG", en: "Retrieval & RAG", range: [1, 5] },
-  { zh: "Agent 工程", en: "Agent engineering", range: [5, 8] },
-  { zh: "评估与生产", en: "Evaluation & production", range: [8, 10] },
+  {
+    id: "model",
+    label: "MODEL",
+    zh: "模型基础",
+    en: "Model foundations",
+    descriptionZh: "理解模型、API 与上下文的基本约束。",
+    descriptionEn: "Understand the constraints of models, APIs, and context.",
+    range: [0, 1],
+  },
+  {
+    id: "retrieval",
+    label: "RETRIEVAL",
+    zh: "检索与 RAG",
+    en: "Retrieval & RAG",
+    descriptionZh: "从检索路径进入可靠、可追溯的知识系统。",
+    descriptionEn: "Move from retrieval paths to reliable, traceable knowledge systems.",
+    range: [1, 5],
+  },
+  {
+    id: "agent",
+    label: "AGENT",
+    zh: "Agent 工程",
+    en: "Agent engineering",
+    descriptionZh: "组织工具、记忆与执行循环，让智能行为可控。",
+    descriptionEn: "Coordinate tools, memory, and execution loops into controlled behavior.",
+    range: [5, 8],
+  },
+  {
+    id: "production",
+    label: "PRODUCTION",
+    zh: "评估与生产",
+    en: "Evaluation & production",
+    descriptionZh: "用评估、观测与平台能力把系统送进生产。",
+    descriptionEn: "Move systems into production with evaluation, observability, and platform controls.",
+    range: [8, 10],
+  },
 ];
+const interactiveChapterNumbers = new Set(["03", "04", "06", "07", "08"]);
 const descriptions = [
   [
     "理解 Generation、Token、Context、Sampling、Embedding、Adaptation 与模型迁移。",
@@ -259,7 +291,7 @@ function App() {
             ? t("我的收藏", "Saved chapters")
             : t("手册目录", "Contents");
     document.title =
-      title + " · " + t("AI 工程手册", "AI Engineering Handbook");
+      title + " · " + t("AI 工程图谱", "AI Engineering Atlas");
     document.documentElement.classList.toggle(
       "focus-reading",
       focus && page === "reader",
@@ -329,8 +361,10 @@ function App() {
             <BookIcon />
           </span>
           <span>
-            {t("AI 工程手册", "AI Engineering")}
-            <span className="brand-en">Engineering Handbook</span>
+            {t("AI 工程图谱", "AI Engineering Atlas")}
+            <span className="brand-en">
+              {t("工程知识系统", "Engineering knowledge system")}
+            </span>
           </span>
         </a>
       </SidebarHeader>
@@ -343,7 +377,7 @@ function App() {
             }}
           >
             <BookIcon />
-            {t("手册目录", "Contents")}
+            {t("知识图谱", "Atlas")}
           </SidebarItem>
           <SidebarItem
             active={page === "home" && filter === "saved"}
@@ -352,7 +386,7 @@ function App() {
             }}
           >
             <BookmarkIcon />
-            {t("我的收藏", "Saved chapters")}
+            {t("笔记", "Notebook")}
             {saved.length > 0 && (
               <span className="ml-auto">{saved.length}</span>
             )}
@@ -378,7 +412,7 @@ function App() {
       </SidebarContent>
       <SidebarFooter>
         <a href="#map" className="preview-caption">
-          {t("知识地图", "Knowledge map")}
+          {t("系统架构", "System architecture")}
         </a>
       </SidebarFooter>
     </Sidebar>
@@ -432,9 +466,11 @@ function App() {
             </Button>
             <span>
               {page === "home"
-                ? t("手册目录", "Contents")
+                ? filter === "saved"
+                  ? t("笔记", "Notebook")
+                  : t("知识图谱", "Atlas")
                 : page === "map"
-                  ? t("知识地图", "Knowledge map")
+                  ? t("系统架构", "System architecture")
                   : chapters[chapterIndex]
                     ? en
                       ? chapters[chapterIndex].en
@@ -452,11 +488,11 @@ function App() {
             <Button
               variant="ghost"
               className="header-search"
-              aria-label={t("搜索手册", "Search handbook")}
+              aria-label={t("搜索知识系统", "Search the atlas")}
               onClick={() => search()}
             >
               <SearchIcon />
-              <span>{t("搜索手册", "Search handbook")}</span>
+              <span>{t("搜索图谱", "Search atlas")}</span>
               <kbd>⌘ K</kbd>
             </Button>
             <Button
@@ -494,221 +530,220 @@ function App() {
           </div>
         </header>
         {page === "home" ? (
-          <main id="content" className="directory" tabIndex={-1}>
-            <div className="intro">
-              <div className="intro-title">
-                <h1>
-                  {t("把知识串起来，", "Connect the concepts.")}
-                  <span>{t("把系统做扎实。", "Build reliable systems.")}</span>
-                </h1>
-                <p>
-                  {t(
-                    "从检索到 Agent，从原理到生产。一本随时翻开的 AI 工程手册。",
-                    "From retrieval to agents, from fundamentals to production. Your AI engineering reference.",
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="entry-search">
-              <div className="search-button">
-                <SearchIcon />
-                <button
-                  type="button"
-                  className="entry-search-trigger"
-                  onClick={() => search()}
-                  aria-label={t("搜索手册", "Search handbook")}
-                >
-                  <span>
+          filter === "saved" ? (
+            <main id="content" className="notebook-page" tabIndex={-1}>
+              <div className="notebook-shell">
+                <header className="notebook-header">
+                  <p className="atlas-eyebrow">NOTEBOOK / SAVED KNOWLEDGE</p>
+                  <h1>{t("笔记", "Notebook")}</h1>
+                  <p>
                     {t(
-                      "搜索概念、方法或工程问题…",
-                      "Search concepts, methods or engineering questions…",
+                      "把需要反复查阅的章节留在这里。第一阶段保留章节级收藏，后续再扩展到段落与概念。",
+                      "Keep the chapters you return to here. Phase one preserves chapter bookmarks; section and concept saves come next.",
                     )}
-                  </span>
-                </button>
-                <kbd>⌘ K</kbd>
-              </div>
-              <div className="popular">
-                <span>{t("常用", "Topics")}</span>
-                {["BM25", "RAG", "Agent", "Memory"].map((q) => (
-                  <Button
-                    variant="link"
-                    size="sm"
-                    key={q}
-                    onClick={() => search(q)}
-                  >
-                    {q}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <section
-              className="catalog"
-              aria-label={t("章节目录", "Chapter directory")}
-            >
-              <div className="catalog-toolbar">
-                <h2>
-                  {t("知识目录", "Chapters")}
-                  <span>09</span>
-                </h2>
-                <ToggleGroup
-                  className="chapter-filters"
-                  type="single"
-                  value={filter}
-                  onValueChange={(v) => {
-                    if (v) {
-                      setFilter(v);
-                      location.hash = "home/" + v;
-                    }
-                  }}
-                  aria-label={t("筛选章节", "Filter chapters")}
-                >
-                  <ToggleGroupItem value="all">
-                    {t("全部", "All")}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="0">
-                    {t("检索与 RAG", "Retrieval")}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="1">Agent</ToggleGroupItem>
-                  <ToggleGroupItem value="2">
-                    {t("生产", "Production")}
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="saved">
-                    {t("收藏", "Saved")}
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </div>
-              <div
-                className="catalog-scroll"
-                key={filter}
-                tabIndex={0}
-                role="region"
-                aria-label={t("章节列表", "Chapter list")}
-              >
-                {filter === "saved" && saved.length === 0 ? (
-                  <div className="empty">
+                  </p>
+                </header>
+                {saved.length === 0 ? (
+                  <div className="empty notebook-empty">
                     <BookmarkIcon />
-                    <h3>
-                      {t("把常查的章节留在这里", "Keep useful chapters here")}
-                    </h3>
+                    <h3>{t("还没有收藏", "Nothing saved yet")}</h3>
                     <p>
                       {t(
-                        "点击章节旁的收藏按钮，下次查阅更方便。",
-                        "Save a chapter using its bookmark button.",
+                        "在 Atlas 或 Reader 中收藏章节，它会出现在这里。",
+                        "Save a chapter from the Atlas or Reader and it will appear here.",
                       )}
                     </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setFilter("all");
-                        location.hash = "home/all";
-                      }}
-                    >
-                      {t("浏览全部章节", "Browse all chapters")}
+                    <Button asChild variant="outline">
+                      <a href="#home/all">{t("返回 Atlas", "Back to Atlas")}</a>
                     </Button>
                   </div>
                 ) : (
-                  groups.map((g, gi) => {
-                    const list = chapters
-                      .slice(...(g.range as [number, number]))
-                      .filter(
-                        (c) => filter !== "saved" || saved.includes(c.slug),
+                  <div className="notebook-groups">
+                    {groups.map((g) => {
+                      const list = chapters
+                        .slice(...(g.range as [number, number]))
+                        .filter((ch) => saved.includes(ch.slug));
+                      if (!list.length) return null;
+                      return (
+                        <section className="notebook-group" key={g.id}>
+                          <header>
+                            <span>{g.label}</span>
+                            <h2>{en ? g.en : g.zh}</h2>
+                          </header>
+                          <div>
+                            {list.map((ch) => {
+                              const i = chapters.indexOf(ch);
+                              return (
+                                <div className="notebook-row" key={ch.slug}>
+                                  <a href={chapterHref(i)}>
+                                    <span>{ch.number}</span>
+                                    <strong>{en ? ch.en : ch.zh}</strong>
+                                  </a>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="is-saved"
+                                    onClick={() => toggleSave(ch.slug)}
+                                    aria-label={t(
+                                      `取消收藏 ${ch.zh}`,
+                                      `Remove ${ch.en} from notebook`,
+                                    )}
+                                  >
+                                    <BookmarkIcon />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </section>
                       );
-                    if (
-                      (filter !== "all" &&
-                        filter !== "saved" &&
-                        filter !== String(gi)) ||
-                      !list.length
-                    )
-                      return null;
-                    return (
-                      <div className="chapter-group" key={g.en}>
-                        <div className="group-heading">
-                          <h3>{en ? g.en : g.zh}</h3>
-                          <span>
-                            {t(
-                              ["建立知识基础", "组织智能行为", "让系统可信赖"][
-                                gi
-                              ],
-                              [
-                                "Build the foundations",
-                                "Coordinate intelligent behavior",
-                                "Make systems dependable",
-                              ][gi],
-                            )}
-                          </span>
-                        </div>
-                        <div className="chapter-list">
-                          {list.map((ch) => {
-                            const i = chapters.indexOf(ch);
-                            return (
-                              <div className="chapter-row" key={ch.slug}>
-                                <a
-                                  className="chapter-link"
-                                  href={chapterHref(i)}
-                                >
-                                  <span className="chapter-number">
-                                    {ch.number}
-                                  </span>
-                                  <span className="chapter-copy">
-                                    <span className="chapter-title">
-                                      {en ? ch.en : ch.zh}
-                                    </span>
-                                    <span className="chapter-description">
-                                      {descriptions[i][en ? 1 : 0]}
-                                    </span>
-                                  </span>
-                                  <ArrowRightIcon className="chapter-arrow" />
-                                </a>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className={
-                                    saved.includes(ch.slug) ? "is-saved" : ""
-                                  }
-                                  aria-pressed={saved.includes(ch.slug)}
-                                  aria-label={
-                                    (saved.includes(ch.slug)
-                                      ? t("取消收藏：", "Unsave: ")
-                                      : t("收藏：", "Save: ")) +
-                                    (en ? ch.en : ch.zh)
-                                  }
-                                  onClick={() => toggleSave(ch.slug)}
-                                >
-                                  <BookmarkIcon />
-                                </Button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })
+                    })}
+                  </div>
                 )}
               </div>
-            </section>
-            <section className="reference">
-              <div>
-                <h2>
-                  {t(
-                    "先看全貌，再深入细节",
-                    "See the system, then the details",
-                  )}
-                </h2>
-                <p>
-                  {t(
-                    "通过系统总框架和 Agent 参考架构，理解知识之间的关系。",
-                    "Explore the system framework and agent reference architecture.",
-                  )}
-                </p>
+            </main>
+          ) : (
+            <main id="content" className="atlas-page" tabIndex={-1}>
+              <div className="atlas-shell">
+                <header className="atlas-intro">
+                  <p className="atlas-eyebrow">AI ENGINEERING / SYSTEM MAP</p>
+                  <h1>
+                    {t(
+                      "把 AI 工程当作一个系统来理解。",
+                      "Understand AI engineering as a system.",
+                    )}
+                  </h1>
+                  <p className="atlas-lede">
+                    {t(
+                      "不是按顺序翻完十章，而是看清模型、检索、Agent 与生产系统之间为什么会连在一起。",
+                      "Do not just read ten chapters in order. See why models, retrieval, agents, and production systems connect.",
+                    )}
+                  </p>
+                  <div className="atlas-search">
+                    <div className="search-button">
+                      <SearchIcon />
+                      <button
+                        type="button"
+                        className="entry-search-trigger"
+                        onClick={() => search()}
+                        aria-label={t("搜索知识系统", "Search the atlas")}
+                      >
+                        <span>
+                          {t(
+                            "搜索概念、方法或工程问题…",
+                            "Search concepts, methods, or engineering questions…",
+                          )}
+                        </span>
+                      </button>
+                      <kbd>⌘ K</kbd>
+                    </div>
+                    <div className="popular">
+                      <span>{t("快速定位", "Quick find")}</span>
+                      {["BM25", "RAG", "Agent", "Memory"].map((q) => (
+                        <Button
+                          variant="link"
+                          size="sm"
+                          key={q}
+                          onClick={() => search(q)}
+                        >
+                          {q}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="atlas-meta" aria-label={t("图谱概览", "Atlas overview")}>
+                    <span><strong>{chapters.length}</strong>{t(" 章", " chapters")}</span>
+                    <span><strong>{groups.length}</strong>{t(" 个系统层", " system layers")}</span>
+                    <span><strong>{interactiveChapterNumbers.size}</strong>{t(" 个交互实验", " interactive labs")}</span>
+                  </div>
+                </header>
+
+                <div className="atlas-layout">
+                  <section
+                    className="atlas-spine"
+                    aria-label={t("AI 工程知识主干", "AI engineering knowledge spine")}
+                  >
+                    {groups.map((g, gi) => (
+                      <section className="atlas-group" key={g.id}>
+                        <header className="atlas-group-heading">
+                          <span className="atlas-group-index">
+                            {String(gi + 1).padStart(2, "0")} / {g.label}
+                          </span>
+                          <h2>{en ? g.en : g.zh}</h2>
+                          <p>{en ? g.descriptionEn : g.descriptionZh}</p>
+                        </header>
+                        <div className="atlas-nodes">
+                          {chapters
+                            .slice(...(g.range as [number, number]))
+                            .map((ch) => {
+                              const i = chapters.indexOf(ch);
+                              const interactive = interactiveChapterNumbers.has(ch.number);
+                              return (
+                                <div className="atlas-node-row" key={ch.slug}>
+                                  <a className="atlas-node" href={chapterHref(i)}>
+                                    <span className="atlas-node-marker" aria-hidden="true" />
+                                    <span className="atlas-node-number">{ch.number}</span>
+                                    <span className="atlas-node-copy">
+                                      <strong>{en ? ch.en : ch.zh}</strong>
+                                      <span>{descriptions[i][en ? 1 : 0]}</span>
+                                      {interactive && (
+                                        <span className="atlas-node-lab">
+                                          ↳ {t("交互图解", "Interactive lab")}
+                                        </span>
+                                      )}
+                                    </span>
+                                    <ArrowRightIcon />
+                                  </a>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={saved.includes(ch.slug) ? "is-saved" : ""}
+                                    onClick={() => toggleSave(ch.slug)}
+                                    aria-label={
+                                      saved.includes(ch.slug)
+                                        ? t(`取消收藏 ${ch.zh}`, `Remove ${ch.en} from notebook`)
+                                        : t(`收藏 ${ch.zh}`, `Save ${ch.en} to notebook`)
+                                    }
+                                  >
+                                    <BookmarkIcon />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </section>
+                    ))}
+                  </section>
+
+                  <aside className="atlas-inspector">
+                    <div className="atlas-inspector-block">
+                      <span className="atlas-eyebrow">SYSTEM / 00</span>
+                      <h2>{t("先看系统，再看章节", "See the system before the chapters")}</h2>
+                      <p>
+                        {t(
+                          "架构总览把执行核心、控制面、反馈环和平台基础放在同一张图里。",
+                          "The architecture overview connects the execution core, control plane, feedback loop, and platform foundation.",
+                        )}
+                      </p>
+                      <a href="#map" className="atlas-text-link">
+                        {t("打开系统架构", "Open system architecture")}
+                        <ArrowRightIcon />
+                      </a>
+                    </div>
+                    <div className="atlas-inspector-block">
+                      <span className="atlas-eyebrow">READ / TRACE / RETURN</span>
+                      <p>
+                        {t(
+                          "Atlas 负责定位关系，Reader 负责深读，Search 负责即时查证，Notebook 负责回来复习。",
+                          "Atlas reveals relationships, Reader supports depth, Search retrieves evidence, and Notebook keeps what you return to.",
+                        )}
+                      </p>
+                    </div>
+                  </aside>
+                </div>
               </div>
-              <Button asChild variant="outline">
-                <a href="#map">
-                  {t("打开架构总览", "Open architecture overview")}
-                  <ArrowRightIcon />
-                </a>
-              </Button>
-            </section>
-          </main>
+            </main>
+          )
         ) : page === "map" ? (
           <Architecture en={en} />
         ) : chapterIndex < 0 ? (
@@ -741,7 +776,7 @@ function App() {
           closeLabel={t("关闭", "Close")}
           className="search-dialog"
         >
-          <DialogTitle>{t("搜索手册", "Search the handbook")}</DialogTitle>
+          <DialogTitle>{t("搜索知识系统", "Search the atlas")}</DialogTitle>
           <DialogDescription>
             {t(
               "查找全部章节与图解，直接跳到相关段落。",
