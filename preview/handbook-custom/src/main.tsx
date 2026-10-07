@@ -286,10 +286,10 @@ function App() {
             : chapters[chapterIndex].zh
           : t("找不到章节", "Chapter not found")
         : page === "map"
-          ? t("知识地图", "Knowledge map")
+          ? t("系统架构", "System architecture")
           : filter === "saved"
-            ? t("我的收藏", "Saved chapters")
-            : t("手册目录", "Contents");
+            ? t("笔记", "Notebook")
+            : t("知识图谱", "Atlas");
     document.title =
       title + " · " + t("AI 工程图谱", "AI Engineering Atlas");
     document.documentElement.classList.toggle(
@@ -538,8 +538,8 @@ function App() {
                   <h1>{t("笔记", "Notebook")}</h1>
                   <p>
                     {t(
-                      "把需要反复查阅的章节留在这里。第一阶段保留章节级收藏，后续再扩展到段落与概念。",
-                      "Keep the chapters you return to here. Phase one preserves chapter bookmarks; section and concept saves come next.",
+                      "把需要反复查阅的章节留在这里。目前收藏以章节为单位。",
+                      "Keep the chapters you return to here. Saved items are currently chapter-level.",
                     )}
                   </p>
                 </header>
