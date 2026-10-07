@@ -3248,3 +3248,42 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Reader shell hierarchy: the top bar tracks the active section; the chapter title belongs only to the page heading. */
+.top-reader-mode {
+  color: var(--muted-foreground);
+  font: 0.6875rem/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.top-reader-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  max-width: 38rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+
+.top-section-mark {
+  flex: 0 0 auto;
+  color: var(--primary);
+  font: 0.75rem/1 var(--font-mono);
+}
+
+@media (max-width: 1000px) {
+  .top-reader-section {
+    max-width: 24rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .top-reader-section {
+    max-width: 8.5rem;
+  }
+}
