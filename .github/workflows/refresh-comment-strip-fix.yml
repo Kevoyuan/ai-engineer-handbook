@@ -1,0 +1,62 @@
+name: Refresh content after comment-strip fix
+
+on:
+  push:
+    branches:
+      - fix/strip-internal-content-comments
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/strip-internal-content-comments
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install content-sync dependencies
+        working-directory: preview/handbook-custom
+        run: |
+          python -m pip install -r scripts/requirements.txt
+          npm install --no-audit --no-fund
+
+      - name: Regenerate canonical preview content
+        working-directory: preview/handbook-custom
+        run: npm run sync-content
+
+      - name: Verify leaked chapter markers are absent
+        shell: bash
+        run: |
+          if grep -R -n -E '={5,}[[:space:]]*CH[0-9]+[[:space:]]*={5,}' preview/handbook-custom/public/content/*.json; then
+            echo "Internal chapter marker leaked into generated content"
+            exit 1
+          fi
+
+      - name: Publish React artifact
+        working-directory: preview/handbook-custom
+        run: npm run publish:web
+
+      - name: Commit generated artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Generated artifacts are already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add preview/handbook-custom/public/content                   preview/handbook-custom/src/chapters.json                   preview/handbook-custom/src/search-index.json                   preview/handbook-custom/evidence/content-manifest.json                   web/site
+          git commit -m "build: regenerate handbook content without internal comments"
+          git push origin HEAD:fix/strip-internal-content-comments
