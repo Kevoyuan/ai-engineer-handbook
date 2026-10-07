@@ -1,44 +1,44 @@
 ---
-name: AI Engineer Handbook
-description: A knowledge manual for focused learning and quick reference
-last_updated: "2026-10-04"
+name: AI Engineering Atlas
+description: An engineering knowledge atlas for exploring systems, learning deeply, and returning to evidence
+last_updated: "2026-10-07"
 status: "active"
 colors:
-  primary: "#285a47"
-  light-background: "#f4f6f4"
-  light-foreground: "#25352f"
-  light-card: "#fdfefd"
-  light-primary: "#285a47"
+  primary: "#2f6850"
+  light-background: "#f4f6f3"
+  light-foreground: "#18211d"
+  light-card: "#fcfdfc"
+  light-primary: "#2f6850"
   light-primary-foreground: "#f7faf8"
-  light-secondary: "#e9eeea"
-  light-secondary-foreground: "#354c40"
-  light-muted: "#edf1ed"
-  light-muted-foreground: "#59645c"
-  light-accent: "#e5eee7"
-  light-accent-foreground: "#285a47"
-  light-border: "#dce3dd"
+  light-secondary: "#e3e9e5"
+  light-secondary-foreground: "#25332c"
+  light-muted: "#eef2ef"
+  light-muted-foreground: "#68736d"
+  light-accent: "#dde9e2"
+  light-accent-foreground: "#25332c"
+  light-border: "#d7dfda"
   light-input: "#f8faf8"
-  light-ring: "#367657"
+  light-ring: "#2f6850"
   light-ring-inverted: "#98c7ac"
-  dark-background: "#171a1c"
-  dark-foreground: "#e4e7e5"
-  dark-card: "#202427"
-  dark-popover: "#2b3034"
+  dark-background: "#141718"
+  dark-foreground: "#e7ebe8"
+  dark-card: "#1b1f20"
+  dark-popover: "#222728"
   dark-success: "#a9c5b5"
   dark-warning: "#d9ba86"
   dark-destructive: "#e1a19b"
   dark-destructive-foreground: "#291b1a"
-  dark-primary: "#b3cabb"
+  dark-primary: "#b8d0c0"
   dark-primary-foreground: "#19241e"
-  dark-secondary: "#2b3135"
+  dark-secondary: "#262c2a"
   dark-secondary-foreground: "#e0e4e2"
-  dark-muted: "#272d30"
-  dark-muted-foreground: "#adb5b8"
-  dark-accent: "#303937"
+  dark-muted: "#222725"
+  dark-muted-foreground: "#a8b0ac"
+  dark-accent: "#2a3430"
   dark-accent-foreground: "#c6d9cd"
-  dark-border: "#373f43"
-  dark-input: "#1b2023"
-  dark-ring: "#b3cabb"
+  dark-border: "#333a37"
+  dark-input: "#181c1d"
+  dark-ring: "#b8d0c0"
   dark-ring-inverted: "#7ba78e"
 typography:
   body:
@@ -86,15 +86,25 @@ spacing:
   xl: "2rem"
 ---
 
-# AI Engineer Handbook Design System
+# AI Engineering Atlas Design System
 
 ## Overview
-This is the active design contract for the production knowledge manual and its preview. Help readers find a topic, understand it, and return to useful passages. Runtime tokens live in `preview/handbook-custom/src/handbook.css`; the published build lives in `web/site`. This contract replaces the earlier blue/orange reader design.
+This is the active visual contract for the AI Engineering Atlas. The product is no longer framed as a conventional online handbook. It is an engineering knowledge instrument: readers should be able to see the system, locate a concept, understand its dependencies, inspect evidence, and then enter deep reading without losing orientation.
 
-Apply targeted evolution rather than a new visual direction. Design variance 5, motion intensity 4 and visual density 5 describe the current concept-teaching enhancement. Preserve routes, anchors, technical content, bilingual labels and established diagram topology.
+The visual North Star is **engineering workbench × technical manual × system topology**. The memorable signature is the Knowledge Spine: a visible trace from Model → Retrieval → Agent → Production that reappears as chapter nodes, section traces, and diagram connections. Everything around that signature stays restrained.
+
+Avoid generic documentation-site patterns, SaaS dashboard cards, glassmorphism, gradient hero sections, decorative analytics, and scroll-reveal marketing motion. Dense technical content is the product. Visual structure must reveal relationships rather than decorate them.
+
+Runtime tokens live in `preview/handbook-custom/src/handbook.css`; the published build lives in `web/site`. Routes, deep section anchors, bilingual content, technical meaning, diagrams, search, bookmarks, and accessibility behavior remain durable product contracts unless explicitly revised together with `UX-CONTRACT.md`.
+
+The redesign is phased. Phase 1 establishes the Atlas home, shell language, palette, and navigation vocabulary while retaining the proven Reader behavior. Reader, Search, and Notebook then adopt the same system vocabulary incrementally rather than through a big-bang rewrite.
 
 ## Colors
-Dark mode uses neutral charcoal surfaces, gray-white headings and body text, and gray secondary text. Use green sparingly for the brand mark, selected controls, links and focus. Never tint reading backgrounds, chapter headings, diagrams or borders green by default. The light palette keeps its established identity; secondary text is slightly darker to maintain AA contrast on secondary surfaces. Semantic aliases in the stylesheet govern components.
+Light mode uses a pale mineral canvas (`#f4f6f3`), near-white reading surfaces (`#fcfdfc`), dark green-black ink (`#18211d`), and restrained gray-green secondary text. The primary `#2f6850` is a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state.
+
+Dark mode is a laboratory graphite system: canvas `#141718`, reading surface `#1b1f20`, raised/popover surface `#222728`, gray-white text, and muted sage signals. Never tint an entire reading surface green. Borders stay neutral; diagrams communicate hierarchy with structure and labels before color.
+
+Semantic colors are allowed when they encode engineering meaning such as evidence, warnings, failures, or destructive actions, but they must not become decorative category colors. Meaning can never depend on color alone.
 
 ## Whole-site dark refinement
 
@@ -103,20 +113,28 @@ The 2026-10-04 user correction applies to the whole website, including directory
 Gain: clearer reading and consistent surface hierarchy across routes. Cost: lighter charcoal surfaces reduce the former deep-black appearance. Light-theme tokens and content are preserved. The terminal has a named dark variant that follows the same graphite material with a quiet peach primary action. Pretext prepare/layout reserve simulator explanation heights after fonts load; native wrapping stays visible and widths are remeasured on resize. No new permission or billing behavior is introduced.
 
 ## Typography
-Use Geist Variable with Chinese system fallbacks for prose, Geist Mono Variable for code. Preserve the existing readable article measure and heading hierarchy. Noninteractive headings stay neutral in dark mode.
+Use Geist Variable with Chinese system fallbacks for the current production implementation and Geist Mono Variable for code, metadata, chapter indices, system labels, and diagram annotations. The Atlas redesign deliberately increases the role of mono typography for structural metadata such as `03 / RETRIEVAL`, but prose remains sans-serif and calm.
+
+A future IBM Plex Sans / IBM Plex Mono migration is acceptable only when the fonts are bundled locally and the runtime tokens, dependency manifest, and this file change together. Do not load remote web fonts just to match a mockup.
+
+Article headings remain neutral. Do not create “AI-looking” display typography. Hierarchy should come from scale, weight, spacing, and system labels rather than ornamental type.
 
 ## Layout
-Desktop chapter navigation can collapse to give the reader more space; preserve the user's choice. On mobile, use a compact navigation dialog and let the toolbar scroll with the content. The page table of contents opens on demand in a dialog, never in a permanently reserved right column. Keep the GitHub link in the upper-right toolbar.
+The product has four mental surfaces: **Atlas** for system orientation, **Reader** for deep learning, **Search** for immediate retrieval, and **Notebook** for returning to saved knowledge. Existing hash routes may continue to back these surfaces during migration.
 
-Previous/next navigation belongs at the end of the chapter in normal flow. Do not add fixed bottom bars, persistent mobile directory/filter bars or reading-position restoration. Font size, theme, language, bookmarks and sidebar preferences remain local. Scrollbars stay quiet and reveal on hover, focus or scrolling while retaining normal scrolling behavior.
+The Atlas home begins with the system itself, not a marketing hero. Its dominant composition is a Knowledge Spine grouped into Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production. Chapters render as nodes on a trace, with descriptions and optional interactive-lab affordances. A secondary inspector may summarize architecture or counts, but it must remain flat and subordinate to the spine.
 
-Wide tables and code scroll inside their own containers. Table cells use a 128px minimum width and normal word wrapping so identifiers are not split into fragments. Avoid page-level horizontal overflow. Check desktop, tablet and phone layouts; principal review widths are 390, 768, 1440 and 1728px.
+Desktop chapter navigation may collapse. Mobile uses an overlay navigation dialog. The Reader must never gain a permanent right-column table of contents; on-page navigation opens on demand. Long-form content owns a single clear scroll context per viewport mode.
+
+Previous/next navigation remains at the end of chapters in normal flow. Do not add fixed bottom bars, persistent mobile control bars, scroll hijacking, or decorative parallax. Wide tables and code scroll internally. Review widths remain 390, 768, 1440, and 1728px.
 
 ## Elevation & Depth
-Distinguish surfaces through neutral tones and thin borders. Reserve the large dark shadow for the search dialog. Keep chapter rows flat.
+The default surface is flat. Use background tone, whitespace, thin rules, topology lines, and alignment before shadows. Chapter nodes and Atlas groups are not cards. Reserve meaningful elevation for transient UI such as Search, dialogs, popovers, and menus. Large soft shadows are never used merely to make static content feel “premium.”
 
 ## Shapes
-Use the existing 0.625rem base radius for controls, inputs and diagram nodes. Architecture panels use 0.75rem; concept-teaching panels use 1rem. Keep these documented variants rather than inventing radii per component. Spacing uses 4/8/12/16/24/32/40/48/64/96/128px tokens.
+Controls and topology nodes use restrained radii. The base radius remains `0.625rem`, architecture panels `0.75rem`, and concept-teaching panels `1rem`. Static content should not become a field of rounded rectangles.
+
+The Knowledge Spine uses circles, fine connector rules, chapter indices, and aligned text rather than decorative badges. Avoid pill-shaped labels except where a true compact control or status requires them. Spacing continues to use the established 4/8/12/16/24/32/40/48/64/96/128px rhythm.
 
 ## Components
 The complete edition covers the directory, the system framework and Agent reference architecture, every chapter and registered supplement, section search, bookmarks, and local reading preferences. Desktop uses one bounded content scroller per route. On phones, the toolbar and route content scroll together. The architecture overview preserves the original execution core, domain connections, control plane, feedback loop and platform foundation; module links open the corresponding chapters. Wide comparison tables and code own their horizontal scrolling.
