@@ -95,6 +95,7 @@ function highlightSearchMatch(text: string, query: string) {
 }
 import { Reader, chapterHref, currentChapter, type ReadingContext } from "./reader";
 import { Architecture } from "./architecture";
+import { concepts, conceptBySlug } from "./concepts";
 import "./content-base.css";
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
@@ -218,9 +219,11 @@ function App() {
   const [page, setPage] = useState(() =>
     location.hash.startsWith("#read")
       ? "reader"
-      : location.hash === "#map"
-        ? "map"
-        : "home",
+      : location.hash.startsWith("#concept/")
+        ? "concept"
+        : location.hash === "#map"
+          ? "map"
+          : "home",
   );
   const [chapterIndex, setChapterIndex] = useState(currentChapter);
   useEffect(() => {
@@ -316,9 +319,11 @@ function App() {
       setPage(
         location.hash.startsWith("#read")
           ? "reader"
-          : location.hash === "#map"
-            ? "map"
-            : "home",
+          : location.hash.startsWith("#concept/")
+            ? "concept"
+            : location.hash === "#map"
+              ? "map"
+              : "home",
       );
       setChapterIndex(currentChapter());
       if (location.hash.startsWith("#home"))
@@ -349,6 +354,8 @@ function App() {
     location.hash = chapterHref(i);
     setMenu(false);
   };
+  const activeConcept =
+    page === "concept" ? conceptBySlug(location.hash.split("/")[1] || "") : undefined;
   useEffect(() => {
     const title =
       page === "reader"
@@ -357,18 +364,24 @@ function App() {
             ? chapters[chapterIndex].en
             : chapters[chapterIndex].zh
           : t("找不到章节", "Chapter not found")
-        : page === "map"
-          ? t("系统架构", "System architecture")
-          : filter === "saved"
-            ? t("笔记", "Notebook")
-            : t("知识图谱", "Atlas");
+        : page === "concept"
+          ? activeConcept
+            ? en
+              ? activeConcept.name
+              : activeConcept.zh
+            : t("找不到概念", "Concept not found")
+          : page === "map"
+            ? t("系统架构", "System architecture")
+            : filter === "saved"
+              ? t("笔记", "Notebook")
+              : t("知识图谱", "Atlas");
     document.title =
       title + " · " + t("AI 工程图谱", "AI Engineering Atlas");
     document.documentElement.classList.toggle(
       "focus-reading",
       focus && page === "reader",
     );
-  }, [page, chapterIndex, en, filter, focus]);
+  }, [page, chapterIndex, en, filter, focus, activeConcept]);
   const toggleSave = (slug: string) => {
     const next = saved.includes(slug)
       ? saved.filter((x) => x !== slug)
@@ -561,9 +574,15 @@ function App() {
                   ? filter === "saved"
                     ? t("笔记", "Notebook")
                     : t("知识图谱", "Atlas")
-                  : page === "map"
-                    ? t("系统架构", "System architecture")
-                    : t("找不到章节", "Chapter not found")}
+                  : page === "concept"
+                    ? activeConcept
+                      ? en
+                        ? activeConcept.name
+                        : activeConcept.zh
+                      : t("找不到概念", "Concept not found")
+                    : page === "map"
+                      ? t("系统架构", "System architecture")
+                      : t("找不到章节", "Chapter not found")}
               </span>
             )}
           </div>
@@ -829,6 +848,17 @@ function App() {
                       </a>
                     </div>
                     <div className="atlas-inspector-block">
+                      <span className="atlas-eyebrow">CONCEPT / INDEX</span>
+                      <div className="atlas-concept-index">
+                        {concepts.map((concept) => (
+                          <a href={"#concept/" + concept.slug} key={concept.slug}>
+                            <span>{concept.group}</span>
+                            <strong>{en ? concept.name : concept.zh}</strong>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="atlas-inspector-block">
                       <span className="atlas-eyebrow">READ / TRACE / RETURN</span>
                       <p>
                         {t(
@@ -840,6 +870,96 @@ function App() {
                   </aside>
                 </div>
               </div>
+            </main>
+          )
+        ) : page === "concept" ? (
+          activeConcept ? (
+            <main id="content" className="concept-page" tabIndex={-1}>
+              <div className="concept-shell">
+                <a className="concept-back" href="#home/all">
+                  <span aria-hidden="true">←</span>
+                  {t("返回 Atlas", "Back to Atlas")}
+                </a>
+                <header className="concept-header">
+                  <div>
+                    <p className="atlas-eyebrow">
+                      CONCEPT / {activeConcept.group}
+                    </p>
+                    <h1>{en ? activeConcept.name : activeConcept.zh}</h1>
+                    <p className="concept-name-secondary">
+                      {en ? activeConcept.zh : activeConcept.name}
+                    </p>
+                  </div>
+                  <p className="concept-summary">
+                    {en ? activeConcept.summaryEn : activeConcept.summaryZh}
+                  </p>
+                </header>
+
+                <section className="concept-primary">
+                  <span className="atlas-eyebrow">
+                    {t("核心入口", "PRIMARY SOURCE")}
+                  </span>
+                  <a href={activeConcept.primaryHref}>
+                    <span className="concept-primary-mark" aria-hidden="true" />
+                    <span>
+                      <strong>{t("进入核心章节", "Open canonical section")}</strong>
+                      <span>{activeConcept.primaryHref.replace("#read/", "")}</span>
+                    </span>
+                    <ArrowRightIcon />
+                  </a>
+                </section>
+
+                <div className="concept-grid">
+                  <section className="concept-sources">
+                    <header>
+                      <span className="atlas-eyebrow">
+                        {t("知识出现在哪里", "SOURCE TRAIL")}
+                      </span>
+                      <h2>{t("跨章节来源", "Across the handbook")}</h2>
+                    </header>
+                    <div>
+                      {activeConcept.sources.map((source, index) => (
+                        <a href={source.href} key={source.href}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <strong>{en ? source.labelEn : source.labelZh}</strong>
+                          <ArrowRightIcon />
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+
+                  <aside className="concept-related">
+                    <span className="atlas-eyebrow">
+                      {t("关联概念", "RELATED CONCEPTS")}
+                    </span>
+                    <div>
+                      {activeConcept.related.map((slug) => {
+                        const related = conceptBySlug(slug);
+                        if (!related) return null;
+                        return (
+                          <a href={"#concept/" + related.slug} key={related.slug}>
+                            <span>{related.group}</span>
+                            <strong>{en ? related.name : related.zh}</strong>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </aside>
+                </div>
+              </div>
+            </main>
+          ) : (
+            <main id="content" className="empty">
+              <h1>{t("找不到概念", "Concept not found")}</h1>
+              <p>
+                {t(
+                  "这个概念还没有进入 Atlas 索引。",
+                  "This concept is not in the Atlas index yet.",
+                )}
+              </p>
+              <Button asChild>
+                <a href="#home/all">{t("返回 Atlas", "Back to Atlas")}</a>
+              </Button>
             </main>
           )
         ) : page === "map" ? (
@@ -1008,15 +1128,16 @@ function App() {
                 </div>
               )
             ) : (
-              <div className="suggestions">
-                <p>{t("按主题查阅", "Explore a topic")}</p>
-                {terms.map((term) => (
-                  <Button
-                    variant="outline"
-                    key={term}
-                    onClick={() => setQuery(term)}
-                  >
-                    {term}
+              <div className="suggestions command-concepts">
+                <p>{t("按概念进入", "Explore a concept")}</p>
+                {concepts.map((concept) => (
+                  <Button asChild variant="outline" key={concept.slug}>
+                    <a
+                      href={"#concept/" + concept.slug}
+                      onClick={() => setSearchOpen(false)}
+                    >
+                      {en ? concept.name : concept.zh}
+                    </a>
                   </Button>
                 ))}
               </div>
