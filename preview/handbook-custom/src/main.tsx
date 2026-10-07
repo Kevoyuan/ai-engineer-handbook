@@ -37,7 +37,7 @@ type SearchEntry = {
   textEn: string;
   href: string;
 };
-import { Reader, chapterHref, currentChapter } from "./reader";
+import { Reader, chapterHref, currentChapter, type ReadingContext } from "./reader";
 import { Architecture } from "./architecture";
 import "./content-base.css";
 import "@fontsource-variable/geist";
@@ -172,6 +172,22 @@ function App() {
       document.querySelector(".workspace")?.scrollTo({ top: 0 });
   }, [page, chapterIndex]);
   const [focus, setFocus] = useState(false);
+  const [readingContext, setReadingContext] = useState<ReadingContext>({
+    sectionId: "",
+    sectionTitle: "",
+    progress: 0,
+    sectionIndex: 0,
+    sectionCount: 0,
+  });
+  useEffect(() => {
+    setReadingContext({
+      sectionId: "",
+      sectionTitle: "",
+      progress: 0,
+      sectionIndex: 0,
+      sectionCount: 0,
+    });
+  }, [chapterIndex, en]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() =>
     read("handbook-sidebar-collapsed", false),
   );
@@ -464,27 +480,47 @@ function App() {
             >
               <MenuIcon />
             </Button>
-            <span>
-              {page === "home"
-                ? filter === "saved"
-                  ? t("笔记", "Notebook")
-                  : t("知识图谱", "Atlas")
-                : page === "map"
-                  ? t("系统架构", "System architecture")
-                  : chapters[chapterIndex]
-                    ? en
-                      ? chapters[chapterIndex].en
-                      : chapters[chapterIndex].zh
-                    : t("找不到章节", "Chapter not found")}
-            </span>
-            {page === "reader" && (
+            {page === "reader" && chapters[chapterIndex] ? (
               <>
-                <span className="crumb-slash">/</span>
-                <span>{chapters[chapterIndex]?.number}</span>
+                <span className="top-reader-chapter">
+                  {chapters[chapterIndex].number} ·{" "}
+                  {en ? chapters[chapterIndex].en : chapters[chapterIndex].zh}
+                </span>
+                {readingContext.sectionTitle && (
+                  <>
+                    <span className="crumb-slash">/</span>
+                    <span className="top-reader-section">
+                      {readingContext.sectionTitle}
+                    </span>
+                  </>
+                )}
+                <span className="top-reading-percent">
+                  {readingContext.progress}%
+                </span>
               </>
+            ) : (
+              <span>
+                {page === "home"
+                  ? filter === "saved"
+                    ? t("笔记", "Notebook")
+                    : t("知识图谱", "Atlas")
+                  : page === "map"
+                    ? t("系统架构", "System architecture")
+                    : t("找不到章节", "Chapter not found")}
+              </span>
             )}
           </div>
           <div className="top-actions">
+            {page === "reader" && focus && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="top-focus-exit"
+                onClick={() => setFocus(false)}
+              >
+                {t("退出专注", "Exit focus")}
+              </Button>
+            )}
             <Button
               variant="ghost"
               className="header-search"
@@ -528,6 +564,11 @@ function App() {
               </a>
             </Button>
           </div>
+          {page === "reader" && (
+            <div className="reading-progress-line" aria-hidden="true">
+              <span style={{ width: readingContext.progress + "%" }} />
+            </div>
+          )}
         </header>
         {page === "home" ? (
           filter === "saved" ? (
@@ -768,6 +809,7 @@ function App() {
             toggle={() => toggleSave(chapters[chapterIndex].slug)}
             focus={focus}
             setFocus={setFocus}
+            onReadingContext={setReadingContext}
           />
         )}
       </div>
