@@ -2983,3 +2983,268 @@ body {
     display: none;
   }
 }
+
+
+/* Concept Layer: source-grounded entities connect chapters without becoming a second handbook. */
+.atlas-concept-index {
+  display: grid;
+  margin-top: 0.75rem;
+}
+
+.atlas-concept-index a,
+.concept-related a {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+
+.atlas-concept-index a:last-child,
+.concept-related a:last-child {
+  border-bottom: 0;
+}
+
+.atlas-concept-index a span,
+.concept-related a span {
+  color: var(--muted-foreground);
+  font: 0.625rem/1.4 var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.atlas-concept-index a strong,
+.concept-related a strong {
+  font-size: 0.75rem;
+  font-weight: 540;
+}
+
+.atlas-concept-index a:hover strong,
+.atlas-concept-index a:focus-visible strong,
+.concept-related a:hover strong,
+.concept-related a:focus-visible strong {
+  color: var(--primary);
+}
+
+.concept-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--background);
+  scrollbar-gutter: stable;
+}
+
+.concept-shell {
+  width: min(100%, 1060px);
+  margin: 0 auto;
+  padding: 3rem 4rem 5rem;
+}
+
+.concept-back {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.concept-back:hover,
+.concept-back:focus-visible {
+  color: var(--primary);
+}
+
+.concept-header {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 1.1fr);
+  gap: 4rem;
+  align-items: end;
+  padding: 4rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.concept-header h1 {
+  margin-top: 0.75rem;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+  font-weight: 590;
+}
+
+.concept-name-secondary {
+  margin-top: 0.75rem;
+  color: var(--muted-foreground);
+  font: 0.75rem/1.5 var(--font-mono);
+}
+
+.concept-summary {
+  max-width: 38rem;
+  color: var(--foreground);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.concept-primary {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 2rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.concept-primary > a {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr) 1rem;
+  gap: 0.875rem;
+  align-items: start;
+}
+
+.concept-primary-mark {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: 0.28rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.concept-primary > a > span:nth-child(2) {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.concept-primary strong {
+  font-size: 0.875rem;
+  font-weight: 570;
+}
+
+.concept-primary a span span {
+  color: var(--muted-foreground);
+  font: 0.6875rem/1.5 var(--font-mono);
+}
+
+.concept-primary svg,
+.concept-sources svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.concept-primary a:hover strong,
+.concept-primary a:focus-visible strong,
+.concept-sources a:hover strong,
+.concept-sources a:focus-visible strong {
+  color: var(--primary);
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15rem;
+  gap: 4rem;
+  padding-top: 2.5rem;
+}
+
+.concept-sources header h2 {
+  margin-top: 0.55rem;
+  font-size: 1rem;
+  font-weight: 570;
+}
+
+.concept-sources > div {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.concept-sources a {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) 1rem;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.concept-sources a > span {
+  color: var(--muted-foreground);
+  font: 0.6875rem/1.5 var(--font-mono);
+}
+
+.concept-sources strong {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  font-weight: 540;
+}
+
+.concept-related {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--border);
+}
+
+.concept-related > div {
+  margin-top: 0.75rem;
+}
+
+.command-concepts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.command-concepts > p {
+  grid-column: 1 / -1;
+}
+
+.command-concepts a {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+@media (max-width: 900px) {
+  .concept-shell {
+    padding-inline: 2rem;
+  }
+
+  .concept-header {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .concept-summary {
+    max-width: 46rem;
+  }
+
+  .concept-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .concept-related {
+    padding: 1.5rem 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 767px) {
+  .concept-page {
+    overflow: visible;
+  }
+
+  .concept-shell {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .concept-header {
+    padding: 2.5rem 0 2rem;
+  }
+
+  .concept-header h1 {
+    font-size: clamp(2.75rem, 15vw, 4rem);
+  }
+
+  .concept-primary {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .command-concepts {
+    grid-template-columns: 1fr;
+  }
+}
