@@ -15,7 +15,7 @@ Date, select/listbox and table selection are not used by the rendered product. U
 
 ## Navigation and route document title policy
 
-`#home` and `#home/all` own the Atlas system view; `#home/saved` owns Notebook. Legacy `#home/{group-index}` links may resolve to the Atlas rather than preserving the old filter UI. `#map` owns the system and Agent reference architecture diagrams; `#read/{chapter-slug}/{section-id}` owns reading destinations. `#read` remains a compatibility route for chapter 02. The native browser Back button restores destinations. Titles follow the active Chinese/English locale and name Atlas, Notebook, System architecture, or the current chapter.
+`#home` and `#home/all` own the Atlas system view; `#home/saved` owns Notebook; `#concept/{concept-slug}` owns a shareable Concept entity view. Legacy `#home/{group-index}` links may resolve to the Atlas rather than preserving the old filter UI. `#map` owns the system and Agent reference architecture diagrams; `#read/{chapter-slug}/{section-id}` owns reading destinations. `#read` remains a compatibility route for chapter 02. The native browser Back button restores destinations. Titles follow the active Chinese/English locale and name Atlas, Notebook, System architecture, or the current chapter.
 
 Every chapter uses the same reader. Previous/next chapter navigation lives at the end of the scrollable article and does not reserve a fixed bottom bar. Menu links, directory links, map links, search results and previous/next navigation enter this reader. All 10 chapters are available; no ordinary reading action routes to the legacy shell. Article data loads per chapter with AbortController cancellation and a localized pending/error/retry region. An unknown chapter has a recovery screen and a contents link.
 
@@ -23,7 +23,9 @@ Architecture navigation scrolls to either complete diagram within the page. Rela
 
 ## Atlas, Notebook, and system orientation
 
-Atlas is the primary home surface. It presents all four engineering layers in one Knowledge Spine: Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production. Chapters are represented as connected nodes rather than isolated cards. Interactive chapters may expose a quiet lab affordance, but the chapter link remains the primary action.
+Atlas is the primary home surface. It presents all four engineering layers in one Knowledge Spine: Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production. Chapters are represented as connected nodes rather than isolated cards. Interactive chapters may expose a quiet lab affordance, but the chapter link remains the primary action. Atlas also exposes a compact Concept Index whose links open first-class concept routes.
+
+Concept routes are curated indexes over canonical handbook content, not independent knowledge articles. Each concept has one primary source, a short source-grounded summary, an ordered source trail into existing chapter/section routes, and optional related-concept links. A concept page must never become a competing technical source of truth; detailed explanations remain owned by the canonical chapters.
 
 Notebook is the saved-knowledge surface backed by the existing local chapter-bookmark state. Phase 1 keeps bookmarks chapter-scoped; section and concept saves are future behavior and must not be implied as already available. Atlas and Notebook share the same chapter routes, locale, theme, and bookmark operations.
 
