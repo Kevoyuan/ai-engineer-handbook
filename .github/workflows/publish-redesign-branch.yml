@@ -1,0 +1,43 @@
+name: Publish redesign branch artifact
+
+on:
+  push:
+    branches:
+      - redesign/ai-engineering-atlas
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: redesign/ai-engineering-atlas
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install preview dependencies
+        working-directory: preview/handbook-custom
+        run: npm install --no-audit --no-fund
+
+      - name: Publish React build into web/site
+        working-directory: preview/handbook-custom
+        run: npm run publish:web
+
+      - name: Commit generated production artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- web/site; then
+            echo "web/site is already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/site
+          git commit -m "build: refresh published handbook site"
+          git push origin HEAD:redesign/ai-engineering-atlas
