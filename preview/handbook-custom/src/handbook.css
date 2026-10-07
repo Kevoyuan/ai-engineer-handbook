@@ -2741,3 +2741,141 @@ body {
     transition: none;
   }
 }
+
+
+/* Reader trace: keep orientation in the existing shell instead of reserving a TOC column. */
+.top-location {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.top-reader-chapter {
+  min-width: 0;
+  max-width: 23rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--foreground);
+  font: 0.75rem/1.4 var(--font-mono);
+}
+
+.top-reader-section {
+  min-width: 0;
+  max-width: 28rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted-foreground);
+}
+
+.top-reading-percent {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-left: 0.75rem;
+  color: var(--muted-foreground);
+  font: 0.6875rem/1 var(--font-mono);
+}
+
+.reading-progress-line {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.reading-progress-line > span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  transform-origin: left center;
+  transition: width 120ms linear;
+}
+
+.top-focus-exit {
+  border-color: color-mix(in srgb, var(--primary) 48%, var(--border));
+  color: var(--foreground);
+}
+
+.reader-heading {
+  padding-top: 0.35rem;
+  padding-bottom: 1.25rem;
+}
+
+.reader-eyebrow {
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.reader-eyebrow > span:last-child {
+  color: var(--muted-foreground);
+}
+
+.reader h1 {
+  max-width: 24ch;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.reader-actions {
+  margin-top: 1.25rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+
+@media (max-width: 1000px) {
+  .top-reader-chapter {
+    max-width: 14rem;
+  }
+
+  .top-reader-section {
+    max-width: 16rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar {
+    position: relative;
+  }
+
+  .top-reader-chapter {
+    max-width: 7.5rem;
+  }
+
+  .top-reader-section,
+  .top-reading-percent {
+    display: none;
+  }
+
+  .reader h1 {
+    max-width: none;
+    font-size: 1.75rem;
+    line-height: 1.15;
+  }
+
+  .reader-eyebrow > span:last-child {
+    display: none;
+  }
+
+  .reader-actions {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+
+  .top-focus-exit {
+    padding-inline: 0.625rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress-line > span {
+    transition: none;
+  }
+}
