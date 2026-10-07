@@ -9,49 +9,49 @@
     "slug": "02-enterprise-retrieval",
     "sections": 9,
     "supplements": 0,
-    "characters": 1671
+    "characters": 1670
   },
   {
     "slug": "03-hybrid-retrieval-query-routing",
     "sections": 7,
     "supplements": 1,
-    "characters": 7954
+    "characters": 7953
   },
   {
     "slug": "04-rag-reliability-selective-answering",
     "sections": 2,
     "supplements": 0,
-    "characters": 2230
+    "characters": 2229
   },
   {
     "slug": "05-document-pdf-rag",
     "sections": 8,
     "supplements": 1,
-    "characters": 8081
+    "characters": 8080
   },
   {
     "slug": "06-skills-routing",
     "sections": 5,
     "supplements": 3,
-    "characters": 12100
+    "characters": 12088
   },
   {
     "slug": "07-memory-context-engineering",
     "sections": 4,
     "supplements": 2,
-    "characters": 5172
+    "characters": 5163
   },
   {
     "slug": "08-agent-orchestration",
     "sections": 14,
     "supplements": 9,
-    "characters": 27633
+    "characters": 27632
   },
   {
     "slug": "09-reliability-evaluation-observability",
     "sections": 28,
     "supplements": 8,
-    "characters": 36528
+    "characters": 36522
   },
   {
     "slug": "10-serving-deployment-ai-platform",
