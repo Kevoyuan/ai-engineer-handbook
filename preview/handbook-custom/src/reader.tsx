@@ -232,6 +232,10 @@ export function Reader({
     if (!data || !pane.current) return;
     const el = scrollPane();
     if (!el) return;
+    // A viewport breakpoint or dialog change can switch the scroll owner.
+    // Treat its current offset as a fresh baseline, not a swipe.
+    lastDirectionPosition.current = el.scrollTop;
+    scrollIntent.current = 0;
     const update = () => {
       let current = data.sections[0]?.id || "";
       for (const s of data.sections) {
