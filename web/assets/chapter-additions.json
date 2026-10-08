@@ -145,6 +145,10 @@
     {
       "path": "/assets/ch12-order-investigation-capstone.html",
       "id": "fde-order-investigation-capstone"
+    },
+    {
+      "path": "/assets/ch12-fde-coverage-audit.html",
+      "id": "fde-coverage-audit-04"
     }
   ],
   "11-data-sql-engineering": [
