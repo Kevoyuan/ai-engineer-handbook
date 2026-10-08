@@ -96,3 +96,63 @@ Exact 规范化必须保留业务身份差异；ACL 不可为 Recall 放宽。De
 - [BM25 implementation](https://www.elastic.co/docs/reference/elasticsearch/index-settings/similarity)
 - [DPR](https://arxiv.org/abs/2004.04906)
 - [GraphRAG](https://arxiv.org/abs/2404.16130)
+
+
+## 2.7 FDE verified answers · Permission-Aware RAG
+
+> **Provenance (2026-10-08).** The public FDEInterviews Concepts curriculum names Permission-Aware RAG, but its gated answer is not available to us. Questions Q1–Q3 below are **independently authored engineering interview prompts**, not a transcript, leaked answer, or endorsed official solution. Azure AI Search primary documentation is used to verify product-specific filtering and permission behavior; vendor-neutral design and tests are handbook synthesis.
+
+### Q1 · How do you prevent a RAG assistant from leaking another employee's documents?
+
+**Interview answer:** Start with an authenticated caller identity, resolve its tenant and entitlements through trusted infrastructure, and enforce an authorized-document predicate **before any text enters prompts, rerankers, logs or caches**. Match permissions at the retrieval boundary; where possible recheck the underlying resource authorization when opening a document, because indexed ACLs may be stale. Never ask the LLM to decide whether a document is confidential.
+
+```text
+trusted identity + tenant → permission snapshot / policy
+    → authorized search predicate / native ACL query
+    → top-k within legal candidate set
+    → rerank only authorized documents
+    → evidence sufficiency / response / citations
+    → tenant-scoped cache + redacted trace
+```
+
+- **Evidence:** Azure AI Search documents both (a) native document-level ACL/RBAC enforcement, with identity claims checked against indexed permission metadata, and (b) security trimming using string filters. The latter is *not* an independent authentication mechanism: the app must supply trusted identity information. Native mechanisms may be preview/version/source dependent.
+- **Failure mode:** A user-supplied `tenant_id`, shared embedding-result cache, retrieval without ACL filter, or stale ACL index can allow data to cross a trust boundary.
+- **Tests:** two tenants with overlapping vocabulary; documents sharing embeddings but different ACLs; revoke access after ingestion; principal/group changes; cached result replay after logout; reranker prompt/log inspection. Assert **zero unauthorized chunks in candidates, rerank input, answer, citations and traces**. A zero observed leak rate is test evidence, not proof of universal security.
+
+### Q2 · Pre-filter or post-filter in vector retrieval?
+
+**Interview answer:** For permission-sensitive candidate selection, apply a *trusted* authorization predicate as part of retrieval rather than computing an unrestricted global top-k and hiding disallowed results afterward. Search algorithm filtering order also changes recall and latency; it cannot supply identity provenance by itself.
+
+Consider 1,000 documents; only 10 are visible to this user. Global unfiltered top-5 might contain zero authorized documents even though relevant permitted documents exist. Returning zero after post-filtering is a **false negative**, not evidence that the authorized corpus has no answer.
+
+| Strategy | Retrieval property | Cost / failure |
+|---|---|---|
+| Pre-filter | Candidate selection searches within authorized subset | More graph traversal may raise CPU / latency at highly selective filters |
+| Post-filter | ANN search happens first, filter is applied later | Can miss authorized relevant results for small k or selective policies |
+| Strict global post-filter | Filter after global top-k | Highest false-negative risk at small k; engine/version specific |
+
+**Evidence:** Microsoft documents `preFilter`, `postFilter` and preview `strictPostFilter` modes for Azure AI Search, with recall/latency trade-offs. **Security rule:** Avoid using an untrusted request-supplied filter as authorization. Some hybrid/vector targeted-filter features can override a global filter; permission predicates must be carried to every relevant search branch.
+
+### Q3 · Source ACL changed: is a previous index permission still trustworthy?
+
+**Interview answer:** No. A copied ACL snapshot is only as current as its propagation. Define a permission-revocation SLO and choose a mechanism: synchronous resource check on fetch, an index invalidation/update stream, or enforced query-time native ACL support where the documented synchronization guarantees are sufficient. Fail closed for sensitive sources when an ACL version cannot be established.
+
+```text
+source access change → ACL sync / index update / cache invalidation
+                   → ensure query sees current effective rights
+                   → optionally verify at document fetch
+```
+
+- **SLO / metric:** revocation-to-denial latency; stale-ACL window; number of permission-denied retrieval attempts; cross-tenant denial rate; authorized recall@k.
+- **Drill:** give Alice and Bob similar document sets, revoke Alice from one document between search and fetch, repeat through semantic caches and async jobs; require no content disclosure.
+- **Boundary:** an index-side filter does not automatically revoke a cached generated answer or prevent a downstream tool with independent credentials from reopening a forbidden document.
+
+**Official verification sources:**
+
+- [Microsoft: Document-level access control](https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview) — native ACL/RBAC versus security filter, permission synchronization and preview limitations.
+- [Microsoft: Security filter pattern](https://learn.microsoft.com/en-us/azure/search/search-security-trimming-for-azure-search) — string comparison is not itself authentication.
+- [Microsoft: Vector filtering modes](https://learn.microsoft.com/en-us/azure/search/vector-search-filters) — pre/post/strict filtering and recall-cost consequences.
+- [Microsoft: Targeted hybrid filters](https://learn.microsoft.com/en-us/azure/search/hybrid-search-how-to-query) — per-vector filter overrides can replace a global filter.
+- [FDEInterviews concept inventory](https://www.fdeinterviews.com/concepts) — topic inspiration only.
+
+**Cross-chapter:** CH06 owns capability execution permissions; CH09 owns retrieval and leakage evals; CH10 owns trusted tenant identity and storage-level enforcement.
