@@ -56,6 +56,7 @@
   transition: border-color .2s ease-out, background .2s ease-out;
 }
 .jev-dfc-stage.is-current { border-color: var(--jev-signal); box-shadow: inset 3px 0 0 var(--jev-signal); background: color-mix(in srgb, var(--jev-paper) 94%, var(--jev-signal) 6%); }
+.jev-dfc-stage.is-current .jev-dfc-stage-id { color: var(--jev-ink); }
 .jev-dfc-stage-id { color: var(--jev-muted); font: 700 9px/1.3 "Geist Mono Variable",monospace; letter-spacing: .09em; }
 .jev-dfc-stage strong { color: var(--jev-ink); font: 700 13px/1.35 "Geist Variable",sans-serif; }
 .jev-dfc-stage small { color: var(--jev-muted); font-size: 11px; line-height: 1.4; }
