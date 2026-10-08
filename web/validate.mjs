@@ -29,7 +29,9 @@ const canonicalChapters = [
   '07-memory-context-engineering.md',
   '08-agent-orchestration.md',
   '09-reliability-evaluation-observability.md',
-  '10-serving-deployment-ai-platform.md'
+  '10-serving-deployment-ai-platform.md',
+  '11-data-sql-engineering.md',
+  '12-fde-customer-delivery.md'
 ];
 
 const retiredSupplements = [
@@ -98,7 +100,9 @@ const semanticByWebSlug = {
   '07-memory-context-engineering': '07-memory-context-engineering.md',
   '08-agent-orchestration': '08-agent-orchestration.md',
   '09-reliability-evaluation-observability': '09-reliability-evaluation-observability.md',
-  '10-serving-deployment-ai-platform': '10-serving-deployment-ai-platform.md'
+  '10-serving-deployment-ai-platform': '10-serving-deployment-ai-platform.md',
+  '11-data-sql-engineering': '11-data-sql-engineering.md',
+  '12-fde-customer-delivery': '12-fde-customer-delivery.md'
 };
 
 for (const chapter of chapters) {
