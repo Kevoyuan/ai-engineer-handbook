@@ -136,7 +136,7 @@ The public FDEInterviews topic catalog is a **scope/index** only; the handbook d
 - [Q24–Q39 source and verification limits](references/fde-2026-answers-05-06-provenance.md): CH01 model/ML foundations, CH09 statistical evals, CH11 coding/data integrity, CH08 graph/tool tests.
 - [Runnable deterministic ML/coding mini-lab](../examples/fde-interview-engineering/): self-contained Python stdlib negative/positive tests.
 - [167 FDE topics → one canonical chapter each](references/fde-2026-concept-crosswalk.md).
-- [167-item heading/body/no-direct-signal evidence audit](references/fde-2026-coverage-audit.md): 2026-10-08 review-branch baseline updated to H99/B31/N37 after stages 05–06; **not a readiness/completion score**.
+- [167-item heading/body/no-direct-signal evidence audit](references/fde-2026-coverage-audit.md): 2026-10-08 review-branch baseline updated to H136/B31/N0 after stages 05–06; **not a readiness/completion score**.
 - [Auditable evidence-pointer verifier](../scripts/verify_fde_coverage.py): no external service or paid content required.
 
 The delivery case remains in CH12 §12.11. Public-facing content changes still require generated bilingual assets plus the separate release process. A feature-branch push is **not** Vercel production publication.
