@@ -3344,3 +3344,162 @@ body {
     padding: 0.65rem 0.75rem;
   }
 }
+
+
+/* Immersive Reader — content-first chrome. The article owns no chapter cover or toolbar. */
+.workspace.reader-workspace .topbar {
+  flex: 0 0 3.25rem;
+  height: 3.25rem;
+  min-height: 3.25rem;
+  padding-block: 0;
+  z-index: 20;
+  transition: flex-basis 180ms ease, height 180ms ease, min-height 180ms ease, opacity 180ms ease, transform 180ms ease;
+}
+.workspace.reader-workspace .top-location {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.5rem;
+}
+.reader-top-identity {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  min-width: 0;
+  overflow: hidden;
+}
+.reader-top-number {
+  flex: 0 0 auto;
+  font: 0.6875rem/1.4 var(--font-mono);
+  color: var(--primary);
+}
+.reader-top-title {
+  min-width: 0;
+  max-width: 24rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 0.875rem/1.4 var(--font-sans);
+  color: var(--foreground);
+  letter-spacing: -0.015em;
+}
+.reader-top-section {
+  display: block;
+  min-width: 0;
+  max-width: min(34vw, 27rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.reader-top-section > span { color: var(--border); margin-right: 0.25rem; }
+.reader-top-identity .top-reading-percent {
+  display: block;
+  padding-left: 0;
+  margin-left: auto;
+  font: 0.6875rem/1.4 var(--font-mono);
+  color: var(--muted-foreground);
+}
+.reader-workspace .top-actions {
+  gap: 0.125rem;
+  flex: 0 0 auto;
+}
+.reader-workspace .reader-header-search {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  justify-content: center;
+}
+.reader-workspace .reader-header-search > span,
+.reader-workspace .reader-header-search > kbd {
+  display: none;
+}
+.reader-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+.reader-top-actions > button {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+}
+.reader-overflow-menu { min-width: 14.5rem; }
+.reader-overflow-menu [role="menuitem"] { min-height: 44px; }
+.workspace.reader-workspace .reader-layout,
+.focus-reading .workspace.reader-workspace .reader-layout {
+  padding-top: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+.reader-workspace .reader {
+  grid-template-rows: minmax(0, 1fr);
+}
+.reader-workspace .chapter-body {
+  padding-top: 0.25rem;
+}
+.workspace.reader-workspace.reader-chrome-hidden .topbar {
+  flex-basis: 0;
+  height: 0;
+  min-height: 0;
+  padding-block: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-100%);
+  overflow: hidden;
+  border: 0;
+}
+@media (max-width: 1180px) {
+  .reader-top-section { max-width: 20vw; }
+  .reader-top-title { max-width: 20rem; }
+}
+@media (max-width: 900px) {
+  .reader-top-section { display: none; }
+  .reader-top-title { max-width: 35vw; }
+}
+@media (max-width: 767px) {
+  .workspace.reader-workspace .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3.25rem;
+    min-height: 3.25rem;
+    padding: 0 0.5rem;
+    transform: translateY(0);
+    z-index: 30;
+  }
+  .workspace.reader-workspace.reader-chrome-hidden .topbar {
+    height: 3.25rem;
+    min-height: 3.25rem;
+    padding: 0 0.5rem;
+    transform: translateY(-100%);
+  }
+  .workspace.reader-workspace .reader-layout,
+  .focus-reading .workspace.reader-workspace .reader-layout {
+    padding: 3.75rem 1rem 1rem;
+  }
+  .reader-workspace .reader {
+    display: block;
+  }
+  .reader-workspace .chapter-body {
+    overflow: visible;
+    padding: 0;
+  }
+  .reader-top-identity { gap: 0.4rem; }
+  .reader-top-title { max-width: none; font-size: 0.8125rem; }
+  .reader-top-identity .top-reading-percent {
+    font-size: 0.625rem;
+  }
+  .reader-workspace .reader-header-search,
+  .reader-top-actions > button {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace.reader-workspace .topbar { transition: none; }
+}

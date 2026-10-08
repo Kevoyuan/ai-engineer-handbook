@@ -8,6 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
+import { MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -104,6 +107,10 @@ export function Reader({
   focus,
   setFocus,
   onReadingContext,
+  onChromeVisible,
+  onToggleTheme,
+  onToggleLocale,
+  dark,
 }: {
   index: number;
   en: boolean;
@@ -112,10 +119,20 @@ export function Reader({
   focus: boolean;
   setFocus: (value: boolean) => void;
   onReadingContext?: (value: ReadingContext) => void;
+  onChromeVisible?: (visible: boolean) => void;
+  onToggleTheme: () => void;
+  onToggleLocale: () => void;
+  dark: boolean;
 }) {
   const t = (zh: string, e: string) => (en ? e : zh);
   const chapter = chapters[index];
   const pane = useRef<HTMLDivElement>(null);
+  const lastDirectionPosition = useRef(0);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [topActionsTarget, setTopActionsTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setTopActionsTarget(document.getElementById("reader-top-actions"));
+  }, []);
   const [mobile, setMobile] = useState(
     () => matchMedia("(max-width: 767px)").matches,
   );
@@ -147,6 +164,8 @@ export function Reader({
     setError(false);
     setActive("");
     setProgress(0);
+    lastDirectionPosition.current = 0;
+    onChromeVisible?.(true);
     fetch("/content/" + chapter.slug + ".json", { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error("Chapter unavailable");
@@ -170,7 +189,10 @@ export function Reader({
       scroller.scrollTop +=
         target.getBoundingClientRect().top -
         scroller.getBoundingClientRect().top -
-        16;
+        (mobile ? 60 : 16);
+      // Section navigation isn't a user scroll gesture: keep tools discoverable.
+      lastDirectionPosition.current = scroller.scrollTop;
+      onChromeVisible?.(true);
       setActive(id);
       target.setAttribute("tabindex", "-1");
       target.focus({ preventScroll: true });
@@ -229,13 +251,25 @@ export function Reader({
         Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)),
       );
       setProgress((value) => (value === nextProgress ? value : nextProgress));
+      const position = el.scrollTop;
+      if (position < 70) {
+        lastDirectionPosition.current = position;
+        onChromeVisible?.(true);
+      } else if (!moreOpen && !tocOpen &&
+                 Math.abs(position - lastDirectionPosition.current) >= 20) {
+        onChromeVisible?.(position < lastDirectionPosition.current);
+        lastDirectionPosition.current = position;
+      }
     };
     el.addEventListener("scroll", update, { passive: true });
     update();
     return () => {
       el.removeEventListener("scroll", update);
     };
-  }, [data, chapter.slug, mobile]);
+  }, [data, chapter.slug, mobile, moreOpen, tocOpen, onChromeVisible]);
+  useEffect(() => {
+    if (moreOpen || tocOpen) onChromeVisible?.(true);
+  }, [moreOpen, tocOpen, onChromeVisible]);
   useEffect(() => {
     if (!data || !onReadingContext) return;
     const sectionIndex = Math.max(
@@ -266,80 +300,78 @@ export function Reader({
   );
   return (
     <main id="content" className="reader-layout" tabIndex={-1}>
-      <article className="reader">
-        <div className="reader-heading">
-          <div className="reader-eyebrow">
-            <span>
-              {chapter.number} /{" "}
-              {index < 1
-                ? "MODEL"
-                : index < 5
-                  ? "RETRIEVAL"
-                  : index < 8
-                    ? "AGENT"
-                    : "PRODUCTION"}
-            </span>
-            <span>{t("深度阅读", "DEEP READ")}</span>
-          </div>
-          <h1>{en ? chapter.en : chapter.zh}</h1>
-          <div className="reader-actions">
-            <div className="reader-tools">
-              <Button
-                variant="outline"
-                className="reader-toc-button"
-                onClick={() => setTocOpen(true)}
-              >
-                <BookIcon />
-                {t("本页目录", "On this page")}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSize((s) => Math.max(14, s - 1))}
-                disabled={size <= 14}
-                aria-label={t("缩小字号", "Decrease text size")}
-              >
-                A−
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSize((s) => Math.min(20, s + 1))}
-                disabled={size >= 20}
-                aria-label={t("放大字号", "Increase text size")}
-              >
-                A+
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setFocus(!focus)}
-                aria-pressed={focus}
-              >
-                {focus ? t("退出专注", "Exit focus") : t("专注阅读", "Focus")}
-              </Button>
-              {hasConceptDiagram(chapter.slug) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={!diagramReady}
-                  onClick={() => jump("concept-demo")}
-                >
-                  {t("交互图解", "Interactive diagram")}
-                </Button>
-              )}
-            </div>
+      {topActionsTarget &&
+        createPortal(
+          <>
             <Button
               variant="ghost"
-              size="sm"
-              onClick={toggle}
-              aria-pressed={saved}
+              size="icon"
+              className="reader-toc-top"
+              onClick={() => { onChromeVisible?.(true); setTocOpen(true); }}
+              aria-label={t("本页目录", "On this page")}
+              title={t("本页目录", "On this page")}
             >
-              <BookmarkIcon />
-              {saved ? t("已收藏", "Saved") : t("收藏章节", "Save chapter")}
+              <BookIcon />
             </Button>
-          </div>
-        </div>
+            <DropdownMenu open={moreOpen} onOpenChange={setMoreOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t("更多阅读设置", "More reading controls")}
+                  title={t("更多阅读设置", "More reading controls")}
+                >
+                  <MoreHorizontal aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="reader-overflow-menu">
+                <DropdownMenuLabel>{t("阅读设置", "Reading settings")}</DropdownMenuLabel>
+                <DropdownMenuItem
+                  disabled={size <= 14}
+                  onSelect={() => setSize((value) => Math.max(14, value - 1))}
+                >
+                  {t("缩小字号", "Decrease text size")} · A−
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={size >= 20}
+                  onSelect={() => setSize((value) => Math.min(20, value + 1))}
+                >
+                  {t("放大字号", "Increase text size")} · A+
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setFocus(!focus)}>
+                  {focus ? t("退出专注", "Exit focus") : t("专注阅读", "Focus reading")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={toggle}>
+                  {saved ? t("取消收藏章节", "Remove chapter bookmark") : t("收藏章节", "Save chapter")}
+                </DropdownMenuItem>
+                {hasConceptDiagram(chapter.slug) && (
+                  <DropdownMenuItem
+                    disabled={!diagramReady}
+                    onSelect={() => { onChromeVisible?.(true); jump("concept-demo"); }}
+                  >
+                    {t("交互图解", "Interactive diagram")}
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={onToggleTheme}>
+                  {dark ? t("浅色模式", "Light theme") : t("深色模式", "Dark theme")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={onToggleLocale}>
+                  {en ? "中文" : "English"}
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href="https://github.com/kevoyuan/ai-engineer-handbook"
+                     target="_blank" rel="noopener noreferrer">
+                    GitHub ↗
+                  </a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>,
+          topActionsTarget,
+        )}
+      <article className="reader">
+        <h1 className="sr-only">{en ? chapter.en : chapter.zh}</h1>
         <div
           ref={pane}
           className="chapter-body"

@@ -143,7 +143,11 @@ Runtime ownership is Model B: `preview/handbook-custom/src/handbook.css` owns se
 
 Technical diagrams retain native, trusted document markup as a compatibility variant so their registered topology, bilingual content, and interactive labs remain complete. Diagram colors express technical roles sparingly; chapter surfaces and noninteractive headings remain neutral.
 
-Reader orientation belongs in the existing shell rather than a reserved TOC column. The full chapter title belongs to the Reader heading and must not be duplicated in the topbar. Desktop topbar context shows the current section (or a neutral Reader label while section data is unavailable) plus rounded reading percentage and a two-pixel progress trace; mobile keeps the compact trace without adding a second navigation layer. Focus mode must keep an always-reachable exit in the topbar.
+Immersive Reader uses a **content-first single-line topbar**. The chapter number and title appear visually only in this topbar; the article retains a screen-reader-only level-one heading for semantic document navigation. The topbar can also show the current section and rounded reading percentage with a two-pixel progress trace, truncating secondary context as width narrows. No large chapter cover or local action strip may precede the article.
+
+Reader tools live in the existing topbar: Search and On this page are direct actions; font size, Focus, chapter bookmark, interactive diagram, theme, language, and GitHub are in an accessible overflow menu. Focus mode keeps a direct topbar exit affordance. Never convert these controls into a persistent bottom bar.
+
+Scroll direction governs visibility: when reading down beyond a short threshold, the topbar hides; upward scrolling, reaching the top, keyboard Tab, or moving the pointer to the top edge reveals it. Ignore small scroll jitter and keep it shown while menus or dialogs are active. On desktop the hidden bar yields its layout height to the article; on mobile it is an overlay so hiding it does not reflow or jump the scroll owner. In reduced motion, visibility remains functional but transition animations are removed.
 
 Search is a command surface, not a result-card gallery. Results remain flat, show chapter index and match language, identify the best deterministic match, and highlight literal match text with the accent token rather than a yellow marker.
 
