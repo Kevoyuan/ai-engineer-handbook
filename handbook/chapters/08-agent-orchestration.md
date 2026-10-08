@@ -6503,3 +6503,48 @@ Sources:
 - [LangChain agents](https://docs.langchain.com/oss/python/langchain/agents)
 - [Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
 - [Cordis lifecycle](https://github.com/deepseek-ai/deepseek-harness/blob/21638c56315ae6a2b552d6091945d3144c9af32e/docs/cordis-primer.md)
+
+
+## 8.18 FDE Coding Craft · Graph Traversal, Topological Sort, Dependency Injection (Q38–Q39)
+
+> These two interview prompts are original handbook synthesis informed by the public FDEInterviews concept titles. No private answer-key content was accessed. Deterministic executable reference fixtures live under examples/fde-interview-engineering; test success is **not** proof a production agent runtime is correct.
+
+### 8.18.1 Q38 · Graph Traversal and Topological Sort：为什么 Agent Workflow 必须能检测环？
+
+A workflow DAG encodes precedence: fetch authorized facts before evaluating evidence; human approval must precede any allowed write; traces should observe finalized action results. A **topological order** exists only for a directed acyclic graph. Kahn's algorithm computes node indegrees, repeatedly emits zero-indegree nodes and decrements successors. If fewer than all nodes emit, a cycle exists (or the source graph was malformed).
+
+~~~~text
+identity → authorize → retrieve → verify → explain
+                                       → (optional approval) → write
+~~~~
+
+- **Complexity:** O(V+E) time and O(V+E) for an adjacency representation/indegree bookkeeping, assuming each vertex/edge is visited once; input parsing may add overhead.
+- **Failure:** tool A requires tool B, but tool B depends on the output of A. A fixed DAG executor deadlocks or cannot schedule either. Reject the dependency graph **before any side effects**.
+- **BFS vs DFS:** BFS explores by level and can find shortest edges in an **unweighted** graph; DFS explores depth and can detect back-edges during traversal. Neither automatically enforces authentication, tool ownership or transaction atomicity.
+- **Agent-loop caveat:** an LLM ReAct loop may intentionally revisit a tool. This is **not** the same thing as a cycle in a fixed execution-dependency DAG; loop policies, stop conditions and bounded budgets are separate concerns.
+
+Use an explicit scheduler/graph model when independent tasks can run in parallel and authorization/dependency boundaries need to be enforced. For the single-order query in CH12, a linear deterministic host workflow is simpler.
+
+### 8.18.2 Q39 · Testability and Dependency Injection：怎么证明 Agent 不会绕过权限直接调用 Tool？
+
+Dependency injection is about **controllable boundaries**, not a library requirement. Supply tool interfaces through the trusted host; tests replace external clients with fakes that record requests and reject forbidden calls. Make policy enforcement occur **outside** the model, ideally at both the tool broker and resource boundary.
+
+~~~~python
+class InvestigationAgent:
+    def __init__(self, reader, policy):
+        self.reader = reader
+        self.policy = policy
+
+    def run(self, actor, order_id):
+        if not self.policy.can_read(actor, order_id):
+            raise PermissionError("denied")
+        return self.reader.read_order(actor, order_id)
+~~~~
+
+**Test matrix:** authorized user returns only scoped evidence; unauthorized user makes **zero** reader calls; injected tool exception yields an explicit error/abstention rather than fabricated facts; retries preserve operation ID; dependency DAG cycles are rejected before execution. A mock asserting the right function was called is useful, but **a fake is not a production security boundary**: verify the real storage identity/row policy in integration tests.
+
+**Production contract:** `actor` must originate from authenticated infrastructure; the method parameter by itself is not trusted. Keep permissions at the tool/resource boundary so a buggy caller or prompt injection cannot bypass an agent-level precheck. Ensure replayability through deterministic fixtures and versioned test cases.
+
+**Interview answer:** “I would test the runtime as a state machine with injected dependencies and forbidden-action sentinels. I would validate the DAG before scheduling; I would enforce actual resource authorization independently of the model; and I would evaluate both final result and the observed execution path.”
+
+**Primary sources and scope:** [Python unittest](https://docs.python.org/3/library/unittest.html), [Python mock](https://docs.python.org/3/library/unittest.mock.html) support deterministic test doubles; [heapq](https://docs.python.org/3/library/heapq.html) provides an ordered heap if deterministic ready-node priority is needed. The graph algorithm and agent-policy design are general engineering synthesis. For implementation-level agent workflow semantics, verify against the particular scheduler/framework release.
