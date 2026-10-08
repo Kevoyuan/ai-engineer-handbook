@@ -184,7 +184,7 @@ export function SkillSimulator({
         --border:var(--sim-border); --ring:#e9ad91; --ring-inverted:#e9ad91; --secondary:var(--sim-raised);
         --secondary-foreground:var(--sim-ink); --accent:#30231e; --accent-foreground:#f1b69c;
         --input:var(--sim-raised); --muted:var(--sim-raised); --success:#a0cbb0; --destructive:#edafa5;
-        padding:2rem; border:.0625rem solid var(--sim-border); border-radius:1rem;
+        padding:1.25rem; border:.0625rem solid var(--sim-border); border-radius:1rem;
         color:var(--sim-ink); background:var(--sim-canvas);
         box-shadow:inset 0 .0625rem 0 #ffffff08, 0 .75rem 2rem #0000000d;
       }
@@ -197,27 +197,27 @@ export function SkillSimulator({
         --primary-foreground:#261c17;
         box-shadow:inset 0 .0625rem 0 #ffffff0a, 0 .5rem 1.5rem #00000014;
       }
-      .dark .chapter-body .skill-terminal h3 { font-family:var(--font-sans); font-size:1.75rem; font-weight:550; letter-spacing:-.035em; }
+      .dark .chapter-body .skill-terminal h3 { font-family:var(--font-sans); font-size:1.5rem; font-weight:550; letter-spacing:-.035em; }
       .dark .skill-terminal .sim-panel { box-shadow:inset 0 .0625rem 0 #ffffff08; }
       .dark .skill-terminal .sim-message { background:var(--sim-panel); border-color:var(--sim-border); }
       .dark .skill-terminal .sim-message[data-current=true] { background:var(--sim-raised); border-color:color-mix(in srgb,var(--message-color) 42%,var(--sim-border)); }
       .dark .skill-terminal .sim-progress { background:var(--sim-canvas); }
       .dark .skill-terminal .sim-run:hover { background:#e6af94; }
       .chapter-body .skill-terminal p { margin:0; }
-      .chapter-body .skill-terminal h3 { margin:0; color:var(--sim-ink); font-family:Georgia,"Noto Serif SC",serif; font-size:1.875rem; font-weight:500; line-height:1.35; letter-spacing:-.02em; }
-      .skill-terminal .sim-header { display:flex; align-items:center; justify-content:space-between; gap:1.5rem; padding-bottom:1.5rem; margin-bottom:1.5rem; border-bottom:.0625rem solid var(--sim-border); }
-      .skill-terminal .sim-header p { margin-top:.75rem; max-width:34rem; color:var(--sim-muted); font-size:.875rem; line-height:1.7; text-wrap:pretty; }
+      .chapter-body .skill-terminal h3 { margin:0; color:var(--sim-ink); font-family:Georgia,"Noto Serif SC",serif; font-size:1.5rem; font-weight:500; line-height:1.35; letter-spacing:-.02em; }
+      .skill-terminal .sim-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:.875rem; margin-bottom:1rem; border-bottom:.0625rem solid var(--sim-border); }
+      .skill-terminal .sim-header p { margin-top:.375rem; max-width:34rem; color:var(--sim-muted); font-size:.875rem; line-height:1.7; text-wrap:pretty; }
       .skill-terminal .sim-scenarios { height:auto; display:flex; flex-wrap:wrap; gap:.25rem; padding:.25rem; border:.0625rem solid var(--sim-border); border-radius:.625rem; background:var(--sim-terminal); box-shadow:inset 0 .0625rem .25rem #00000040; }
       .skill-terminal .sim-scenarios button { height:auto; min-height:2.75rem; border:.0625rem solid transparent; background:transparent; color:var(--sim-muted); border-radius:.375rem; padding:.5rem .75rem; box-shadow:none; font-size:.8125rem; font-weight:500; }
       .skill-terminal .sim-scenarios button[data-state=active] { background:var(--accent); border-color:#745344; color:var(--accent-foreground); box-shadow:inset 0 .0625rem 0 #ffffff0a; }
-      .skill-terminal .sim-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.9fr); gap:1.25rem; }
+      .skill-terminal .sim-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.9fr); gap:.875rem; }
       .skill-terminal .sim-panel { display:flex; flex-direction:column; border:.0625rem solid var(--sim-border); border-radius:.75rem; overflow:hidden; background:var(--sim-panel); }
-      .skill-terminal .sim-titlebar { display:flex; align-items:center; justify-content:space-between; gap:1rem; min-height:4.5rem; padding:1rem 1.25rem; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-panel); }
+      .skill-terminal .sim-titlebar { display:flex; align-items:center; justify-content:space-between; gap:1rem; min-height:3.5rem; padding:.75rem 1rem; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-panel); }
       .skill-terminal .sim-window-title { display:flex; align-items:center; gap:.5rem; color:var(--sim-ink); font-family:var(--font-mono); font-size:.75rem; font-weight:500; letter-spacing:.04em; }
       .skill-terminal .sim-window-prefix { color:var(--sim-accent); font-size:1rem; line-height:1; }
       .skill-terminal .sim-window-caption { display:block; margin-top:.375rem; color:var(--sim-muted); font-size:.6875rem; line-height:1.5; }
-      .skill-terminal .sim-terminal { flex:1; height:25rem; min-height:20rem; max-height:29rem; overflow:auto; scrollbar-gutter:stable; padding:1.5rem 1.25rem; background:var(--sim-terminal); font-family:var(--font-mono); font-size:.8125rem; line-height:1.9; overflow-wrap:anywhere; }
-      .skill-terminal .sim-pending { padding-bottom:1.5rem; margin-bottom:1.5rem; border-bottom:.0625rem solid var(--sim-border); }
+      .skill-terminal .sim-terminal { flex:1; height:16rem; min-height:14rem; max-height:18rem; overflow:auto; scrollbar-gutter:stable; padding:1rem; background:var(--sim-terminal); font-family:var(--font-mono); font-size:.8125rem; line-height:1.9; overflow-wrap:anywhere; }
+      .skill-terminal .sim-pending { padding-bottom:1rem; margin-bottom:1rem; border-bottom:.0625rem solid var(--sim-border); }
       .skill-terminal .sim-pending-label { display:block; color:var(--sim-muted); font-size:.6875rem; margin-bottom:1rem; }
       .skill-terminal .sim-request { display:grid; grid-template-columns:auto 1fr; gap:.75rem; align-items:baseline; color:var(--sim-ink); }
       .chapter-body .skill-terminal .sim-request p { font-size:.9375rem; line-height:1.9; }
@@ -231,19 +231,19 @@ export function SkillSimulator({
       .skill-terminal .sim-log.process { color:#b8bfc4; }
       .skill-terminal .sim-log.result { color:var(--success); }
       .skill-terminal .sim-log.blocked { color:var(--destructive); }
-      .skill-terminal .sim-controls { padding:1rem; display:grid; grid-template-columns:1fr auto; gap:.5rem; border-top:.0625rem solid var(--sim-border); background:var(--sim-panel); }
+      .skill-terminal .sim-controls { padding:.75rem; display:grid; grid-template-columns:1fr auto; gap:.5rem; border-top:.0625rem solid var(--sim-border); background:var(--sim-panel); }
       .skill-terminal .sim-controls button { border-radius:.5rem; font-size:.8125rem; min-height:2.75rem; min-width:4rem; cursor:pointer; }
       .skill-terminal .sim-controls .sim-run { grid-column:1/-1; min-height:3rem; color:var(--primary-foreground); background:var(--sim-accent); box-shadow:inset 0 .0625rem 0 #ffffff24, 0 .125rem .25rem #00000030; font-weight:600; }
       .skill-terminal .sim-run svg { width:1rem; height:1rem; flex:none; }
       .skill-terminal .sim-controls button:not(.sim-run) { background:var(--sim-raised); color:var(--sim-ink); border-color:var(--sim-border); box-shadow:inset 0 .0625rem 0 #ffffff06; }
       .skill-terminal button:disabled { cursor:default; opacity:.45; }
       .skill-terminal .sim-progress { padding:0 1.25rem; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-terminal); }
-      .skill-terminal .sim-progress [data-progress-style] { min-height:3.5rem; gap:.5rem; align-items:center; }
+      .skill-terminal .sim-progress [data-progress-style] { min-height:2.75rem; gap:.5rem; align-items:center; }
       .skill-terminal .sim-progress span { font-family:var(--font-mono); font-size:.6875rem; }
       .skill-terminal .sim-progress [data-step-state] { padding:.75rem 0; }
       .skill-terminal .sim-progress [data-step-state=current] { color:var(--accent-foreground); }
-      .skill-terminal .sim-stream { height:22rem; overflow:auto; scrollbar-gutter:stable; padding:1.25rem; display:flex; flex-direction:column; gap:.75rem; }
-      .skill-terminal .sim-message { --message-color:var(--sim-blue); padding:1rem; border:.0625rem solid color-mix(in srgb,var(--message-color) 18%,var(--sim-border)); border-radius:.5rem; background:color-mix(in srgb,var(--message-color) 5%,var(--sim-panel)); flex:none; }
+      .skill-terminal .sim-stream { height:15rem; overflow:auto; scrollbar-gutter:stable; padding:1rem; display:flex; flex-direction:column; gap:.75rem; }
+      .skill-terminal .sim-message { --message-color:var(--sim-blue); padding:.75rem; border:.0625rem solid color-mix(in srgb,var(--message-color) 18%,var(--sim-border)); border-radius:.5rem; background:color-mix(in srgb,var(--message-color) 5%,var(--sim-panel)); flex:none; }
       .skill-terminal .sim-message strong { display:flex; align-items:center; justify-content:space-between; gap:.5rem; color:var(--message-color); font-family:var(--font-mono); font-size:.6875rem; font-weight:500; letter-spacing:.04em; margin-bottom:.5rem; }
       .skill-terminal .sim-message-index { color:var(--sim-muted); font-variant-numeric:tabular-nums; letter-spacing:0; }
       .chapter-body .skill-terminal .sim-message p { font-family:var(--font-sans); font-size:.875rem; line-height:1.8; color:#c5c9cb; }
@@ -253,15 +253,15 @@ export function SkillSimulator({
       .skill-terminal .sim-message.result { --message-color:var(--success); }
       .skill-terminal .sim-message.blocked { --message-color:var(--destructive); }
       .skill-terminal .sim-message[data-current=true] { border-color:color-mix(in srgb,var(--message-color) 45%,var(--sim-border)); box-shadow:inset 0 .0625rem 0 #ffffff06; }
-      .skill-terminal .sim-assets { display:grid; grid-template-columns:1fr 1fr; margin-top:auto; background:var(--sim-terminal); border-top:.0625rem solid var(--sim-border); min-height:8rem; }
-      .skill-terminal .sim-assets > div { padding:1.25rem; }
+      .skill-terminal .sim-assets { display:grid; grid-template-columns:1fr 1fr; margin-top:auto; background:var(--sim-terminal); border-top:.0625rem solid var(--sim-border); min-height:6rem; }
+      .skill-terminal .sim-assets > div { padding:.875rem; }
       .skill-terminal .sim-assets > div+div { border-left:.0625rem solid var(--sim-border); }
       .chapter-body .skill-terminal .sim-assets h4 { font-family:var(--font-sans); font-size:.75rem; line-height:1.5; color:var(--sim-muted); margin:0 0 .75rem; font-weight:500; }
       .skill-terminal .sim-assets p { font-family:var(--font-mono); font-size:.6875rem; line-height:1.8; color:var(--sim-muted); overflow-wrap:anywhere; }
       .skill-terminal .sim-scope { display:inline-block; border:.0625rem solid var(--sim-border); padding:.25rem .5rem; border-radius:.25rem; font-family:var(--font-mono); font-size:.6875rem; margin-right:.5rem; margin-bottom:.5rem; color:var(--sim-ink); background:var(--sim-raised); }
       .skill-terminal .sim-asset-row { display:flex; gap:.5rem; align-items:baseline; margin-bottom:.25rem; }
       .skill-terminal .sim-asset-row::before { content:"+"; color:var(--success); }
-      .skill-terminal .sim-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; border-top:.0625rem solid var(--sim-border); padding:1.25rem 0 0; margin-top:1.5rem; }
+      .skill-terminal .sim-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; border-top:.0625rem solid var(--sim-border); padding:.875rem 0 0; margin-top:1rem; }
       .skill-terminal .sim-metrics > div+div { border-left:.0625rem solid var(--sim-border); padding-left:1rem; }
       .skill-terminal .sim-metrics dt { font-family:var(--font-sans); font-size:.6875rem; color:var(--sim-muted); }
       .skill-terminal .sim-metrics dd { margin:.5rem 0 0; font-family:var(--font-mono); font-size:.875rem; color:var(--sim-ink); font-variant-numeric:tabular-nums; }
@@ -288,13 +288,13 @@ export function SkillSimulator({
       }
       @media (prefers-reduced-motion:no-preference) { .skill-terminal .sim-message[data-current=true] { animation:sim-arrive 180ms ease-out; } @keyframes sim-arrive { from {opacity:.5;transform:translateY(.25rem)} to {opacity:1;transform:translateY(0)} } }
       @media (prefers-reduced-motion:reduce) { .skill-terminal button { transition:none; transform:none; } }
-      @container (max-width:1050px) { .skill-terminal .sim-header { align-items:flex-start; flex-direction:column; gap:1.25rem; } }
+      @container (max-width:1050px) { .skill-terminal .sim-header { align-items:flex-start; flex-direction:column; gap:.75rem; } }
       @container (max-width:760px) {
-        .chapter-body .skill-terminal { padding:1.25rem; }
+        .chapter-body .skill-terminal { padding:1rem; }
         .skill-terminal .sim-grid { grid-template-columns:1fr; gap:1rem; }
-        .skill-terminal .sim-terminal { height:17rem; min-height:17rem; flex:auto; }
-        .skill-terminal .sim-stream { height:23rem; }
-        .skill-terminal .sim-metrics { grid-template-columns:1fr 1fr; gap:1.25rem; }
+        .skill-terminal .sim-terminal { height:11rem; min-height:11rem; max-height:11rem; flex:auto; }
+        .skill-terminal .sim-stream { height:13rem; }
+        .skill-terminal .sim-metrics { grid-template-columns:1fr 1fr; gap:.875rem; }
         .skill-terminal .sim-metrics > div:nth-child(3) { border-left:0; padding-left:0; }
         .skill-terminal .sim-scenarios { width:100%; }
         .skill-terminal .sim-scenarios button { flex:1; padding:.5rem; white-space:normal; }
