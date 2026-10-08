@@ -106,6 +106,7 @@ const records = [];
     const access = await browser.newContext({viewport:{width:390,height:900},reducedMotion:"reduce"});
     await access.addInitScript(() => { window.__name=fn=>fn; });
     const a11y = await access.newPage();
+    const a11yFailures = [];
     for(const route of ["#home/all","#home/saved","#concept/bm25","#map","#read/03-hybrid-retrieval-query-routing","#read/06-skills-routing"]){
       await a11y.goto(base+route);
       if(route.includes("#read/0"))await a11y.locator("#concept-demo").waitFor();
@@ -113,10 +114,13 @@ const records = [];
         .include("#content")
         .withTags(["wcag2a","wcag2aa","wcag21aa"])
         .analyze();
-      assert.equal(axe.violations.length,0,
-        "Accessibility: "+route+" "+JSON.stringify(axe.violations.map(x=>({id:x.id,targets:x.nodes.map(n=>n.target)}))));
+      if (axe.violations.length)
+        a11yFailures.push({ route, violations: axe.violations.map(
+          x => ({id:x.id,targets:x.nodes.map(n=>n.target)}),
+        ) });
     }
     await access.close();
+    assert.deepEqual(a11yFailures, [], "Accessibility findings across shipped surfaces: "+JSON.stringify(a11yFailures));
     assert.deepEqual(errors,[],"Unexpected browser runtime exceptions");
     console.log("PASS: "+records.length+" route/viewport/locale/theme layouts, "
       +"search and Notebook interactions, six WCAG surface families.");
