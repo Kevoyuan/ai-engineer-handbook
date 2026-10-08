@@ -28,6 +28,8 @@ The interactive product has four primary surfaces plus one connective layer:
 8. Agent / Workflow / Orchestration
 9. Reliability / Evaluation / Observability
 10. Serving / Deployment / Security / AI Platform
+11. Data / SQL / Lakehouse Engineering
+12. FDE Customer Delivery / Requirements / Handoff
 
 A system-level Chapter 00 provides the architecture map shared by the active chapters.
 
@@ -73,9 +75,11 @@ handbook/chapters/07-memory-context-engineering.md
 handbook/chapters/08-agent-orchestration.md
 handbook/chapters/09-reliability-evaluation-observability.md
 handbook/chapters/10-serving-deployment-ai-platform.md
+handbook/chapters/11-data-sql-engineering.md
+handbook/chapters/12-fde-customer-delivery.md
 ```
 
-The public edition contains chapters 01–10. Chapter 00 remains the shared system architecture source.
+The public edition contains chapters 01–12. Chapter 00 remains the shared system architecture source.
 
 ## Source-of-truth and build model
 
@@ -140,3 +144,9 @@ A successful React build does not update `web/site` by itself. Production-facing
 The canonical operating procedure lives in **[MAINTENANCE.md](./MAINTENANCE.md)**.
 
 The guiding principle remains: **engineering knowledge first; interview preparation is only one downstream use case.**
+
+## FDE curriculum integration (2026-10-08)
+
+FDEInterviews provides a 167-concept curriculum across ten original tracks. The [full source-track-to-canonical-chapter crosswalk](handbook/references/fde-2026-concept-crosswalk.md) assigns each concept to one stable knowledge owner. This is an **editorial classification**, not proof of deep coverage or access to premium course material.
+
+CH11 adds data/SQL/CDC/Spark foundations; CH12 adds customer discovery, walking skeleton, delivery acceptance and handoff. Existing model, RAG, agent, evaluation and serving knowledge remains in CH01–10. The four-layer Atlas Knowledge Spine remains unchanged, with data engineering and field delivery grouped under production.
