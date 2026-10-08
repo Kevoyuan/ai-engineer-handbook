@@ -370,9 +370,9 @@ The source curriculum lists **167 concepts in ten original FDE tracks**. The [si
 
 | Source-text audit grade | 2026-10-08 branch baseline | What it actually means |
 |---|---:|---|
-| H — owning chapter section heading | 76 | An explicit concept-specific name or reviewed alias occurs in a heading. **Not** a proof of deep coverage. |
-| B — owning chapter body | 34 | A concept name or reviewed alias is mentioned without a corresponding heading. Review for depth. |
-| N — no direct owner-chapter term signal | 57 | No reviewed English/alias term was found in that chapter. Could be a true content gap **or** Chinese/equivalent wording; manually check before calling it missing. |
+| H — owning chapter section heading | 99 | An explicit concept-specific name or reviewed alias occurs in a heading. **Not** a proof of deep coverage. |
+| B — owning chapter body | 31 | A concept name or reviewed alias is mentioned without a corresponding heading. Review for depth. |
+| N — no direct owner-chapter term signal | 37 | No reviewed English/alias term was found in that chapter. Could be a true content gap **or** Chinese/equivalent wording; manually check before calling it missing. |
 
 **This is a reproducible evidence-location scan, not a scored interview exam and not a verified 167-topic textbook.** Unlike a naive keyword-count completion chart, this audit does not label any concept “fully covered”. The next semantic audit should independently check whether each topic has:
 
@@ -386,3 +386,13 @@ The source curriculum lists **167 concepts in ten original FDE tracks**. The [si
 **Editorial priority:** P0 production architecture (CH10 §10.26), data engineering (CH11 §11.10), customer discovery and handoff (CH12 §12.11), authorization (CH02), and eval gates (CH09). Fill true technical gaps instead of creating duplicate “interview” chapters. The [Q10–Q23 research ledger](../references/fde-2026-answers-02-04-provenance.md) documents primary-source checks and unexecuted limitations; earlier [Q1–Q9 ledger](../references/fde-2026-verified-answer-ledger.md) remains separate.
 
 **Release boundary:** this phase is pushed to a feature branch for review. The source, bilingual Reader fragment, report and local build artifacts do not imply Vercel production has been deployed. No production release should occur without an explicit later request.
+
+## 12.13 Interview readiness vs evidence discoverability · Stages 05–06
+
+On the 2026-10-08 review branch, we added **independently researched Q24–Q39** across CH01/08/09/11, with an executable stdlib mini-lab. These cover ML optimization, leakage, calibrated prediction, rare-class metrics, synthetic evaluation, CSV input integrity, sliding windows, heap-based Top-K, DAG dependency validation and negative tool-authorization tests. See the [Q24–Q39 provenance ledger](../references/fde-2026-answers-05-06-provenance.md).
+
+**Audit updated:** 99 topic-heading signals, 31 body-mention signals, 37 no-direct-term signals out of 167. This is *not* a claim that 130 topics are completely taught. Some were already correctly explained using different terminology; the new sections add concrete counterexamples and first-party references, but no customer deployment or proprietary question-answer key was accessed.
+
+A strong FDE candidate still needs to solve an unseen problem under constraints: choose a safe data path, explain the failure mode, implement or sketch working code, and defend the metric and security boundary. A growing keyword index is not a substitute for those capabilities.
+
+The changes are retained on a **GitHub Draft PR only**. Do not infer Vercel publication from generated Reader content or a passing offline build.
