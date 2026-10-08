@@ -156,3 +156,80 @@ source access change → ACL sync / index update / cache invalidation
 - [FDEInterviews concept inventory](https://www.fdeinterviews.com/concepts) — topic inspiration only.
 
 **Cross-chapter:** CH06 owns capability execution permissions; CH09 owns retrieval and leakage evals; CH10 owns trusted tenant identity and storage-level enforcement.
+
+
+## 2.8 FDE Retrieval production contracts · Vector Index, Drift, Freshness and ColBERT (Q40–Q43)
+
+> **2026-10-08 provenance.** Original engineering interview prompts based on the public FDE topic inventory; not paywalled answers. Algorithm explanations follow the first-party Azure AI Search documentation and the original ColBERT paper. Example tenant/document IDs, version numbers and SLOs are illustrative, not measured deployment results.
+
+### Q40 · Vector Databases：既然有 SQL，为什么还需要向量库？
+
+A vector index stores vectors and supports nearest-neighbor search (often ANN) plus metadata filters and, on some engines, hybrid lexical/dense retrieval. It is useful when evidence is semantic text; it is **not** the authoritative database for precise order IDs, identity or transaction commits.
+
+```text
+authoritative source (orders, docs, ACL)
+ → chunk/embedding versioned build
+ → index with source ID, version, tenant, permission metadata
+ → trusted identity + filter → ANN/hybrid candidates
+ → exact document authorization at appropriate boundary
+ → evidence freshness + re-rank + grounded answer
+```
+
+| Choice | Use when | Do not assume |
+|---|---|---|
+| SQL exact/structured lookup | known order IDs, joins, authoritative state | embeddings improve unique-ID correctness |
+| lexical/BM25 | exact terms, identifiers, uncommon error codes | embedding replacement preserves rare strings |
+| ANN vector index | paraphrases, semantic policies, multilingual meaning | nearest neighbor implies business truth or permission |
+| hybrid/fusion | varied query classes | extra branches automatically improve recall after ACL |
+
+**Failure injection:** customer-specific private document receives a high similarity score. Verify the document never enters the *authorized candidate set* for another tenant. An application metadata filter is not an identity authority; permission and index sync are separate contracts (CH02 §2.7). In multi-tenant deployment, document/index version and permission scope must be carried to every search branch.
+
+### Q41 · Embedding Versions and Drift：换 Embedding Model 为什么不能直接沿用旧索引？
+
+Embedding spaces are **model and preprocessing version dependent**. Vectors from different encoders and changed normalization/tokenization policies cannot be presumed metrically compatible even when dimensions match; a same-dimension vector does **not** imply semantically interchangeable geometry. Even a valid new model can lower retrieval for IDs, minority locales or customer jargon.
+
+**Version contract**:
+
+```text
+index_manifest = {source_snapshot, chunker_revision,
+  embedding_model_version, normalization, metric,
+  ACL_snapshot/reconciliation_version, build_time}
+retrieval_request → pinned active_index_revision
+rollback → prior validated revision + compatible query encoder
+```
+
+- Build a separate shadow index; backfill from a pinned source snapshot. Keep **query encoder matched to that index's document encoder**.
+- Compare authorized Recall@k, nDCG/MRR, zero-hit rate, downstream grounded task success, index freshness and p95 query latency across tenant/language/source slices.
+- Canary with immutable `index_revision` and an atomic alias/routing switch; rollback means switch **both query encoder and index** rather than only the index name.
+- **Staleness caveat:** an old index alias may restore embeddings but also restore old permissions/documents. Permission revocation must still be enforced by a current authority. Rolling back retrieval quality may not roll back ACL policy.
+
+**Counterexample:** a new embedding model produces 1536-dimensional vectors just like the old model. The mixed index returns many “top matches” but lower reference evidence recall. Dimension equality was not a compatibility guarantee.
+
+### Q42 · Index Freshness and Staleness Windows：CDC 已成功是否等于 RAG 已最新？
+
+No. Track separate timepoints: source commit, ingestion/CDC, enrichment+embedding, index visible, permission effective, cache invalidated. Query-time index visibility can lag ingestion success; “eventual consistency” is **not a quantified freshness guarantee**.
+
+```text
+source_commit → CDC_ack → embedding_completed → index_visible
+                                    ↘ metadata/ACL sync
+                     → authorized query + source recheck
+                     → cache invalidation / trace
+```
+
+Set explicitly negotiated **source-to-query freshness SLI** and **revocation-to-denial SLI**; these are different. For sensitive authorization changes, fail closed or recheck source at fetch when index freshness cannot be proven.
+
+**Fault drill:** revoke employee access immediately after vector retrieval but before fetching a paragraph. Require refusal at evidence fetch/prompt boundary, including previously cached results; log permission version and no forbidden evidence. **Do not** use search quality metrics to conclude access-control security is correct.
+
+### Q43 · Late-Interaction Retrieval (ColBERT)：它比普通 Dense Retrieval 多了什么？
+
+Classical single-vector dense retrieval represents a passage as one vector. ColBERT independently encodes query and document **at token level**, then performs late interaction (e.g. MaxSim across document token representations per query token). This preserves finer-grained term interactions while allowing document encoding offline, but raises index/storage and scoring complexity versus one vector per document.
+
+```text
+query tokens:   q1, q2, q3  → encoder → token vectors
+doc tokens:     d1 ... dn   → offline encoder → token vectors
+score(q,d) ≈ Σ over query tokens [max over d_j similarity(q_i,d_j)]
+```
+
+**When to test:** rare terminology or multi-concept evidence that single-vector compression misses. **When not default:** if exact IDs, permission filters, data freshness or lexical synonyms already explain the error; use simpler routes first. Evaluate authorized recall/nDCG, index size, CPU/GPU cost, search p95 and evidence-support rate. Published paper benchmark speedups apply to its measured setup; no universal production improvement is claimed here.
+
+**Sources and boundary:** [Azure vector filtering](https://learn.microsoft.com/en-us/azure/search/vector-search-filters) and [document permissions](https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview) are provider-specific. [ColBERT original paper](https://arxiv.org/abs/2004.12832) defines late interaction and comparative experiments. Architecture tests above are design recommendations, not a verified enterprise rollout.
