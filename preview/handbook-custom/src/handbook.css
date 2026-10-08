@@ -3351,13 +3351,23 @@ body {
 
 
 /* Immersive Reader — content-first chrome. The article owns no chapter cover or toolbar. */
+/* Reader chrome overlays the scroll pane: animating height/flex-basis
+   resized the pane and generated spurious scroll events (flicker/jump). */
+.workspace.reader-workspace {
+  position: relative;
+}
 .workspace.reader-workspace .topbar {
-  flex: 0 0 3.25rem;
+  position: absolute;
+  inset: 0 0 auto;
+  flex: none;
   height: 3.25rem;
   min-height: 3.25rem;
   padding-block: 0;
   z-index: 20;
-  transition: flex-basis 180ms ease, height 180ms ease, min-height 180ms ease, opacity 180ms ease, transform 180ms ease;
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  will-change: transform;
+  transition: transform 180ms ease-out, opacity 180ms ease-out;
 }
 .workspace.reader-workspace .top-location {
   display: flex;
@@ -3443,17 +3453,20 @@ body {
 }
 .reader-workspace .chapter-body {
   padding-top: 0.25rem;
+  scroll-padding-top: 4rem;
+}
+/* Only the start of the document reserves topbar clearance. The space
+   scrolls away; revealing/hiding chrome never changes scroller geometry. */
+.reader-workspace .chapter-body::before {
+  content: "";
+  display: block;
+  height: 3.25rem;
+  pointer-events: none;
 }
 .workspace.reader-workspace.reader-chrome-hidden .topbar {
-  flex-basis: 0;
-  height: 0;
-  min-height: 0;
-  padding-block: 0;
+  transform: translate3d(0, -100%, 0);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-100%);
-  overflow: hidden;
-  border: 0;
 }
 @media (max-width: 1180px) {
   .reader-top-section { max-width: 20vw; }
@@ -3472,14 +3485,11 @@ body {
     height: 3.25rem;
     min-height: 3.25rem;
     padding: 0 0.5rem;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
     z-index: 30;
   }
   .workspace.reader-workspace.reader-chrome-hidden .topbar {
-    height: 3.25rem;
-    min-height: 3.25rem;
-    padding: 0 0.5rem;
-    transform: translateY(-100%);
+    transform: translate3d(0, -100%, 0);
   }
   .workspace.reader-workspace .reader-layout,
   .focus-reading .workspace.reader-workspace .reader-layout {
@@ -3492,6 +3502,8 @@ body {
     overflow: visible;
     padding: 0;
   }
+  /* Mobile already has the initial 3.75rem clearance in reader-layout. */
+  .reader-workspace .chapter-body::before { display: none; }
   .reader-top-identity { gap: 0.4rem; }
   .reader-top-title { max-width: none; font-size: 0.8125rem; }
   .reader-top-identity .top-reading-percent {
