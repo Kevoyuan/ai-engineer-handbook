@@ -276,6 +276,16 @@ function App() {
   );
   const selectedAtlas =
     chapters.find((chapter) => chapter.slug === selectedAtlasSlug) || chapters[0];
+  const inspectAtlas = (slug: string) => {
+    setSelectedAtlasSlug(slug);
+    // On stacked layouts, the inspector follows the full spine.
+    // An explicit Inspect action should bring its result into view.
+    if (matchMedia("(max-width: 900px)").matches) {
+      const inspector = document.getElementById("atlas-inspector-selected");
+      inspector?.scrollIntoView({ block: "start", behavior: "auto" });
+      inspector?.focus({ preventScroll: true });
+    }
+  };
   const [resultLimit, setResultLimit] = useState(15);
   useEffect(() => setResultLimit(15), [query]);
   const [notice, setNotice] = useState("");
@@ -826,7 +836,7 @@ function App() {
                                     <Button variant="ghost" size="icon" className="atlas-inspect-toggle"
                                       aria-pressed={selectedAtlasSlug === ch.slug}
                                       aria-label={t(`查看 ${ch.zh} 的知识关系`, `Inspect ${ch.en} relationships`)}
-                                      onClick={() => setSelectedAtlasSlug(ch.slug)}>
+                                      onClick={() => inspectAtlas(ch.slug)}>
                                       <span aria-hidden="true">i</span>
                                     </Button>
                                     {interactive && (
@@ -855,7 +865,7 @@ function App() {
 
                   <aside className="atlas-inspector">
                     <section className="atlas-inspector-block atlas-context-inspector"
-                      id="atlas-inspector-selected"
+                      id="atlas-inspector-selected" tabIndex={-1}
                       aria-label={t("章节知识关系", "Chapter relationships")}>
                       <span className="atlas-eyebrow">INSPECT / {selectedAtlas.number}</span>
                       <h2>{en ? selectedAtlas.en : selectedAtlas.zh}</h2>
