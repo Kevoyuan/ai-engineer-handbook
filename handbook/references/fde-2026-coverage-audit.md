@@ -5,7 +5,7 @@
 **Alias discipline:** Only explicit concept-specific aliases in the manual dictionary are used to rescue known English-title/synonym mismatches (e.g. “Embeddings & Vector Representations” → `embedding`); a generic `AI`, `model`, `data` or `agent` match is not sufficient. An alias match also does not prove depth.
 
 ## Interpret the evidence grades
-**Current review-branch evidence signals (2026-10-08; after stages 05–06):** H=99, B=31, N=37; total 167. **Before stages 05–06:** H76/B34/N57. These are **term-location signals, not mastery/completeness counts**.
+**Current review-branch direct terminology signals (2026-10-08 after semantic audit):** H=136, B=31, N=0; total 167. **Previous:** H99/B31/N37; initial scan H39/B7/N121. These are discoverability signals only, not verification of depth or interview readiness.
 **Public reference:** [FDE topics](https://www.fdeinterviews.com/concepts) · [FDE concept map](https://www.fdeinterviews.com/map) · [Atlas crosswalk](./fde-2026-concept-crosswalk.md).
 
 
@@ -29,32 +29,32 @@
 | Foundations of LLMs & GenAI | Why LLMs Hallucinate | CH01 | H | — | P1 | CH01 L671 (hallucination) |
 | Foundations of LLMs & GenAI | RLHF (Alignment) | CH01 | H | — | P1 | CH01 L592 (RLHF) |
 | Foundations of LLMs & GenAI | Reward Models | CH01 | B | — | P1 | CH01 L576 (reward model) |
-| Foundations of LLMs & GenAI | Prompt Engineering | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Prompt Engineering | CH01 | H | — | P1 | CH01 L1818 (Prompt Engineering) |
 | Foundations of LLMs & GenAI | Fine-tuning vs RAG vs Prompting | CH01 | H | — | P1 | CH01 L753 (fine-tuning) |
 | Foundations of LLMs & GenAI | Structured Output and Schema Validation | CH01 | H | — | P1 | CH01 L983 (structured output) |
 | Foundations of LLMs & GenAI | Tokenization & Tokens | CH01 | H | — | P1 | CH01 L224 (tokeniz) |
 | Foundations of LLMs & GenAI | Temperature, Top-p and Sampling | CH01 | H | — | P1 | CH01 L365 (temperature) |
-| Foundations of LLMs & GenAI | Multimodal Models and VLMs | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Multimodal Models and VLMs | CH01 | H | — | P1 | CH01 L1836 (Multimodal Models and VLMs) |
 | Foundations of LLMs & GenAI | Direct Preference Optimization (DPO) | CH01 | H | — | P1 | CH01 L592 (DPO) |
-| Foundations of LLMs & GenAI | Inference-Time Compute | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Inference-Time Compute | CH01 | H | — | P1 | CH01 L1828 (Inference-Time Compute) |
 | Foundations of LLMs & GenAI | Prompt Caching and Semantic Caching | CH10 | H | — | P1 | CH10 L156 (prefix cache) |
-| Foundations of LLMs & GenAI | Model Selection for Enterprise Deployments | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
+| Foundations of LLMs & GenAI | Model Selection for Enterprise Deployments | CH10 | H | CHECK | P1 | CH10 L2321 (Model Selection for Enterprise Deployments) |
 | Foundations of LLMs & GenAI | Attention and Self-Attention | CH01 | H | — | P1 | CH01 L203 (attention) |
 | Foundations of LLMs & GenAI | Constrained Decoding | CH01 | H | — | P1 | CH01 L1042 (Constrained Decoding) |
-| Foundations of LLMs & GenAI | Constitutional AI and RLAIF | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Constitutional AI and RLAIF | CH01 | H | — | P1 | CH01 L1849 (Constitutional AI and RLAIF) |
 | Foundations of LLMs & GenAI | Policy Optimization: PPO and GRPO | CH01 | H | CHECK | P1 | CH01 L592 (GRPO) |
 | Foundations of LLMs & GenAI | RoPE and Positional Encodings | CH01 | H | — | P1 | CH01 L1577 (RoPE) |
-| Foundations of LLMs & GenAI | Chain-of-Thought Prompting | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Chain-of-Thought Prompting | CH01 | H | — | P1 | CH01 L1818 (Chain-of-Thought Prompting) |
 | Foundations of LLMs & GenAI | LoRA and Parameter-Efficient Fine-tuning | CH01 | H | — | P1 | CH01 L867 (LoRA) |
-| Foundations of LLMs & GenAI | Mixture of Experts (MoE) | CH10 | N | — | P1 | CH10 semantic/synonym review |
-| Foundations of LLMs & GenAI | Scaling Laws | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Foundations of LLMs & GenAI | Speech and Voice AI | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Mixture of Experts (MoE) | CH10 | H | — | P1 | CH10 L2337 (MoE) |
+| Foundations of LLMs & GenAI | Scaling Laws | CH01 | H | — | P1 | CH01 L1828 (Scaling Laws) |
+| Foundations of LLMs & GenAI | Speech and Voice AI | CH01 | H | — | P1 | CH01 L1836 (Speech and Voice AI) |
 | Foundations of LLMs & GenAI | Autoregressive Decoding | CH01 | B | — | P1 | CH01 L41 (autoregressive) |
-| Foundations of LLMs & GenAI | Diffusion Models | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Foundations of LLMs & GenAI | Diffusion Models | CH01 | H | — | P1 | CH01 L1836 (Diffusion Models) |
 | Retrieval & Agents | Retrieval-Augmented Generation (RAG) | CH04 | H | — | P1 | CH04 L2 (RAG reliability) |
 | Retrieval & Agents | Guardrails | CH09 | H | — | P1 | CH09 L1311 (Guardrail) |
-| Retrieval & Agents | Tool / Function Calling | CH06 | N | — | P1 | CH06 semantic/synonym review |
-| Retrieval & Agents | Vector Databases | CH02 | N | — | P1 | CH02 semantic/synonym review |
+| Retrieval & Agents | Tool / Function Calling | CH06 | H | — | P1 | CH06 L1420 (Tool / Function Calling) |
+| Retrieval & Agents | Vector Databases | CH02 | H | — | P1 | CH02 L165 (Vector Databases) |
 | Retrieval & Agents | MCP (Model Context Protocol) | CH06 | H | CHECK | P1 | CH06 L2 (MCP) |
 | Retrieval & Agents | The ReAct Loop (Reason, Act, Observe) | CH08 | H | — | P1 | CH08 L1804 (ReAct) |
 | Retrieval & Agents | Chunking Strategies | CH05 | H | — | P1 | CH05 L79 (chunking) |
@@ -69,16 +69,16 @@
 | Retrieval & Agents | Agent-to-Agent Interoperability (A2A) | CH08 | B | CHECK | P1 | CH08 L5186 (A2A) |
 | Retrieval & Agents | Approximate Nearest Neighbor (ANN) | CH02 | B | — | P1 | CH02 L124 (ANN) |
 | Retrieval & Agents | Agent Frameworks and How Agents Fail | CH08 | H | — | P1 | CH08 L250 (langgraph) |
-| Retrieval & Agents | Embedding Versions and Drift | CH02 | N | — | P1 | CH02 semantic/synonym review |
+| Retrieval & Agents | Embedding Versions and Drift | CH02 | H | — | P1 | CH02 L187 (Embedding Versions and Drift) |
 | Retrieval & Agents | Multi-Agent Orchestration | CH08 | H | — | P1 | CH08 L102 (multi-agent) |
-| Retrieval & Agents | Context Window Management for FDE Agents | CH07 | N | — | P1 | CH07 semantic/synonym review |
+| Retrieval & Agents | Context Window Management for FDE Agents | CH07 | H | — | P1 | CH07 L877 (Context Window Management for Agents) |
 | Retrieval & Agents | Context Failure Modes | CH07 | H | — | P1 | CH07 L2 (context) |
 | Retrieval & Agents | GraphRAG and Contextual Retrieval | CH02 | B | — | P1 | CH02 L41 (GraphRAG) |
-| Retrieval & Agents | Query Rewriting, Expansion and HyDE | CH03 | N | — | P1 | CH03 semantic/synonym review |
-| Retrieval & Agents | Index Freshness and Staleness Windows | CH02 | N | — | P1 | CH02 semantic/synonym review |
-| Retrieval & Agents | Late-Interaction Retrieval (ColBERT) | CH02 | N | — | P1 | CH02 semantic/synonym review |
-| Retrieval & Agents | AG-UI: The Agent-User Interaction Protocol | CH06 | N | CHECK | P1 | CH06 semantic/synonym review |
-| Retrieval & Agents | AP2: The Agent Payments Protocol | CH06 | N | CHECK | P1 | CH06 semantic/synonym review |
+| Retrieval & Agents | Query Rewriting, Expansion and HyDE | CH03 | H | — | P1 | CH03 L422 (Query Rewriting, Expansion and HyDE) |
+| Retrieval & Agents | Index Freshness and Staleness Windows | CH02 | H | — | P1 | CH02 L208 (Index Freshness and Staleness Windows) |
+| Retrieval & Agents | Late-Interaction Retrieval (ColBERT) | CH02 | H | — | P1 | CH02 L223 (Late-Interaction Retrieval) |
+| Retrieval & Agents | AG-UI: The Agent-User Interaction Protocol | CH06 | H | CHECK | P1 | CH06 L1420 (AG-UI) |
+| Retrieval & Agents | AP2: The Agent Payments Protocol | CH06 | H | CHECK | P1 | CH06 L1420 (AP2) |
 | Retrieval & Agents | Text-to-SQL | CH11 | H | CHECK | P0 | CH11 L108 (Text-to-SQL) |
 | Retrieval & Agents | Document Parsing and Extraction | CH05 | H | — | P1 | CH05 L24 (parsing) |
 | Retrieval & Agents | TF-IDF and BM25 | CH02 | H | — | P1 | CH02 L16 (BM25) |
@@ -115,33 +115,33 @@
 | System Design for AI in Production | Idempotency | CH10 | H | — | P0 | CH10 L2064 (Idempotency) |
 | System Design for AI in Production | AI Cost and Unit Economics | CH10 | H | — | P0 | CH10 L2221 (cost per successful) |
 | System Design for AI in Production | Retries, Exponential Backoff and Jitter | CH10 | H | — | P0 | CH10 L2068 (retry) |
-| System Design for AI in Production | Rate Limiting | CH10 | N | — | P1 | CH10 semantic/synonym review |
+| System Design for AI in Production | Rate Limiting | CH10 | H | — | P1 | CH10 L2265 (Rate Limiting) |
 | System Design for AI in Production | The Walking Skeleton (Thin Slice First) | CH12 | H | — | P0 | CH12 L39 (walking skeleton) |
-| System Design for AI in Production | REST API Design for Integrations | CH10 | N | — | P1 | CH10 semantic/synonym review |
+| System Design for AI in Production | REST API Design for Integrations | CH10 | H | — | P1 | CH10 L2265 (REST API Design for Integrations) |
 | System Design for AI in Production | Containers and Kubernetes for Customer Deployments | CH10 | H | CHECK | P1 | CH10 L713 (container) |
-| System Design for AI in Production | Consistency, CAP and What Your Workflow Actually Needs | CH10 | N | — | P1 | CH10 semantic/synonym review |
+| System Design for AI in Production | Consistency, CAP and What Your Workflow Actually Needs | CH10 | H | — | P1 | CH10 L2282 (Consistency, CAP) |
 | System Design for AI in Production | Deployment Models: SaaS, BYOC, On-Prem and Air-Gapped | CH10 | H | CHECK | P0 | CH10 L2130 (BYOC) |
 | System Design for AI in Production | Message Queues and Pub/Sub | CH10 | H | — | P1 | CH10 L1541 (queue) |
 | System Design for AI in Production | Fallbacks and Provider Failover | CH10 | B | — | P1 | CH10 L2104 (fallback) |
-| System Design for AI in Production | Palantir's Platform: Foundry, AIP, Gotham and Apollo | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
+| System Design for AI in Production | Palantir's Platform: Foundry, AIP, Gotham and Apollo | CH10 | H | CHECK | P1 | CH10 L2419 (Palantir's Platform) |
 | System Design for AI in Production | The Enterprise AI Reference Architecture | CH10 | H | — | P1 | CH10 L810 (control plane) |
 | System Design for AI in Production | SLOs, SLIs and Error Budgets | CH09 | H | CHECK | P0 | CH09 L920 (SLO) |
 | MLOps & Lifecycle | Data and Concept Drift | CH09 | B | — | P1 | CH09 L287 (drift) |
 | MLOps & Lifecycle | CI/CD for Models | CH09 | H | — | P1 | CH09 L340 (release gate) |
-| MLOps & Lifecycle | Model Versioning and Migration | CH10 | N | — | P1 | CH10 semantic/synonym review |
+| MLOps & Lifecycle | Model Versioning and Migration | CH10 | H | — | P1 | CH10 L2296 (Model Versioning and Migration) |
 | MLOps & Lifecycle | Model Monitoring | CH09 | H | — | P1 | CH09 L2 (monitoring) |
 | MLOps & Lifecycle | Eval Regression Suites and CI Gates | CH09 | H | — | P0 | CH09 L340 (Release Gate) |
-| MLOps & Lifecycle | Feature Stores | CH11 | N | CHECK | P1 | CH11 semantic/synonym review |
-| MLOps & Lifecycle | Model Registry and Promotion | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
+| MLOps & Lifecycle | Feature Stores | CH11 | H | CHECK | P1 | CH11 L430 (Feature Stores) |
+| MLOps & Lifecycle | Model Registry and Promotion | CH10 | H | CHECK | P1 | CH10 L2296 (Model Registry and Promotion) |
 | ML Infrastructure & Serving | Inference Serving (vLLM, TGI) | CH10 | H | CHECK | P1 | CH10 L129 (vLLM) |
 | ML Infrastructure & Serving | GPU Memory and VRAM | CH10 | B | CHECK | P1 | CH10 L583 (GPU) |
 | ML Infrastructure & Serving | Knowledge Distillation | CH01 | H | — | P1 | CH01 L867 (distillation) |
-| ML Infrastructure & Serving | Quantization | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
+| ML Infrastructure & Serving | Quantization | CH10 | H | CHECK | P1 | CH10 L2337 (Quantization) |
 | ML Infrastructure & Serving | Noisy Neighbors and KV Fair Share | CH10 | H | — | P1 | CH10 L1600 (noisy neighbor) |
 | ML Infrastructure & Serving | Continuous Batching | CH10 | B | — | P1 | CH10 L13 (batching) |
-| ML Infrastructure & Serving | PagedAttention | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
-| ML Infrastructure & Serving | Distributed Training (FSDP, Parallelism) | CH10 | N | — | P1 | CH10 semantic/synonym review |
-| ML Infrastructure & Serving | Speculative Decoding | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
+| ML Infrastructure & Serving | PagedAttention | CH10 | H | CHECK | P1 | CH10 L2337 (PagedAttention) |
+| ML Infrastructure & Serving | Distributed Training (FSDP, Parallelism) | CH10 | H | — | P1 | CH10 L2400 (Distributed Training) |
+| ML Infrastructure & Serving | Speculative Decoding | CH10 | H | CHECK | P1 | CH10 L2348 (Speculative Decoding) |
 | ML Infrastructure & Serving | GPU Architecture and Execution | CH10 | B | CHECK | P1 | CH10 L583 (GPU) |
 | Data & SQL Engineering | Data Quality and Validation | CH11 | B | — | P0 | CH11 L4 (data quality) |
 | Data & SQL Engineering | Idempotent Data Pipelines | CH11 | H | — | P1 | CH11 L41 (idempotency) |
@@ -153,7 +153,7 @@
 | Data & SQL Engineering | Dimensional Modeling and Slowly Changing Dimensions | CH11 | H | CHECK | P1 | CH11 L71 (SCD) |
 | Data & SQL Engineering | Orchestration: DAGs, Retries and Backfills | CH11 | B | — | P1 | CH11 L69 (backfill) |
 | Data & SQL Engineering | Spark Internals and Performance Tuning | CH11 | H | CHECK | P0 | CH11 L93 (Spark engineering) |
-| Data & SQL Engineering | SQL vs NoSQL: Choosing a Data Store | CH11 | N | CHECK | P1 | CH11 semantic/synonym review |
+| Data & SQL Engineering | SQL vs NoSQL: Choosing a Data Store | CH11 | H | CHECK | P1 | CH11 L426 (SQL vs NoSQL) |
 | Data & SQL Engineering | Deduplication and LSH | CH11 | B | — | P1 | CH11 L15 (dedup) |
 | Data & SQL Engineering | SQL Window Functions | CH11 | B | CHECK | P0 | CH11 L73 (window functions) |
 | Data & SQL Engineering | Gaps and Islands | CH11 | H | — | P1 | CH11 L71 (Gaps and Islands) |
@@ -165,14 +165,14 @@
 | AI Security, Privacy & Governance | IAM and Least Privilege | CH10 | B | — | P1 | CH10 L1355 (IAM) |
 | AI Security, Privacy & Governance | AI Incident Response | CH10 | B | — | P1 | CH10 L1724 (incident) |
 | AI Security, Privacy & Governance | Prompt Injection and Defense | CH10 | H | — | P1 | CH10 L394 (prompt injection) |
-| AI Security, Privacy & Governance | AI Governance (SOC2, EU AI Act) | CH10 | N | CHECK | P0 | CH10 semantic/synonym review |
-| AI Security, Privacy & Governance | Enterprise SSO: SAML and OIDC | CH10 | N | CHECK | P1 | CH10 semantic/synonym review |
+| AI Security, Privacy & Governance | AI Governance (SOC2, EU AI Act) | CH10 | H | CHECK | P0 | CH10 L2363 (AI Governance) |
+| AI Security, Privacy & Governance | Enterprise SSO: SAML and OIDC | CH10 | H | CHECK | P1 | CH10 L2379 (Enterprise SSO) |
 | AI Security, Privacy & Governance | Data Residency and Sovereignty | CH10 | B | CHECK | P1 | CH10 L2132 (data residency) |
 | AI Security, Privacy & Governance | Secrets Management | CH10 | H | — | P1 | CH10 L590 (secret) |
 | AI Security, Privacy & Governance | Agent Sandboxing and Execution Isolation | CH10 | H | — | P1 | CH10 L282 (sandbox) |
-| AI Security, Privacy & Governance | Differential Privacy | CH01 | N | CHECK | P1 | CH01 semantic/synonym review |
-| AI Security, Privacy & Governance | Federated Learning | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| AI Security, Privacy & Governance | Mechanistic Interpretability | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| AI Security, Privacy & Governance | Differential Privacy | CH01 | H | CHECK | P1 | CH01 L1865 (Differential Privacy) |
+| AI Security, Privacy & Governance | Federated Learning | CH01 | H | — | P1 | CH01 L1865 (Federated Learning) |
+| AI Security, Privacy & Governance | Mechanistic Interpretability | CH01 | H | — | P1 | CH01 L1865 (Mechanistic Interpretability) |
 | Coding & Engineering Craft | Streaming and Backpressure | CH10 | B | — | P1 | CH10 L2112 (backpressure) |
 | Coding & Engineering Craft | Big-O That Actually Matters | CH11 | H | — | P1 | CH11 L352 (Big-O That Actually Matters) |
 | Coding & Engineering Craft | Parsing Messy, Real-World Data | CH11 | H | — | P1 | CH11 L368 (Parsing Messy, Real-World Data) |
@@ -180,7 +180,7 @@
 | Coding & Engineering Craft | Caching and Eviction | CH10 | H | — | P1 | CH10 L26 (cache) |
 | Coding & Engineering Craft | Sliding Window and Two Pointers | CH11 | H | — | P1 | CH11 L382 (Sliding Window and Two Pointers) |
 | Coding & Engineering Craft | Concurrency and the GIL | CH11 | H | — | P1 | CH11 L401 (Concurrency and the GIL) |
-| Coding & Engineering Craft | Numerical Stability | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Coding & Engineering Craft | Numerical Stability | CH01 | H | — | P1 | CH01 L1881 (Numerical Stability) |
 | Coding & Engineering Craft | Testability and Dependency Injection | CH08 | H | — | P1 | CH08 L6528 (Testability and Dependency Injection) |
 | Coding & Engineering Craft | Graph Traversal and Topological Sort | CH08 | H | — | P1 | CH08 L6512 (Graph Traversal and Topological Sort) |
 | The Customer-Facing Craft | Scoping Ambiguous Problems | CH12 | H | — | P0 | CH12 L57 (scope) |
@@ -196,6 +196,16 @@
 - CH11 §11.11 now contains the coding cost/CSV/sliding-window/GIL contracts; CH08 §8.18 owns DAG/topological scheduling and injected tool-test boundaries.
 - **23 named owner-chapter items** were manually remapped to explicit heading evidence. A positive signal means **the concept now has a discoverable section**, not that it has passed rigorous model benchmarking or a hiring interview.
 - The runnable stdlib mini-lab includes positive and negative test cases. These cover narrow deterministic behavior but not customer deployment/real ML model performance.
+
+## Stage 07 · Manual review of all previous 37 N entries
+
+**Interpretation:** Every previously N-marked topic now has an explicit term/approved synonym in its assigned canonical chapter heading, with reasoned content or an explicit pointer to existing coverage. **N=0 is a heading-location property, not “167 concepts complete”.** Some sections cover several concepts and are shorter than a dedicated tutorial; depth, correctness, hands-on proficiency and independent first-party validation require continued testing.
+
+- **Prior substantive content, reconciled rather than re-created:** Prompt Engineering; Tool / Function Calling; Context Window Management for FDE Agents; Numerical Stability.
+- **Newly expanded thematic explanations:** 33 titles routed to CH01/02/03/06/07/10/11; explanatory prompts Q40–Q64, architecture alternatives, negative cases and sources are documented under the canonical chapter owners.
+- **Current implementation evidence:** the stdlib lab adds index/embedding/ACL revision consistency, per-tenant quota admission and bitemporal feature lookup negative tests. All still need service-specific integration validation.
+- **Flag:** `CHECK` in the 167-row table means the product/standard/law is version-sensitive and must be reverified; it does not certify legal compliance, accuracy or performance.
+- **Important remaining work:** develop a true six-criterion semantic rubric for *all 167 topics* (mechanism, example, choice/trade-off, failure, metric, first-party evidence) and close insufficient topics only on explicit evidence, not lexical tags.
 
 ## Next editorial review (not automatically inferred coverage)
 
@@ -220,15 +230,15 @@
 
 | FDE track | H | B | N | Total |
 |---|---:|---:|---:|---:|
-| Foundations of LLMs & GenAI | 17 | 3 | 10 | 30 |
-| Retrieval & Agents | 16 | 6 | 9 | 31 |
+| Foundations of LLMs & GenAI | 27 | 3 | 0 | 30 |
+| Retrieval & Agents | 25 | 6 | 0 | 31 |
 | Evaluation & ML Foundations | 21 | 3 | 0 | 24 |
-| System Design for AI in Production | 14 | 2 | 4 | 20 |
-| MLOps & Lifecycle | 3 | 1 | 3 | 7 |
-| ML Infrastructure & Serving | 3 | 3 | 4 | 10 |
-| Data & SQL Engineering | 8 | 5 | 1 | 14 |
-| AI Security, Privacy & Governance | 5 | 6 | 5 | 16 |
-| Coding & Engineering Craft | 7 | 2 | 1 | 10 |
+| System Design for AI in Production | 18 | 2 | 0 | 20 |
+| MLOps & Lifecycle | 6 | 1 | 0 | 7 |
+| ML Infrastructure & Serving | 7 | 3 | 0 | 10 |
+| Data & SQL Engineering | 9 | 5 | 0 | 14 |
+| AI Security, Privacy & Governance | 10 | 6 | 0 | 16 |
+| Coding & Engineering Craft | 8 | 2 | 0 | 10 |
 | The Customer-Facing Craft | 5 | 0 | 0 | 5 |
 
 ## Audit method and limitations
