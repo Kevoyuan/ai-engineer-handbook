@@ -363,3 +363,26 @@ The architecture must preserve auditability, security boundaries, rollback and c
 - [AWS Well-Architected retries](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_prevent_interaction_failure_idempotent.html) and [bounded backoff](https://docs.aws.amazon.com/wellarchitected/2023-04-10/framework/rel_mitigate_interaction_failure_limit_retries.html) — idempotent writes and limited retry amplification.
 
 This section is the **canonical system-level case owner**. Refer to CH11 for CDC/Spark/SQL detail, CH02–05 for authorized retrieval/grounding, CH08 for workflow orchestration, CH09 for evaluation and CH10 for runtime identity/serving. The presentation fragment in \`web/assets/ch12-order-investigation-capstone.html\` is **derived content**.
+
+## 12.12 FDE Curriculum Coverage Audit: topic signals are not readiness scores
+
+The source curriculum lists **167 concepts in ten original FDE tracks**. The [single-owner concept crosswalk](../references/fde-2026-concept-crosswalk.md) maps each item to CH01–12. The [per-concept evidence audit](../references/fde-2026-coverage-audit.md) examines **each assigned canonical chapter**, including this branch's new CH10 §10.26 and CH11 §11.10, to locate direct terminology/alias evidence:
+
+| Source-text audit grade | 2026-10-08 branch baseline | What it actually means |
+|---|---:|---|
+| H — owning chapter section heading | 76 | An explicit concept-specific name or reviewed alias occurs in a heading. **Not** a proof of deep coverage. |
+| B — owning chapter body | 34 | A concept name or reviewed alias is mentioned without a corresponding heading. Review for depth. |
+| N — no direct owner-chapter term signal | 57 | No reviewed English/alias term was found in that chapter. Could be a true content gap **or** Chinese/equivalent wording; manually check before calling it missing. |
+
+**This is a reproducible evidence-location scan, not a scored interview exam and not a verified 167-topic textbook.** Unlike a naive keyword-count completion chart, this audit does not label any concept “fully covered”. The next semantic audit should independently check whether each topic has:
+
+1. A correct causal/mechanistic answer grounded in the owning chapter.
+2. A concrete system/SQL/agent or business example with conditions.
+3. A design alternative and its trade-off.
+4. A failure injection / negative test / counterexample.
+5. An observable metric or acceptance criterion.
+6. A primary-source reference when implementation/version detail matters.
+
+**Editorial priority:** P0 production architecture (CH10 §10.26), data engineering (CH11 §11.10), customer discovery and handoff (CH12 §12.11), authorization (CH02), and eval gates (CH09). Fill true technical gaps instead of creating duplicate “interview” chapters. The [Q10–Q23 research ledger](../references/fde-2026-answers-02-04-provenance.md) documents primary-source checks and unexecuted limitations; earlier [Q1–Q9 ledger](../references/fde-2026-verified-answer-ledger.md) remains separate.
+
+**Release boundary:** this phase is pushed to a feature branch for review. The source, bilingual Reader fragment, report and local build artifacts do not imply Vercel production has been deployed. No production release should occur without an explicit later request.
