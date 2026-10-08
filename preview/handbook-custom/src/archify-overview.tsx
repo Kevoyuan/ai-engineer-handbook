@@ -20,10 +20,10 @@ export function ArchifyOverview({ anchor, en }: { anchor: string; en: boolean })
       <div><span className="archify-kicker">{en ? "VISUAL MAP" : "可视化全景"}</span><h4>{title}</h4></div>
       <Button asChild variant="outline"><a href={source + ".html"} target="_blank" rel="noopener noreferrer">{en ? "Explore map" : "打开全景图"}<ArrowRightIcon /><span className="sr-only">{en ? " (new tab)" : "（新标签页）"}</span></a></Button>
     </div>
-    <a className="archify-poster" href={source + ".html"} target="_blank" rel="noopener noreferrer" aria-label={en ? `Explore ${title} in a new tab` : `在新标签页探索${title}`}>
-      <img className="archify-light" src={source + "-light.png"} alt={title} width={dimensions[0]} height={dimensions[1]} loading="lazy" />
-      <img className="archify-dark" src={source + "-dark.png"} alt={title} width={dimensions[0]} height={dimensions[1]} loading="lazy" />
-    </a>
+    <div className="archify-poster" role="img" aria-label={en ? `Preview: ${title}` : `预览：${title}`}>
+      <img className="archify-light" src={source + "-light.png"} alt="" width={dimensions[0]} height={dimensions[1]} loading="lazy" decoding="async" />
+      <img className="archify-dark" src={source + "-dark.png"} alt="" width={dimensions[0]} height={dimensions[1]} loading="lazy" decoding="async" />
+    </div>
     <figcaption><p>{summary}</p><span>{en ? "Open to zoom, inspect connections and export." : "打开后可缩放、查看节点关系并导出。"}</span></figcaption>
   </figure>;
 }
