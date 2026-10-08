@@ -1,205 +1,198 @@
 "use client";
 
-import { memo, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { memo, useLayoutEffect, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { motion, useReducedMotion } from "motion/react";
 import "./jev-flow-comparison.css";
 
-type Copy = [string, string];
-type Stage = {
-  number: string;
-  left: Copy;
-  right: Copy;
-  leftDetail: Copy;
-  rightDetail: Copy;
-  note: Copy;
+type Copy = readonly [string, string];
+
+type Responsibility = {
+  id: "generation" | "decision" | "runtime";
+  title: string;
+  subtitle: Copy;
+  tasks: readonly Copy[];
+  takeaway: Copy;
+  boundary: Copy;
 };
 
-const stages: Stage[] = [
+const responsibilities: readonly Responsibility[] = [
   {
-    number: "01 · INPUT",
-    left: ["User / Agent State", "User / Agent State"],
-    right: ["User / Agent State", "User / Agent State"],
-    leftDetail: ["用户输入与当前任务状态。", "User input and current task state."],
-    rightDetail: ["同一份输入和当前任务状态。", "The same input and current task state."],
-    note: ["两种执行路径可以拿到相同输入；差别在于输出契约与推理机制。", "Both paths can read identical input; the output contract and execution mechanism differ."],
+    id: "generation",
+    title: "Generative Model",
+    subtitle: ["负责开放式工作", "For open-ended work"],
+    tasks: [
+      ["编程", "Coding"],
+      ["规划", "Planning"],
+      ["研究", "Research"],
+      ["开放式生成", "Open-ended generation"],
+    ],
+    takeaway: ["擅长创意、推理与复杂任务", "For creative, reasoning and complex tasks"],
+    boundary: [
+      "需要自由生成代码、文章或计划时，交给 Generative Model。它也能提出动作，但提出动作不等于获得执行权限。",
+      "Use a generative model for code, writing and plans with open answer spaces. Proposing an action does not grant permission to execute it.",
+    ],
   },
   {
-    number: "02 · CONTRACT",
-    left: ["Prompt + JSON Schema", "Prompt + JSON Schema"],
-    right: ["Defined Decision Questions", "Defined Decision Questions"],
-    leftDetail: ["要求生成符合 schema 的答案文本。", "Ask the model to generate an answer conforming to a schema."],
-    rightDetail: ["事先声明 Choice / Noul / Score。", "Define Choice / Noul / Score before inference."],
-    note: ["给生成模型加 schema 仍是约束文本生成；决策模型的输出空间在调用前已经封闭。", "Constraining an LLM with a schema still involves generation; the decision model starts with a bounded answer space."],
+    id: "decision",
+    title: "Jev",
+    subtitle: ["负责边界明确的判断", "For bounded decisions"],
+    tasks: [
+      ["模型路由", "Model routing"],
+      ["工具 / 风险检查", "Tool / risk checks"],
+      ["进度判断", "Progress"],
+      ["完成判断", "Completion"],
+    ],
+    takeaway: ["类型化判断 + 概率", "Typed decisions + probabilities"],
+    boundary: [
+      "Jev 处理预先定义答案空间的判断（例如 Choice / Noul / Score），返回候选与概率。概率与类型有效不代表判断正确；是否通过由策略与阈值决定。",
+      "Jev handles bounded Choice / Noul / Score decisions and produces typed candidates and probabilities. These are not proof of correctness; policy and evaluated thresholds determine the branch.",
+    ],
   },
   {
-    number: "03 · INFERENCE",
-    left: ["Sequential Token Decode", "Sequential Token Decode"],
-    right: ["Independent Decisions", "Independent Decisions"],
-    leftDetail: ["按 token 顺序形成输出。", "Construct the output sequentially, token by token."],
-    rightDetail: ["互不依赖的问题可在一次决策调用中共同求值。", "Independent questions can be evaluated together in one decision call."],
-    note: ["Jev 的并行指同一状态下互不依赖的判断；若问题 B 依赖问题 A 的新结果，仍必须遵守数据依赖。", "Parallel Jev decisions refer to independent judgments over the same state; true dependencies between A and B remain sequential."],
-  },
-  {
-    number: "04 · RESPONSE",
-    left: ["Generated JSON Text", "Generated JSON Text"],
-    right: ["Typed Values + Probabilities", "Typed Values + Probabilities"],
-    leftDetail: ["返回 JSON 字符串或受约束的结构化输出。", "Return JSON text or constrained structured output."],
-    rightDetail: ["返回候选结果、概率和相应决策字段。", "Return typed candidates, probabilities and decision fields."],
-    note: ["Typed output 更容易直接接入代码分支，但合法类型不等于判断一定正确。", "Typed output integrates directly with branches, but a valid type is not a guarantee of correct judgment."],
-  },
-  {
-    number: "05 · APPLICATION",
-    left: ["Validate → Convert to Decision", "Validate → Convert to Decision"],
-    right: ["Threshold → Select Branch", "Threshold → Select Branch"],
-    leftDetail: ["验证结构与业务语义后，转为可执行决策。", "Validate structure and business meaning before converting to a software decision."],
-    rightDetail: ["根据概率校准与业务阈值，选择路径或升级处理。", "Use locally evaluated thresholds and calibration to select or escalate."],
-    note: ["最终授权、审批与副作用执行始终由 Runtime 决定，而不是由任意模型的输出直接决定。", "Final authorization, approvals and side effects stay with the runtime, not either model output."],
+    id: "runtime",
+    title: "Runtime",
+    subtitle: ["负责安全执行", "For safe execution"],
+    tasks: [
+      ["权限", "Permissions"],
+      ["开销上限", "Spend limits"],
+      ["允许列表", "Allowlist"],
+      ["执行 / 拦截 / 重试", "Execute / block / retry"],
+    ],
+    takeaway: ["执行确定性硬约束", "Enforces hard constraints"],
+    boundary: [
+      "Runtime 才是最终的执行和授权边界。无论动作建议来自 LLM 还是 Jev，都必须经过权限、预算、审批与验证。",
+      "Runtime owns execution and authorization. Actions suggested by an LLM or Jev still pass permissions, budgets, approvals and validation.",
+    ],
   },
 ];
 
-function FlowColumn({
-  kind,
-  en,
-  step,
-  reduce,
-}: {
-  kind: "llm" | "jev";
-  en: boolean;
-  step: number;
-  reduce: boolean;
-}) {
-  const isLLM = kind === "llm";
-  const t = (value: Copy) => value[en ? 1 : 0];
-
-  return (
-    <div className={"jev-dfc-path " + (isLLM ? "jev-dfc-path--llm" : "jev-dfc-path--typed")} aria-label={isLLM ? "Generative LLM flow" : "Jev decision model flow"}>
-      <header className="jev-dfc-path-head">
-        <span className="jev-dfc-path-id">{isLLM ? "PATH A / GENERATION" : "PATH B / DECISION"}</span>
-        <strong>{isLLM ? "Generative LLM" : "Jev / System One"}</strong>
-        <small>{isLLM
-          ? t(["按 token 生成，再转为软件决策", "Generate tokens, then recover a decision"])
-          : t(["定义问题，直接返回类型化判断", "Ask bounded questions, receive typed decisions"])}</small>
-      </header>
-      <div className="jev-dfc-stack">
-        {stages.map((stage, index) => (
-          <div key={stage.number} className="jev-dfc-stage-wrap">
-            {index > 0 && (
-              <div className={"jev-dfc-connector" + (step >= index ? " is-complete" : "")} aria-hidden="true">
-                <span className="jev-dfc-connector-line" />
-                <span className="jev-dfc-connector-arrow">↓</span>
-              </div>
-            )}
-            <motion.div
-              className={"jev-dfc-stage" + (step === index ? " is-current" : "") + (step > index ? " is-complete" : "")}
-              initial={false}
-              animate={reduce ? {} : { opacity: step === index ? 1 : 0.84, scale: step === index ? 1 : 0.997 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              aria-current={step === index ? "step" : undefined}
-            >
-              <span className="jev-dfc-stage-id">{stage.number}</span>
-              <strong>{t(isLLM ? stage.left : stage.right)}</strong>
-              <small>{t(isLLM ? stage.leftDetail : stage.rightDetail)}</small>
-              {step === 2 && index === 2 && (
-                <div className="jev-dfc-example" aria-label={isLLM ? "Illustrative sequential tokens" : "Illustrative independent judgments"}>
-                  {(isLLM ? ["{", '"intent"', ":", '"refund"', "}"] : ["Choice", "Noul", "Score"]).map((word, token) => (
-                    <motion.span
-                      key={word}
-                      initial={reduce ? false : { opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={reduce ? { duration: 0 } : { duration: 0.18, delay: isLLM ? token * 0.26 : 0.14 }}
-                    >{word}</motion.span>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+const beforeTasks: readonly Copy[] = [
+  ["规划", "Plan"],
+  ["写代码", "Write code"],
+  ["模型路由", "Route model"],
+  ["研究", "Research"],
+  ["结果评分", "Score result"],
+  ["工具审批？", "Tool approval?"],
+  ["任务完成？", "Task complete?"],
+  ["仍有进展？", "Still making progress?"],
+];
 
 function Comparison({ en }: { en: boolean }) {
   const t = (value: Copy) => value[en ? 1 : 0];
-  const reduce = Boolean(useReducedMotion());
-  const root = useRef<HTMLElement | null>(null);
-  const [step, setStep] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const last = step === stages.length - 1;
+  const [selected, setSelected] = useState<Responsibility["id"]>("decision");
+  const current = responsibilities.find((role) => role.id === selected)!;
 
-  useEffect(() => {
-    if (reduce && playing) setPlaying(false);
-  }, [reduce, playing]);
-  useEffect(() => {
-    if (!playing || reduce || last) return;
-    const id = window.setTimeout(() => setStep((value) => Math.min(stages.length - 1, value + 1)), 2800);
-    return () => window.clearTimeout(id);
-  }, [playing, reduce, step, last]);
-  useEffect(() => {
-    if (last && playing) setPlaying(false);
-  }, [last, playing]);
-  useEffect(() => {
-    const stop = () => { if (document.hidden) setPlaying(false); };
-    document.addEventListener("visibilitychange", stop);
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries[0]?.isIntersecting) setPlaying(false);
-    }, { threshold: 0.06 });
-    if (root.current) observer.observe(root.current);
-    return () => {
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", stop);
-    };
-  }, []);
-
-  function play() {
-    if (reduce) return;
-    if (last) setStep(0);
-    setPlaying(true);
-  }
-  function move(next: number) {
-    setPlaying(false);
-    setStep(Math.max(0, Math.min(stages.length - 1, next)));
-  }
   return (
-    <section className="jev-dfc-root" ref={root} aria-labelledby="jev-dfc-title">
-      <div className="jev-dfc-heading">
-        <div>
-          <span className="jev-dfc-eyebrow">FIG.6.C4 · DUAL EXECUTION PATHS</span>
-          <h3 id="jev-dfc-title">{t(["相同决策任务，两条不同执行路径", "The same decision task, two execution paths"])}</h3>
-          <p>{t(["对比「生成答案文本」与「直接给出类型化决策」，观察哪一步发生了改变。", "Compare generating an answer string with returning typed decisions, and inspect exactly where the execution paths diverge."])}</p>
-        </div>
-        <div className="jev-dfc-controls" role="group" aria-label={t(["流程演示控制", "Flow playback controls"])}>
-          <button type="button" onClick={() => move(step - 1)} disabled={step === 0} aria-label={t(["上一步", "Previous step"])}>←</button>
-          <button type="button" className="jev-dfc-primary" onClick={playing ? () => setPlaying(false) : play} disabled={reduce && !playing} aria-label={playing ? t(["暂停演示", "Pause demonstration"]) : last ? t(["重播演示", "Replay demonstration"]) : t(["播放演示", "Play demonstration"])}>
-            {reduce ? t(["逐步浏览", "Step manually"]) : playing ? t(["暂停", "Pause"]) : last ? t(["重播", "Replay"]) : t(["播放", "Play"])}
-          </button>
-          <button type="button" onClick={() => move(step + 1)} disabled={last} aria-label={t(["下一步", "Next step"])}>→</button>
-        </div>
+    <section className="jev-dfc-root" aria-labelledby="jev-dfc-title">
+      <header className="jev-dfc-heading">
+        <span className="jev-dfc-eyebrow">FIG.6.C4 · RESPONSIBILITY SPLIT</span>
+        <h3 id="jev-dfc-title">Jev vs. Generative LLMs</h3>
+        <p>{t([
+          "重点不是把 LLM 替换成 Jev，而是把生成、决策与执行放在不同层。",
+          "The point is not to replace the LLM with Jev, but to separate generation, decisions and execution.",
+        ])}</p>
+      </header>
+
+      <div className="jev-dfc-compare">
+        <section className="jev-dfc-before" aria-labelledby="jev-dfc-before-title">
+          <header className="jev-dfc-side-head">
+            <span className="jev-dfc-label jev-dfc-label--before">Before</span>
+            <h4 id="jev-dfc-before-title">{t([
+              "用一个生成式模型处理所有事情",
+              "Generative model for everything",
+            ])}</h4>
+            <p>{t([
+              "同一个 LLM 同时承担开放式任务和 Agent 决策。",
+              "One LLM handles both open-ended work and agent decisions.",
+            ])}</p>
+          </header>
+
+          <div className="jev-dfc-before-visual" aria-label={t([
+            "所有任务集中在同一个 LLM",
+            "All responsibilities concentrated in one LLM",
+          ])}>
+            <div className="jev-dfc-task-grid">
+              {beforeTasks.slice(0, 4).map((task) => (
+                <span className="jev-dfc-task" key={task[1]}>{t(task)}</span>
+              ))}
+            </div>
+            <div className="jev-dfc-single-model">
+              <strong>Single LLM</strong>
+              <span>{t(["处理所有事情", "for everything"])}</span>
+            </div>
+            <div className="jev-dfc-task-grid">
+              {beforeTasks.slice(4).map((task) => (
+                <span className="jev-dfc-task" key={task[1]}>{t(task)}</span>
+              ))}
+            </div>
+          </div>
+
+          <p className="jev-dfc-verdict jev-dfc-verdict--before">{t([
+            "一个生成模型同时承担开放任务与边界明确的判断。",
+            "One generative model handles both open-ended work and bounded decisions.",
+          ])}</p>
+        </section>
+
+        <section className="jev-dfc-after" aria-labelledby="jev-dfc-after-title">
+          <header className="jev-dfc-side-head">
+            <span className="jev-dfc-label jev-dfc-label--after">After</span>
+            <h4 id="jev-dfc-after-title">{t([
+              "把职责分开",
+              "Separate the responsibilities",
+            ])}</h4>
+            <p>{t([
+              "生成、决策与执行由不同的组件负责。",
+              "Specialized components for generation, decision-making and execution.",
+            ])}</p>
+          </header>
+
+          <div className="jev-dfc-roles" role="group" aria-label={t([
+            "选择要查看的职责层",
+            "Choose a responsibility to inspect",
+          ])}>
+            {responsibilities.map((role) => (
+              <button
+                key={role.id}
+                type="button"
+                className={"jev-dfc-role jev-dfc-role--" + role.id + (selected === role.id ? " is-selected" : "")}
+                aria-label={t(["查看 ", "Inspect "]) + role.title}
+                aria-pressed={selected === role.id}
+                aria-controls="jev-dfc-insight"
+                onClick={() => setSelected(role.id)}
+              >
+                <span className="jev-dfc-role-top">
+                  <span className="jev-dfc-role-icon" aria-hidden="true">
+                    {role.id === "generation" ? "G" : role.id === "decision" ? "J" : "R"}
+                  </span>
+                  <span className="jev-dfc-role-name">
+                    <strong>{role.title}</strong>
+                    <small>{t(role.subtitle)}</small>
+                  </span>
+                </span>
+                <span className="jev-dfc-role-tasks">
+                  {role.tasks.map((task) => (
+                    <span key={task[1]}>{t(task)}</span>
+                  ))}
+                </span>
+                <span className="jev-dfc-role-takeaway">{t(role.takeaway)}</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="jev-dfc-verdict jev-dfc-verdict--after">{t([
+            "生成、决策和执行分别由合适的层负责。",
+            "Separate generation, decisions and execution.",
+          ])}</p>
+        </section>
       </div>
-      <div className="jev-dfc-progress" role="group" aria-label={t(["演示阶段选择", "Choose a demonstration stage"])}>
-        {stages.map((stage, index) => (
-          <button key={stage.number} type="button" className={step === index ? "is-current" : ""} onClick={() => move(index)} aria-label={t(["跳至阶段 ", "Jump to stage "]) + String(index + 1)} aria-current={step === index ? "step" : undefined} title={stage.number}>
-            <span />
-          </button>
-        ))}
-      </div>
-      <div className="jev-dfc-grid">
-        <FlowColumn kind="llm" en={en} step={step} reduce={reduce} />
-        <FlowColumn kind="jev" en={en} step={step} reduce={reduce} />
-      </div>
-      <div className="jev-dfc-explanation" role="status" aria-live={playing ? "off" : "polite"} aria-atomic="true">
-        <span>{stages[step].number}</span>
-        <p>{t(stages[step].note)}</p>
-      </div>
-      <div className="jev-dfc-control-plane">
-        <span className="jev-dfc-rule" aria-hidden="true">↓</span>
-        <strong>SHARED RUNTIME · Authorization / Policy / Host</strong>
-        <p>{t(["两条路径都不能绕过权限、确定性业务约束与执行验证。", "Neither route bypasses authorization, deterministic business constraints, or execution validation."])}</p>
+
+      <div className="jev-dfc-insight" id="jev-dfc-insight" aria-live="polite" aria-atomic="true">
+        <span className="jev-dfc-insight-label">{t(["职责边界", "RESPONSIBILITY BOUNDARY"])} · {current.title}</span>
+        <p>{t(current.boundary)}</p>
       </div>
       <p className="jev-dfc-caption">{t([
-        "概念示意，非性能实测。Jev 的并行判断仅适用于相互独立的问题；类型合法不保证语义正确。减少动态效果模式支持手动逐步阅读。",
-        "Conceptual comparison, not a performance benchmark. Parallel Jev judgments require independent questions; type-valid does not guarantee semantic correctness. Reduced-motion mode supports manual stepping.",
+        "架构对照示意，不是性能基准。Jev 的概率需要校准；类型化输出不等于判断正确；最终审批和副作用由 Runtime 控制。",
+        "Conceptual architecture comparison, not a performance benchmark. Jev probabilities need calibration; typed outputs do not guarantee correctness; runtime controls final approval and side effects.",
       ])}</p>
     </section>
   );

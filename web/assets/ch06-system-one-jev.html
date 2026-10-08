@@ -80,14 +80,26 @@
   </div>
 </div>
 
-<div id="jev-dual-flow-slot" aria-label="Jev vs Generative LLM flow comparison">
+<div id="jev-dual-flow-slot" aria-label="Jev vs Generative LLM responsibility comparison">
   <div class="jev-dfc-static-fallback">
-    <h3 class="sub"><span class="i18n-text" data-i18n-zh="FIG.6.C4 · 两条执行路径，对照阅读" data-i18n-en="FIG.6.C4 · Two execution paths side by side">FIG.6.C4 · 两条执行路径，对照阅读</span></h3>
+    <h3 class="sub">FIG.6.C4 · Jev vs. Generative LLMs</h3>
     <div class="bfs-grid bfs-g2">
-      <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">PATH A · GENERATIVE LLM</span></div><h3 class="bfs-card-title">User State → Prompt / Schema → Token Decode → JSON → Validate</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先生成答案文本，后由应用还原决策。" data-i18n-en="Generate an answer string first; the application then recovers a decision.">先生成答案文本，后由应用还原决策。</span></div></div>
-      <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">PATH B · JEV</span></div><h3 class="bfs-card-title">User State → Typed Questions → Independent Judgments → Typed Values → Threshold</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="预先定义输出空间，直接返回可编程判断。" data-i18n-en="Predefine the output space and return decisions that software can use directly.">预先定义输出空间，直接返回可编程判断。</span></div></div>
+      <div class="bfs-card bfs-blue">
+        <div class="bfs-card-head"><span class="bfs-stage-pill">BEFORE</span></div>
+        <h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="生成式模型包办所有任务" data-i18n-en="Generative model for everything">生成式模型包办所有任务</span></h3>
+        <div class="bfs-card-desc">Single LLM → Plan · Write code · Route model · Research · Score result · Tool approval? · Task complete? · Progress?</div>
+      </div>
+      <div class="bfs-card bfs-teal">
+        <div class="bfs-card-head"><span class="bfs-stage-pill">AFTER</span></div>
+        <h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="按职责拆分生成、决策与执行" data-i18n-en="Separate generation, decisions and execution">按职责拆分生成、决策与执行</span></h3>
+        <div class="bfs-card-desc">
+          <strong>Generative Model</strong> · <span class="i18n-text" data-i18n-zh="编码、规划、研究、开放生成" data-i18n-en="Coding, planning, research, open-ended generation">编码、规划、研究、开放生成</span><br>
+          <strong>Jev</strong> · <span class="i18n-text" data-i18n-zh="模型路由、风险检查、进度、完成判断；类型化概率" data-i18n-en="Model routing, risk checks, progress, completion; typed probabilities">模型路由、风险检查、进度、完成判断；类型化概率</span><br>
+          <strong>Runtime</strong> · <span class="i18n-text" data-i18n-zh="权限、预算上限、允许列表、执行或拦截" data-i18n-en="Permissions, spend limits, allowlist, execute or block">权限、预算上限、允许列表、执行或拦截</span>
+        </div>
+      </div>
     </div>
-    <p class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="两条路径最后都经过 Runtime 的授权、策略和执行检查；只对互不依赖的判断讨论并行。" data-i18n-en="Both paths still pass runtime authorization, policy and execution checks; parallelism only applies to independent judgments.">两条路径最后都经过 Runtime 的授权、策略和执行检查；只对互不依赖的判断讨论并行。</span></p>
+    <p class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="职责分离不代表模型判断自动可靠；执行边界仍由 Runtime 掌握。" data-i18n-en="Responsibility separation does not make model judgments inherently correct; Runtime still owns execution boundaries.">职责分离不代表模型判断自动可靠；执行边界仍由 Runtime 掌握。</span></p>
   </div>
 </div>
 
