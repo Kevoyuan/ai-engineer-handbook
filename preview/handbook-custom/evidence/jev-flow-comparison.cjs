@@ -34,6 +34,16 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
           assert.equal(await diagram.locator(".jev-dfc-after").count(), 1);
           assert.equal(await diagram.locator(".jev-dfc-task").count(), 8);
           assert.equal(await diagram.locator(".jev-dfc-role").count(), 3);
+          assert.equal(await diagram.locator(".jev-dfc-before-link .jev-dfc-arrow-track").count(), 2);
+          assert.equal(await diagram.locator(".jev-dfc-handoff .jev-dfc-arrow-track").count(), 2);
+          assert.match(await diagram.locator(".jev-dfc-handoff--decision").innerText(),
+            en ? /Bounded decision/ : /边界决策/);
+          assert.match(await diagram.locator(".jev-dfc-handoff--runtime").innerText(),
+            en ? /permission gate/ : /权限校验/);
+          assert.equal(await diagram.locator(".jev-dfc-root.is-playing").count(), 0);
+          assert.equal(await diagram.getByRole("button", {
+            name: en ? "Animate responsibility handoff" : "演示职责流转",
+          }).isDisabled(), true, "reduced motion has static arrows but disables autoplay");
           assert.equal(await page.locator("#jev-dual-flow-slot").count(), 1);
           assert.equal(await page.locator("#jev-dual-flow-slot .jev-dfc-static-fallback").isVisible(), false);
           const before = await diagram.locator(".jev-dfc-before").innerText();
@@ -67,6 +77,41 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
         }
       }
     }
+    // Explicit, finite motion: no automatic playback, animation on click,
+    // it ends by itself, and the user can replay.
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 950 },
+      reducedMotion: "no-preference",
+    });
+    await context.addInitScript(() => {
+      localStorage.setItem("preview-locale", "false");
+      window.__name = fn => fn;
+    });
+    const page = await context.newPage();
+    page.on("pageerror", error => errors.push(error.message));
+    await page.goto(base + "#read/06-skills-routing");
+    const diagram = page.locator(".jev-dfc-root");
+    await diagram.waitFor();
+    assert.equal(await diagram.evaluate(node => node.classList.contains("is-playing")), false);
+    const play = diagram.getByRole("button", { name: "演示职责流转" });
+    await play.click();
+    assert.equal(await diagram.evaluate(node => node.classList.contains("is-playing")), true);
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll(".jev-dfc-root .jev-dfc-role")].some(
+        node => node.getAnimations().some(animation => animation.playState === "running"),
+      ),
+      { timeout: 2800 },
+    );
+    await page.waitForFunction(() =>
+      !document.querySelector(".jev-dfc-root")?.classList.contains("is-playing"),
+      { timeout: 7000 },
+    );
+    assert.equal(await play.isEnabled(), true);
+    await play.click();
+    assert.equal(await diagram.evaluate(node => node.classList.contains("is-playing")), true);
+    await page.close();
+    await context.close();
+    console.log("PASS explicit finite Jev connector animation and replay");
     assert.equal(errors.length, 0, "No runtime errors: " + errors.join("; "));
   } finally {
     await browser.close();
