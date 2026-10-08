@@ -176,6 +176,8 @@ Legacy article variables map into the shared semantic theme. `--blu` maps to the
 
 Callout headings stay in normal content flow with a transparent background, neutral container border and restrained semantic foreground. Use orange for essential points, green for tips and red for warnings. Do not reintroduce floating badges, saturated label backgrounds or inherited white text on pale fills. Callouts use 24px desktop inset and 16px on phones, with 24px vertical separation.
 
+Verification-boundary notes are supporting evidence metadata, not primary reading blocks. Render them as native `details/summary` disclosures collapsed by default, with a thin neutral rule and compact mono metadata. Closed state should stay around one control row tall; opening reveals the full boundary text and sources without changing semantic content.
+
 Code keys, strings and numbers use theme-specific syntax tokens from `preview/handbook-custom/src/handbook.css`. Inline role fills use a subtle mixed surface with the normal text foreground. Filled and hovered controls always pair `--primary` with `--primary-foreground`; never override only one side. Verify actual computed contrast on both themes: at least 4.5:1 for ordinary text and 3:1 for large text.
 
 ## Interactive concept diagrams
