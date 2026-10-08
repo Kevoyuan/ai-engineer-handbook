@@ -5,7 +5,7 @@
 **Alias discipline:** Only explicit concept-specific aliases in the manual dictionary are used to rescue known English-title/synonym mismatches (e.g. “Embeddings & Vector Representations” → `embedding`); a generic `AI`, `model`, `data` or `agent` match is not sufficient. An alias match also does not prove depth.
 
 ## Interpret the evidence grades
-**Computed scan counts (with reviewed term aliases):** H=76, B=34, N=57; total 167. These are **signals, not depth/completeness counts**.
+**Current review-branch evidence signals (2026-10-08; after stages 05–06):** H=99, B=31, N=37; total 167. **Before stages 05–06:** H76/B34/N57. These are **term-location signals, not mastery/completeness counts**.
 **Public reference:** [FDE topics](https://www.fdeinterviews.com/concepts) · [FDE concept map](https://www.fdeinterviews.com/map) · [Atlas crosswalk](./fde-2026-concept-crosswalk.md).
 
 
@@ -84,28 +84,28 @@
 | Retrieval & Agents | TF-IDF and BM25 | CH02 | H | — | P1 | CH02 L16 (BM25) |
 | Evaluation & ML Foundations | Golden Datasets and Eval Sets | CH09 | H | — | P0 | CH09 L1560 (Golden Dataset) |
 | Evaluation & ML Foundations | LLM-as-a-Judge | CH09 | H | — | P1 | CH09 L256 (LLM-as-Judge) |
-| Evaluation & ML Foundations | Precision, Recall and F1 | CH09 | B | — | P1 | CH09 L403 (precision) |
+| Evaluation & ML Foundations | Precision, Recall and F1 | CH09 | H | — | P1 | CH09 L1632 (Precision, Recall and F1) |
 | Evaluation & ML Foundations | Offline vs Online Evaluation | CH09 | H | — | P1 | CH09 L312 (offline) |
 | Evaluation & ML Foundations | A/B, Canary and Shadow Testing | CH09 | B | — | P1 | CH09 L65 (canary) |
-| Evaluation & ML Foundations | Gradient Descent & Learning Rate | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Bias-Variance Tradeoff | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Information Theory for ML: Entropy, Cross-Entropy, KL and Perplexity | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Overfitting and Regularization | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Evaluation & ML Foundations | Gradient Descent & Learning Rate | CH01 | H | — | P1 | CH01 L1735 (Gradient Descent & Learning Rate) |
+| Evaluation & ML Foundations | Bias-Variance Tradeoff | CH01 | H | — | P1 | CH01 L1744 (Bias-Variance Tradeoff) |
+| Evaluation & ML Foundations | Information Theory for ML: Entropy, Cross-Entropy, KL and Perplexity | CH01 | H | — | P1 | CH01 L1757 (Information Theory) |
+| Evaluation & ML Foundations | Overfitting and Regularization | CH01 | H | — | P1 | CH01 L1744 (Overfitting and Regularization) |
 | Evaluation & ML Foundations | Evaluating RAG Systems | CH09 | H | — | P1 | CH09 L398 (rag evaluation) |
-| Evaluation & ML Foundations | Calibration and Uncertainty | CH09 | B | — | P1 | CH09 L285 (calibration) |
+| Evaluation & ML Foundations | Calibration and Uncertainty | CH09 | H | — | P1 | CH09 L1648 (Calibration and Uncertainty) |
 | Evaluation & ML Foundations | Benchmarks and Their Limits | CH09 | B | — | P1 | CH09 L1614 (benchmark) |
 | Evaluation & ML Foundations | Faithfulness vs Answer Relevancy | CH09 | B | — | P1 | CH09 L1545 (faithfulness) |
-| Evaluation & ML Foundations | Synthetic Data Generation | CH09 | N | — | P1 | CH09 semantic/synonym review |
-| Evaluation & ML Foundations | Catastrophic Forgetting | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Loss Functions | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Activation Functions | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Neural Network Basics: Perceptron to MLP | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Semi-Supervised and Self-Training | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Computer Vision: Classification, Detection, Segmentation | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Multi-Armed Bandits | CH09 | N | — | P1 | CH09 semantic/synonym review |
-| Evaluation & ML Foundations | Normalization: Batch vs Layer | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Evaluation & ML Foundations | Handling Imbalanced Data | CH09 | N | — | P1 | CH09 semantic/synonym review |
-| Evaluation & ML Foundations | Convex vs Non-Convex Optimization | CH01 | N | — | P1 | CH01 semantic/synonym review |
+| Evaluation & ML Foundations | Synthetic Data Generation | CH09 | H | — | P1 | CH09 L1662 (Synthetic Data Generation) |
+| Evaluation & ML Foundations | Catastrophic Forgetting | CH01 | H | — | P1 | CH01 L1794 (Catastrophic Forgetting) |
+| Evaluation & ML Foundations | Loss Functions | CH01 | H | — | P1 | CH01 L1775 (Loss Functions) |
+| Evaluation & ML Foundations | Activation Functions | CH01 | H | — | P1 | CH01 L1775 (Activation Functions) |
+| Evaluation & ML Foundations | Neural Network Basics: Perceptron to MLP | CH01 | H | — | P1 | CH01 L1775 (Neural Network Basics) |
+| Evaluation & ML Foundations | Semi-Supervised and Self-Training | CH01 | H | — | P1 | CH01 L1794 (Semi-Supervised) |
+| Evaluation & ML Foundations | Computer Vision: Classification, Detection, Segmentation | CH01 | H | — | P1 | CH01 L1800 (Computer Vision) |
+| Evaluation & ML Foundations | Multi-Armed Bandits | CH09 | H | — | P1 | CH09 L1675 (Multi-Armed Bandits) |
+| Evaluation & ML Foundations | Normalization: Batch vs Layer | CH01 | H | — | P1 | CH01 L1775 (Batch vs Layer Normalization) |
+| Evaluation & ML Foundations | Handling Imbalanced Data | CH09 | H | — | P1 | CH09 L1628 (Imbalance) |
+| Evaluation & ML Foundations | Convex vs Non-Convex Optimization | CH01 | H | — | P1 | CH01 L1800 (Convex vs Non-Convex) |
 | System Design for AI in Production | Latency Optimization | CH10 | B | — | P1 | CH10 L87 (latency) |
 | System Design for AI in Production | Observability for AI Systems | CH09 | H | — | P1 | CH09 L2 (observability) |
 | System Design for AI in Production | VPC and Air-Gapped Deployment | CH10 | H | CHECK | P0 | CH10 L2130 (air-gap) |
@@ -174,20 +174,28 @@
 | AI Security, Privacy & Governance | Federated Learning | CH01 | N | — | P1 | CH01 semantic/synonym review |
 | AI Security, Privacy & Governance | Mechanistic Interpretability | CH01 | N | — | P1 | CH01 semantic/synonym review |
 | Coding & Engineering Craft | Streaming and Backpressure | CH10 | B | — | P1 | CH10 L2112 (backpressure) |
-| Coding & Engineering Craft | Big-O That Actually Matters | CH11 | N | — | P1 | CH11 semantic/synonym review |
-| Coding & Engineering Craft | Parsing Messy, Real-World Data | CH11 | N | — | P1 | CH11 semantic/synonym review |
+| Coding & Engineering Craft | Big-O That Actually Matters | CH11 | H | — | P1 | CH11 L352 (Big-O That Actually Matters) |
+| Coding & Engineering Craft | Parsing Messy, Real-World Data | CH11 | H | — | P1 | CH11 L368 (Parsing Messy, Real-World Data) |
 | Coding & Engineering Craft | Heaps and Top-K | CH02 | B | — | P1 | CH02 L84 (heap) |
 | Coding & Engineering Craft | Caching and Eviction | CH10 | H | — | P1 | CH10 L26 (cache) |
-| Coding & Engineering Craft | Sliding Window and Two Pointers | CH11 | N | — | P1 | CH11 semantic/synonym review |
-| Coding & Engineering Craft | Concurrency and the GIL | CH11 | B | — | P1 | CH11 L231 (concurrency) |
+| Coding & Engineering Craft | Sliding Window and Two Pointers | CH11 | H | — | P1 | CH11 L382 (Sliding Window and Two Pointers) |
+| Coding & Engineering Craft | Concurrency and the GIL | CH11 | H | — | P1 | CH11 L401 (Concurrency and the GIL) |
 | Coding & Engineering Craft | Numerical Stability | CH01 | N | — | P1 | CH01 semantic/synonym review |
-| Coding & Engineering Craft | Testability and Dependency Injection | CH08 | N | — | P1 | CH08 semantic/synonym review |
-| Coding & Engineering Craft | Graph Traversal and Topological Sort | CH08 | N | — | P1 | CH08 semantic/synonym review |
+| Coding & Engineering Craft | Testability and Dependency Injection | CH08 | H | — | P1 | CH08 L6528 (Testability and Dependency Injection) |
+| Coding & Engineering Craft | Graph Traversal and Topological Sort | CH08 | H | — | P1 | CH08 L6512 (Graph Traversal and Topological Sort) |
 | The Customer-Facing Craft | Scoping Ambiguous Problems | CH12 | H | — | P0 | CH12 L57 (scope) |
 | The Customer-Facing Craft | Requirements Discovery | CH12 | H | — | P1 | CH12 L22 (Requirements Discovery) |
 | The Customer-Facing Craft | Explaining Trade-offs to Non-Engineers | CH12 | H | — | P1 | CH12 L83 (trade-offs) |
 | The Customer-Facing Craft | Stakeholder Management | CH12 | H | — | P1 | CH12 L83 (stakeholder) |
 | The Customer-Facing Craft | Recovering a Failing Live Demo | CH12 | H | — | P1 | CH12 L97 (live demos) |
+
+## Stage 05–06 manual evidence-pointer update
+
+- CH01 §1.21 now explains optimization, bias/variance, data leakage, information-theory loss, normalization, catastrophic forgetting, semi-supervision, convexity and vision labels with first-party PyTorch/scikit-learn references.
+- CH09 §9.24 now separately explains rare-class recall, probability calibration, synthetic-eval leakage and adaptive online experiment risks.
+- CH11 §11.11 now contains the coding cost/CSV/sliding-window/GIL contracts; CH08 §8.18 owns DAG/topological scheduling and injected tool-test boundaries.
+- **23 named owner-chapter items** were manually remapped to explicit heading evidence. A positive signal means **the concept now has a discoverable section**, not that it has passed rigorous model benchmarking or a hiring interview.
+- The runnable stdlib mini-lab includes positive and negative test cases. These cover narrow deterministic behavior but not customer deployment/real ML model performance.
 
 ## Next editorial review (not automatically inferred coverage)
 
@@ -214,13 +222,13 @@
 |---|---:|---:|---:|---:|
 | Foundations of LLMs & GenAI | 17 | 3 | 10 | 30 |
 | Retrieval & Agents | 16 | 6 | 9 | 31 |
-| Evaluation & ML Foundations | 4 | 5 | 15 | 24 |
+| Evaluation & ML Foundations | 21 | 3 | 0 | 24 |
 | System Design for AI in Production | 14 | 2 | 4 | 20 |
 | MLOps & Lifecycle | 3 | 1 | 3 | 7 |
 | ML Infrastructure & Serving | 3 | 3 | 4 | 10 |
 | Data & SQL Engineering | 8 | 5 | 1 | 14 |
 | AI Security, Privacy & Governance | 5 | 6 | 5 | 16 |
-| Coding & Engineering Craft | 1 | 3 | 6 | 10 |
+| Coding & Engineering Craft | 7 | 2 | 1 | 10 |
 | The Customer-Facing Craft | 5 | 0 | 0 | 5 |
 
 ## Audit method and limitations
