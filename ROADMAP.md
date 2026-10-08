@@ -42,7 +42,9 @@
 - [x] Add maintained JavaScript syntax checks to CI
 - [x] Use one shared dynamic-fragment manifest across runtime injection, search and rebuild logic
 - [x] Remove the stale shadow `web/DESIGN.md`; root `DESIGN.md` is the only design contract
-- [ ] Add browser-based responsive regression checks at the DESIGN.md validation widths
+- [x] Add browser-based responsive regression checks at the DESIGN.md validation widths (390 / 768 / 1440 / 1728) via `evidence/surface-ui-audit.cjs`
+- [ ] Make the cross-surface browser regression suite a permanent required CI gate rather than a manual/one-off PR check
+- [ ] Add source-figure visual parity checks for complex teaching diagrams (compare topology, labels, connectors, not only bounding boxes)
 - [ ] Add lightweight visual regression coverage for the architecture diagrams
 - [ ] Add a generated aggregate/export pipeline if a single-file manuscript is needed again
 
@@ -56,7 +58,7 @@
 - [x] Add source-grounded Concept routes that connect canonical sections across chapters
 - [x] Add concept-first deterministic local search ranking and bilingual match-aware snippets
 - [x] Add Reader current-section trace, reading progress, and always-reachable Focus exit
-- [x] Prevent the Reader topbar from duplicating the full chapter title already shown in the page heading
+- [x] Keep the full visible chapter identity in the compact auto-hiding topbar, with a screen-reader-only article h1 and no duplicated visible chapter cover
 - [x] Strip internal HTML comments before locale transforms and reject leaked `===== CHn =====` markers
 - [ ] Extend Notebook from chapter-level saves to section/concept-level saves
 - [ ] Expand Concept coverage and relationship visualization without creating a second semantic source

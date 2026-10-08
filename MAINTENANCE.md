@@ -133,6 +133,17 @@ Use root `DESIGN.md` as the only visual contract.
 
 Diagrams and structural UI must express real knowledge relationships rather than decorate the page.
 
+### Reference fidelity when improving diagrams
+
+A supplied article image or reference diagram is evidence for the *information structure*, not merely its colors. Before changing a diagram, record and check:
+
+- the true relationship: Before/After comparison, branch/join, hierarchy, state transition or sequence;
+- what each box means, and whether arrow direction represents input, output, possible handoff or a mandatory order;
+- which visual groups, prominent nodes, labels, source caveats and authorization boundaries are essential;
+- what can become selectable or animated without inventing a mechanism, score or real-world result.
+
+**Do not turn a comparison into parallel numbered timelines or omit informative arrows just to make layouts uniform.** Prefer responsive faithful structure over visual template reuse. Animation may clarify a relationship, but static content and keyboard interaction must preserve its meaning under reduced motion. Keep a useful fallback if an optional dynamic module fails.
+
 ## 5. Implement through the current application pipeline
 
 The current UI source is `preview/handbook-custom/`. The deployed artifact is `web/site/`.
@@ -266,6 +277,27 @@ node --check web/rebuild.mjs
 
 Validate the widths defined in `DESIGN.md`, especially 390, 768, 1440, and 1728px. There must be no page-level horizontal overflow. Wide tables and code may scroll within their own containers.
 
+### Cross-surface UI regression
+
+For broad visual/interaction changes, start the local React server from `preview/handbook-custom/` and run the cross-surface browser test in a second terminal:
+
+```bash
+npm run dev -- --port 4180
+# in a separate terminal, same directory
+node evidence/surface-ui-audit.cjs
+```
+
+This script checks Atlas, Notebook, Concept, system architecture and chapters 01–10 at 390/768/1440/1728px across two locale/theme states (112 route × viewport × state combinations), plus search and Notebook interaction flows and six representative automated accessibility surfaces. It is a **manual regression tool, not currently a mandatory CI gate**; do not treat its earlier pass as proof that a later change remains correct.
+
+For affected specialty components also run:
+
+```bash
+node evidence/jev-flow-comparison.cjs  # Before/After semantics, connectors, finite animation and accessibility
+node evidence/bento/check.cjs         # Chapter 06 skill simulator and state boundaries
+```
+
+Before accepting UI work, review the rendered figure against any supplied source graphic. Check both themes and languages, readable node/connector labels, reduced motion, keyboard access, focus, and any content that collapses or scrolls. Verify compactness does **not** truncate meaning or shrink actions below the `DESIGN.md` touch targets. Automated geometry/a11y passes do not substitute for a source-fidelity visual review.
+
 ## 9. Git workflow
 
 ```text
@@ -341,10 +373,13 @@ edit canonical chapter
 ### React UI-only change
 
 ```text
-edit preview/handbook-custom/src
-→ update DESIGN.md / UX-CONTRACT.md if durable behavior changed
+inspect current DESIGN.md + UX-CONTRACT.md + source figure (when applicable)
+→ edit preview/handbook-custom/src
+→ update DESIGN.md / UX-CONTRACT.md only if durable contracts changed
 → npm run build + relevant browser tests
-→ npm run publish:web
+→ run evidence/surface-ui-audit.cjs for cross-surface changes
+→ inspect source-faithful visual output
+→ npm run publish:web and commit web/site
 → PR / CI / preview
 ```
 
