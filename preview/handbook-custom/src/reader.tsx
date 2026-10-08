@@ -20,6 +20,11 @@ import {
 } from "@/components/ui/dialog";
 import { BookIcon, BookmarkIcon, ArrowRightIcon } from "@/components/icons";
 import chapters from "./chapters.json";
+import {
+  advanceScrollChrome,
+  makeScrollChromeState,
+  resetScrollChrome,
+} from "./reader-scroll-intent";
 const JevFlowComparison = lazy(() =>
   import("./jev-flow-comparison").then((module) => ({
     default: module.JevFlowComparison,
@@ -108,8 +113,8 @@ export function Reader({
   setFocus,
   onReadingContext,
   onChromeVisible,
+  chromeVisible,
   onToggleTheme,
-  onToggleLocale,
   dark,
 }: {
   index: number;
@@ -120,14 +125,14 @@ export function Reader({
   setFocus: (value: boolean) => void;
   onReadingContext?: (value: ReadingContext) => void;
   onChromeVisible?: (visible: boolean) => void;
+  chromeVisible: boolean;
   onToggleTheme: () => void;
-  onToggleLocale: () => void;
   dark: boolean;
 }) {
   const t = (zh: string, e: string) => (en ? e : zh);
   const chapter = chapters[index];
   const pane = useRef<HTMLDivElement>(null);
-  const lastDirectionPosition = useRef(0);
+  const chromeMotion = useRef(makeScrollChromeState());
   const [moreOpen, setMoreOpen] = useState(false);
   const [topActionsTarget, setTopActionsTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -147,6 +152,18 @@ export function Reader({
       ? pane.current?.closest<HTMLElement>(".workspace")
       : pane.current;
   }
+  // The app shell can reveal chrome via keyboard focus or pointer entry.
+  // Synchronize that external change without reinstalling a scroll listener.
+  useEffect(() => {
+    if (chromeMotion.current.visible !== chromeVisible) {
+      resetScrollChrome(
+        chromeMotion.current,
+        scrollPane()?.scrollTop ?? 0,
+        chromeVisible,
+        performance.now(),
+      );
+    }
+  }, [chromeVisible]);
   const [data, setData] = useState<ChapterContent | null>(null),
     [diagramReady, setDiagramReady] = useState(false),
     [error, setError] = useState(false),
@@ -164,7 +181,7 @@ export function Reader({
     setError(false);
     setActive("");
     setProgress(0);
-    lastDirectionPosition.current = 0;
+    resetScrollChrome(chromeMotion.current, 0, true, performance.now());
     onChromeVisible?.(true);
     fetch("/content/" + chapter.slug + ".json", { signal: controller.signal })
       .then((r) => {
@@ -189,9 +206,9 @@ export function Reader({
       scroller.scrollTop +=
         target.getBoundingClientRect().top -
         scroller.getBoundingClientRect().top -
-        (mobile ? 60 : 16);
-      // Section navigation isn't a user scroll gesture: keep tools discoverable.
-      lastDirectionPosition.current = scroller.scrollTop;
+        (mobile ? 60 : 64);
+      // Programmatic jumps are not a swipe; start new intent from this offset.
+      resetScrollChrome(chromeMotion.current, scroller.scrollTop, true, performance.now());
       onChromeVisible?.(true);
       setActive(id);
       target.setAttribute("tabindex", "-1");
@@ -231,6 +248,13 @@ export function Reader({
     if (!data || !pane.current) return;
     const el = scrollPane();
     if (!el) return;
+    // Viewport breakpoint/dialog changes can switch scroll owners.
+    resetScrollChrome(
+      chromeMotion.current,
+      el.scrollTop,
+      chromeMotion.current.visible,
+      performance.now(),
+    );
     const update = () => {
       let current = data.sections[0]?.id || "";
       for (const s of data.sections) {
@@ -251,15 +275,13 @@ export function Reader({
         Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)),
       );
       setProgress((value) => (value === nextProgress ? value : nextProgress));
-      const position = el.scrollTop;
-      if (position < 70) {
-        lastDirectionPosition.current = position;
-        onChromeVisible?.(true);
-      } else if (!moreOpen && !tocOpen &&
-                 Math.abs(position - lastDirectionPosition.current) >= 20) {
-        onChromeVisible?.(position < lastDirectionPosition.current);
-        lastDirectionPosition.current = position;
-      }
+      const nextVisible = advanceScrollChrome(
+        chromeMotion.current,
+        el.scrollTop,
+        performance.now(),
+        moreOpen || tocOpen,
+      );
+      if (nextVisible !== null) onChromeVisible?.(nextVisible);
     };
     el.addEventListener("scroll", update, { passive: true });
     update();
@@ -355,15 +377,6 @@ export function Reader({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={onToggleTheme}>
                   {dark ? t("浅色模式", "Light theme") : t("深色模式", "Dark theme")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={onToggleLocale}>
-                  {en ? "中文" : "English"}
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="https://github.com/kevoyuan/ai-engineer-handbook"
-                     target="_blank" rel="noopener noreferrer">
-                    GitHub ↗
-                  </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

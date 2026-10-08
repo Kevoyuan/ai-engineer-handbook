@@ -1,7 +1,6 @@
 "use client";
 
-import { Fragment, memo, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import { useReducedMotion } from "motion/react";
+import { Fragment, memo, useLayoutEffect, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import "./jev-flow-comparison.css";
 
@@ -81,36 +80,11 @@ const beforeTasks: readonly Copy[] = [
 function Comparison({ en }: { en: boolean }) {
   const t = (value: Copy) => value[en ? 1 : 0];
   const [selected, setSelected] = useState<Responsibility["id"]>("decision");
-  const [playing, setPlaying] = useState(false);
-  const reducedMotion = Boolean(useReducedMotion());
-  const root = useRef<HTMLElement | null>(null);
   const current = responsibilities.find((role) => role.id === selected)!;
-
-  // Only play on an explicit click, once. There is no perpetual React animation loop.
-  useEffect(() => {
-    if (!playing) return;
-    const stop = () => { if (document.hidden) setPlaying(false); };
-    const timeout = window.setTimeout(() => setPlaying(false), 3800);
-    document.addEventListener("visibilitychange", stop);
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries[0]?.isIntersecting) setPlaying(false);
-    }, { threshold: 0.06 });
-    if (root.current) observer.observe(root.current);
-    return () => {
-      window.clearTimeout(timeout);
-      document.removeEventListener("visibilitychange", stop);
-      observer.disconnect();
-    };
-  }, [playing]);
-
-  useEffect(() => {
-    if (reducedMotion && playing) setPlaying(false);
-  }, [reducedMotion, playing]);
 
   return (
     <section
-      className={"jev-dfc-root" + (playing ? " is-playing" : "")}
-      ref={root}
+      className={"jev-dfc-root is-inspecting-" + selected}
       aria-labelledby="jev-dfc-title"
     >
       <header className="jev-dfc-heading">
@@ -120,24 +94,7 @@ function Comparison({ en }: { en: boolean }) {
           "重点不是把 LLM 替换成 Jev，而是把生成、决策与执行放在不同层。",
           "The point is not to replace the LLM with Jev, but to separate generation, decisions and execution.",
         ])}</p>
-        <div className="jev-dfc-flow-controls">
-          <button
-            type="button"
-            className="jev-dfc-play"
-            disabled={reducedMotion || playing}
-            onClick={() => setPlaying(true)}
-            aria-label={t(["演示职责流转", "Animate responsibility handoff"])}
-          >
-            <span aria-hidden="true">▶</span>
-            {playing
-              ? t(["演示中…", "Animating…"])
-              : t(["演示箭头流转", "Animate arrows"])}
-          </button>
-          <span>{reducedMotion
-            ? t(["已启用减少动态效果；箭头仍可静态查看", "Reduced motion: static connectors remain visible"])
-            : t(["单次 3.8 秒 · 非固定调用顺序", "One 3.8s illustration · not a mandatory call order"])}
-          </span>
-        </div>
+
       </header>
 
       <div className="jev-dfc-compare">
@@ -255,8 +212,8 @@ function Comparison({ en }: { en: boolean }) {
         <p>{t(current.boundary)}</p>
       </div>
       <p className="jev-dfc-caption">{t([
-        "箭头演示一种可能的 Agent 职责交接，并非所有请求都必须依次调用三层，也不是性能基准。Jev 的概率需要校准；类型化输出不等于判断正确；最终审批和副作用由 Runtime 控制。",
-        "Arrows illustrate one possible agent handoff, not a mandatory three-stage call order or a performance benchmark. Jev probabilities require calibration; typed outputs do not guarantee correctness; Runtime controls final approval and side effects.",
+        "箭头说明可能的职责交接，并非所有请求都必须依次调用三层，也不是性能基准。Jev 的概率需要校准；类型化输出不等于判断正确；最终审批和副作用由 Runtime 控制。",
+        "Arrows show possible responsibility handoffs, not a mandatory three-stage call order or a performance benchmark. Jev probabilities require calibration; typed outputs do not guarantee correctness; Runtime controls final approval and side effects.",
       ])}</p>
     </section>
   );
