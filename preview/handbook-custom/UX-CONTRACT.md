@@ -74,6 +74,8 @@ The final gate is deterministic Runtime authorization, policy and host execution
 
 Reader HTML and search payloads are generated presentation data. Internal authoring comments, separator markers, build notes, and other maintainer-only annotations are never user-facing content.
 
+Verification-boundary blocks are rendered as native `details` disclosures with their existing title as `summary`. They are collapsed by default to preserve reading space, remain keyboard-operable, and reveal the complete authored boundary/source content when opened.
+
 `scripts/sync-content.py` removes HTML comments before locale transformation and ignores BeautifulSoup `Comment` nodes during English conversion. Generated content must fail synchronization if a visible internal separator such as `===== CH7 =====` leaks into either locale.
 
 Generated JSON under `public/content/` and the published copies under `web/site/content/` must not be hand-edited to hide a leak. Repair the derivation step and regenerate the outputs so preview and production remain equivalent.
