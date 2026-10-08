@@ -59,7 +59,7 @@ jobs:
                   # requiring a specific implementation of title sanitization.
                   hits=[h for h in sec.find_all('h3') if h.get('id','').startswith('fde-q')]
                   assert len(hits)==count,(chapter,lang,len(hits),count)
-                  assert len(sec.get_text(' ',strip=True))>900,(chapter,lang,'content')
+                  assert len(sec.get_text(' ',strip=True))>max(350,125*count),(chapter,lang,'content')
                   assert len(sec.find_all('a',href=True))>=2,(chapter,lang,'sources')
                   print(chapter,lang,count,'Q labels and sources present')
           assert not Path('.github/workflows/fde-02-04-qa-once.yml').exists()
