@@ -221,6 +221,25 @@ function App() {
       document.querySelector(".workspace")?.scrollTo({ top: 0 });
   }, [page, chapterIndex, conceptSlug]);
   const [focus, setFocus] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
+  useEffect(() => {
+    setChromeVisible(true);
+  }, [page, chapterIndex]);
+  useEffect(() => {
+    if (page !== "reader") return;
+    const revealAtEdge = (event: MouseEvent) => {
+      if (event.clientY <= 16) setChromeVisible(true);
+    };
+    const revealForKeyboard = (event: KeyboardEvent) => {
+      if (event.key === "Tab") setChromeVisible(true);
+    };
+    window.addEventListener("mousemove", revealAtEdge, { passive: true });
+    document.addEventListener("keydown", revealForKeyboard);
+    return () => {
+      window.removeEventListener("mousemove", revealAtEdge);
+      document.removeEventListener("keydown", revealForKeyboard);
+    };
+  }, [page]);
   const [readingContext, setReadingContext] = useState<ReadingContext>({
     sectionId: "",
     sectionTitle: "",
@@ -531,8 +550,12 @@ function App() {
       <div className="desktop-nav" id="desktop-chapter-nav">
         {nav}
       </div>
-      <div className="workspace">
-        <header className="topbar">
+      <div className={
+        page === "reader"
+          ? "workspace reader-workspace" + (chromeVisible ? "" : " reader-chrome-hidden")
+          : "workspace"
+      }>
+        <header className="topbar" onFocusCapture={() => setChromeVisible(true)}>
           <div className="top-location">
             <Button
               variant="ghost"
@@ -564,19 +587,20 @@ function App() {
               <MenuIcon />
             </Button>
             {page === "reader" && chapters[chapterIndex] ? (
-              <>
-                {readingContext.sectionTitle ? (
-                  <span className="top-reader-section">
-                    <span className="top-section-mark" aria-hidden="true">§</span>
-                    {readingContext.sectionTitle}
+              <div className="reader-top-identity">
+                <span className="reader-top-number">{chapters[chapterIndex].number}</span>
+                <h1 className="reader-top-title">
+                  {en ? chapters[chapterIndex].en : chapters[chapterIndex].zh}
+                </h1>
+                {readingContext.sectionTitle && (
+                  <span className="reader-top-section" title={readingContext.sectionTitle}>
+                    <span aria-hidden="true">/</span> {readingContext.sectionTitle}
                   </span>
-                ) : (
-                  <span className="top-reader-mode">{t("阅读", "Reader")}</span>
                 )}
                 <span className="top-reading-percent">
                   {readingContext.progress}%
                 </span>
-              </>
+              </div>
             ) : (
               <span>
                 {page === "home"
@@ -608,7 +632,7 @@ function App() {
             )}
             <Button
               variant="ghost"
-              className="header-search"
+              className={page === "reader" ? "header-search reader-header-search" : "header-search"}
               aria-label={t("搜索知识系统", "Search the atlas")}
               onClick={() => search()}
             >
@@ -616,6 +640,11 @@ function App() {
               <span>{t("搜索图谱", "Search atlas")}</span>
               <kbd>⌘ K</kbd>
             </Button>
+            {page === "reader" && (
+              <div id="reader-top-actions" className="reader-top-actions" />
+            )}
+            {page !== "reader" && (
+              <>
             <Button
               variant="ghost"
               size="icon"
@@ -648,6 +677,8 @@ function App() {
                 <GithubIcon aria-hidden="true" />
               </a>
             </Button>
+              </>
+            )}
           </div>
           {page === "reader" && (
             <div className="reading-progress-line" aria-hidden="true">
@@ -996,6 +1027,10 @@ function App() {
             focus={focus}
             setFocus={setFocus}
             onReadingContext={setReadingContext}
+            onChromeVisible={setChromeVisible}
+            onToggleTheme={() => setDark((value) => !value)}
+            onToggleLocale={() => setEn((value) => !value)}
+            dark={dark}
           />
         )}
       </div>
