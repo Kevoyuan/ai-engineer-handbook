@@ -1,0 +1,92 @@
+/* Chapter 06 · paired execution paths. Atlas tokens; interaction-only motion. */
+.jev-dfc-root {
+  --jev-ink: var(--foreground);
+  --jev-muted: var(--muted-foreground);
+  --jev-line: var(--border);
+  --jev-paper: var(--card);
+  --jev-back: var(--background);
+  --jev-signal: var(--primary);
+  margin: 28px 0;
+  border: 1px solid var(--jev-line);
+  border-radius: 12px;
+  background: var(--jev-paper);
+  padding: 24px;
+  color: var(--jev-ink);
+  overflow: clip;
+}
+.jev-dfc-root * { box-sizing: border-box; }
+.jev-dfc-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.jev-dfc-heading > div:first-child { min-width: 0; max-width: 65ch; }
+.jev-dfc-eyebrow { display: block; font: 750 10px/1.3 "Geist Mono Variable", monospace; letter-spacing: .12em; color: var(--jev-muted); }
+.jev-dfc-heading h3 { margin: 10px 0 8px; font-size: clamp(17px, 2vw, 23px); line-height: 1.3; font-weight: 740; color: var(--jev-ink); }
+.jev-dfc-heading p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--jev-muted); }
+.jev-dfc-controls { display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+.jev-dfc-controls button {
+  min-width: 44px; min-height: 44px; border: 1px solid var(--jev-line); background: var(--jev-paper);
+  border-radius: 7px; color: var(--jev-ink); padding: 10px 12px; cursor: pointer;
+  font: 650 12px/1.2 "Geist Variable", sans-serif;
+  transition: border-color .16s ease-out, background .16s ease-out, transform .16s ease-out;
+}
+.jev-dfc-controls button:hover:not(:disabled) { border-color: var(--jev-signal); }
+.jev-dfc-controls button:active:not(:disabled) { transform: scale(.98); }
+.jev-dfc-controls button:focus-visible, .jev-dfc-progress button:focus-visible { outline: 2px solid var(--jev-signal); outline-offset: 3px; }
+.jev-dfc-controls button:disabled { cursor: not-allowed; opacity: .42; }
+.jev-dfc-controls .jev-dfc-primary { min-width: 76px; background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.jev-dfc-controls .jev-dfc-primary:hover:not(:disabled) { background: var(--primary); filter: brightness(.97); }
+.jev-dfc-progress { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 7px; margin: 18px 0 15px; }
+.jev-dfc-progress button { background: transparent; padding: 10px 0; border: 0; cursor: pointer; border-radius: 5px; min-height: 34px; }
+.jev-dfc-progress button span { display: block; height: 3px; background: var(--jev-line); border-radius: 3px; transition: background .2s ease-out, height .2s ease-out; }
+.jev-dfc-progress button.is-current span { height: 4px; background: var(--jev-signal); }
+.jev-dfc-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-items: stretch; }
+.jev-dfc-path { min-width: 0; border: 1px solid var(--jev-line); border-radius: 9px; padding: 16px; background: var(--jev-back); }
+.jev-dfc-path-head { min-height: 94px; padding-bottom: 13px; border-bottom: 1px solid var(--jev-line); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.jev-dfc-path-id { font: 700 10px/1.25 "Geist Mono Variable",monospace; letter-spacing: .07em; color: var(--jev-muted); }
+.jev-dfc-path-head strong { font-size: 17px; letter-spacing: -.015em; line-height: 1.25; }
+.jev-dfc-path-head small { font-size: 11px; line-height: 1.45; color: var(--jev-muted); }
+.jev-dfc-stack { padding-top: 16px; }
+.jev-dfc-stage-wrap { min-width: 0; }
+.jev-dfc-connector { height: 25px; display: flex; align-items: center; flex-direction: column; justify-content: center; gap: 0; color: var(--jev-muted); opacity: .57; transition: opacity .2s ease-out, color .2s ease-out; }
+.jev-dfc-connector.is-complete { color: var(--jev-signal); opacity: 1; }
+.jev-dfc-connector-line { height: 12px; width: 1px; display: block; background: currentColor; }
+.jev-dfc-connector-arrow { font: 750 14px/11px "Geist Mono Variable",monospace; display: block; }
+.jev-dfc-stage {
+  position: relative; min-height: 112px; display: flex; flex-direction: column; align-items: flex-start;
+  gap: 6px; background: var(--jev-paper); border: 1px solid var(--jev-line);
+  border-radius: 7px; padding: 12px 14px; min-width: 0;
+  transition: border-color .2s ease-out, background .2s ease-out;
+}
+.jev-dfc-stage.is-current { border-color: var(--jev-signal); box-shadow: inset 3px 0 0 var(--jev-signal); background: color-mix(in srgb, var(--jev-paper) 94%, var(--jev-signal) 6%); }
+.jev-dfc-stage-id { color: var(--jev-muted); font: 700 9px/1.3 "Geist Mono Variable",monospace; letter-spacing: .09em; }
+.jev-dfc-stage strong { color: var(--jev-ink); font: 700 13px/1.35 "Geist Variable",sans-serif; }
+.jev-dfc-stage small { color: var(--jev-muted); font-size: 11px; line-height: 1.4; }
+.jev-dfc-example { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.jev-dfc-example span { border: 1px solid var(--jev-line); background: var(--jev-back); border-radius: 4px; padding: 3px 5px; font: 700 10px/1.2 "Geist Mono Variable", monospace; color: var(--jev-ink); }
+.jev-dfc-path--typed .jev-dfc-stage.is-current .jev-dfc-example span { border-color: color-mix(in srgb, var(--jev-signal) 40%, var(--jev-line)); }
+.jev-dfc-explanation { margin-top: 16px; border: 1px solid var(--jev-line); background: var(--jev-back); border-radius: 8px; padding: 15px 16px; min-height: 86px; }
+.jev-dfc-explanation > span { color: var(--jev-signal); font: 750 10px/1.3 "Geist Mono Variable",monospace; letter-spacing: .08em; }
+.jev-dfc-explanation p { color: var(--jev-ink); font-size: 12px; line-height: 1.6; margin: 7px 0 0; }
+.jev-dfc-control-plane { text-align: center; padding: 0 12px; }
+.jev-dfc-rule { display: block; color: var(--jev-signal); font-size: 18px; margin: 8px 0; }
+.jev-dfc-control-plane strong { display: block; padding: 13px 10px; border: 1px solid var(--jev-line); border-radius: 6px; background: var(--jev-back); font: 700 12px/1.5 "Geist Mono Variable",monospace; }
+.jev-dfc-control-plane p { margin: 9px 0 0; font-size: 11px; line-height: 1.6; color: var(--jev-muted); }
+.jev-dfc-caption { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--jev-line); color: var(--jev-muted); font-size: 11px; line-height: 1.6; }
+#jev-dual-flow-slot .jev-dfc-static-fallback { display: none; }
+@media (max-width: 830px) {
+  .jev-dfc-heading { flex-direction: column; align-items: stretch; }
+  .jev-dfc-controls { width: 100%; }
+  .jev-dfc-grid { grid-template-columns: 1fr; }
+  .jev-dfc-path-head { min-height: 0; }
+}
+@media (max-width: 480px) {
+  .jev-dfc-root { margin: 18px 0; padding: 14px; }
+  .jev-dfc-path { padding: 12px; }
+  .jev-dfc-stage { min-height: 96px; }
+  .jev-dfc-heading h3 { font-size: 18px; }
+  .jev-dfc-controls button { flex: 1; }
+  .jev-dfc-controls .jev-dfc-primary { flex: 1.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jev-dfc-root *, .jev-dfc-root *::before, .jev-dfc-root *::after {
+    animation: none !important; transition: none !important;
+  }
+}
