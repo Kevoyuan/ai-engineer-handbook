@@ -59,15 +59,15 @@ Run `npm run test:learning` for scenario boundaries, correct/incorrect feedback,
 
 
 
-## Chapter 06 · Paired Jev / Generative LLM comparison
+## Chapter 06 · Jev vs. Generative LLMs responsibility comparison
 
-The paired flows compare the same task from shared input to the shared Runtime authorization gate. Path A shows prompted structured generation, sequential token decoding, result parsing/validation, and decision recovery. Path B shows predefined typed questions, independent decision sampling in one query, typed values/probabilities, and software thresholding. It is an illustrative process comparison, not an independent latency or accuracy benchmark.
+Figure 6.C4 is a Before/After **architectural responsibility** comparison, not two parallel execution timelines. The Before panel shows a single generative model used for planning, writing, routing, research, scoring, approval questions and completion/progress judgments. The After panel separates the Generative Model (open tasks), Jev (bounded typed probabilistic decisions), and Runtime (permission, budget, allowlist and execution enforcement).
 
-The paired reader diagram remains visible without JavaScript through the registered fragment's static comparison. With the optional React player loaded, the replacement is a two-column, five-stage comparison. Playback starts only on explicit reader action and advances one stage every 2.8 seconds. Pause, replay, previous, next and direct stage selection use named 44px controls. The selected stage and connector change with finite 200ms visual feedback; illustrative sequential LLM tokens reveal one after another while independent Jev fields appear together. No unbounded animation runs.
+The source-preserving fallback follows the same Before/After grouping without JavaScript. In the interactive rendition the three After responsibility cards are explicit keyboard-operable buttons with a visible selected state and `aria-pressed`. Selecting a role reveals a short, bilingual scope/boundary explanation in an `aria-live` region. There is no autoplay, stage progress animation, network model call or implied benchmark. No role selection grants authorization or executes tools.
 
-Playback stops at the final stage, on route unmount, when the document is hidden, or when the comparison leaves the viewport. Reduced-motion preference disables autoplay and spatial transitions but preserves all stages and manual step controls. Manual explanations are announced via a polite status region; automatic playback does not repeatedly announce intermediate stages. The two columns stack in reading panes narrower than 830px and must not cause page-level overflow at 390px. Bilingual reader state comes from the existing locale contract.
+The columns stay side by side only when the reading content width permits and stack responsively. At 390px there must be no horizontal page overflow; long role text must remain readable. Both locales and light/dark mode preserve this information hierarchy, and reduced-motion leaves all content/controls available.
 
-The final gate is deterministic Runtime authorization, policy and host execution on both paths. Jev parallelism applies only to independent decisions over the same state, never to true upstream/downstream dependencies. The demo makes no external model calls, reports no measured speedup and does not turn model confidence into authorization.
+Jev typed probabilities still require calibration, policy thresholds and evaluation; the Runtime remains the final authorization and side-effect boundary. The figure is not a statement that any model's judgments are automatically correct.
 
 
 ## Generated content boundary
