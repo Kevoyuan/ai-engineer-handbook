@@ -6,12 +6,12 @@
 
 | Question | Primary owning chapter | Fact/evidence and boundary |
 |---|---|---|
-| Q24 · Gradient Descent and Learning Rate | CH01 §1.21 | Gradient optimization math; training objective does not prove held-out production improvement |
-| Q25 · Bias/variance, regularization, data leakage | CH01 §1.21 | [scikit-learn common pitfalls](https://scikit-learn.org/stable/common_pitfalls.html), [TimeSeriesSplit](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html); future data contamination is not repaired by model complexity |
-| Q26 · Entropy, CrossEntropy, KL, Perplexity and logsumexp | CH01 §1.21 | [PyTorch CrossEntropyLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html), [BCEWithLogitsLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html); no model training was executed |
-| Q27 · MLP, activation, loss, BatchNorm vs LayerNorm | CH01 §1.21 | [PyTorch LayerNorm](https://docs.pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html), [BatchNorm1d](https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html); framework-specific axis/optimizer behavior must be version-checked |
-| Q28 · Catastrophic forgetting, semi/self-training | CH01 §1.21 | General model/data methodology; no claim that PEFT eliminates forgetting or pseudo-labels are correct |
-| Q29 · Convex vs non-convex, CV classification/detection/segmentation | CH01 §1.21 | General mathematical and label-granularity distinctions; no CV benchmark tested |
+| Q24 · Gradient Descent and Learning Rate | CH01 §1.22 | Gradient optimization math; training objective does not prove held-out production improvement |
+| Q25 · Bias/variance, regularization, data leakage | CH01 §1.22 | [scikit-learn common pitfalls](https://scikit-learn.org/stable/common_pitfalls.html), [TimeSeriesSplit](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html); future data contamination is not repaired by model complexity |
+| Q26 · Entropy, CrossEntropy, KL, Perplexity and logsumexp | CH01 §1.22 | [PyTorch CrossEntropyLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html), [BCEWithLogitsLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html); no model training was executed |
+| Q27 · MLP, activation, loss, BatchNorm vs LayerNorm | CH01 §1.22 | [PyTorch LayerNorm](https://docs.pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html), [BatchNorm1d](https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html); framework-specific axis/optimizer behavior must be version-checked |
+| Q28 · Catastrophic forgetting, semi/self-training | CH01 §1.22 | General model/data methodology; no claim that PEFT eliminates forgetting or pseudo-labels are correct |
+| Q29 · Convex vs non-convex, CV classification/detection/segmentation | CH01 §1.22 | General mathematical and label-granularity distinctions; no CV benchmark tested |
 | Q30 · Precision / Recall / F1 and imbalanced classes | CH09 §9.24 | [scikit-learn precision/recall/F-score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html); 99% accuracy / zero recall is a constructed 1000-record counterexample |
 | Q31 · Calibration and uncertainty | CH09 §9.24 | [scikit-learn probability calibration](https://scikit-learn.org/stable/modules/calibration.html); a low Brier score does not prove calibration alone |
 | Q32 · Synthetic data for golden eval | CH09 §9.24 | First-party [scikit-learn data leakage pitfalls](https://scikit-learn.org/stable/common_pitfalls.html) supports holdout separation; data-generator design is handbook synthesis |
