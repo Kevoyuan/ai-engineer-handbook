@@ -40,14 +40,19 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
         if (width > 767) assert(initial.spacerHeight >= 52, "Initial desktop clearance must scroll away");
         if (width <= 767) assert.equal(initial.spacerDisplay, "none");
 
-        await scroller.evaluate(el => { el.scrollTop = 1000; });
+        // A large single jump is programmatic, not evidence of a user swipe.
+        // Two smaller moves simulate a deliberate downward reading gesture.
+        await page.waitForTimeout(500);
+        await scroller.evaluate(el => { el.scrollTop = 800; });
+        await page.waitForTimeout(120);
+        await scroller.evaluate(el => { el.scrollTop += 110; });
         await page.waitForTimeout(300);
         assert(await workspace.evaluate(el => el.classList.contains("reader-chrome-hidden")),
-          "Scrolling down must hide chrome at " + width);
+          "Sustained downward movement must hide chrome at " + width);
         const hidden = await metrics();
         assert(Math.abs(hidden.clientHeight - initial.clientHeight) <= 1,
           "Hiding chrome resized scroll owner: " + JSON.stringify({initial, hidden}));
-        assert(Math.abs(hidden.scrollTop - 1000) <= 3, "Scroll location jumped on hide");
+        assert(Math.abs(hidden.scrollTop - 910) <= 3, "Scroll location jumped on hide");
         assert.equal(Math.round(hidden.headerHeight), 52);
 
         await scroller.evaluate(el => { el.scrollTop += 250; });
