@@ -126,6 +126,7 @@ export function Reader({
   const chapter = chapters[index];
   const pane = useRef<HTMLDivElement>(null);
   const lastDirectionPosition = useRef(0);
+  const scrollIntent = useRef(0);
   const [moreOpen, setMoreOpen] = useState(false);
   const [topActionsTarget, setTopActionsTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -163,6 +164,7 @@ export function Reader({
     setActive("");
     setProgress(0);
     lastDirectionPosition.current = 0;
+    scrollIntent.current = 0;
     onChromeVisible?.(true);
     fetch("/content/" + chapter.slug + ".json", { signal: controller.signal })
       .then((r) => {
@@ -187,9 +189,10 @@ export function Reader({
       scroller.scrollTop +=
         target.getBoundingClientRect().top -
         scroller.getBoundingClientRect().top -
-        (mobile ? 60 : 16);
-      // Section navigation isn't a user scroll gesture: keep tools discoverable.
+        (mobile ? 60 : 64);
+      // Programmatic jumps should not be mistaken for a swipe.
       lastDirectionPosition.current = scroller.scrollTop;
+      scrollIntent.current = 0;
       onChromeVisible?.(true);
       setActive(id);
       target.setAttribute("tabindex", "-1");
@@ -249,14 +252,28 @@ export function Reader({
         Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)),
       );
       setProgress((value) => (value === nextProgress ? value : nextProgress));
-      const position = el.scrollTop;
-      if (position < 70) {
-        lastDirectionPosition.current = position;
+      const position = Math.max(0, el.scrollTop);
+      const delta = position - lastDirectionPosition.current;
+      // Update the physical sample on *every* scroll event. Direction intent
+      // accumulates separately so subpixel jitter cannot reverse the chrome.
+      lastDirectionPosition.current = position;
+      if (position < 70 || moreOpen || tocOpen) {
+        scrollIntent.current = 0;
         onChromeVisible?.(true);
-      } else if (!moreOpen && !tocOpen &&
-                 Math.abs(position - lastDirectionPosition.current) >= 20) {
-        onChromeVisible?.(position < lastDirectionPosition.current);
-        lastDirectionPosition.current = position;
+      } else if (Math.abs(delta) > 0.5) {
+        // A small reverse gesture cancels the previous travel before it can
+        // reopen a toolbar during momentum scrolling.
+        if (scrollIntent.current * delta < 0) scrollIntent.current = 0;
+        scrollIntent.current = Math.max(
+          -80, Math.min(80, scrollIntent.current + delta),
+        );
+        if (scrollIntent.current >= 32) {
+          onChromeVisible?.(false);
+          scrollIntent.current = 0;
+        } else if (scrollIntent.current <= -24) {
+          onChromeVisible?.(true);
+          scrollIntent.current = 0;
+        }
       }
     };
     el.addEventListener("scroll", update, { passive: true });
