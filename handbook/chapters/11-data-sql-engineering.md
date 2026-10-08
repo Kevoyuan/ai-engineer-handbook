@@ -343,3 +343,81 @@ Investigation sequence:
 - [Apache Spark performance tuning](https://spark.apache.org/docs/latest/sql-performance-tuning.html) and [Structured Streaming guide](https://spark.apache.org/docs/latest/streaming/index.html) — Spark plan, AQE and stateful-stream semantics.
 
 **Canonical ownership:** CH11 owns data engineering, operational SQL and metric correctness. CH10 owns platform security and operational SLOs. CH12 owns customer discovery and delivery acceptance.
+
+
+## 11.11 FDE Coding & Engineering Craft: Big-O, dirty parsing, windows and the GIL (Q34–Q37)
+
+> **Source boundary (2026-10-08):** Independently authored from the public FDE topics, not a proprietary question bank. Python stdlib contracts are grounded in the documentation linked below. Working examples and **unittest** negative cases live in examples/fde-interview-engineering; no customer data or external API is required.
+
+### 11.11.1 Q34 · Big-O That Actually Matters + Heaps and Top-K：100M 条候选只留前 20 个怎么办？
+
+You must name **N**, **K**, the memory limit, tie policy, and whether items arrive in a stream. Sorting the entire set costs O(N log N) comparisons and generally O(N) materialization if input is not already stored. A bounded min-heap costs O(N log K) time and O(K) extra memory when maintaining K best scores, useful when K ≪ N. Python heapq.nlargest is designed for small N-of-largest outputs; for K near N a full sort may be faster in practice. Compare benchmark cases instead of universalizing complexity formulas.
+
+~~~~python
+import heapq
+def top_k(scores, k):
+    if k < 0:
+        raise ValueError("k cannot be negative")
+    return heapq.nlargest(k, scores)  # handles k=0
+~~~~
+
+For real RAG retrieval, exact heap selection occurs **after an upstream candidate generator** and cannot improve the missing-candidate recall of an ANN search. A top-20 score list does not guarantee top-20 authorized documents; **permission filter must precede eligibility**. With highly dynamic streams, tie-breaking is part of result determinism (e.g. use stable document ID after score).
+
+**Complexity nuance:** map O(N)/O(K) to workload geometry, skew, data serialization and network/IO. Repeated vector scoring against millions of documents is usually a more expensive bottleneck than heap maintenance; therefore optimize the right layer first.
+
+### 11.11.2 Q35 · Parsing Messy, Real-World Data：为什么简单 split(',') 危险？
+
+CSV allows quoted commas, embedded newlines and escaped quotes; naive string.split(',') cannot implement that grammar. Parse using Python csv.DictReader/open(newline=''), **validate exactly expected headers and required fields**, quarantine malformed rows, and retain source row numbers. Invalid timestamps, duplicate keys, unknown enum values and empty tenant IDs must **not** silently coerce to valid business facts.
+
+~~~~text
+raw CSV / JSON → schema & field count → type/UTC time check
+→ tenant + source ID/uniqueness → quarantine with reason
+→ accepted rows + lineage → canonical source table
+~~~~
+
+If one invalid carrier status row is skipped without an observable dead-letter record, the resulting Gold order chronology can be wrong even though every downstream model behaves correctly. Parse errors and business-rule violations are different categories: the parser may succeed structurally but yield an unknown carrier status.
+
+**Tests:** comma inside quoted field, empty tenant, unexpected extra column, missing timestamp, duplicate source key with conflicting values, UTF-8 text and timezone-naive event time. Use a positive control to prove the parser does not reject every row. A CSV fixture that is syntactically valid but missing required columns should fail **by policy**, not a fragile string split exception.
+
+### 11.11.3 Q36 · Sliding Window and Two Pointers：分析近 15 分钟错误率怎么做？
+
+For **already sorted** event timestamps, a two-pointer/deque window can maintain recent events in amortized O(N) time while processing the stream once (each event enters and leaves at most once). For unsorted arrival, first establish event-time sorting/watermark/retraction semantics; a simple deque on arrival order is **not** a correct event-time streaming aggregator.
+
+~~~~python
+from collections import deque
+from datetime import timedelta
+
+window = deque()
+for event in already_sorted_events:
+    window.append(event)
+    cutoff = event.event_time - timedelta(minutes=15)
+    while window and window[0].event_time < cutoff:
+        window.popleft()
+    # derive count, errors and denominator for this exact event_time window
+~~~~
+
+When error rate = failures/eligible requests, specify the denominator (e.g., tenant-scoped authorized investigations), how gaps/duplicate requests are handled, and whether intervals are [start,end] or (start,end]. For large Spark streaming/stateful workloads, use supported window aggregations and checkpointing rather than a single-process Python deque.
+
+### 11.11.4 Q37 · Concurrency and the GIL：异步、线程、进程分别解决什么？
+
+| Technique | Good for | Trap |
+|---|---|---|
+| asyncio | many I/O waits; explicit cooperative scheduling | synchronous blocking CPU work stalls event loop |
+| ThreadPoolExecutor | I/O-bound call overlap in standard CPython | typical GIL-limited pure-Python CPU threads do not scale linearly |
+| ProcessPoolExecutor | CPU-bound Python workloads when serialization overhead justified | startup, pickling, memory and process management |
+| Task queue / distributed workers | durable long work and fault recovery | at-least-once delivery, idempotency and queue admission required |
+
+**Version-sensitive fact:** Python 3.13+ supports an **optional free-threaded CPython build**, and relevant extensions may reenable the GIL; it is **incorrect** to claim “Python threads can never execute CPU code in parallel” without specifying runtime. In standard GIL-enabled CPython only one thread executes Python bytecode at once; native extensions and processes change this picture.
+
+**Failure injection:** a ThreadPoolExecutor with a worker that waits for another task submitted to a fully occupied pool can deadlock; Python docs explicitly warn about nested Future waits. Do not assume max_workers automatically fixes deadlocks or thread safety. Set bounded concurrency, timeouts, cancellation/retry ownership and monitor event-loop delay, queue depth and p95 completion.
+
+**Interview convergence:** A production data application should choose the *least complex execution model* that satisfies workload needs and correctness: single-process parse for small datasets, Spark/DataFrame for distributed heavy joins, separate worker queues for durable integration calls, and explicit performance testing before tuning.
+
+**First-party sources (2026-10-08):**
+- [Python heapq](https://docs.python.org/3/library/heapq.html) — min heap, nlargest and small-K guidance.
+- [Python csv](https://docs.python.org/3/library/csv.html) — DictReader and newline behavior.
+- [Python threading](https://docs.python.org/3/library/threading.html), [free-threading support](https://docs.python.org/3/howto/free-threading-python.html) — GIL and version-specific free-threaded builds.
+- [Python concurrent.futures](https://docs.python.org/3/library/concurrent.futures.html) — Executor semantics and deadlock examples.
+- [Spark Structured Streaming](https://spark.apache.org/docs/latest/streaming/index.html) — stateful event-time windowing beyond a stdlib deque.
+
+**Canonical ownership:** CH11 owns data parsing, correctness-oriented algorithms, windows and Python/SQL processing; CH02 owns production retrieval ANN/heap eligibility; CH08 owns workflow execution, dependency boundaries and DAG orchestration.
