@@ -129,6 +129,10 @@ export function Reader({
   const pane = useRef<HTMLDivElement>(null);
   const lastDirectionPosition = useRef(0);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [topActionsTarget, setTopActionsTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setTopActionsTarget(document.getElementById("reader-top-actions"));
+  }, []);
   const [mobile, setMobile] = useState(
     () => matchMedia("(max-width: 767px)").matches,
   );
@@ -185,7 +189,7 @@ export function Reader({
       scroller.scrollTop +=
         target.getBoundingClientRect().top -
         scroller.getBoundingClientRect().top -
-        16;
+        (mobile ? 60 : 16);
       setActive(id);
       target.setAttribute("tabindex", "-1");
       target.focus({ preventScroll: true });
@@ -293,8 +297,7 @@ export function Reader({
   );
   return (
     <main id="content" className="reader-layout" tabIndex={-1}>
-      {typeof document !== "undefined" &&
-        document.getElementById("reader-top-actions") &&
+      {topActionsTarget &&
         createPortal(
           <>
             <Button
@@ -362,9 +365,10 @@ export function Reader({
               </DropdownMenuContent>
             </DropdownMenu>
           </>,
-          document.getElementById("reader-top-actions")!,
+          topActionsTarget,
         )}
       <article className="reader">
+        <h1 className="sr-only">{en ? chapter.en : chapter.zh}</h1>
         <div
           ref={pane}
           className="chapter-body"
