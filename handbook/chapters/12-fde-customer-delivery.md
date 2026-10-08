@@ -406,3 +406,59 @@ The 167-row audit now reports **H136 / B31 / N0**, which means all 167 topic nam
 Verification assets: the [stdlib mini-lab](../../examples/fde-interview-engineering/) now adds negative tests for index/encoder version mismatch, ACL revocation, fair per-tenant token bucket and bitemporal feature training lookups. These tests simulate invariants; real identity verification, distributed concurrency, embedding quality, privacy compliance, EU legal interpretation and customer performance remain untested.
 
 **Release boundary:** Changes remain on Draft PR #70 only. Do not merge main, build web/site production assets or deploy/promote Vercel without explicit later user instructions.
+
+
+## 12.15 FDE Interview Readiness Audit: 36 prioritized concepts, six evidence dimensions
+
+> **Review scope · 2026-10-08.** The FDE 167-concept index is only a **topic-location crosswalk**; it does not measure explanation depth or candidate ability. The [core-36 editorial readiness matrix](../references/fde-2026-readiness-core36.md) is an independent **manual, provisional review of this Handbook's canonical chapter teaching evidence**, not a ranking of candidates or an FDEInterviews official answer key. The machine-checkable review input is [core36.json](../references/fde-2026-readiness-core36.json). Sources from the canonical chapters are evaluated as documented evidence, not newly tested current deployments.
+
+### Six-dimensional evidence rubric
+
+| Dimension | 0 | 1 | 2 (inspectable teaching evidence, not real production proof) |
+|---|---|---|---|
+| M · Mechanism | absent causal mechanism | named/outlined mechanism | conditions and stepwise behavior explained |
+| E · Worked Example | no scoped task | illustration only | typed example, code or reproducible fixture |
+| T · Trade-off | no alternative | names alternative | decision boundary and downside explicit |
+| F · Failure Test | no negative case | risk mentioned | fault injection with expected safe result |
+| G · Acceptance Gate | no quantified criterion | metric named | explicit denominator, guardrail or reproducible test protocol |
+| P · Primary Evidence | no applicable primary evidence | general/indirect chapter-level source | direct first-party API/spec or original research on the relevant behavior |
+
+For each of **36 deliberately selected FDE core concepts** (3 Model, 6 Retrieval, 5 Agent, 6 Evaluation, 7 Production, 6 Data, 3 Delivery), the audit records the **exact assigned canonical owner**, a heading and repository line pointer, the six provisional grades, the *specific weak aspect*, a realistic interview follow-up, and pass criteria. **Thirty-six of 167 were qualitatively assessed; the other 131 were not scored.**
+
+### Findings: the bottleneck is acceptance evidence
+
+The audit's descriptive dimension counts are:
+
+| Dimension | Concrete evidence = 2 | Partial = 1 | Absent = 0 |
+|---|---:|---:|---:|
+| Mechanism | 33 | 3 | 0 |
+| Worked example | 18 | 18 | 0 |
+| Trade-off | 36 | 0 | 0 |
+| Failure test | 15 | 21 | 0 |
+| Acceptance criterion | **5** | **31** | 0 |
+| Primary evidence | 14 | 18 | 4 |
+
+These are **subjective repository-content evidence assessments** with explicitly defined grades—not test results, official course scores or evidence that these subjects are interview-ready. A source citation is not a production integration test. The practical priority is to strengthen G/F/P with reproducible, risk-sensitive acceptance cases rather than add generic definitions.
+
+### Four oral mock rounds grounded in the order-investigation capstone
+
+1. **Authorized RAG revoked between vector retrieval and paragraph fetch:** same order ID in tenant A and B; require trusted scope, zero unauthorized context/cache/log access, separate freshness and revocation-denial SLIs.
+2. **Out-of-order CDC and bitemporal feature leakage:** duplicated/corrected/tombstone events and a feature arriving after decision time; require source sequence, consistent snapshot boundary, history replay, source reconciliation and feature effective/available time.
+3. **Refund timeout + retry storm:** unknown result after possible commit, carrier dependency 503; require explicit human approval, durable operation ID, receipt reconciliation, retry budgets, circuit breaker and bounded queue.
+4. **Pilot quality regresses and live customer demo fails:** pilot versus production cohort mismatch, security slice worsens, live 503; require stratified sealed gold dataset, risk-blocking eval gate, truthful fallback, canary/rollback and incident handoff.
+
+**Exercises are interview designs, not reported customer incidents.** See [complete rehearsal prompts and source-linked matrix](../references/fde-2026-readiness-core36.md), as well as runnable local tests in [examples/fde-interview-engineering](../../examples/fde-interview-engineering/) and the [order investigation walking skeleton](../../examples/fde-order-copilot/). The local tests support narrower programming contracts and do **not** validate deployed identity, cloud VPC networking, vector ACLs, payment gateway idempotency or Databricks integration.
+
+### Handoff: turn a green documentation signal into a testable answer
+
+For each gap, an FDE candidate should be able to answer without simply quoting the Handbook:
+
+```text
+business outcome + source of truth + authorized identity
+  → chosen architecture and a rejected alternative
+  → failure injection with expected safe behavior
+  → measurable gate / denominator / rollback trigger
+  → primary docs and explicitly unverified assumptions
+```
+
+The bilingual DESIGN-aligned presentation fragment is `web/assets/ch12-fde-interview-readiness.html`, registered as `fde-readiness-audit-08`. This phase remains on **Draft PR #70 only**, with no `main` merge, production `web/site` regeneration, or Vercel release.
