@@ -50,7 +50,7 @@ web/site generated artifact
         ↓
 feature branch + pull request
         ↓
-preview build + structural audit + English audit + Vercel Preview
+locally run preview build + structural validation + English audit; Vercel Preview if available
         ↓
 merge main
         ↓
@@ -311,7 +311,7 @@ pull request
   ↓
 review source + generated diff
   ↓
-CI + Vercel Preview
+local validation + review (+ Vercel Preview if available)
   ↓
 merge
   ↓
@@ -330,16 +330,30 @@ web/<topic>
 
 Generated artifacts are expected when the production build changes, but inspect them intentionally rather than treating them as noise.
 
-## 10. CI and preview gates
+## 10. Manual validation and Vercel preview
 
-A pull request is ready only when applicable checks are green:
+**GitHub Actions automatic workflows were retired at the user's request.** No GitHub-hosted React, English or structural audit automatically runs on pushes or pull requests. Their underlying local scripts and generated artifacts remain available. Before merging a changed UI or chapter, run the relevant checks yourself:
 
-- **Handbook preview build** — compiles the React source;
-- **English language audit**;
-- **Repository structural audit**;
-- **Vercel Preview**.
+```bash
+# From the repository root
+node web/validate.mjs
+node --check web/assets/app.js
+node --check web/assets/search.js
+node --check web/assets/handbook-interactions.js
+node --check web/rebuild.mjs
+node --check web/validate.mjs
 
-These gates answer different questions. A green React build proves source compilation; it does not prove `web/site` was refreshed. A green Vercel deployment proves the committed artifact deployed; it does not replace semantic, visual, or interaction review.
+# From preview/handbook-custom/
+npm install --no-audit --no-fund
+npm run build
+# For changed Reader/interactive UI, run the relevant browser tests
+# with `npm run dev -- --port 4180` running separately:
+npm run test:ui
+```
+
+The English HTML audit formerly embedded in `.github/workflows/english-language-audit.yml` does not have a standalone local replacement yet: manually review English-mode text and translated artifacts for English-only output (including labels, placeholders and metadata) until this check is extracted into a script. Do not claim language validation passed unless you actually performed it.
+
+Review the PR diff and, when available, Vercel Preview independently. A green React build proves only compilation, not that `web/site` was refreshed. Vercel's build quota and deployment status are unrelated to GitHub Actions. A blocked Vercel preview/production deployment cannot be cleared merely by disabling GitHub Actions.
 
 ## 11. Merge and production verification
 
@@ -367,7 +381,7 @@ edit canonical chapter
 → validate generated content/search
 → npm run build
 → npm run publish:web
-→ PR / CI / preview
+→ PR / manual validation / preview if available
 ```
 
 ### React UI-only change
@@ -380,7 +394,7 @@ inspect current DESIGN.md + UX-CONTRACT.md + source figure (when applicable)
 → run evidence/surface-ui-audit.cjs for cross-surface changes
 → inspect source-faithful visual output
 → npm run publish:web and commit web/site
-→ PR / CI / preview
+→ PR / manual validation / preview if available
 ```
 
 ### Generator bug
@@ -390,7 +404,7 @@ fix sync/publish generator
 → regenerate outputs
 → verify preview and web/site
 → add regression guard
-→ PR / CI / preview
+→ PR / manual validation / preview if available
 ```
 
 Always fix derivation bugs at their source rather than patching generated output.
