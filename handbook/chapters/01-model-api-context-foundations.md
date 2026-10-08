@@ -1809,3 +1809,71 @@ Computer Vision 三种不同任务：**Classification** 输出图片类别；**D
 - The mathematical distinctions and synthetic scenarios are handbook teaching synthesis. **No training experiment or production performance claim was made.**
 
 **Ownership:** CH01 owns model/ML fundamentals. CH09 owns customer eval, metrics/calibration/experimental design. CH11 owns malformed data and time-aware SQL. The Python fixture at examples/fde-interview-engineering exercises deterministic algorithms, not a foundation-model training run.
+
+
+## 1.23 FDE Remaining Model Foundations: prompting, modalities, optimization and privacy (Q58–Q62)
+
+> **Source boundary · 2026-10-08:** Concepts from the public FDE index; questions and architecture advice are original Handbook synthesis, not proprietary solutions. Technical distinctions follow the cited academic papers and framework/maintainer docs. Do not treat an illustrative model design or numeric example as a trained benchmark, privacy certification or regulatory compliance.
+
+### Q58 · Prompt Engineering 与 Chain-of-Thought Prompting：提示词是不是在修改模型权重？
+
+No. A prompt changes **inference-time context**; fine-tuning updates weights. Effective enterprise prompts provide clear task bounds, output schema, evidence source rules, authorized tool interface and explicit abstention when evidence is absent. Version prompts as release artifacts; **prompt injection** arrives from lower-trust sources and cannot be eliminated by adding “ignore malicious instructions.”
+
+**Chain-of-Thought (CoT) prompting** historically elicits intermediate reasoning-like text in some models, but is **not a proof of factual correctness**, and production apps should neither depend on access to hidden model reasoning nor regard exposed reasoning text as an audit log. For predictable calculations, use a deterministic tool and independently check the final output. Use concise, auditable **decision summaries** and observed tool trajectories instead of demanding internal reasoning traces.
+
+**Test**: two near-identical purchase orders differ by one digit, a retrieved PDF says “Ignore permissions,” and user asks for unobserved facts. Assert schema, order IDs, trusted policy, refusal and grounded evidence remain intact across prompt revisions.
+
+**Ownership note:** CH01 §1.9 already covers prompting versus RAG versus fine-tuning. This new question adds explicit Prompt Engineering and CoT failure tests rather than renaming existing material.
+
+### Q59 · Inference-Time Compute and Scaling Laws：给更多推理 Token 就一定更准？
+
+**No.** More inference-time work can include sampling multiple candidates, search or repeated tool reasoning, using verifier/reranker calls and tighter evidence validation. It may improve some tasks but increases latency/cost and can amplify incorrect assumptions. Distinguish **pretraining scaling laws** (empirical relationships among model size/data/compute and predictive loss) from **test-time compute scaling**, and do not extrapolate one directly into another.
+
+**FDE experiment**: compare a single LLM call versus bounded verifier/tool-assisted path for same labeled customer tasks; track approved successful-task rate, p95 latency, budget per success and safety. If a deterministic SQL answer exists, spending 10× reasoning tokens may be pure waste.
+
+**Original evidence:** [Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361) studies empirical loss scaling during training. It does not guarantee that spending arbitrary reasoning tokens will improve any customer's RAG task.
+
+### Q60 · Multimodal Models and VLMs、Speech and Voice AI、Diffusion Models：三个体系怎么分别评估？
+
+| Category | Input/output contract | Failure to evaluate |
+|---|---|---|
+| VLM / image-text-to-text | image(s) + user text → text/structured output | missing tiny chart labels, OCR errors, page citation drift |
+| ASR / speech-to-text | audio → transcribed text + timing/confidence as supported | accents, overlapping speakers, PII exposure, noise-induced mistakes |
+| TTS / speech synthesis | text → audio with voice/prosody | incorrect numbers/names, latency, voice/consent abuse |
+| Diffusion generative models | iterative denoising/generative process, often images/audio | content quality/safety, nondeterministic seeds, expensive sampling |
+
+**Decision example:** for a scanned shipping PDF, use document extraction/OCR and structured validation first; add VLM for genuinely image-semantic elements such as diagrams. Do not accept a VLM's natural-language impression of a cell as a verified accounting figure without source-grounded comparison. Voice assistants add streaming ASR latency, turn detection, interruption/cancellation and audio privacy—not just “wrap text chat in TTS”.
+
+**Primary sources:** [Hugging Face VLM task](https://huggingface.co/docs/transformers/tasks/image_text_to_text), [TTS task](https://huggingface.co/docs/transformers/tasks/text-to-speech), [Improved DDPM paper](https://arxiv.org/abs/2102.09672). They validate task categories, **not** a claim that a single system supports every modality.
+
+### Q61 · Constitutional AI and RLAIF：让模型自我批评，就不用人类和安全策略了？
+
+No. **Constitutional AI** uses explicit principles to guide critiques/revisions and AI-generated preference feedback in a training pipeline. RLAIF (RL from AI Feedback) does not mean a production model is allowed to set its own binding policy at runtime; evaluators/reward models can inherit their source model's blind spots.
+
+Pipeline distinction:
+
+```text
+principles approved by operators
+ → supervised critique/revision data
+ → model training / preference comparison
+ → reward/proxy and optimization
+ → independent human+policy evaluation at deployment
+```
+
+**Negative test**: an AI critic likes a convincing but unauthorized tool request. Runtime execution must still be blocked by the trusted host; evaluate reward-model bias and refusal overcritical slices. **Primary source:** [Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073). The paper describes a training/research approach, not enterprise authorization certification.
+
+### Q62 · Differential Privacy、Federated Learning、Mechanistic Interpretability：都是保护隐私的技术吗？
+
+**No—three fundamentally different concerns:**
+
+| Concept | Goal | Important limit |
+|---|---|---|
+| Differential Privacy (DP) | bound the distributional effect of a participant's data via a specified (ε, δ) mechanism/accountant | a vague “noise added” statement is not a measured DP guarantee; clipping/noise/sampling/composition matter |
+| Federated Learning (FL) | coordinate model training where data stays with local participants while updates are exchanged | raw-data locality **does not automatically prevent update leakage**; consider secure aggregation and DP separately |
+| Mechanistic Interpretability | understand internal model representations/causal computational mechanisms | an interpreted feature/circuit is **not** an access-control/privacy guarantee or universal proof of reasoning truth |
+
+**FDE privacy decision:** If customer data may not leave a device, FL might be one architectural candidate, but updates/metadata/network access still require threat modeling. A DP-SGD deployment needs a published accountant and versioned ε/δ budget; composition across multiple training rounds matters. Neither FL nor DP makes prompt logging, model provider processing or cross-tenant RAG safe by itself.
+
+**Source check:** [Opacus DP-SGD tutorial](https://opacus.ai/tutorials/building_image_classifier) describes per-sample clipping/noise/ε/δ; [Flower FL training](https://flower.ai/docs/framework/tutorial-series-get-started-with-flower-pytorch.html) and [secure aggregation](https://flower.ai/docs/framework/main/en/explanation-ref-secure-aggregation-protocols.html) distinguish FL and confidentiality of updates. Mechanistic interpretability is a research framework, not a runtime product feature; avoid implying exhaustive causal explanation.
+
+**Numerical Stability audit note:** CH01 §1.21 Q26 already demonstrates stable log-sum-exp versus naive exponentials, with runnable stdlib negative cases in examples/fde-interview-engineering. The previously missing Numerical Stability label is an **alias mismatch**, not a new math topic; validate existing logic rather than adding duplicate explanations.
