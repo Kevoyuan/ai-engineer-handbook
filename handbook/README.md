@@ -18,7 +18,9 @@ handbook/chapters/
 ├── 07-memory-context-engineering.md
 ├── 08-agent-orchestration.md
 ├── 09-reliability-evaluation-observability.md
-└── 10-serving-deployment-ai-platform.md
+├── 10-serving-deployment-ai-platform.md
+├── 11-data-sql-engineering.md
+└── 12-fde-customer-delivery.md
 ```
 
 `handbook/ai_engineer_handbook.md` is retained only as a compatibility entry point for old links. It is **not** a semantic manuscript and must not receive new handbook content.
@@ -69,6 +71,8 @@ If Markdown and the rendered product disagree on **technical meaning**, re-check
 | 08 | Agent / Workflow / Orchestration | Artifacts, bounded loops, graphs, LangChain/LangGraph, coding-agent engineering |
 | 09 | Reliability / Eval / Observability | Harness, datasets, traces, monitoring, experiments, security, cost, release gates |
 | 10 | Serving / Deployment / Security / AI Platform | Inference serving, KV/prefix cache, cache isolation; deployment/security/platform sections expanding incrementally |
+| 11 | Data & SQL Engineering | ETL/ELT, CDC, idempotent pipelines, Delta/Lakehouse, Spark, temporal SQL, safe Text-to-SQL |
+| 12 | FDE Customer Delivery | Discovery, scope, walking skeleton, acceptance metrics, stakeholder trade-offs, live demo recovery, handoff |
 
 ## Adding knowledge
 
@@ -117,3 +121,7 @@ Do not create a new semantic supplement next to an existing canonical chapter me
 ## 知识核验
 
 [2026-09-28 全章节资料核验报告](verification/2026-09-28.md)：逐节覆盖、修正记录、来源和未验证边界。
+
+## FDEInterviews concept ownership (2026-10-08)
+
+The [167-concept routing inventory](references/fde-2026-concept-crosswalk.md) preserves the source's ten tracks and maps each item to exactly one of chapters 01–12. A mapping is a knowledge ownership plan, **not** an audited completeness claim. New CH11 owns the data plane; new CH12 owns the customer delivery process. Continue deepening existing chapters instead of duplicating their knowledge in the new files.
