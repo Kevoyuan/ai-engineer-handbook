@@ -3287,3 +3287,60 @@ body {
     max-width: 8.5rem;
   }
 }
+
+
+/* Verification notes are evidence metadata, not primary reading blocks. */
+.chapter-body details.verification-note {
+  margin: 1rem 0 1.5rem;
+  padding: 0;
+  border: 0;
+  border-left: 2px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted-foreground);
+}
+
+.chapter-body details.verification-note > summary.co-t {
+  display: list-item;
+  cursor: pointer;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  color: var(--muted-foreground) !important;
+  font: 560 0.75rem/1.5 var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+.chapter-body details.verification-note > summary.co-t:hover,
+.chapter-body details.verification-note > summary.co-t:focus-visible {
+  color: var(--foreground) !important;
+}
+
+.chapter-body details.verification-note > p {
+  margin: 0;
+  padding: 0 0.75rem 0.6rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125em;
+  line-height: 1.7;
+}
+
+.chapter-body details.verification-note > p:last-child {
+  padding-bottom: 0.75rem;
+}
+
+.chapter-body details.verification-note[open] > summary.co-t {
+  color: var(--foreground) !important;
+}
+
+@media (max-width: 640px) {
+  .chapter-body details.verification-note {
+    margin: 0.875rem 0 1.25rem !important;
+    padding: 0 !important;
+  }
+
+  .chapter-body details.verification-note > summary.co-t {
+    min-height: 44px;
+    display: list-item;
+    padding: 0.65rem 0.75rem;
+  }
+}
