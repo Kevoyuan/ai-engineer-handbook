@@ -3,6 +3,10 @@
     {
       "path": "/assets/ch03-conversational-rag.html",
       "id": "conversational-rag"
+    },
+    {
+      "path": "/assets/fde-stage07-query.html",
+      "id": "fde-stage07-query"
     }
   ],
   "05-document-pdf-rag": [
@@ -24,6 +28,10 @@
     {
       "path": "/assets/ch06-system-one-jev.html",
       "id": "system-one-jev"
+    },
+    {
+      "path": "/assets/fde-stage07-protocols.html",
+      "id": "fde-stage07-protocols"
     }
   ],
   "08-agent-orchestration": [
@@ -62,6 +70,10 @@
     {
       "path": "/assets/ch08-cancellation-steering.html",
       "id": "agent-cancellation-steering"
+    },
+    {
+      "path": "/assets/ch08-fde-agent-coding.html",
+      "id": "fde-agent-coding-06"
     }
   ],
   "09-reliability-evaluation-observability": [
@@ -101,6 +113,10 @@
     {
       "path": "/assets/ch09-fde-verified-evals.html",
       "id": "fde-verified-eval-harness"
+    },
+    {
+      "path": "/assets/ch09-fde-eval-foundations.html",
+      "id": "fde-eval-foundations-05"
     }
   ],
   "07-memory-context-engineering": [
@@ -111,6 +127,10 @@
     {
       "path": "/assets/ch07-enterprise-knowledge-context.html",
       "id": "enterprise-knowledge-context"
+    },
+    {
+      "path": "/assets/fde-stage07-context.html",
+      "id": "fde-stage07-context"
     }
   ],
   "10-serving-deployment-ai-platform": [
@@ -129,18 +149,62 @@
     {
       "path": "/assets/ch10-fde-verified-retries.html",
       "id": "fde-verified-retry-idempotency"
+    },
+    {
+      "path": "/assets/ch10-fde-system-design.html",
+      "id": "fde-system-design-02"
+    },
+    {
+      "path": "/assets/fde-stage07-serving.html",
+      "id": "fde-stage07-serving"
     }
   ],
   "02-enterprise-retrieval": [
     {
       "path": "/assets/ch02-fde-verified-permission-rag.html",
       "id": "fde-verified-permission-rag"
+    },
+    {
+      "path": "/assets/fde-stage07-retrieval.html",
+      "id": "fde-stage07-retrieval"
     }
   ],
   "12-fde-customer-delivery": [
     {
       "path": "/assets/ch12-order-investigation-capstone.html",
       "id": "fde-order-investigation-capstone"
+    },
+    {
+      "path": "/assets/ch12-fde-coverage-audit.html",
+      "id": "fde-coverage-audit-04"
+    },
+    {
+      "path": "/assets/ch12-fde-interview-readiness.html",
+      "id": "fde-readiness-audit-08"
+    }
+  ],
+  "11-data-sql-engineering": [
+    {
+      "path": "/assets/ch11-fde-databricks-drills.html",
+      "id": "fde-databricks-03"
+    },
+    {
+      "path": "/assets/ch11-fde-coding-craft.html",
+      "id": "fde-coding-craft-06"
+    },
+    {
+      "path": "/assets/fde-stage07-data.html",
+      "id": "fde-stage07-data"
+    }
+  ],
+  "01-model-api-context-foundations": [
+    {
+      "path": "/assets/ch01-fde-ml-foundations.html",
+      "id": "fde-ml-foundations-05"
+    },
+    {
+      "path": "/assets/fde-stage07-model.html",
+      "id": "fde-stage07-model"
     }
   ]
 }

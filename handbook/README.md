@@ -125,3 +125,21 @@ Do not create a new semantic supplement next to an existing canonical chapter me
 ## FDEInterviews concept ownership (2026-10-08)
 
 The [167-concept routing inventory](references/fde-2026-concept-crosswalk.md) preserves the source's ten tracks and maps each item to exactly one of chapters 01–12. A mapping is a knowledge ownership plan, **not** an audited completeness claim. New CH11 owns the data plane; new CH12 owns the customer delivery process. Continue deepening existing chapters instead of duplicating their knowledge in the new files.
+
+
+## Independently researched FDE practice and 167-concept audit
+
+The public FDEInterviews topic catalog is a **scope/index** only; the handbook does not claim access to paid answer keys. Independent answer explanations are canonical chapter content, with product-specific claims verified against first-party sources and fictional scenarios labeled.
+
+- [Q1–Q9 source and verification limits](references/fde-2026-verified-answer-ledger.md): CH02 access-aware retrieval, CH09 evals, CH10 idempotency/retries.
+- [Q10–Q23 source and verification limits](references/fde-2026-answers-02-04-provenance.md): CH10 production FDE system design (§10.26), CH11 Databricks/Data & SQL (§11.10).
+- [Q40–Q64 independently sourced topic-gap answers](references/fde-2026-answers-07-provenance.md): manual reconciliation of the previous 37 unlocated topics across CH01/02/03/06/07/10/11; H136/B31/N0 is **name-location evidence, not depth certification**.
+- [Q24–Q39 source and verification limits](references/fde-2026-answers-05-06-provenance.md): CH01 model/ML foundations, CH09 statistical evals, CH11 coding/data integrity, CH08 graph/tool tests.
+- [Runnable deterministic ML/coding mini-lab](../examples/fde-interview-engineering/): self-contained Python stdlib negative/positive tests.
+- [167 FDE topics → one canonical chapter each](references/fde-2026-concept-crosswalk.md).
+- [36-core FDE interview evidence-depth review](references/fde-2026-readiness-core36.md): manual six-factor review, source-line pointers, 12 prioritized editorial repairs and four mock interviews; **not** a personal readiness score.
+- [Structured 36-topic review data](references/fde-2026-readiness-core36.json) and [source-pointer verifier](../scripts/verify_fde_readiness.py).
+- [167-item heading/body/no-direct-signal evidence audit](references/fde-2026-coverage-audit.md): 2026-10-08 review-branch baseline updated to H136/B31/N0 after stages 05–06; **not a readiness/completion score**.
+- [Auditable evidence-pointer verifier](../scripts/verify_fde_coverage.py): no external service or paid content required.
+
+The delivery case remains in CH12 §12.11. Public-facing content changes still require generated bilingual assets plus the separate release process. A feature-branch push is **not** Vercel production publication.

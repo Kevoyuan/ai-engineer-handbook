@@ -1623,3 +1623,74 @@ observe_after_release:
 - [OpenAI: Evals API](https://platform.openai.com/docs/api-reference/evals) and [Graders](https://platform.openai.com/docs/api-reference/graders) — evaluation and grader primitives.
 
 **Cross-chapter:** CH02 owns retrieval/security candidate selection; CH04 owns refusal/evidence sufficiency; CH08 owns agent architecture; CH12 owns customer acceptance negotiation.
+
+
+## 9.24 FDE evaluation foundations · Imbalance, Calibration, Synthetic Sets and Bandits (Q30–Q33)
+
+> **Independent-source boundary · 2026-10-08.** These original engineering prompts draw from public [FDE concepts](https://www.fdeinterviews.com/concepts), **not private answer keys**. Equations are standard math and examples are hypothetical. scikit-learn product behaviors follow first-party docs; no model was trained or calibrated on customer data.
+
+### 9.24.1 Q30 · Precision, Recall and F1：99% Accuracy 还能漏掉所有高风险事件吗？
+
+**Yes.** On a dataset with 990 normal requests and 10 policy-violation attempts, a classifier predicting “normal” for all 1,000 achieves 99% accuracy while policy-violation **recall = 0/10**. This is a constructed arithmetic counterexample, not a measured model result.
+
+For positive = "security violation":
+
+~~~~text
+Precision = TP / (TP + FP)
+Recall = TP / (TP + FN)
+F1 = 2 * Precision * Recall / (Precision + Recall)
+~~~~
+
+Undefined denominators require a documented convention. For multiclass systems, **macro** averaging treats categories equally, **micro** aggregates individual predictions, and **support-weighted** accounts for class frequency. Reporting a single average can hide critical slices; always include confusion matrices for access-denied, low-evidence, and allowed requests. If false negatives are expensive, optimize recall subject to an acceptable false-positive/human-review budget rather than pursuing raw accuracy.
+
+**RAG distinction:** retrieval evidence Recall@k is defined against labeled relevant document IDs; it is **not the same object** as the classification recall above. State the gold set and denominator.
+
+### 9.24.2 Q31 · Calibration and Uncertainty：LLM Confidence=0.9 真的有 90% 正确率吗？
+
+**No automatic probability guarantee.** Calibration means among similarly scored predictions, the observed fraction correct should approximately match the probability. This requires **a defined target variable, calibrated score and representative held-out labels**; free-form LLM self-confidence is not automatically a statistically calibrated probability.
+
+~~~~text
+bucket predicted p≈0.8
+observed reviewed correctness = correct / total within bucket
+compare with p; inspect reliability diagram + cohort drift
+~~~~
+
+Use Brier/log-loss as proper probabilistic scoring signals but note **they measure both discrimination and calibration-related effects**; lower Brier alone does not prove better calibration. Calibrators should be fit on data disjoint from underlying model training, e.g. cross-validation or a separate calibration set. Decide abstention threshold by customer risk and review budget—not by assuming "score 0.8" is universal.
+
+**Counterexample:** A model says "90% confident" on every invoice but is correct on only 65% of audited real invoices. Without a calibrated scorer and independent customer holdout the number should be treated as text, not a risk estimate.
+
+### 9.24.3 Q32 · Synthetic Data Generation：可以用 LLM 自动生成全部 Golden Test 吗？
+
+Not by default. Synthetic generation is useful to create **edge cases, privacy-safe fixtures, and targeted stress samples**, but **a model cannot verify its own facts just because it generated both question and reference answer**. Require source-record support (event IDs, approved policy), human adjudication for critical use cases, provenance, and a separately maintained real-traffic holdout.
+
+| Dataset role | Strength | Leakage/validity risk |
+|---|---|---|
+| Real consented and sampled user tasks | captures genuine workload | privacy, annotation cost and representativeness |
+| Hand-authored corner cases | targets incident failure and permission boundaries | narrow, may not represent frequency |
+| Synthetic prompts and trajectories | scalable exploration/stress | correlated errors, unrealistic prevalence, label contamination |
+| Sealed acceptance holdout | independent release decision | becomes development set if repeatedly inspected/tuned |
+
+If using synthetic negative tenancy probes, the **expected denial comes from the explicit permission policy fixture**, not from the same generating LLM’s opinion. Record generator/model version, test reference, expected behavior and source snapshot. Do not publish an impressive "100% pass" without distinguishing test composition and outcome validity.
+
+### 9.24.4 Q33 · Multi-Armed Bandits vs A/B testing：在线切流有何不同？
+
+A fixed randomized A/B test compares candidate variants under a predeclared sampling and analysis plan, with outcome attribution and guardrails. **Multi-armed bandits** adaptively shift traffic toward variants that appear to perform better, trading off exploration/exploitation. This may reduce regret in suitable settings but complicates naive inference because treatment assignment probabilities vary and feedback can be delayed or biased.
+
+**FDE recommendation:** For customer-critical permission/security capabilities, **do not use adaptive experimentation to learn whether an unsafe route is acceptable**. Both A/B and bandits require prelaunch deterministic authorization/safety gates. For low-risk ranking UX experiments, bandits may be justified if outcomes arrive promptly, identities are stable, and the team can handle adaptive statistical analysis.
+
+| Choice | Suitable when | Stop/guardrail |
+|---|---|---|
+| Fixed A/B | stable evaluation and interpretable cohort comparison | predeclared exposure, duration, variant/version |
+| Bandit | many safe alternatives, repeat opportunities, short trustworthy reward delay | monitor exposure bias, regret, feedback delay and fairness |
+| Shadow | need production-shaped input without exposing risky outputs | no customer side effects; offline comparison |
+| Canary | stepwise exposure to already-approved change | predefined error, latency, cost and safety rollback triggers |
+
+**Metric-specific review:** confidence interval / sequential testing rules, sample ratio mismatches, correlated per-user sessions, delayed outcomes, drift and safeguards for small protected slices. Adaptive routing should never bypass user authorizations or create feedback loops that measure clicks rather than the actual customer goal.
+
+**Primary-source checks (2026-10-08):**
+- [scikit-learn precision, recall and F-score](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_recall_fscore_support.html), [recall averaging modes](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html).
+- [scikit-learn probability calibration](https://scikit-learn.org/stable/modules/calibration.html): reliability curve, independent calibration fit and Brier caveats.
+- [scikit-learn model-selection leakage](https://scikit-learn.org/stable/common_pitfalls.html), [cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html).
+- Evaluation framework/trade-off explanations beyond the documented API behaviors are original teaching synthesis, **not empirical performance claims**.
+
+**Cross-chapter ownership:** CH01 gradient/loss and foundational optimization, CH02 retrieval-specific recall@k, CH11 data quality, CH12 customer acceptance; CH09 owns statistical evaluation, policy gates and online experiment methodology.

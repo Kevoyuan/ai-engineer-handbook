@@ -2121,3 +2121,316 @@ Watch request amplification, queue age/depth, retry fraction, concurrency satura
 - [FDEInterviews Concepts](https://www.fdeinterviews.com/concepts) — thematic source only.
 
 **Cross-chapter:** CH08 owns action selection and agent control loop; CH11 owns event-sink idempotency/CDC; CH12 owns customer-specific reliability SLO and incident agreement.
+
+
+## 10.26 FDE System Design: private deployment, resilient integrations and operating economics
+
+> **2026-10-08 independent research note.** These original FDE-style prompts are informed by the public [FDEInterviews Concepts](https://www.fdeinterviews.com/concepts) list, **not private paid answers**. Vendor-specific details below are checked against Microsoft, AWS and Databricks primary documentation; architecture examples, customer assumptions and proposed gates are **handbook synthesis**, not measured deployments.
+
+### 10.26.1 Q10 · Customer says “data must remain in our VPC”: SaaS, Private Link, BYOC or air-gap?
+
+First separate **data residency**, **private network transport**, **compute ownership**, **model-provider processing**, and **operations responsibility**. These are not interchangeable controls.
+
+| Option | App runtime ownership | Data path | FDE trade-off |
+|---|---|---|---|
+| Multi-tenant SaaS | Vendor | Governed vendor-managed service | Fastest update/operations, but data custody and tenant isolation must meet policy |
+| Private connectivity to SaaS | Vendor | Private endpoint / tunnel for selected links | Network traffic can avoid the public internet without relocating vendor compute |
+| BYOC / customer VPC | Customer-controlled cloud account for specified components | Customer network controls; explicitly audited outbound dependencies | More customer control; installation/upgrade/support burden and shared-responsibility contracts |
+| On-prem | Customer facility | Local network plus named outbound exceptions | Requires local capacity, update pipeline and hardware management |
+| Air-gapped | Enclosed customer network with no live external connectivity (as defined contractually) | Offline package import, evidence and updates | Highest operational complexity; cloud-hosted model API cannot be silently assumed |
+
+**Decision sequence**: (1) which bytes are prohibited from leaving and where; (2) model and embedding processing location; (3) control-plane metadata, telemetry, support access, backups; (4) DNS, egress allowlist, secrets, keys, SSO, identity federation; (5) incident ownership; (6) upgrade and rollback channel.
+
+```text
+Customer regulation / contractual boundary
+  → data-flow inventory [prompts, docs, embeddings, traces, backups, keys]
+  → identity/network/compute owners
+  → select candidate SaaS / private endpoint / BYOC / on-prem
+  → verify every outbound path AND model provider
+  → walking-skeleton deployment + permission/egress regression
+```
+
+**Crucial distinction**: a private endpoint protects selected traffic paths; it does **not** mean the entire application runs in the customer's VPC, that all egress is blocked, or that model prompts never leave the region. Azure's private PaaS guidance differentiates service endpoints, private endpoints and outbound VNet integration; its architecture guidance also calls out private DNS and disabling public network access where supported. Product SKUs and allowed configurations must be confirmed case by case.
+
+**Interview trap:** “Use Private Link, therefore customer data never leaves the VPC” is false absent a verified data-flow inventory. Likewise BYOC does not automatically mean no vendor remote operation or metadata collection.
+
+### 10.26.2 Q11 · When does an integration need a circuit breaker rather than more retries?
+
+At an overloaded dependency, retries can amplify demand. Retry **only** when the operation is safe to repeat (read or documented idempotent write), within both a maximum-attempt count and deadline; use jitter and a budget. A circuit breaker stops repeatedly initiating likely-failing calls; a concurrency limit, bounded queue and load shedding prevent unbounded backpressure.
+
+```text
+caller deadline
+ → classify operation safe/idempotent?
+ → remaining retry budget?
+ → concurrency admission / queue bound
+ → service request
+   ├─ success → return / emit traces
+   ├─ transient → capped jitter retry, if within budget
+   ├─ repeated dependency failure → circuit OPEN / degrade
+   └─ unsafe unknown write → reconcile, not replay with new key
+```
+
+Don't place independent retries at every nested layer. If three layers each make three attempts, an illustrative upper bound is 27 downstream tries for a logical request. Whether a breaker or controlled retry improves performance is workload- and recovery-pattern-dependent; measure it by fault injection. AWS Builders' Library explicitly discusses retries as load, correlated backoff and jitter.
+
+**Failure injection:** kill the carrier API for 60 s (simulation); inject 429, 503 and half-open recovery; check max in-flight, retry amplification, queue age, p95/p99, graceful failure and restored traffic. Distinguish upstream queue admission from actual downstream side effects.
+
+### 10.26.3 Q12 · What is a safe idempotency contract for tool actions?
+
+Idempotency belongs to **the business operation**, not merely the HTTP request. Model can propose `createRefund(orderId)`; trusted host authorizes a logical operation, assigns a stable operation ID, durably records intent, and calls a backend honoring that ID. On timeout the outcome is *unknown*, not known failed. Query/reconcile or retry **same key and parameters** only when contract allows it.
+
+```text
+operation_id + tenant + allowed tool + immutable parameters
+ → validate authorization + persist intent
+ → execute with downstream idempotency contract
+ → store receipt, or mark UNKNOWN and reconcile
+ → emit audit event; human approval for irreversible changes
+``
+
+**Limitations**: exactly-once effects across independent DB/queue/payment systems require explicit transactional or reconciliation design. The Stripe first-result replay rules are specific to Stripe; do not universalize the reported TTL or 500 behavior.
+
+### 10.26.4 Q13 · Ontology, knowledge graph and metric view: which boundary owns meaning?
+
+An **ontology / semantic layer** defines stable business entities, relations, authorized actions, business metrics and time semantics. A **knowledge graph** stores relationships or graph-shaped facts. **GraphRAG** is a retrieval architecture that can use entity/relationship structure. These can overlap, but none are identical:
+
+| Concern | Entity/semantic layer | Graph store | RAG/GraphRAG |
+|---|---|---|---|
+| Example | Order, Customer, Shipment, metric “late handoff” | edges `ORDER→SHIPMENT→CARRIER` | query evidence across policies and relations |
+| Ownership | business semantics, access/action contract | fact representation and traversal | answer-time evidence selection |
+| Validity | definitions, units, temporal policy | graph correctness/provenance | recall, precision, grounded claims |
+| Anti-pattern | free-form model invents metric meaning | every row becomes graph node | graph traversal bypasses ACL / source truth |
+
+For the order Copilot, start with a semantic contract: `delivered_event_time`, `handoff_event_time`, `timestamp_authority`, `source_freshness`, `permitted_order_scope`. Do **not** ask the LLM to invent these definitions at runtime. Databricks Unity Catalog **metric views** expose centrally defined fields/measures (YAML/SQL based on version), which can reduce metric drift, but **do not automatically implement** the full entity/action/process ontology or replace separate access controls.
+
+### 10.26.5 Q14 · How do SLI, SLO and error budget differ?
+
+**SLI** = measured service behavior; **SLO** = agreed reliability target evaluated on that indicator; **error budget** = tolerated failed events (or time) under a precisely defined denominator/window.
+
+Example, **hypothetical only**:
+
+```text
+SLI: authorized investigations returning a reviewed, grounded result
+     in <= 8 seconds / all eligible investigation requests
+SLO: 99.0% over a trailing 28-day window
+Error budget at 10,000 eligible requests: 100 unsuccessful requests
+```
+
+Specify *what counts as unsuccessful*: timeout, wrong/ungrounded answer, authorization leak, policy refusal, customer-cancelled task, and whether human review is included. Never combine security leaks into a tolerated normal error budget: make them release-blocking critical incidents. SLO 99% over 28 days is an **exercise assumption**, not a vendor standard.
+
+**Operational policy:** burn-rate alert → incident and safe degradation; budget exhaustion → pause risky feature rollouts until remedied. End-to-end p95 and freshness are separate SLIs; do not average them into one accuracy score.
+
+### 10.26.6 Q15 · Why optimize cost per successful task, not just token unit price?
+
+```text
+attributed_cost = LLM + embedding + retrieval/SQL + tool calls
+                  + retries + serving/infra + human review (if in scope)
+cost_per_approved_success = attributed_cost / approved_successful_tasks
+```
+
+Changing to a cheaper model can *increase* retries, lower answer quality and raise manual review cost. Attribution must use consistent cohort, data snapshot, workload and outcome definition. Track **success rate, latency, tokens/cost, refusal rate, human correction time**, and a comparable non-AI baseline. In high-risk workflows minimizing cost without respecting security/regression gates is not optimization.
+
+### 10.26.7 Q16 · What does a production-shaped Walking Skeleton prove?
+
+A **walking skeleton** is one minimal *real* vertical execution path through critical boundaries: trusted SSO identity → one protected record → one task route → one trace → one deployment/rollback action → one human acceptance check. It proves integration assumptions and makes missing IAM/network/data dependencies visible before full features.
+
+It does **not** by itself prove general correctness, scalable serving or SLO attainment. A mock of SSO, fake in-memory data and a notebook can be a useful local exercise (see CH12.11), but is **not** a customer-VPC deployment, load test or security certification. A second stage must validate a real identity provider, actual governed warehouse, upstream integration and telemetry.
+
+### 10.26.8 Release-gate matrix and defendable interview answer
+
+| Gate | Test method | Blocker |
+|---|---|---|
+| Boundary | egress map + private DNS/network failure injection | unapproved prompt/trace/data outbound path |
+| Authorization | authenticated negative-tenant / revoked scope cases | any observed unauthorized read/write |
+| Idempotency | timeout after commit + retry/reconcile simulation | duplicated side effect |
+| Reliability | dependency outage, 429 storm, half-open recovery | unbounded amplification / unknown outcome ignored |
+| Semantics | golden business contracts / ontology and metric-version checks | inconsistent definition or time semantics |
+| Economics | cohort cost per *approved successful task* | agreed unit-economics guardrail violated |
+| Deployment | versioned CI, canary and rollback rehearsal | no working recovery/ownership procedure |
+
+**Answer framing:** “I would identify the actual constraint, draw the full data and identity flow, select deployment by verified data-egress requirements, build one authorization-safe vertical slice, then add bounded retries and idempotent writes where needed. I would explicitly define business semantics and SLO denominators, and use a risk-stratified eval/observability gate before rollout.”
+
+**Verified primary references (reviewed 2026-10-08):**
+- [Microsoft Azure private PaaS networking](https://learn.microsoft.com/en-us/azure/networking/design-guide/private-platform-as-a-service) and [Azure hybrid considerations](https://learn.microsoft.com/en-us/azure/architecture/guide/technology-choices/hybrid-considerations) — topology, public access, DNS and regional dependencies.
+- [AWS Builders' Library retries/backoff/jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/) and [AWS Well-Architected retry limit](https://docs.aws.amazon.com/wellarchitected/2023-04-10/framework/rel_mitigate_interaction_failure_limit_retries.html).
+- [Stripe idempotency](https://docs.stripe.com/api/idempotent_requests) — provider-specific replay boundary.
+- [Databricks metric views](https://docs.databricks.com/aws/en/uc-semantics/metric-views/yaml-reference) — managed dimensions/measures, not a universal ontology or authorization engine.
+- [Google SRE workbook SLO implementation](https://sre.google/workbook/implementing-slos/) — indicator/target/error-budget methodology.
+
+**Ownership:** CH10 owns this production architecture; CH11 owns the operational data plane; CH12 owns customer discovery, scope, walking skeleton and handoff. Q10–Q16 are original prompts, not official FDEInterviews answers.
+
+
+## 10.27 FDE Deployment / Serving / Governance gaps: guarded implementation decisions (Q48–Q55)
+
+> **Scope 2026-10-08:** Original questions Q48–Q55. Public FDE concepts supply only the topic names, not premium answers. Library and standards facts below were checked against the first-party vLLM, Hugging Face, OpenID Foundation, Databricks, European Commission/EUR-Lex documentation. Example code/config, SLOs and customer decisions are proposals—not production tests or legal advice.
+
+### Q48 · Rate Limiting and REST API Design for Integrations：加一个 429 就防住 Agent 重试了吗？
+
+**No.** Rate limiting bounds admitted *request count or resource usage* under a declared identity and time window. An agent may launch many calls across multiple tools/users/tenants, and internal retries consume resources even when the user's external request count is low.
+
+- Apply admission at **tenant + principal + route/tool class** (with shared global backend limits). A token bucket can allow bounded bursts; a concurrency semaphore limits in-flight expensive requests. Neither automatically replaces queue limits.
+- Return 429/503, documented retry hints where appropriate; never treat untrusted client-specified tenant IDs as rate-limit identity.
+- Resource budget should include tokens, embeddings, DB CPU/rows, tool requests and cost per successful task. Set per-operation *total deadlines and retry ownership* (CH10 §10.25/26).
+- REST write contract: stable resource IDs, explicit authorization, idempotency key and status query; a POST timeout has unknown commit status. GET is conventionally safe but **not proof that an undocumented integration has no side effects**.
+
+```text
+SSO verified actor → tenant quota / per-tool concurrency
+    → allowlisted route & budget → backend
+    → response {request_id, outcome, retryability, source_revision}
+```
+
+**Negative test**: two tenants alternate requests and retry 429. Verify one tenant cannot starve the other, responses never disclose cross-tenant data, and queued work is bounded. Report per-tenant fair share, 429s, p95, retry amplification and total accepted cost.
+
+### Q49 · Consistency, CAP and What Your Workflow Actually Needs：需要所有组件都强一致吗？
+
+**No.** CAP describes the conflict between strong consistency and availability **during network partitions** under the applicable distributed-system model; it does not provide a menu where two properties are freely chosen in normal operation. A Copilot needs **different** consistency contracts for different data:
+
+| Data/operation | Preferred contract | Why |
+|---|---|---|
+| Tenant access / approval at write | current authorization check, fail closed | eventual ACL view can disclose or mutate private records |
+| Order source events | durable per-source sequence and replay, eventual read model as specified | CDC ingestion lag is observable and tolerable for read-only explanation only if disclosed |
+| Search/vector index | explicitly bounded freshness/ACL recheck | RAG can be slightly delayed but cannot silently leak revoked evidence |
+| Agent tool side effects | durable operation ID + reconciliation | messages can duplicate, acknowledgement can be lost |
+| UI progress stream | monotonic event IDs / idempotent rendering | UI state can lag without changing authoritative outcome |
+
+**Failure injection**: database commits a refund but network disconnects before response. If the agent assumes the transaction rolled back, it may pay twice. Status reconciliation plus idempotency is necessary; “exactly once delivery” for event transport does not establish exactly-once cross-system effects.
+
+### Q50 · Model Versioning and Migration + Model Registry and Promotion：Tag=Production 就上线了吗？
+
+**No.** A registered model/version is an artifact; a serving endpoint and traffic-routing policy are separate release objects. Databricks **Models in Unity Catalog** provides governed model artifacts, lineage and alias references; its documented lifecycle uses **aliases such as Champion rather than legacy fixed stages**, and merely using a catalog named prod does not serve traffic.
+
+```text
+train/evaluate → immutable model artifact + signature + dataset/hash
+ → register in Unity Catalog → assign approved Champion alias
+ → update batch/serving target (explicitly) → canary / rollback
+ → archive provenance of model + prompt + index + tool version
+```
+
+Example **illustrative MLflow client** (requires authorized workspace/UC environment):
+
+```python
+from mlflow import MlflowClient
+client = MlflowClient()
+client.set_registered_model_alias("prod.ml_team.order_risk", "Champion", 7)
+# Repointing alias does not by itself prove the deployed endpoint
+# has picked up version 7: verify endpoint configuration and traffic.
+```
+
+**Negative tests**: staged alias points to v7 but endpoint still serves v6; an old prompt/parser expects a schema dropped in v7; an index-embedding pair mismatches. Pin rollout manifest and validate output signature, golden customer tasks, rollback and lineage together.
+
+[Databricks model lifecycle in UC](https://docs.databricks.com/aws/en/machine-learning/manage-model-lifecycle/) documents alias behavior, permissions and the stages limitation; [MLflow Model Registry](https://www.mlflow.org/docs/latest/model-registry/) supplies general artifact semantics. Workspace Registry and UC lifecycle APIs must not be conflated.
+
+### Q51 · Model Selection for Enterprise Deployments：模型选择为什么必须带系统预算？
+
+The model is one component of an end-to-end customer workflow. Compare **quality on critical slices**, data boundary/legal constraints, evidence fidelity, tool/schema failure rate, latency (TTFT, decode and overall), context robustness, model availability/deprecation and all-in cost per approved success.
+
+Decision table:
+
+| Need | Candidate route | Trade-off to validate |
+|---|---|---|
+| Simple classification/extraction | small governed classifier / rules | lower runtime cost, but may miss rare or ambiguous cases |
+| Reliable exact business order decision | deterministic SQL/host workflow | semantics must be maintained, cannot explain arbitrary unstructured policy alone |
+| Ambiguous policy interpretation | grounded higher-capability LLM with retrieval | context cost, source freshness and hallucination |
+| Customer-managed isolated inference | supported self-hosted weights | GPU ops, vulnerability fixes, observability and regional egress |
+| Peak traffic | routing/cascade with high-capability fallback | false routing, selective escalation, fairness and budget |
+
+**Release gate**: same gold corpus across options, frozen identities/evidence, failure slice and latency measurement, plus customer architecture constraints. Switching from SaaS model to self-host changes SLO/cost/support and identity responsibilities; do not compare model token prices alone.
+
+### Q52 · Quantization, PagedAttention, MoE：它们解决的是同一个显存问题吗？
+
+| Mechanism | What it changes | Key pitfall |
+|---|---|---|
+| Quantization | numerical representation of weights/activations/KV cache | model precision, kernel support and GPU compatibility; quality must be tested |
+| PagedAttention | virtualized/block-based KV-cache allocation and attention access | **does not** change the mathematical prompt into a model memory or waive cache tenancy policy |
+| Mixture of Experts (MoE) | routes token representations to selected expert subnetworks in supported architectures | active expert compute differs from total parameter storage; routing/load balance can dominate |
+| Prefix caching | reuses exact compatible token-prefix KV work | same “meaning” does not prove token-level prefix identity |
+
+**Operator test**: at equal workload and batch/concurrency, compare peak VRAM, fragmentation, throughput, TTFT, inter-token latency and output quality; quantify index/weight quantization separately from KV cache. vLLM documents PagedAttention for KV memory management and multiple quantization formats, but **supported methods differ by device, weight format and runtime release**. A 4-bit model is not necessarily 4× cheaper for an entire deployment.
+
+### Q53 · Speculative Decoding：小模型先生成，是否就改变大模型回答分布？
+
+For the correctly implemented **lossless verification/sampling algorithm**, a cheap draft proposes tokens, and the target model verifies with an acceptance/resampling step that preserves the target distribution. This is different from replacing the target model with a small model. Real speedup depends on draft acceptance, model sizes, batch size, sampling mode, KV work and hardware; a weak draft can slow down execution.
+
+```text
+context → draft model proposes N tokens
+        → target model verifies candidate block
+        → accept/reject/resample per specified algorithm
+        → continue until budget/stop condition
+```
+
+**Negative tests:** compare target output distribution on controlled seeds/tasks as supported by framework; inspect p50/p95 tokens/s, TTFT, end-to-end task correctness, VRAM and overhead. Do not claim “always the same output string” under stochastic sampling—distribution preservation is the relevant property.
+
+[Hugging Face Assisted Decoding](https://huggingface.co/docs/transformers/main/assisted_decoding) explains verification and documented feature/runtime constraints; [vLLM serving overview](https://docs.vllm.ai/en/stable/) lists supported speculative methods. Version-specific batching support must be verified before deployment.
+
+### Q54 · AI Governance (SOC2, EU AI Act)：有 SOC 2 报告就等于 AI Act 合规吗？
+
+**No.** A SOC 2 examination/report is an assurance artifact against defined Trust Services Criteria and a scoped system/period; it does not automatically certify compliance with **EU Regulation 2024/1689 (AI Act)**, sector privacy requirements, high-risk system obligations or a specific customer's subprocessors. EU AI Act obligations depend on role (provider/deployer/importer/etc.), use case/risk category, application dates and amended legal text.
+
+**FDE evidence-room checklist**:
+
+1. Customer use-case classification + operator responsibility matrix. Classify decisions by legal/business owner, not LLM guess.
+2. Inventory model versions, data provenance, model providers, subprocessors, training/evaluation, applicable licenses and geographic flows.
+3. Risk controls: human oversight, disclosure/transparency, logs, incident reporting where required, retention, auditability, red-team and robustness.
+4. Link each claim to evidence: technical test report, signed policy owner, live monitoring and documented limitations. A claim “SOC2 compliant” without the **report scope and period** is not a sufficient artifact.
+5. For EU AI Act applicability/date, consult the **current amended official consolidated law and European Commission Service Desk** at rollout, not a static 2024 blog table; legal counsel owns interpretation.
+
+**Date-sensitivity:** EU legislation and implementation dates have been amended since the original 2024 act; for example, the official AI Act Service Desk distinguishes 2026 provisions from later dates for certain high-risk categories. This chapter does **not** assert one universal enforcement date or offer a legal conclusion.
+
+[EU AI Act EUR-Lex consolidated act](https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng) · [European Commission AI Act Service Desk](https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/when-does-enforcement-start) · [AICPA SOC 2 overview](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services).
+
+### Q55 · Enterprise SSO: SAML and OIDC：有 JWT 就完成多租户授权了吗？
+
+**No.** Authentication (who logged in), authorization (what they may read/do), tenancy (which organization/resource boundary), and delegated action (on whose behalf a tool runs) are separate.
+
+- **SAML 2.0:** XML-based federation assertions in supported enterprise login architectures; map trusted IdP-issued identity to the application principal and its provisioning/deprovisioning lifecycle.
+- **OIDC:** authentication layer on OAuth 2.0 with an ID Token. Verify issuer, audience, signature algorithm/key, expiry and appropriate nonce/state/PKCE requirements for the selected flow/client. An OAuth **access token is not automatically a valid ID token**; verify its intended audience/scope for the protected API.
+- **Application tenant:** resolve authoritative tenant mapping and groups from a trusted session/policy store; do not allow model-generated tenant_id or email domain heuristics to grant rows.
+- **SCIM/entitlement sync and revocation:** provisioning delays, group membership changes and emergency user disablement need session/token/cache invalidation design.
+
+```text
+Enterprise IdP → verified OIDC/SAML exchange → trusted principal
+  → mapped customer tenant + group entitlements
+  → service-side permission policy + storage RLS
+  → bounded delegated tool scope
+```
+
+**Negative tests**: wrong aud token, expired token, tenant-switch request, token replay, removed group, revoked employee still holding a stale session, service principal broad access; no protected tool or retrieved document may enter the prompt on denial. Never implement production JWT verification from a model-generated code snippet without a trusted standard library, issuer discovery/key rotation and security review.
+
+[OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html) is the normative OIDC reference; [SAML 2.0 OASIS](https://docs.oasis-open.org/security/saml/v2.0/) covers SAML specifications. CH10 §10.22/10.24 owns runtime policy execution; CH02 §2.7 protects retrieval; CH06 owns tool authorization.
+
+
+## 10.28 Distributed Training (FSDP, Parallelism) and Palantir platform architecture (Q63–Q64)
+
+> **Evidence boundary:** The technical behaviors below are drawn from the PyTorch FSDP2 API and Palantir's first-party platform documentation as of 2026-10-08. Q63–Q64 are original interview prompts, not official FDEInterviews answers. A documentation review does not prove performance or feature access in a specific customer environment.
+
+### Q63 · Distributed Training (FSDP, Parallelism)：Data Parallel、Tensor Parallel、Pipeline Parallel 谁解决显存？
+
+| Approach | Core idea | Typical limiting factor |
+|---|---|---|
+| DDP / replicated data parallel | each worker owns a full model replica, receives distinct samples; gradients synchronize | whole model/optimizer state replicated |
+| FSDP / ZeRO-style state sharding | partition parameter/gradient/optimizer states across workers, all-gather when needed | collective communication, activation memory, checkpoint/restoration |
+| Tensor parallel | split large layer operations across accelerator devices | intra-layer all-reduce, fast interconnect |
+| Pipeline parallel | split sequential layer stages across devices | pipeline bubbles, microbatch design, stage imbalance |
+
+**FSDP2** in PyTorch has a distinct `fully_shard()` API using distributed tensors and per-parameter sharding. It is **not** the same library interface as the original FSDP1 wrapper. The PyTorch docs recommend bottom-up application to submodules to overlap per-layer all-gather with compute; wrapping only root can prevent that overlap. Validate `model(input)` hooks, checkpoint restore, mixed precision, per-device OOM, network contention and world-size changes in a real cluster.
+
+**FDE decision:** if customer is **serving** a hosted LLM and not training large weights, distributed **training** parallelism may be irrelevant. First inspect request throughput, KV cache, prefill/decode and memory (CH10 §10.1–10.8, §10.27). Do not advocate FSDP as a generic inference speed optimization.
+
+[PyTorch FSDP1](https://docs.pytorch.org/docs/stable/fsdp.html) · [PyTorch FSDP2 fully_shard reference](https://docs.pytorch.org/docs/stable/distributed.fsdp.fully_shard.html).
+
+### Q64 · Palantir's Platform: Foundry, AIP, Gotham and Apollo：谁是数据层、Agent 层、交付层？
+
+Palantir's first-party documentation describes an **integrated stack**, not four interchangeable buzzwords:
+
+| Platform | Vendor-described primary role | Important qualification |
+|---|---|---|
+| **Foundry** | data operations, transformation, logic authoring, Ontology, analytics/workflows | ontology is not simply a vector database; objects, links, actions form a governed operational representation |
+| **AIP** | generative AI integration, agent/automation development, AI-enabled apps and evals | model connectivity does not by itself settle customer authorization or tool approval |
+| **Apollo** | continuous delivery and infrastructure management for integrated services | release/deployment plane, not the authoritative source of business ontology |
+| **Gotham** | defense/intelligence operational product/domain workflows | distinct domain-oriented applications and access models; verify specific product/enrollment entitlements |
+
+Palantir's official architecture center emphasizes **Foundry + AIP + Apollo** as the primary three platform architecture; Gotham is not simply a fourth layer in that same basic trio. The Ontology maps real objects, relationships and **Actions** to operational workflows, unlike a static GraphRAG evidence index.
+
+**FDE architecture comparison:** for the Order Investigation Copilot, map Delta/SQL/CDC to Foundry-like data/logic plane, a governed entity/action model to Ontology, agent tool flow to AIP-like execution, and managed rollout to Apollo-like delivery. This is an **architectural analogy**, not a statement that an independent Databricks/LangGraph stack implements Palantir product features or is API-compatible.
+
+**Key interview question:** “Which existing enterprise system owns the order, status semantics, tenant permissions and approval?” Determine that before prescribing any Palantir SKU or any generic LLM orchestration graph.
+
+**Sources:** [Palantir official AIP/Foundry/Apollo architecture](https://www.palantir.com/docs/foundry/architecture-center/platforms), [Foundry Ontology introductory concepts](https://www.palantir.com/docs/foundry/getting-started/introductory-concepts), [AIP architecture](https://www.palantir.com/docs/foundry/architecture-center/aip-architecture). Gotham product-specific capabilities are **not comprehensively audited** in this chapter and must be verified for each proposed deployment.

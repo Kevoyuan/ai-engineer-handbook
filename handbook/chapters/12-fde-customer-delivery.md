@@ -363,3 +363,102 @@ The architecture must preserve auditability, security boundaries, rollback and c
 - [AWS Well-Architected retries](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_prevent_interaction_failure_idempotent.html) and [bounded backoff](https://docs.aws.amazon.com/wellarchitected/2023-04-10/framework/rel_mitigate_interaction_failure_limit_retries.html) — idempotent writes and limited retry amplification.
 
 This section is the **canonical system-level case owner**. Refer to CH11 for CDC/Spark/SQL detail, CH02–05 for authorized retrieval/grounding, CH08 for workflow orchestration, CH09 for evaluation and CH10 for runtime identity/serving. The presentation fragment in \`web/assets/ch12-order-investigation-capstone.html\` is **derived content**.
+
+## 12.12 FDE Curriculum Coverage Audit: topic signals are not readiness scores
+
+The source curriculum lists **167 concepts in ten original FDE tracks**. The [single-owner concept crosswalk](../references/fde-2026-concept-crosswalk.md) maps each item to CH01–12. The [per-concept evidence audit](../references/fde-2026-coverage-audit.md) examines **each assigned canonical chapter**, including this branch's new CH10 §10.26 and CH11 §11.10, to locate direct terminology/alias evidence:
+
+| Source-text audit grade | 2026-10-08 branch baseline | What it actually means |
+|---|---:|---|
+| H — owning chapter section heading | 136 | An explicit concept-specific name or reviewed alias occurs in a heading. **Not** a proof of deep coverage. |
+| B — owning chapter body | 31 | A concept name or reviewed alias is mentioned without a corresponding heading. Review for depth. |
+| N — no direct owner-chapter term signal | 0 | No reviewed English/alias term was found in that chapter. Could be a true content gap **or** Chinese/equivalent wording; manually check before calling it missing. |
+
+**This is a reproducible evidence-location scan, not a scored interview exam and not a verified 167-topic textbook.** Unlike a naive keyword-count completion chart, this audit does not label any concept “fully covered”. The next semantic audit should independently check whether each topic has:
+
+1. A correct causal/mechanistic answer grounded in the owning chapter.
+2. A concrete system/SQL/agent or business example with conditions.
+3. A design alternative and its trade-off.
+4. A failure injection / negative test / counterexample.
+5. An observable metric or acceptance criterion.
+6. A primary-source reference when implementation/version detail matters.
+
+**Editorial priority:** P0 production architecture (CH10 §10.26), data engineering (CH11 §11.10), customer discovery and handoff (CH12 §12.11), authorization (CH02), and eval gates (CH09). Fill true technical gaps instead of creating duplicate “interview” chapters. The [Q10–Q23 research ledger](../references/fde-2026-answers-02-04-provenance.md) documents primary-source checks and unexecuted limitations; earlier [Q1–Q9 ledger](../references/fde-2026-verified-answer-ledger.md) remains separate.
+
+**Release boundary:** this phase is pushed to a feature branch for review. The source, bilingual Reader fragment, report and local build artifacts do not imply Vercel production has been deployed. No production release should occur without an explicit later request.
+
+## 12.13 Interview readiness vs evidence discoverability · Stages 05–06
+
+On the 2026-10-08 review branch, we added **independently researched Q24–Q39** across CH01/08/09/11, with an executable stdlib mini-lab. These cover ML optimization, leakage, calibrated prediction, rare-class metrics, synthetic evaluation, CSV input integrity, sliding windows, heap-based Top-K, DAG dependency validation and negative tool-authorization tests. See the [Q24–Q39 provenance ledger](../references/fde-2026-answers-05-06-provenance.md).
+
+**Audit updated:** 136 heading signals, 31 body signals, zero remaining direct-name gaps out of 167. This is *not* a claim that 130 topics are completely taught. Some were already correctly explained using different terminology; the new sections add concrete counterexamples and first-party references, but no customer deployment or proprietary question-answer key was accessed.
+
+A strong FDE candidate still needs to solve an unseen problem under constraints: choose a safe data path, explain the failure mode, implement or sketch working code, and defend the metric and security boundary. A growing keyword index is not a substitute for those capabilities.
+
+The changes are retained on a **GitHub Draft PR only**. Do not infer Vercel publication from generated Reader content or a passing offline build.
+
+## 12.14 Stage 07: 37 previously unlocated concepts independently reviewed
+
+The 2026-10-08 branch previously had **37 N-class lexical/no-direct-title signals**. Manual owner-chapter review showed **four existing-but-mismatched naming cases** (Prompt Engineering, Tool/Function Calling, Context Window Management, Numerical Stability); the other 33 have now received domain-specific explanations and design/negative-test boundaries across CH01/02/03/06/07/10/11. Original technical questions **Q40–Q64** and first-party provenance are indexed in [the Stage-07 source ledger](../references/fde-2026-answers-07-provenance.md).
+
+The 167-row audit now reports **H136 / B31 / N0**, which means all 167 topic names or reviewed equivalent aliases are **locatable in their owning chapter**, not that every topic is complete, verified, production-implemented, or mastered. Several H rows share one topical heading and require their own future depth review. In particular, the Palantir Gotham content here is limited to grounded platform distinctions, not an exhaustive product entitlement audit.
+
+Verification assets: the [stdlib mini-lab](../../examples/fde-interview-engineering/) now adds negative tests for index/encoder version mismatch, ACL revocation, fair per-tenant token bucket and bitemporal feature training lookups. These tests simulate invariants; real identity verification, distributed concurrency, embedding quality, privacy compliance, EU legal interpretation and customer performance remain untested.
+
+**Release boundary:** Changes remain on Draft PR #70 only. Do not merge main, build web/site production assets or deploy/promote Vercel without explicit later user instructions.
+
+
+## 12.15 FDE Interview Readiness Audit: 36 prioritized concepts, six evidence dimensions
+
+> **Review scope · 2026-10-08.** The FDE 167-concept index is only a **topic-location crosswalk**; it does not measure explanation depth or candidate ability. The [core-36 editorial readiness matrix](../references/fde-2026-readiness-core36.md) is an independent **manual, provisional review of this Handbook's canonical chapter teaching evidence**, not a ranking of candidates or an FDEInterviews official answer key. The machine-checkable review input is [core36.json](../references/fde-2026-readiness-core36.json). Sources from the canonical chapters are evaluated as documented evidence, not newly tested current deployments.
+
+### Six-dimensional evidence rubric
+
+| Dimension | 0 | 1 | 2 (inspectable teaching evidence, not real production proof) |
+|---|---|---|---|
+| M · Mechanism | absent causal mechanism | named/outlined mechanism | conditions and stepwise behavior explained |
+| E · Worked Example | no scoped task | illustration only | typed example, code or reproducible fixture |
+| T · Trade-off | no alternative | names alternative | decision boundary and downside explicit |
+| F · Failure Test | no negative case | risk mentioned | fault injection with expected safe result |
+| G · Acceptance Gate | no quantified criterion | metric named | explicit denominator, guardrail or reproducible test protocol |
+| P · Primary Evidence | no applicable primary evidence | general/indirect chapter-level source | direct first-party API/spec or original research on the relevant behavior |
+
+For each of **36 deliberately selected FDE core concepts** (3 Model, 6 Retrieval, 5 Agent, 6 Evaluation, 7 Production, 6 Data, 3 Delivery), the audit records the **exact assigned canonical owner**, a heading and repository line pointer, the six provisional grades, the *specific weak aspect*, a realistic interview follow-up, and pass criteria. **Thirty-six of 167 were qualitatively assessed; the other 131 were not scored.**
+
+### Findings: the bottleneck is acceptance evidence
+
+The audit's descriptive dimension counts are:
+
+| Dimension | Concrete evidence = 2 | Partial = 1 | Absent = 0 |
+|---|---:|---:|---:|
+| Mechanism | 33 | 3 | 0 |
+| Worked example | 18 | 18 | 0 |
+| Trade-off | 36 | 0 | 0 |
+| Failure test | 15 | 21 | 0 |
+| Acceptance criterion | **5** | **31** | 0 |
+| Primary evidence | 14 | 18 | 4 |
+
+These are **subjective repository-content evidence assessments** with explicitly defined grades—not test results, official course scores or evidence that these subjects are interview-ready. A source citation is not a production integration test. The practical priority is to strengthen G/F/P with reproducible, risk-sensitive acceptance cases rather than add generic definitions.
+
+### Four oral mock rounds grounded in the order-investigation capstone
+
+1. **Authorized RAG revoked between vector retrieval and paragraph fetch:** same order ID in tenant A and B; require trusted scope, zero unauthorized context/cache/log access, separate freshness and revocation-denial SLIs.
+2. **Out-of-order CDC and bitemporal feature leakage:** duplicated/corrected/tombstone events and a feature arriving after decision time; require source sequence, consistent snapshot boundary, history replay, source reconciliation and feature effective/available time.
+3. **Refund timeout + retry storm:** unknown result after possible commit, carrier dependency 503; require explicit human approval, durable operation ID, receipt reconciliation, retry budgets, circuit breaker and bounded queue.
+4. **Pilot quality regresses and live customer demo fails:** pilot versus production cohort mismatch, security slice worsens, live 503; require stratified sealed gold dataset, risk-blocking eval gate, truthful fallback, canary/rollback and incident handoff.
+
+**Exercises are interview designs, not reported customer incidents.** See [complete rehearsal prompts and source-linked matrix](../references/fde-2026-readiness-core36.md), as well as runnable local tests in [examples/fde-interview-engineering](../../examples/fde-interview-engineering/) and the [order investigation walking skeleton](../../examples/fde-order-copilot/). The local tests support narrower programming contracts and do **not** validate deployed identity, cloud VPC networking, vector ACLs, payment gateway idempotency or Databricks integration.
+
+### Handoff: turn a green documentation signal into a testable answer
+
+For each gap, an FDE candidate should be able to answer without simply quoting the Handbook:
+
+```text
+business outcome + source of truth + authorized identity
+  → chosen architecture and a rejected alternative
+  → failure injection with expected safe behavior
+  → measurable gate / denominator / rollback trigger
+  → primary docs and explicitly unverified assumptions
+```
+
+The bilingual DESIGN-aligned presentation fragment is `web/assets/ch12-fde-interview-readiness.html`, registered as `fde-readiness-audit-08`. This phase remains on **Draft PR #70 only**, with no `main` merge, production `web/site` regeneration, or Vercel release.

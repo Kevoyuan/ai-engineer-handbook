@@ -1415,3 +1415,44 @@ Skill Contract 是业务注册表建议，不是通用 SKILL.md Schema。429 可
 补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
 
 - [HTTP retry semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110.html)
+
+
+## 6.11 FDE Tool / Function Calling, AG-UI and AP2 protocol boundaries (Q45–Q46)
+
+> **Provenance:** Tool/function calling already has a substantial owner explanation in §6.6: the earlier missing-term mark in the 167-topic audit was a **label mismatch, not absence of the concept**. AG-UI and AP2 are versioned external protocols, verified against their maintainers' public documentation as of 2026-10-08. Questions below are original, not paywalled FDE answer text.
+
+### Tool / Function Calling · Owner reconciliation, not a new protocol
+
+Model-produced function name and JSON arguments are **proposals**, not authorized actions; the host validates schema, trusted caller/tenant scope, resource policy, idempotency/approval, tool availability, then executes and appends the observed tool response. A schema-valid tool invocation may still have wrong business meaning. See §6.6 and CH08/CH10 for existing deeper examples.
+
+### Q45 · AG-UI vs MCP vs A2A：这三个协议替代关系是什么？
+
+AG-UI is an **agent↔user-facing app interaction/event stream**, not by default a tool API or an agent-agent interoperability standard. It handles UI update semantics, streamed events, shared state and human participation between a frontend and an agent backend. Its maintainers distinguish **A2UI** (agent-delivered UI description/widgets) from **AG-UI** (the transport/event interface); neither means the frontend should be trusted to grant tool permissions.
+
+| Boundary | Protocol role | What it does NOT supply |
+|---|---|---|
+| MCP | Host/tool or resource interface and capability discovery | end-user authenticated policy for every tool side effect |
+| A2A | Agent-to-agent interoperation/task interaction | UI event stream by itself |
+| AG-UI | Agent runtime ↔ frontend events, state and user interactions | source-of-truth permissions or business transactions |
+| A2UI | Generated UI component specification | trustworthy workflow approval on its own |
+
+**Architecture**: trusted SSO host → policy-aware Agent/Tool Broker → observed structured events → AG-UI stream → browser. UI can render a NEEDS_APPROVAL state; actual approval must be authenticated, scoped to immutable operation parameters and revalidated by the host **at commit**. Cancel signal does not necessarily undo a side effect that already committed (CH08 §8.17).
+
+**Failure drill:** browser replays tool_success, changes a displayed order ID or fakes an approval widget. Require the host to ignore browser-generated claims about tool execution and authenticate the actual approval before any write. Stream reconnection needs ordered IDs/replay behavior appropriate to the chosen library version.
+
+### Q46 · AP2 Agent Payments Protocol：为什么普通 Tool Calling 不等于可审计支付？
+
+AP2 (Agent Payments Protocol) is a public protocol effort for **agent-initiated commerce/payment interactions and interoperable authorization evidence**, available as an extension to agent interoperability/commercial protocols in its published ecosystem. It does **not** turn free-form assistant text into legally sufficient authorization, nor replace payment processor settlement, risk controls or enterprise approval policy.
+
+~~~~text
+User intent + explicit scope
+ → verify payer and permitted merchant/payment method
+ → host records immutable amount/currency/beneficiary/operation ID
+ → delegated authorization / user approval where required
+ → payment rail / gateway executes with documented idempotency
+ → independent receipt reconciliation + dispute/audit
+~~~~
+
+**Release non-goals:** never allow “the LLM thought payment approved” to trigger a transfer; never reuse a prompt assertion as the approval credential. On write timeout treat outcome as **unknown**, and reconcile under the gateway's own idempotency contract (CH10 §10.25–26). Confirm protocol version, mandate formats, issuer/merchant support and legal policy independently before implementing.
+
+**Sources:** [AG-UI protocol reference (maintainer repository)](https://github.com/ag-ui-protocol/ag-ui/blob/main/docs/introduction.mdx); [AP2 reference website](https://ap2-protocol.org/); [MCP specification](https://modelcontextprotocol.io/specification/2025-11-25); [A2A protocol](https://a2a-protocol.org/latest/). Cross-chapter: CH08 owns task/control state; CH10 owns trusted identity, approval and idempotency.

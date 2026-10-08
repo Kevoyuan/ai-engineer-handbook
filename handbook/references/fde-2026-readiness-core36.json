@@ -1,0 +1,742 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-08",
+  "method": "manual editorial, source-section bounded; scores are content evidence, not learner skill or production validation",
+  "rubric": {
+    "dimensions": [
+      "Mechanism",
+      "WorkedExample",
+      "Tradeoff",
+      "NegativeTest",
+      "AcceptanceMetric",
+      "PrimaryEvidence"
+    ],
+    "scale": {
+      "0": "Not demonstrable in selected owning section",
+      "1": "Explained or proposed but not operationally demonstrated",
+      "2": "Concrete, inspectable or reproducible criterion in owning chapter/context; not live customer proof"
+    }
+  },
+  "items": [
+    {
+      "id": "R01",
+      "track": "MODEL",
+      "concept": "Structured Output and Schema Validation",
+      "owner": "01",
+      "heading_contains": "Structured Outputs",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "Schema 合法与业务真值被混同；缺反例测例及拒判门禁。",
+      "drill_zh": "让输出符合 JSON Schema，却在客户订单上引用错误 ID；给出端到端阻断机制。",
+      "drill_en": "A JSON-schema-valid output cites the wrong order; design the end-to-end release gate.",
+      "pass_zh": "无论格式多正确，错误订单/权限被拒绝；保留 trace、审计和负例。",
+      "pass_en": "Wrong order or scope is denied despite valid JSON; preserve traces and negative cases."
+    },
+    {
+      "id": "R02",
+      "track": "MODEL",
+      "concept": "Fine-tuning vs RAG vs Prompting",
+      "owner": "01",
+      "heading_contains": "Prompting vs RAG vs Fine-tuning",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "有机制比较，缺可执行的逐组成本/成功任务验收。",
+      "drill_zh": "客户要求“记住每小时更新的运单”，在 prompt、RAG、微调中决策。",
+      "drill_en": "Customer needs hourly shipment updates: choose prompting, RAG or fine-tuning.",
+      "pass_zh": "说明为何动态事实用可授权外部数据，给出可复现错误分布与成本门槛。",
+      "pass_en": "Use authorized external facts; report reproducible error cohorts and cost gates."
+    },
+    {
+      "id": "R03",
+      "track": "MODEL",
+      "concept": "Model Routing and Cascades",
+      "owner": "01",
+      "heading_contains": "Model Selection",
+      "grades": [
+        1,
+        1,
+        2,
+        1,
+        1,
+        0
+      ],
+      "gap_zh": "Routing Cascade 没有独立决策阈值与人工标注样本。",
+      "drill_zh": "设计规则/小模型/大模型三级路由，避免便宜模型错误拦截越权请求。",
+      "drill_en": "Design rules/small/large-model routing without cheap-model misrouting.",
+      "pass_zh": "按关键切片给出升级率、漏升级率与成功任务成本。",
+      "pass_en": "Report escalation, missed-escalation and cost per approved task by slice."
+    },
+    {
+      "id": "R04",
+      "track": "RETRIEVAL",
+      "concept": "Permission-Aware RAG",
+      "owner": "02",
+      "heading_contains": "FDE verified answers · Permission-Aware",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "gap_zh": "已有权限边界与负例方案；仍需要真实资源身份集成验证。",
+      "drill_zh": "两个租户拥有同一订单号，撤权发生于检索与段落读取之间。",
+      "drill_en": "Same order ID in two tenants; revoke access between retrieval and paragraph fetch.",
+      "pass_zh": "禁止跨租户候选进入上下文；缓存/日志也不泄漏；记录撤权→拒绝延迟。",
+      "pass_en": "No unauthorized context/cache/logs; record revocation-to-denial lag."
+    },
+    {
+      "id": "R05",
+      "track": "RETRIEVAL",
+      "concept": "Hybrid Search (Lexical + Vector)",
+      "owner": "03",
+      "heading_contains": "Hybrid Retrieval Pipeline",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "召回融合流程完善，仍需 ID/政策查询分层的实测消融。",
+      "drill_zh": "在含订单号与承运商 SLA 的混合问题中决定 exact/BM25/dense。",
+      "drill_en": "Choose exact, BM25 and dense routes for an order-ID plus carrier SLA query.",
+      "pass_zh": "给出受权限限制的 Recall@k、无关候选率、p95、成本。",
+      "pass_en": "Report authorized recall, irrelevant candidates, p95 and cost."
+    },
+    {
+      "id": "R06",
+      "track": "RETRIEVAL",
+      "concept": "Reranking and Two-Stage Retrieval",
+      "owner": "03",
+      "heading_contains": "Hybrid Retrieval Pipeline",
+      "grades": [
+        1,
+        1,
+        2,
+        1,
+        1,
+        0
+      ],
+      "gap_zh": "Rerank 介绍分散，缺候选无法召回时的失败回归和来源验证。",
+      "drill_zh": "问 Top-20 候选缺少正确证据，是否应升级 Cross-Encoder？",
+      "drill_en": "Correct evidence is absent from top-20 candidates: can a cross-encoder fix it?",
+      "pass_zh": "说清上游召回上限，验证 rerank 在相同候选集中的改善。",
+      "pass_en": "Explain first-stage recall ceiling; measure rerank gains on fixed candidates."
+    },
+    {
+      "id": "R07",
+      "track": "RETRIEVAL",
+      "concept": "Query Rewriting, Expansion and HyDE",
+      "owner": "03",
+      "heading_contains": "FDE Query Rewriting",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        2
+      ],
+      "gap_zh": "有具体反例与论文来源；缺可执行的 protected-slot 断言。",
+      "drill_zh": "把“不是订单 42，而是 43”用于 HyDE，禁止改写实体槽位。",
+      "drill_en": "Apply HyDE to 'not order 42, order 43' while pinning slots.",
+      "pass_zh": "证明不改写租户、order ID、否定词；生成文本不能当证据引用。",
+      "pass_en": "Preserve tenant, order ID and negation; never cite hypothetical content."
+    },
+    {
+      "id": "R08",
+      "track": "RETRIEVAL",
+      "concept": "Embedding Versions and Drift",
+      "owner": "02",
+      "heading_contains": "Embedding Versions and Drift",
+      "grades": [
+        2,
+        1,
+        2,
+        2,
+        2,
+        2
+      ],
+      "gap_zh": "已有版本契约与本地负例；未验证真实向量索引的迁移收益。",
+      "drill_zh": "同维旧/新 Embedding 混在一个索引，如何发现并安全迁移？",
+      "drill_en": "Old/new embeddings share dimensions but are mixed: detect and migrate.",
+      "pass_zh": "匹配 query/document encoder，影子索引对比权限召回，失败时原子回滚。",
+      "pass_en": "Match query/doc encoders, compare shadow authorized recall and rollback atomically."
+    },
+    {
+      "id": "R09",
+      "track": "RETRIEVAL",
+      "concept": "Index Freshness and Staleness Windows",
+      "owner": "02",
+      "heading_contains": "Index Freshness and Staleness Windows",
+      "grades": [
+        2,
+        1,
+        2,
+        2,
+        1,
+        2
+      ],
+      "gap_zh": "索引可见性与权限 SLI 已分离；尚无真实端到端时钟与缓存压测。",
+      "drill_zh": "删除敏感文档后向量索引仍返回旧缓存，设计拒绝策略。",
+      "drill_en": "A revoked document persists in vector-cache results: design denial.",
+      "pass_zh": "可验证 Source→Visible lag 和 Revocation→Deny lag，权限失败阻断发布。",
+      "pass_en": "Measure source-to-visible and revocation-to-deny; access leak blocks release."
+    },
+    {
+      "id": "R10",
+      "track": "AGENT",
+      "concept": "MCP (Model Context Protocol)",
+      "owner": "06",
+      "heading_contains": "MCP vs Skill",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "组件边界清楚；缺具体 JSON tool schema 到资源级授权的完整实验。",
+      "drill_zh": "MCP 服务器提供 delete_order 工具，用户无删除权限。",
+      "drill_en": "MCP exposes delete_order, but user has no delete entitlement.",
+      "pass_zh": "Host 必须拒绝调用、记录租户作用域，不能信任模型 args。",
+      "pass_en": "Host denies execution with audit; model args cannot override tenant."
+    },
+    {
+      "id": "R11",
+      "track": "AGENT",
+      "concept": "Tool / Function Calling",
+      "owner": "06",
+      "heading_contains": "Function Calling：模型提议",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        1
+      ],
+      "gap_zh": "有 Host 模式与隔离设计，缺一次完整真实服务响应验证。",
+      "drill_zh": "模型发出合法 JSON，但工具目标是无权访问的订单。",
+      "drill_en": "Model emits valid tool JSON targeting an unauthorized order.",
+      "pass_zh": "工具 Broker 读策略拒绝；验证没有后端写入或暴露敏感结果。",
+      "pass_en": "Tool broker denies; no backend write or sensitive output."
+    },
+    {
+      "id": "R12",
+      "track": "AGENT",
+      "concept": "Agent vs Workflow vs a Single Call",
+      "owner": "08",
+      "heading_contains": "Agent, Workflow, and Orchestration",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "多种控制结构论述充分；缺同一任务的消融式接受试验。",
+      "drill_zh": "订单时间线异常分类需要单次 SQL、Workflow 还是 Multi-Agent？",
+      "drill_en": "Order chronology classifier: single call, workflow or multi-agent?",
+      "pass_zh": "优先确定性执行；比较状态数量、故障恢复、延迟和人审。",
+      "pass_en": "Favor deterministic path; compare state, recovery, latency and review."
+    },
+    {
+      "id": "R13",
+      "track": "AGENT",
+      "concept": "Bounded Autonomy and Human-in-the-Loop",
+      "owner": "08",
+      "heading_contains": "Bounded Repair Loop",
+      "grades": [
+        2,
+        1,
+        2,
+        2,
+        1,
+        1
+      ],
+      "gap_zh": "循环上限与审批存在；端到端支付批准/取消语义未集成验证。",
+      "drill_zh": "Agent 想自动退款并持续重试，设计人工审批与停止状态机。",
+      "drill_en": "Agent wants automatic refund and retries: design approval/stop state.",
+      "pass_zh": "超时进入 UNKNOWN，批准作用域不可变，重试需幂等与总预算。",
+      "pass_en": "Timeout becomes UNKNOWN; immutable approval scope and bounded idempotent retries."
+    },
+    {
+      "id": "R14",
+      "track": "AGENT",
+      "concept": "Agent Memory",
+      "owner": "07",
+      "heading_contains": "六层 Memory Structure",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "治理层明确；长期记忆污染/撤权的可运行回归较少。",
+      "drill_zh": "客服上一会话记录订单隐私，权限撤回后如何更新 Memory？",
+      "drill_en": "Private order data was remembered; access is now revoked: how to handle memory?",
+      "pass_zh": "撤权后不再读取缓存记忆，保留来源/TTL/版本，回归负测。",
+      "pass_en": "Revoke cached memory access; retain provenance, TTL, version and negative tests."
+    },
+    {
+      "id": "R15",
+      "track": "EVAL",
+      "concept": "Golden Datasets and Eval Sets",
+      "owner": "09",
+      "heading_contains": "Where does a golden dataset",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        2
+      ],
+      "gap_zh": "可分层抽样与 Holdout；未有跨客户标注一致率实测。",
+      "drill_zh": "线上 70% vs Pilot 95%，设计避免泄漏的 Golden Dataset。",
+      "drill_en": "Production 70% vs pilot 95%: design leakage-resistant gold data.",
+      "pass_zh": "按租户/查询/风险分层，独立封存数据，记录争议裁决。",
+      "pass_en": "Stratify tenant/query/risk, seal holdout, document adjudication."
+    },
+    {
+      "id": "R16",
+      "track": "EVAL",
+      "concept": "Agentic Evals: Grading the Trajectory, Not the Answer",
+      "owner": "09",
+      "heading_contains": "Why is final-answer accuracy insufficient",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        2
+      ],
+      "gap_zh": "轨迹风险解释充分；需真实 Tool Trace 驱动的回归。",
+      "drill_zh": "最终订单解释正确但调用了禁用退款工具，是否通过？",
+      "drill_en": "Final explanation correct but agent called forbidden refund tool: pass?",
+      "pass_zh": "失败；同时评分最终事实和工具路径、预算、状态、副作用。",
+      "pass_en": "Fail; grade factual outcome, trajectory, budget, state and side effects."
+    },
+    {
+      "id": "R17",
+      "track": "EVAL",
+      "concept": "LLM-as-a-Judge",
+      "owner": "09",
+      "heading_contains": "LLM-as-Judge",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        2
+      ],
+      "gap_zh": "列出 Judge Bias，但缺真实人工标注校准误差分布。",
+      "drill_zh": "一个 Judge 偏爱长答案且忽略越权事件，如何纠偏？",
+      "drill_en": "A judge favors verbose unsafe answers: calibrate and detect bias.",
+      "pass_zh": "分离结构检测/人审，报告 Human Agreement、Pairwise Bias 与置信区间。",
+      "pass_en": "Separate deterministic/human checks; report agreement, bias and uncertainty."
+    },
+    {
+      "id": "R18",
+      "track": "EVAL",
+      "concept": "Calibration and Uncertainty",
+      "owner": "09",
+      "heading_contains": "Calibration and Uncertainty",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        2
+      ],
+      "gap_zh": "概率概念有来源；缺真实分桶 Calibration 曲线实验。",
+      "drill_zh": "模型自称 90% confidence，如何证明是否可信？",
+      "drill_en": "Model says 90% confidence: how can this be validated?",
+      "pass_zh": "独立标注、可靠性曲线、Brier及切片漂移；未校准不能当概率。",
+      "pass_en": "Held-out labels, reliability plot, Brier and slices; uncalibrated isn't probability."
+    },
+    {
+      "id": "R19",
+      "track": "EVAL",
+      "concept": "Eval Regression Suites and CI Gates",
+      "owner": "09",
+      "heading_contains": "How would you implement CI gates",
+      "grades": [
+        2,
+        1,
+        2,
+        2,
+        2,
+        2
+      ],
+      "gap_zh": "已有 Release Gate 表；阈值需由客户风险批准。",
+      "drill_zh": "新路由提高平均准确率却降低一个受保护小语种子集。",
+      "drill_en": "New router raises average accuracy but harms a protected locale slice.",
+      "pass_zh": "预先冻结切片门禁，回归则阻断，Canary/回滚留证据。",
+      "pass_en": "Freeze slice gates, block regression and retain canary/rollback evidence."
+    },
+    {
+      "id": "R20",
+      "track": "EVAL",
+      "concept": "SLOs, SLIs and Error Budgets",
+      "owner": "09",
+      "heading_contains": "Release Gate",
+      "grades": [
+        1,
+        1,
+        2,
+        1,
+        1,
+        0
+      ],
+      "gap_zh": "CH09 是归属章节，但精确 SLO/分母/预算算式在 CH10 §10.26，存在跨章节依赖。",
+      "drill_zh": "10k 请求，SLO 99%，怎样定预算且不能容忍越权？",
+      "drill_en": "10k requests at 99% SLO: compute budget without tolerating leaks.",
+      "pass_zh": "给出100个允许失败的算例；越权应成为独立零容忍阻断。",
+      "pass_en": "Illustrate 100 normal misses; unauthorized access always blocks."
+    },
+    {
+      "id": "R21",
+      "track": "PRODUCTION",
+      "concept": "VPC and Air-Gapped Deployment",
+      "owner": "10",
+      "heading_contains": "data must remain in our VPC",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        2
+      ],
+      "gap_zh": "网络、数据、运维边界清楚；欠客户真实 Egress 探测。",
+      "drill_zh": "客户说“绝不能出 VPC”，Private Link 就够了吗？",
+      "drill_en": "Customer forbids data leaving VPC: is Private Link enough?",
+      "pass_zh": "逐路径清点 prompt、向量、Trace、备份、外部模型与远程运维。",
+      "pass_en": "Inventory prompts, embeddings, traces, backups, model and support egress."
+    },
+    {
+      "id": "R22",
+      "track": "PRODUCTION",
+      "concept": "Circuit Breakers and Backpressure",
+      "owner": "10",
+      "heading_contains": "circuit breaker rather than more retries",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        1
+      ],
+      "gap_zh": "上限、熔断和测试计划明确；未做真实故障注入/饱和基准。",
+      "drill_zh": "承运商 API 503 五分钟，三层 Retry 把负载放大。",
+      "drill_en": "Carrier API 503 for 5 minutes; nested retries multiply load.",
+      "pass_zh": "限制总尝试和队列，测恢复时间、p95、放大量。",
+      "pass_en": "Bound attempts/queues; measure recovery, p95 and amplification."
+    },
+    {
+      "id": "R23",
+      "track": "PRODUCTION",
+      "concept": "Idempotency",
+      "owner": "10",
+      "heading_contains": "safe idempotency contract",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        1
+      ],
+      "gap_zh": "业务 key 与 UNKNOWN 处理清楚；支付网关副作用未做真实集成测试。",
+      "drill_zh": "Refund API 提交后超时，Agent 能否换 Key 再发一次？",
+      "drill_en": "Refund commits then times out: can the agent send a new key?",
+      "pass_zh": "不得换 Key；查询收据/对账，保证业务 Operation ID 稳定。",
+      "pass_en": "Never mint a new key; reconcile receipt with stable operation ID."
+    },
+    {
+      "id": "R24",
+      "track": "PRODUCTION",
+      "concept": "Multi-Tenancy and Data Isolation",
+      "owner": "10",
+      "heading_contains": "Production Multi-Tenant Agent Runtime",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "gap_zh": "控制面隔离很完整；真实数据层权限与密钥轮换仍是上线前提。",
+      "drill_zh": "Tenant A/B 订单号相同，缓存、队列和 KV 该怎么隔离？",
+      "drill_en": "Tenant A/B share an ID: how do cache, queue and KV isolate?",
+      "pass_zh": "读取/写入/日志/缓存都按可信 Tenant Scope，负例必须零泄漏。",
+      "pass_en": "All operations use trusted tenant scope; zero observed leaks."
+    },
+    {
+      "id": "R25",
+      "track": "PRODUCTION",
+      "concept": "The Ontology (Semantic Layer)",
+      "owner": "10",
+      "heading_contains": "Ontology, knowledge graph",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "语义层案例有，但缺 business owner 签署后的时态规则回归。",
+      "drill_zh": "业务让 LLM 定义 late shipment rate，如何治理？",
+      "drill_en": "Business asks LLM to define late-shipment rate: govern it.",
+      "pass_zh": "业务确认分子、分母、时区与 Action 权限，版本化并做 Golden SQL。",
+      "pass_en": "Owner approves numerator, denominator, time zone/actions; version golden SQL."
+    },
+    {
+      "id": "R26",
+      "track": "PRODUCTION",
+      "concept": "AI Cost and Unit Economics",
+      "owner": "10",
+      "heading_contains": "cost per successful task",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "公式说明了归因，但没有按真实 Cohort 的成本口径和数据校核。",
+      "drill_zh": "便宜模型的重试与人工复核增加，如何评估 ROI？",
+      "drill_en": "Cheaper model raises retries/review: how to evaluate ROI?",
+      "pass_zh": "比较同任务 Cohort 的正确成功率和全成本/成功任务。",
+      "pass_en": "Compare matched cohorts' approved success and all-in cost per success."
+    },
+    {
+      "id": "R27",
+      "track": "PRODUCTION",
+      "concept": "Model Registry and Promotion",
+      "owner": "10",
+      "heading_contains": "Model Versioning and Migration",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        2
+      ],
+      "gap_zh": "Registry alias 与 Endpoint 分离清楚；缺真实 Serving Target 集成测试。",
+      "drill_zh": "UC Champion 切到 v7，仍然返回 v6 的端点怎么办？",
+      "drill_en": "UC Champion points to v7 but endpoint returns v6: diagnose.",
+      "pass_zh": "核对 Endpoint 路由和签名，Canary/回滚同时锁模型与索引版本。",
+      "pass_en": "Verify endpoint routing/signature; canary/rollback pinned model-index pair."
+    },
+    {
+      "id": "R28",
+      "track": "DATA",
+      "concept": "Change Data Capture (CDC)",
+      "owner": "11",
+      "heading_contains": "Customer's orders stream arrives late",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        2
+      ],
+      "gap_zh": "AUTO CDC 顺序和快照阐述好；实际客户重放/保留配置未测试。",
+      "drill_zh": "更新和删除乱序、初始快照重叠导致交付数量重复。",
+      "drill_en": "Out-of-order update/delete and overlapping initial snapshot double counts.",
+      "pass_zh": "检查 Source Sequence/Offset、Tombstone、SCD2 区间与对账。",
+      "pass_en": "Verify sequence/offset, tombstones, SCD2 intervals and reconciliation."
+    },
+    {
+      "id": "R29",
+      "track": "DATA",
+      "concept": "Lakehouse, Delta and the Medallion Architecture",
+      "owner": "11",
+      "heading_contains": "Delta / Lakehouse and the medallion",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "Bronze/Silver/Gold 解释明确；缺可重放运行工单和故障恢复门槛。",
+      "drill_zh": "Gold 出错，怎么从 Bronze 证明并重新生产？",
+      "drill_en": "Gold is incorrect: reconstruct and prove from Bronze.",
+      "pass_zh": "Pin source version/offset,演示重放并审计输入输出行数。",
+      "pass_en": "Pin sources/offsets, replay and reconcile input/output counts."
+    },
+    {
+      "id": "R30",
+      "track": "DATA",
+      "concept": "Spark Internals and Performance Tuning",
+      "owner": "11",
+      "heading_contains": "Spark join is slow",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        2
+      ],
+      "gap_zh": "EXPLAIN/Skew/AQE 故障明确；未跑真实 Spark 同数据基准。",
+      "drill_zh": "大 Join 有热点 Key，怎么先确认语义正确再调速？",
+      "drill_en": "Hot key in large join: establish correctness before tuning.",
+      "pass_zh": "对照执行计划、Join 基数、倾斜与代价；禁凭单次耗时下结论。",
+      "pass_en": "Compare explain, cardinality, skew and cost; avoid one timing result."
+    },
+    {
+      "id": "R31",
+      "track": "DATA",
+      "concept": "Text-to-SQL",
+      "owner": "11",
+      "heading_contains": "Text-to-SQL is an authorization",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        1
+      ],
+      "gap_zh": "强制 Scope 和 AST 已说明；真实 UC RLS 端到端未验证。",
+      "drill_zh": "LLM 生成跨租户 SELECT，但语法合法，如何防止执行？",
+      "drill_en": "LLM generates syntactically valid cross-tenant SELECT: prevent execution.",
+      "pass_zh": "可信身份+授权 Schema+RLS/ABAC，拒绝未授权读，日志不泄漏。",
+      "pass_en": "Trusted identity/schema/RLS/ABAC; deny unauthorized read with clean logs."
+    },
+    {
+      "id": "R32",
+      "track": "DATA",
+      "concept": "Feature Stores",
+      "owner": "11",
+      "heading_contains": "Feature Stores",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        1,
+        2
+      ],
+      "gap_zh": "双时态负例已可运行；真实 Databricks Workspace 未执行。",
+      "drill_zh": "13点才到的数据有11点 EventTime，能用于12点标签预测吗？",
+      "drill_en": "Feature arrives at 13:00 with event time 11:00; usable at noon?",
+      "pass_zh": "不能；同时满足 effective_at 和 available_at 的历史约束。",
+      "pass_en": "No; enforce both effective_at and available_at historical constraints."
+    },
+    {
+      "id": "R33",
+      "track": "DATA",
+      "concept": "SQL Window Functions",
+      "owner": "11",
+      "heading_contains": "SQL: windows, SCD Type",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "ROW_NUMBER/SCD2 例子有；缺真实 Delta 处理多源顺序的运行测试。",
+      "drill_zh": "同订单多源事件用 ROW_NUMBER 选最新状态为什么会错？",
+      "drill_en": "Why can ROW_NUMBER latest status be wrong across sources?",
+      "pass_zh": "必须定义排序和权威来源、删除语义及 tie-break，提供最小反例。",
+      "pass_en": "Define source authority, ordering, tombstones and tie-breaking; counterexample."
+    },
+    {
+      "id": "R34",
+      "track": "DELIVERY",
+      "concept": "Scoping Ambiguous Problems",
+      "owner": "12",
+      "heading_contains": "Requirements discovery",
+      "grades": [
+        2,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "gap_zh": "发现问题和 MVP 示例明确；缺真实利益相关方签署的范围证据。",
+      "drill_zh": "客户说“做个会调查一切的 AI”，如何砍到一周 Thin Slice？",
+      "drill_en": "Customer asks for an AI to investigate everything: scope a 1-week slice.",
+      "pass_zh": "定义单任务/权限/来源/拒判/验收人和不可做功能。",
+      "pass_en": "Define one task, policy, sources, abstention, owner and non-goals."
+    },
+    {
+      "id": "R35",
+      "track": "DELIVERY",
+      "concept": "The Walking Skeleton (Thin Slice First)",
+      "owner": "12",
+      "heading_contains": "Walking skeleton: reduce",
+      "grades": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "gap_zh": "现有 SQLite 演示可运行，但不构成真实 SSO/云端纵切部署。",
+      "drill_zh": "只完成演示 Notebook，是否算客户系统的 Walking Skeleton？",
+      "drill_en": "Does a working notebook count as deployed customer walking skeleton?",
+      "pass_zh": "不能；至少真实身份、保护源、一次任务、Trace 和部署回滚。",
+      "pass_en": "No; need real identity, protected source, task, trace and rollback."
+    },
+    {
+      "id": "R36",
+      "track": "DELIVERY",
+      "concept": "Recovering a Failing Live Demo",
+      "owner": "12",
+      "heading_contains": "Live demos: design",
+      "grades": [
+        2,
+        1,
+        2,
+        1,
+        1,
+        0
+      ],
+      "gap_zh": "已有预检与降级方法；缺一套分钟级现场恢复演练和客户验收量化。",
+      "drill_zh": "演示现场 503 且数据不新鲜，你如何处理客户与审批？",
+      "drill_en": "Live demo hits 503 and stale data: handle customer and approvals.",
+      "pass_zh": "如实标注故障/样例，停止高风险写入，事后提供追踪与补测。",
+      "pass_en": "Label degraded/sample output, block writes, follow up with trace and retest."
+    }
+  ]
+}

@@ -417,3 +417,33 @@ Complex / conflicting history
 RRF 的 rank 从 1 开始，缺席结果贡献 0，k 不是 Top-K。检索广度预算始终在授权范围内；权限变化后缓存需失效或重新授权。会话状态与路由分层是本手册的设计建议。
 
 核对依据：[Elastic RRF](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+
+## 3.14 FDE Query Rewriting, Expansion and HyDE (Q44)
+
+> **Source boundary (2026-10-08):** Original FDE-style prompt. “HyDE” below follows the original research paper [Precise Zero-Shot Dense Retrieval without Relevance Labels](https://arxiv.org/abs/2212.10496), not a paid FDEInterviews solution. No retrieval benchmark was run here.
+
+### Q44 · Query Rewrite、Multi-query Expansion 和 HyDE 什么时候会帮倒忙？
+
+| Route | What is produced | Useful when | Concrete failure |
+|---|---|---|---|
+| Rewrite | one clarified search query preserving entity intent | conversation ellipsis, pronoun resolution | changes order ID, tenant, negation or timestamp |
+| Expansion | multiple alternative queries | vocabulary mismatch or product aliases | cost/candidate noise rises; bad expansions outvote exact matches |
+| HyDE | hypothetical answer/passage text **for embedding and corpus retrieval** | zero-shot dense search with weak query/doc distribution fit | fabricated details can steer to irrelevant source neighbors |
+| No rewrite / exact | immutable identifier lookup | order number, case ID, legal provision | false semantic “near match” replaces exact record |
+
+**Correct HyDE pipeline**: original question → generator drafts hypothetical document → encode hypothetical document → retrieve real corpus documents → re-rank and cite **real documents only**. The generated hypothetical document **is not evidence**, and may contain false claims. The original HyDE paper explicitly treats it as hypothetical and retrieves actual passages after embedding. Nothing in this pipeline grants the generated text authority.
+
+```text
+Question "What carrier rule applies to order 42?"
+  → protect exact entities: order_id=42, trusted tenant
+  → structured SQL route for order facts
+  → rewrite text POLICY query only, preserve constraints
+  → optional HyDE query representation
+  → authorized retrieval from *actual* policy corpus
+  → grounded answer / abstain
+```
+
+**Evaluation**: freeze query IDs and tenant rights; split exact-ID, conversational, policy-rewrite, negation and “no authorized answer” slices. Compare answer-bearing document Recall@k, changes to protected entity slots, permission leakage, rewriter hallucination and p95/cost. A rewrite that retrieves a plausible but wrong customer document is worse than no rewrite.
+
+**Source:** [HyDE original paper](https://arxiv.org/abs/2212.10496); [Azure vector filters](https://learn.microsoft.com/en-us/azure/search/vector-search-filters) for engine-specific filter order. CH02 owns index permissions and embeddings; CH07 owns conversation state and protected memory.
