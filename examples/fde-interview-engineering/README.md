@@ -20,6 +20,10 @@ The tests are intentionally **positive and negative** rather than just happy pat
 - Deterministic DAG topological order; reject cycles and unknown dependencies **before scheduling side effects**.
 - Dependency-injected policy fake proves a denied request calls the data reader zero times; this is **not** a test of a real SSO or database RLS implementation.
 
+## Stage 07 production contract tests
+
+Run the same unittest command to additionally validate version-pinned index promotion, fail-closed ACL revision invalidation, independent tenant rate-limit budget and bitemporal Feature Store lookups. The Python code in `production_contracts.py` is a **toy deterministic simulation**, not a real vector store, API gateway or Databricks Feature Store. Its negative tests prove the **declared teaching invariants only**.
+
 ## Read the canonical explanations
 
 - CH01 §1.21 — Gradient Descent, Bias/Variance, Overfitting, Information Theory, Loss/Activation/Norm, Semi-supervised learning, Forgetting, Optimization and Vision tasks.
