@@ -1,0 +1,18 @@
+<section id="validated-context-optimization" aria-labelledby="validated-context-optimization-title">
+<h2 class="sub" id="validated-context-optimization-title"><span class="i18n-text" data-i18n-zh="Context Optimization：选择、压缩、缓存是三个不同问题" data-i18n-en="Context optimization: selection, compression and caching solve different problems">Context Optimization：选择、压缩、缓存是三个不同问题</span> <small>§7.12</small></h2>
+<p class="lead"><span class="i18n-text" data-i18n-zh="不要把 Token 减少等同于事实保留。Agent 必须保留约束、关键异常、实体身份及可重新打开的原始证据。" data-i18n-en="Do not equate fewer tokens with preserving facts. Agents must retain constraints, critical anomalies, entity identity and recoverable original evidence.">不要把 Token 减少等同于事实保留。Agent 必须保留约束、关键异常、实体身份及可重新打开的原始证据。</span></p>
+<div class="tw"><table><thead><tr><th>Gate</th><th>Question</th><th>Owner</th></tr></thead><tbody>
+<tr><td>A · Retrieval</td><td>Which authorized evidence must be fetched?</td><td>CH02 / CH03</td></tr>
+<tr><td>B · Compaction</td><td>Which facts survive the context budget?</td><td>CH07</td></tr>
+<tr><td>C · Prefix caching</td><td>Which exact input prefixes reuse prefill computation?</td><td>CH01 / CH10</td></tr>
+</tbody></table></div>
+<pre role="region" aria-label="Compaction verification">Tool output → content-type routing → compact view + original pointer
+                                      ↓
+              Validate numbers, errors, constraints, provenance
+                      ├─ PASS → LLM
+                      └─ FAIL → reopen raw / expand context</pre>
+<p><span class="i18n-text" data-i18n-zh="Headroom 的 60–95% 数字来自部分工具输出场景；其限制文档将 JSON、日志、代码、RAG 文档分开报告。当前项目已退役新闻稿提及的 IntelligentContext，CacheAligner 也并非自动重写所有 Prompt。" data-i18n-en="Headroom's 60–95% headline concerns certain tool-output workloads. Its limitations separate JSON, logs, code and RAG documents. The current project retired the newsletter's IntelligentContext component; CacheAligner does not rewrite every prompt.">Headroom 的 60–95% 数字来自部分工具输出场景；其限制文档将 JSON、日志、代码、RAG 文档分开报告。当前项目已退役新闻稿提及的 IntelligentContext，CacheAligner 也并非自动重写所有 Prompt。</span></p>
+<p><span class="i18n-text" data-i18n-zh="Agentic Context Management 预印本倡导为 Compaction 返回验证凭证，包括来源、保留约束、验证结果和恢复路径。论文自报指标并非通用生产保证。" data-i18n-en="The Agentic Context Management preprint motivates a validation receipt for compaction, including provenance, retained constraints, checks and recovery. Its reported benchmarks are not universal production guarantees.">Agentic Context Management 预印本倡导为 Compaction 返回验证凭证，包括来源、保留约束、验证结果和恢复路径。论文自报指标并非通用生产保证。</span></p>
+<div class="co must"><span class="co-t">Core rule</span><p class="say">Compression is not retrieval; neither is proof of correctness or authorization.</p></div>
+<p><a href="https://aiengineering.beehiiv.com/p/reduce-ai-agent-token-costs-by-95">Headroom newsletter</a> · <a href="https://github.com/headroomlabs-ai/headroom/blob/main/wiki/LIMITATIONS.md">Headroom limitations</a> · <a href="https://arxiv.org/abs/2607.21503">ACM paper</a></p>
+</section>
