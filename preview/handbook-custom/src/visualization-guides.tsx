@@ -234,7 +234,11 @@ export function VisualizationGuide({slug, en, pane, onReady}: {
     if (!anchor) return;
     const slot = document.createElement("div");
     slot.className = "v2-guide-slot";
-    anchor.after(slot);
+    // Preserve the authored CH11 lead-in and pipeline example before the teaching decision.
+    const firstParagraph = anchor.nextElementSibling;
+    const nextBlock = firstParagraph?.nextElementSibling;
+    const insertionPoint = isData && nextBlock?.tagName === "PRE" ? nextBlock : anchor;
+    insertionPoint.after(slot);
     setHost(slot);
     return () => slot.remove();
   }, [slug, pane, en, isServing, isData]);
