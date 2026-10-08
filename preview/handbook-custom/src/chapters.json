@@ -3,72 +3,222 @@
     "slug": "01-model-api-context-foundations",
     "number": "01",
     "zh": "Model / API / Context 基础",
-    "en": "Model / API / Context Foundations"
+    "en": "Model / API / Context Foundations",
+    "group": "model",
+    "summaryZh": "理解 Generation、Token、Context、Sampling、Embedding、Adaptation 与模型迁移。",
+    "summaryEn": "Understand generation, tokens, context, sampling, embeddings, adaptation, and model migration.",
+    "interactive": false,
+    "decisionZh": "如何选择模型、上下文与适配方式？",
+    "decisionEn": "Which model, context strategy and adaptation path fit the task?",
+    "failureZh": "忽略成本、延迟与上下文预算，仅凭基准分数选模型。",
+    "failureEn": "Choosing by benchmark score alone while ignoring cost, latency and context budget.",
+    "relatedNumbers": [
+      "07",
+      "10"
+    ]
   },
   {
     "slug": "02-enterprise-retrieval",
     "number": "02",
     "zh": "企业检索基础",
-    "en": "Enterprise Retrieval Foundations"
+    "en": "Enterprise Retrieval Foundations",
+    "group": "retrieval",
+    "summaryZh": "理解 Exact、BM25、Dense、Graph 与元数据过滤的边界。",
+    "summaryEn": "Understand Exact, BM25, Dense, Graph and metadata filtering.",
+    "interactive": false,
+    "decisionZh": "哪类问题应该使用 Exact、BM25、Dense 或 Graph？",
+    "decisionEn": "When should a query use Exact, BM25, Dense or Graph?",
+    "failureZh": "用向量相似度代替精确 ID 匹配。",
+    "failureEn": "Using vector similarity in place of exact identifier matching.",
+    "relatedNumbers": [
+      "03",
+      "05"
+    ]
   },
   {
     "slug": "03-hybrid-retrieval-query-routing",
     "number": "03",
     "zh": "混合检索与 Query Routing",
-    "en": "Hybrid Retrieval and Query Routing"
+    "en": "Hybrid Retrieval and Query Routing",
+    "group": "retrieval",
+    "summaryZh": "组合词法与语义检索，为不同问题选择合适的路径。",
+    "summaryEn": "Combine lexical and semantic retrieval with query routing.",
+    "interactive": true,
+    "decisionZh": "依据查询形状、权限与证据要求，选择什么检索路径？",
+    "decisionEn": "Which retrieval route matches query shape, authorization and evidence needs?",
+    "failureZh": "所有检索器全跑一遍，或忽略授权与失败恢复。",
+    "failureEn": "Running every retriever or skipping authorization and recovery.",
+    "relatedNumbers": [
+      "02",
+      "04"
+    ]
   },
   {
     "slug": "04-rag-reliability-selective-answering",
     "number": "04",
     "zh": "RAG 可靠性与选择性回答",
-    "en": "RAG Reliability and Selective Answering"
+    "en": "RAG Reliability and Selective Answering",
+    "group": "retrieval",
+    "summaryZh": "衡量证据质量，在回答与拒答之间做可靠决策。",
+    "summaryEn": "Assess evidence and decide when to answer or abstain.",
+    "interactive": true,
+    "decisionZh": "证据足够回答、需要澄清，还是应该拒答？",
+    "decisionEn": "Is the evidence sufficient to answer, clarify or abstain?",
+    "failureZh": "把高相关度误认为证据充分。",
+    "failureEn": "Mistaking relevant passages for sufficient evidence.",
+    "relatedNumbers": [
+      "03",
+      "05",
+      "09"
+    ]
   },
   {
     "slug": "05-document-pdf-rag",
     "number": "05",
     "zh": "生产级 PDF RAG",
-    "en": "Production-grade PDF RAG"
+    "en": "Production-grade PDF RAG",
+    "group": "retrieval",
+    "summaryZh": "从解析、分块到引用，构建可追溯的文档问答。",
+    "summaryEn": "Build traceable document Q&A from parsing to citations.",
+    "interactive": false,
+    "decisionZh": "如何解析并定位可引用的文档证据？",
+    "decisionEn": "How should documents be parsed and their evidence cited?",
+    "failureZh": "跨页表格、单元格来源或文档结构丢失。",
+    "failureEn": "Losing cross-page tables, cell provenance or document structure.",
+    "relatedNumbers": [
+      "02",
+      "04"
+    ]
   },
   {
     "slug": "06-skills-routing",
     "number": "06",
     "zh": "Skills 与路由",
-    "en": "Skills and Routing"
+    "en": "Skills and Routing",
+    "group": "agent",
+    "summaryZh": "组织可复用能力，让任务找到合适的工具与执行方式。",
+    "summaryEn": "Organize reusable skills, tools and task routing.",
+    "interactive": true,
+    "decisionZh": "如何区分 Skill、MCP 协议、工具和运行时权限？",
+    "decisionEn": "How do skills, MCP protocols, tools and runtime permissions differ?",
+    "failureZh": "把工具能力等同于自动获得执行权限。",
+    "failureEn": "Treating tool capability as permission to execute.",
+    "relatedNumbers": [
+      "07",
+      "08",
+      "10"
+    ]
   },
   {
     "slug": "07-memory-context-engineering",
     "number": "07",
     "zh": "Memory 与上下文工程",
-    "en": "Memory and Context Engineering"
+    "en": "Memory and Context Engineering",
+    "group": "agent",
+    "summaryZh": "管理工作状态、长期记忆与上下文预算。",
+    "summaryEn": "Manage working state, long-term memory and context budgets.",
+    "interactive": true,
+    "decisionZh": "什么状态应该进入持久记忆，什么时候检索？",
+    "decisionEn": "Which state deserves persistent memory and when should it be retrieved?",
+    "failureZh": "无差别保留所有对话，或提取过时记忆。",
+    "failureEn": "Retaining every utterance or retrieving stale memories.",
+    "relatedNumbers": [
+      "01",
+      "08"
+    ]
   },
   {
     "slug": "08-agent-orchestration",
     "number": "08",
     "zh": "Agent 编排与内容生成",
-    "en": "Agent Orchestration and Content Generation"
+    "en": "Agent Orchestration and Content Generation",
+    "group": "agent",
+    "summaryZh": "设计执行循环、工作流与多 Agent 协作。",
+    "summaryEn": "Design execution loops, workflows and multi-agent collaboration.",
+    "interactive": true,
+    "decisionZh": "哪些步骤由 Workflow 控制，哪些交给 Agent 决策？",
+    "decisionEn": "Which steps belong to workflows versus agent decisions?",
+    "failureZh": "没有重试边界、共享状态控制或人工批准。",
+    "failureEn": "Missing bounded retries, shared-state governance or human approval.",
+    "relatedNumbers": [
+      "06",
+      "09"
+    ]
   },
   {
     "slug": "09-reliability-evaluation-observability",
     "number": "09",
     "zh": "可靠性、评估与可观测性",
-    "en": "Reliability, Evaluation, and Observability"
+    "en": "Reliability, Evaluation, and Observability",
+    "group": "production",
+    "summaryZh": "用评估、追踪与监控验证系统的真实表现。",
+    "summaryEn": "Verify system behavior through evaluation, tracing and monitoring.",
+    "interactive": false,
+    "decisionZh": "怎样用评测和追踪发现系统失效？",
+    "decisionEn": "How can evaluation and traces reveal system failures?",
+    "failureZh": "只看单一离线分数，缺少真实故障定位。",
+    "failureEn": "Relying on a single offline score without failure diagnostics.",
+    "relatedNumbers": [
+      "04",
+      "08",
+      "10"
+    ]
   },
   {
     "slug": "10-serving-deployment-ai-platform",
     "number": "10",
     "zh": "推理服务、部署、安全与 AI 平台",
-    "en": "Inference Serving, Deployment, Security, and AI Platform"
+    "en": "Inference Serving, Deployment, Security, and AI Platform",
+    "group": "production",
+    "summaryZh": "理解推理服务、缓存、隔离与生产控制面。",
+    "summaryEn": "Explore serving, caching, isolation and production control planes.",
+    "interactive": false,
+    "decisionZh": "什么时候可以复用 KV 前缀，如何保证租户隔离？",
+    "decisionEn": "When can KV prefixes be reused while preserving tenant isolation?",
+    "failureZh": "混淆请求内 KV 与跨请求前缀复用。",
+    "failureEn": "Conflating within-request KV state with cross-request prefix reuse.",
+    "relatedNumbers": [
+      "01",
+      "09",
+      "11"
+    ]
   },
   {
     "slug": "11-data-sql-engineering",
     "number": "11",
     "zh": "数据与 SQL 工程",
-    "en": "Data & SQL Engineering"
+    "en": "Data & SQL Engineering",
+    "group": "production",
+    "summaryZh": "设计可靠的 CDC、Lakehouse、Spark 和 SQL 数据流，提供可核验的 AI 数据基础。",
+    "summaryEn": "Design dependable CDC, Lakehouse, Spark and SQL data pipelines for grounded AI systems.",
+    "interactive": false,
+    "decisionZh": "如何保证 CDC、表更新与数据消费正确？",
+    "decisionEn": "How do we keep CDC, table updates and consumption correct?",
+    "failureZh": "误以为 at-least-once 处理天然得到 exactly-once 业务效果。",
+    "failureEn": "Assuming at-least-once delivery ensures exactly-once business effects.",
+    "relatedNumbers": [
+      "02",
+      "10",
+      "12"
+    ]
   },
   {
     "slug": "12-fde-customer-delivery",
     "number": "12",
     "zh": "FDE 客户交付与需求工程",
-    "en": "FDE Customer Delivery & Engineering Craft"
+    "en": "FDE Customer Delivery & Engineering Craft",
+    "group": "production",
+    "summaryZh": "把客户需求变成受控的最小交付、明确验收与可运营的系统。",
+    "summaryEn": "Turn customer ambiguity into controlled thin slices, measurable acceptance and operable systems.",
+    "interactive": false,
+    "decisionZh": "如何把客户目标转成可验收的最小端到端交付？",
+    "decisionEn": "How do customer goals become an acceptable end-to-end thin slice?",
+    "failureZh": "演示成功却没有基线、权限、验收指标与交接。",
+    "failureEn": "A successful demo without baselines, access checks, acceptance or handoff.",
+    "relatedNumbers": [
+      "09",
+      "10",
+      "11"
+    ]
   }
 ]
