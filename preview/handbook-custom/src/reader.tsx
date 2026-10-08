@@ -17,6 +17,11 @@ import {
 } from "@/components/ui/dialog";
 import { BookIcon, BookmarkIcon, ArrowRightIcon } from "@/components/icons";
 import chapters from "./chapters.json";
+const JevFlowComparison = lazy(() =>
+  import("./jev-flow-comparison").then((module) => ({
+    default: module.JevFlowComparison,
+  })),
+);
 const ConceptDiagram = lazy(() =>
   import("./concept-diagrams").then((module) => ({
     default: module.ConceptDiagram,
@@ -367,6 +372,13 @@ export function Reader({
               key={chapter.slug + (en ? "en" : "zh")}
               dangerouslySetInnerHTML={{ __html: html }}
             />
+          )}
+          {data && !error && chapter.slug === "06-skills-routing" && (
+            <DiagramBoundary key={"jev-" + en} en={en}>
+              <Suspense fallback={null}>
+                <JevFlowComparison en={en} pane={pane} />
+              </Suspense>
+            </DiagramBoundary>
           )}
           {data && !error && hasConceptDiagram(chapter.slug) && (
             <DiagramBoundary key={chapter.slug + en} en={en}>
