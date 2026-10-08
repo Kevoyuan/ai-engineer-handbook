@@ -239,6 +239,14 @@ export function Reader({
       window.removeEventListener("hashchange", onHash);
     };
   }, [data, en, chapter.slug, mobile]);
+  // The interactive lesson mounts asynchronously after chapter HTML.
+  // A direct Atlas link must resolve only after the concept-demo anchor exists.
+  useEffect(() => {
+    if (!data || !diagramReady || !hasConceptDiagram(chapter.slug)) return;
+    if (location.hash.split("/")[2] !== "concept-demo") return;
+    const frame = requestAnimationFrame(() => jump("concept-demo"));
+    return () => cancelAnimationFrame(frame);
+  }, [data, diagramReady, chapter.slug, mobile]);
   useEffect(() => {
     try {
       localStorage.setItem("handbook-reading-size", JSON.stringify(size));
