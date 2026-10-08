@@ -2256,3 +2256,142 @@ It does **not** by itself prove general correctness, scalable serving or SLO att
 - [Google SRE workbook SLO implementation](https://sre.google/workbook/implementing-slos/) — indicator/target/error-budget methodology.
 
 **Ownership:** CH10 owns this production architecture; CH11 owns the operational data plane; CH12 owns customer discovery, scope, walking skeleton and handoff. Q10–Q16 are original prompts, not official FDEInterviews answers.
+
+
+## 10.27 FDE Deployment / Serving / Governance gaps: guarded implementation decisions (Q48–Q55)
+
+> **Scope 2026-10-08:** Original questions Q48–Q55. Public FDE concepts supply only the topic names, not premium answers. Library and standards facts below were checked against the first-party vLLM, Hugging Face, OpenID Foundation, Databricks, European Commission/EUR-Lex documentation. Example code/config, SLOs and customer decisions are proposals—not production tests or legal advice.
+
+### Q48 · Rate Limiting and REST API Design for Integrations：加一个 429 就防住 Agent 重试了吗？
+
+**No.** Rate limiting bounds admitted *request count or resource usage* under a declared identity and time window. An agent may launch many calls across multiple tools/users/tenants, and internal retries consume resources even when the user's external request count is low.
+
+- Apply admission at **tenant + principal + route/tool class** (with shared global backend limits). A token bucket can allow bounded bursts; a concurrency semaphore limits in-flight expensive requests. Neither automatically replaces queue limits.
+- Return 429/503, documented retry hints where appropriate; never treat untrusted client-specified tenant IDs as rate-limit identity.
+- Resource budget should include tokens, embeddings, DB CPU/rows, tool requests and cost per successful task. Set per-operation *total deadlines and retry ownership* (CH10 §10.25/26).
+- REST write contract: stable resource IDs, explicit authorization, idempotency key and status query; a POST timeout has unknown commit status. GET is conventionally safe but **not proof that an undocumented integration has no side effects**.
+
+```text
+SSO verified actor → tenant quota / per-tool concurrency
+    → allowlisted route & budget → backend
+    → response {request_id, outcome, retryability, source_revision}
+```
+
+**Negative test**: two tenants alternate requests and retry 429. Verify one tenant cannot starve the other, responses never disclose cross-tenant data, and queued work is bounded. Report per-tenant fair share, 429s, p95, retry amplification and total accepted cost.
+
+### Q49 · Consistency, CAP and What Your Workflow Actually Needs：需要所有组件都强一致吗？
+
+**No.** CAP describes the conflict between strong consistency and availability **during network partitions** under the applicable distributed-system model; it does not provide a menu where two properties are freely chosen in normal operation. A Copilot needs **different** consistency contracts for different data:
+
+| Data/operation | Preferred contract | Why |
+|---|---|---|
+| Tenant access / approval at write | current authorization check, fail closed | eventual ACL view can disclose or mutate private records |
+| Order source events | durable per-source sequence and replay, eventual read model as specified | CDC ingestion lag is observable and tolerable for read-only explanation only if disclosed |
+| Search/vector index | explicitly bounded freshness/ACL recheck | RAG can be slightly delayed but cannot silently leak revoked evidence |
+| Agent tool side effects | durable operation ID + reconciliation | messages can duplicate, acknowledgement can be lost |
+| UI progress stream | monotonic event IDs / idempotent rendering | UI state can lag without changing authoritative outcome |
+
+**Failure injection**: database commits a refund but network disconnects before response. If the agent assumes the transaction rolled back, it may pay twice. Status reconciliation plus idempotency is necessary; “exactly once delivery” for event transport does not establish exactly-once cross-system effects.
+
+### Q50 · Model Versioning and Migration + Model Registry and Promotion：Tag=Production 就上线了吗？
+
+**No.** A registered model/version is an artifact; a serving endpoint and traffic-routing policy are separate release objects. Databricks **Models in Unity Catalog** provides governed model artifacts, lineage and alias references; its documented lifecycle uses **aliases such as Champion rather than legacy fixed stages**, and merely using a catalog named prod does not serve traffic.
+
+```text
+train/evaluate → immutable model artifact + signature + dataset/hash
+ → register in Unity Catalog → assign approved Champion alias
+ → update batch/serving target (explicitly) → canary / rollback
+ → archive provenance of model + prompt + index + tool version
+```
+
+Example **illustrative MLflow client** (requires authorized workspace/UC environment):
+
+```python
+from mlflow import MlflowClient
+client = MlflowClient()
+client.set_registered_model_alias("prod.ml_team.order_risk", "Champion", 7)
+# Repointing alias does not by itself prove the deployed endpoint
+# has picked up version 7: verify endpoint configuration and traffic.
+```
+
+**Negative tests**: staged alias points to v7 but endpoint still serves v6; an old prompt/parser expects a schema dropped in v7; an index-embedding pair mismatches. Pin rollout manifest and validate output signature, golden customer tasks, rollback and lineage together.
+
+[Databricks model lifecycle in UC](https://docs.databricks.com/aws/en/machine-learning/manage-model-lifecycle/) documents alias behavior, permissions and the stages limitation; [MLflow Model Registry](https://www.mlflow.org/docs/latest/model-registry/) supplies general artifact semantics. Workspace Registry and UC lifecycle APIs must not be conflated.
+
+### Q51 · Model Selection for Enterprise Deployments：模型选择为什么必须带系统预算？
+
+The model is one component of an end-to-end customer workflow. Compare **quality on critical slices**, data boundary/legal constraints, evidence fidelity, tool/schema failure rate, latency (TTFT, decode and overall), context robustness, model availability/deprecation and all-in cost per approved success.
+
+Decision table:
+
+| Need | Candidate route | Trade-off to validate |
+|---|---|---|
+| Simple classification/extraction | small governed classifier / rules | lower runtime cost, but may miss rare or ambiguous cases |
+| Reliable exact business order decision | deterministic SQL/host workflow | semantics must be maintained, cannot explain arbitrary unstructured policy alone |
+| Ambiguous policy interpretation | grounded higher-capability LLM with retrieval | context cost, source freshness and hallucination |
+| Customer-managed isolated inference | supported self-hosted weights | GPU ops, vulnerability fixes, observability and regional egress |
+| Peak traffic | routing/cascade with high-capability fallback | false routing, selective escalation, fairness and budget |
+
+**Release gate**: same gold corpus across options, frozen identities/evidence, failure slice and latency measurement, plus customer architecture constraints. Switching from SaaS model to self-host changes SLO/cost/support and identity responsibilities; do not compare model token prices alone.
+
+### Q52 · Quantization, PagedAttention, MoE：它们解决的是同一个显存问题吗？
+
+| Mechanism | What it changes | Key pitfall |
+|---|---|---|
+| Quantization | numerical representation of weights/activations/KV cache | model precision, kernel support and GPU compatibility; quality must be tested |
+| PagedAttention | virtualized/block-based KV-cache allocation and attention access | **does not** change the mathematical prompt into a model memory or waive cache tenancy policy |
+| Mixture of Experts (MoE) | routes token representations to selected expert subnetworks in supported architectures | active expert compute differs from total parameter storage; routing/load balance can dominate |
+| Prefix caching | reuses exact compatible token-prefix KV work | same “meaning” does not prove token-level prefix identity |
+
+**Operator test**: at equal workload and batch/concurrency, compare peak VRAM, fragmentation, throughput, TTFT, inter-token latency and output quality; quantify index/weight quantization separately from KV cache. vLLM documents PagedAttention for KV memory management and multiple quantization formats, but **supported methods differ by device, weight format and runtime release**. A 4-bit model is not necessarily 4× cheaper for an entire deployment.
+
+### Q53 · Speculative Decoding：小模型先生成，是否就改变大模型回答分布？
+
+For the correctly implemented **lossless verification/sampling algorithm**, a cheap draft proposes tokens, and the target model verifies with an acceptance/resampling step that preserves the target distribution. This is different from replacing the target model with a small model. Real speedup depends on draft acceptance, model sizes, batch size, sampling mode, KV work and hardware; a weak draft can slow down execution.
+
+```text
+context → draft model proposes N tokens
+        → target model verifies candidate block
+        → accept/reject/resample per specified algorithm
+        → continue until budget/stop condition
+```
+
+**Negative tests:** compare target output distribution on controlled seeds/tasks as supported by framework; inspect p50/p95 tokens/s, TTFT, end-to-end task correctness, VRAM and overhead. Do not claim “always the same output string” under stochastic sampling—distribution preservation is the relevant property.
+
+[Hugging Face Assisted Decoding](https://huggingface.co/docs/transformers/main/assisted_decoding) explains verification and documented feature/runtime constraints; [vLLM serving overview](https://docs.vllm.ai/en/stable/) lists supported speculative methods. Version-specific batching support must be verified before deployment.
+
+### Q54 · AI Governance (SOC2, EU AI Act)：有 SOC 2 报告就等于 AI Act 合规吗？
+
+**No.** A SOC 2 examination/report is an assurance artifact against defined Trust Services Criteria and a scoped system/period; it does not automatically certify compliance with **EU Regulation 2024/1689 (AI Act)**, sector privacy requirements, high-risk system obligations or a specific customer's subprocessors. EU AI Act obligations depend on role (provider/deployer/importer/etc.), use case/risk category, application dates and amended legal text.
+
+**FDE evidence-room checklist**:
+
+1. Customer use-case classification + operator responsibility matrix. Classify decisions by legal/business owner, not LLM guess.
+2. Inventory model versions, data provenance, model providers, subprocessors, training/evaluation, applicable licenses and geographic flows.
+3. Risk controls: human oversight, disclosure/transparency, logs, incident reporting where required, retention, auditability, red-team and robustness.
+4. Link each claim to evidence: technical test report, signed policy owner, live monitoring and documented limitations. A claim “SOC2 compliant” without the **report scope and period** is not a sufficient artifact.
+5. For EU AI Act applicability/date, consult the **current amended official consolidated law and European Commission Service Desk** at rollout, not a static 2024 blog table; legal counsel owns interpretation.
+
+**Date-sensitivity:** EU legislation and implementation dates have been amended since the original 2024 act; for example, the official AI Act Service Desk distinguishes 2026 provisions from later dates for certain high-risk categories. This chapter does **not** assert one universal enforcement date or offer a legal conclusion.
+
+[EU AI Act EUR-Lex consolidated act](https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng) · [European Commission AI Act Service Desk](https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/when-does-enforcement-start) · [AICPA SOC 2 overview](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services).
+
+### Q55 · Enterprise SSO: SAML and OIDC：有 JWT 就完成多租户授权了吗？
+
+**No.** Authentication (who logged in), authorization (what they may read/do), tenancy (which organization/resource boundary), and delegated action (on whose behalf a tool runs) are separate.
+
+- **SAML 2.0:** XML-based federation assertions in supported enterprise login architectures; map trusted IdP-issued identity to the application principal and its provisioning/deprovisioning lifecycle.
+- **OIDC:** authentication layer on OAuth 2.0 with an ID Token. Verify issuer, audience, signature algorithm/key, expiry and appropriate nonce/state/PKCE requirements for the selected flow/client. An OAuth **access token is not automatically a valid ID token**; verify its intended audience/scope for the protected API.
+- **Application tenant:** resolve authoritative tenant mapping and groups from a trusted session/policy store; do not allow model-generated tenant_id or email domain heuristics to grant rows.
+- **SCIM/entitlement sync and revocation:** provisioning delays, group membership changes and emergency user disablement need session/token/cache invalidation design.
+
+```text
+Enterprise IdP → verified OIDC/SAML exchange → trusted principal
+  → mapped customer tenant + group entitlements
+  → service-side permission policy + storage RLS
+  → bounded delegated tool scope
+```
+
+**Negative tests**: wrong aud token, expired token, tenant-switch request, token replay, removed group, revoked employee still holding a stale session, service principal broad access; no protected tool or retrieved document may enter the prompt on denial. Never implement production JWT verification from a model-generated code snippet without a trusted standard library, issuer discovery/key rotation and security review.
+
+[OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html) is the normative OIDC reference; [SAML 2.0 OASIS](https://docs.oasis-open.org/security/saml/v2.0/) covers SAML specifications. CH10 §10.22/10.24 owns runtime policy execution; CH02 §2.7 protects retrieval; CH06 owns tool authorization.
