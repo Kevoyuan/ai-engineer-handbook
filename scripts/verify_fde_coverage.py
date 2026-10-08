@@ -51,12 +51,16 @@ for index, ((source_name, source_owner), (_, name, owner, grade, source_flag, pr
     else:
         assert location == f"CH{owner} semantic/synonym review", (name, location)
 
-assert grades == Counter({"H": 99, "B": 31, "N": 37}), grades
+assert grades == Counter({"H": 136, "B": 31, "N": 0}), grades
 # Verify actual freshly-authored question sections in canonical owners.
 for chapter, start, end in [
     ("10", 10, 16), ("11", 17, 23),
     ("01", 24, 29), ("09", 30, 33),
     ("11", 34, 37), ("08", 38, 39),
+    ("02", 40, 43), ("03", 44, 44),
+    ("06", 45, 46), ("07", 47, 47),
+    ("10", 48, 55), ("11", 56, 57),
+    ("01", 58, 62), ("10", 63, 64),
 ]:
     source = "\n".join(CHAPTER_LINES[chapter])
     for num in range(start, end + 1):
@@ -64,5 +68,5 @@ for chapter, start, end in [
 
 print("PASS 167/167 topic ownership and source pointers")
 print(f"PASS grades H={grades['H']} B={grades['B']} N={grades['N']}")
-print("PASS Q10–Q39 canonically routed to CH01/08/09/10/11")
+print("PASS Q10–Q64 canonically routed to CH01/02/03/06/07/08/09/10/11")
 print("NOTE evidence-location scan only; no claim of conceptual completeness")
