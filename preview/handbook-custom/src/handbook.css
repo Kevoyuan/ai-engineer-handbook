@@ -1455,6 +1455,10 @@ body,
   color: var(--muted-foreground);
   background: var(--secondary);
 }
+/* Tiny stage pills need full text contrast in both themes. */
+.chapter-body .bfs-stage-pill {
+  color: var(--foreground);
+}
 .chapter-body .bfs-strip {
   height: 2px;
   opacity: 0.6;
