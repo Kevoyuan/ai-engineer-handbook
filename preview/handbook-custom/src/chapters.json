@@ -58,5 +58,17 @@
     "number": "10",
     "zh": "推理服务、部署、安全与 AI 平台",
     "en": "Inference Serving, Deployment, Security, and AI Platform"
+  },
+  {
+    "slug": "11-data-sql-engineering",
+    "number": "11",
+    "zh": "数据与 SQL 工程",
+    "en": "Data & SQL Engineering"
+  },
+  {
+    "slug": "12-fde-customer-delivery",
+    "number": "12",
+    "zh": "FDE 客户交付与需求工程",
+    "en": "FDE Customer Delivery & Engineering Craft"
   }
 ]

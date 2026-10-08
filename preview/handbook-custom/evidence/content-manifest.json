@@ -33,7 +33,7 @@
     "slug": "06-skills-routing",
     "sections": 5,
     "supplements": 3,
-    "characters": 13149
+    "characters": 13724
   },
   {
     "slug": "07-memory-context-engineering",
@@ -58,5 +58,17 @@
     "sections": 11,
     "supplements": 3,
     "characters": 10150
+  },
+  {
+    "slug": "11-data-sql-engineering",
+    "sections": 8,
+    "supplements": 0,
+    "characters": 2507
+  },
+  {
+    "slug": "12-fde-customer-delivery",
+    "sections": 10,
+    "supplements": 0,
+    "characters": 2290
   }
 ]
