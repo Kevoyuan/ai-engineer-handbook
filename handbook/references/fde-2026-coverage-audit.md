@@ -191,7 +191,7 @@
 
 ## Stage 05–06 manual evidence-pointer update
 
-- CH01 §1.21 now explains optimization, bias/variance, data leakage, information-theory loss, normalization, catastrophic forgetting, semi-supervision, convexity and vision labels with first-party PyTorch/scikit-learn references.
+- CH01 §1.22 now explains optimization, bias/variance, data leakage, information-theory loss, normalization, catastrophic forgetting, semi-supervision, convexity and vision labels with first-party PyTorch/scikit-learn references.
 - CH09 §9.24 now separately explains rare-class recall, probability calibration, synthetic-eval leakage and adaptive online experiment risks.
 - CH11 §11.11 now contains the coding cost/CSV/sliding-window/GIL contracts; CH08 §8.18 owns DAG/topological scheduling and injected tool-test boundaries.
 - **23 named owner-chapter items** were manually remapped to explicit heading evidence. A positive signal means **the concept now has a discoverable section**, not that it has passed rigorous model benchmarking or a hiring interview.
