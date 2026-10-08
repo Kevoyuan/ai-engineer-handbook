@@ -1,0 +1,17 @@
+<section id="model-architecture-axes" aria-labelledby="model-architecture-axes-title">
+<h2 class="sub" id="model-architecture-axes-title"><span class="i18n-text" data-i18n-zh="模型架构的八个术语：其实横跨多个分类轴" data-i18n-en="Eight model architecture labels actually span different design axes">模型架构的八个术语：其实横跨多个分类轴</span> <small>§1.22</small></h2>
+<p class="lead"><span class="i18n-text" data-i18n-zh="先区分底层网络结构、训练与推理目标、模态、模型规模和 Agent 系统拓扑。八个术语不是互斥的八种基础模型。" data-i18n-en="Separate network structure, training and inference objectives, modalities, model scale, and agent system topology. These eight labels are not eight mutually exclusive model families.">先区分底层网络结构、训练与推理目标、模态、模型规模和 Agent 系统拓扑。八个术语不是互斥的八种基础模型。</span></p>
+<div class="tw"><table><thead><tr><th scope="col">Pattern</th><th scope="col">Axis</th><th scope="col">Boundary</th></tr></thead><tbody>
+<tr><td>GPT</td><td>Decoder-only / autoregressive</td><td>Encoder–decoder can generate too</td></tr>
+<tr><td>MoE</td><td>Sparse expert activation</td><td>Total parameters ≠ active compute</td></tr>
+<tr><td>LRM</td><td>Reasoning-oriented training/inference</td><td>Not a fixed neural architecture</td></tr>
+<tr><td>VLM</td><td>Image + language modality</td><td>Verify OCR and visual grounding</td></tr>
+<tr><td>SLM</td><td>Size and deployment constraints</td><td>Quantization is an independent technique</td></tr>
+<tr><td>LAM</td><td>Tool/action behavior</td><td>Tool call ≠ execution or permission</td></tr>
+<tr><td>HLM</td><td>Hierarchical agent control</td><td>Planner/executor often describes orchestration</td></tr>
+<tr><td>LCM</td><td>Research: concept-level modeling</td><td>Meta predicts SONAR sentence embeddings, not knowledge graphs</td></tr>
+</tbody></table></div>
+<p><span class="i18n-text" data-i18n-zh="例如 MoE、VLM 和 reasoning model 可以同时描述同一系统。Meta 的 LCM 是句子表示空间中的概念级预测研究，而不是知识图谱检索架构。" data-i18n-en="MoE, VLM, and reasoning can simultaneously describe the same system. Meta's LCM researches prediction in a sentence-representation space, not a knowledge-graph retrieval architecture.">例如 MoE、VLM 和 reasoning model 可以同时描述同一系统。Meta 的 LCM 是句子表示空间中的概念级预测研究，而不是知识图谱检索架构。</span></p>
+<div class="co must"><span class="co-t">Core rule</span><p class="say">Model structure, training, modality, scale and system control are orthogonal design axes.</p></div>
+<p><a href="https://aiengineering.beehiiv.com/p/8-llm-architectures-clearly-explained">AI Engineering: 8 LLM Architectures</a> · <a href="https://ai.meta.com/research/publications/large-concept-models-language-modeling-in-a-sentence-representation-space/">Meta LCM primary source</a></p>
+</section>
