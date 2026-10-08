@@ -2141,14 +2141,14 @@ First separate **data residency**, **private network transport**, **compute owne
 
 **Decision sequence**: (1) which bytes are prohibited from leaving and where; (2) model and embedding processing location; (3) control-plane metadata, telemetry, support access, backups; (4) DNS, egress allowlist, secrets, keys, SSO, identity federation; (5) incident ownership; (6) upgrade and rollback channel.
 
-\`\`\`text
+```text
 Customer regulation / contractual boundary
   → data-flow inventory [prompts, docs, embeddings, traces, backups, keys]
   → identity/network/compute owners
   → select candidate SaaS / private endpoint / BYOC / on-prem
   → verify every outbound path AND model provider
   → walking-skeleton deployment + permission/egress regression
-\`\`\`
+```
 
 **Crucial distinction**: a private endpoint protects selected traffic paths; it does **not** mean the entire application runs in the customer's VPC, that all egress is blocked, or that model prompts never leave the region. Azure's private PaaS guidance differentiates service endpoints, private endpoints and outbound VNet integration; its architecture guidance also calls out private DNS and disabling public network access where supported. Product SKUs and allowed configurations must be confirmed case by case.
 
@@ -2158,7 +2158,7 @@ Customer regulation / contractual boundary
 
 At an overloaded dependency, retries can amplify demand. Retry **only** when the operation is safe to repeat (read or documented idempotent write), within both a maximum-attempt count and deadline; use jitter and a budget. A circuit breaker stops repeatedly initiating likely-failing calls; a concurrency limit, bounded queue and load shedding prevent unbounded backpressure.
 
-\`\`\`text
+```text
 caller deadline
  → classify operation safe/idempotent?
  → remaining retry budget?
@@ -2168,7 +2168,7 @@ caller deadline
    ├─ transient → capped jitter retry, if within budget
    ├─ repeated dependency failure → circuit OPEN / degrade
    └─ unsafe unknown write → reconcile, not replay with new key
-\`\`\`
+```
 
 Don't place independent retries at every nested layer. If three layers each make three attempts, an illustrative upper bound is 27 downstream tries for a logical request. Whether a breaker or controlled retry improves performance is workload- and recovery-pattern-dependent; measure it by fault injection. AWS Builders' Library explicitly discusses retries as load, correlated backoff and jitter.
 
@@ -2176,15 +2176,15 @@ Don't place independent retries at every nested layer. If three layers each make
 
 ### 10.26.3 Q12 · What is a safe idempotency contract for tool actions?
 
-Idempotency belongs to **the business operation**, not merely the HTTP request. Model can propose \`createRefund(orderId)\`; trusted host authorizes a logical operation, assigns a stable operation ID, durably records intent, and calls a backend honoring that ID. On timeout the outcome is *unknown*, not known failed. Query/reconcile or retry **same key and parameters** only when contract allows it.
+Idempotency belongs to **the business operation**, not merely the HTTP request. Model can propose `createRefund(orderId)`; trusted host authorizes a logical operation, assigns a stable operation ID, durably records intent, and calls a backend honoring that ID. On timeout the outcome is *unknown*, not known failed. Query/reconcile or retry **same key and parameters** only when contract allows it.
 
-\`\`text
+```text
 operation_id + tenant + allowed tool + immutable parameters
  → validate authorization + persist intent
  → execute with downstream idempotency contract
  → store receipt, or mark UNKNOWN and reconcile
  → emit audit event; human approval for irreversible changes
-\`\`
+``
 
 **Limitations**: exactly-once effects across independent DB/queue/payment systems require explicit transactional or reconciliation design. The Stripe first-result replay rules are specific to Stripe; do not universalize the reported TTL or 500 behavior.
 
@@ -2194,12 +2194,12 @@ An **ontology / semantic layer** defines stable business entities, relations, au
 
 | Concern | Entity/semantic layer | Graph store | RAG/GraphRAG |
 |---|---|---|---|
-| Example | Order, Customer, Shipment, metric “late handoff” | edges \`ORDER→SHIPMENT→CARRIER\` | query evidence across policies and relations |
+| Example | Order, Customer, Shipment, metric “late handoff” | edges `ORDER→SHIPMENT→CARRIER` | query evidence across policies and relations |
 | Ownership | business semantics, access/action contract | fact representation and traversal | answer-time evidence selection |
 | Validity | definitions, units, temporal policy | graph correctness/provenance | recall, precision, grounded claims |
 | Anti-pattern | free-form model invents metric meaning | every row becomes graph node | graph traversal bypasses ACL / source truth |
 
-For the order Copilot, start with a semantic contract: \`delivered_event_time\`, \`handoff_event_time\`, \`timestamp_authority\`, \`source_freshness\`, \`permitted_order_scope\`. Do **not** ask the LLM to invent these definitions at runtime. Databricks Unity Catalog **metric views** expose centrally defined fields/measures (YAML/SQL based on version), which can reduce metric drift, but **do not automatically implement** the full entity/action/process ontology or replace separate access controls.
+For the order Copilot, start with a semantic contract: `delivered_event_time`, `handoff_event_time`, `timestamp_authority`, `source_freshness`, `permitted_order_scope`. Do **not** ask the LLM to invent these definitions at runtime. Databricks Unity Catalog **metric views** expose centrally defined fields/measures (YAML/SQL based on version), which can reduce metric drift, but **do not automatically implement** the full entity/action/process ontology or replace separate access controls.
 
 ### 10.26.5 Q14 · How do SLI, SLO and error budget differ?
 
@@ -2207,12 +2207,12 @@ For the order Copilot, start with a semantic contract: \`delivered_event_time\`,
 
 Example, **hypothetical only**:
 
-\`\`\`text
+```text
 SLI: authorized investigations returning a reviewed, grounded result
      in <= 8 seconds / all eligible investigation requests
 SLO: 99.0% over a trailing 28-day window
 Error budget at 10,000 eligible requests: 100 unsuccessful requests
-\`\`\`
+```
 
 Specify *what counts as unsuccessful*: timeout, wrong/ungrounded answer, authorization leak, policy refusal, customer-cancelled task, and whether human review is included. Never combine security leaks into a tolerated normal error budget: make them release-blocking critical incidents. SLO 99% over 28 days is an **exercise assumption**, not a vendor standard.
 
@@ -2220,11 +2220,11 @@ Specify *what counts as unsuccessful*: timeout, wrong/ungrounded answer, authori
 
 ### 10.26.6 Q15 · Why optimize cost per successful task, not just token unit price?
 
-\`\`\`text
+```text
 attributed_cost = LLM + embedding + retrieval/SQL + tool calls
                   + retries + serving/infra + human review (if in scope)
 cost_per_approved_success = attributed_cost / approved_successful_tasks
-\`\`\`
+```
 
 Changing to a cheaper model can *increase* retries, lower answer quality and raise manual review cost. Attribution must use consistent cohort, data snapshot, workload and outcome definition. Track **success rate, latency, tokens/cost, refusal rate, human correction time**, and a comparable non-AI baseline. In high-risk workflows minimizing cost without respecting security/regression gates is not optimization.
 
