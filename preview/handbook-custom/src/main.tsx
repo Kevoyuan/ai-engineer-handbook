@@ -589,9 +589,9 @@ function App() {
             {page === "reader" && chapters[chapterIndex] ? (
               <div className="reader-top-identity">
                 <span className="reader-top-number">{chapters[chapterIndex].number}</span>
-                <h1 className="reader-top-title">
+                <span className="reader-top-title">
                   {en ? chapters[chapterIndex].en : chapters[chapterIndex].zh}
-                </h1>
+                </span>
                 {readingContext.sectionTitle && (
                   <span className="reader-top-section" title={readingContext.sectionTitle}>
                     <span aria-hidden="true">/</span> {readingContext.sectionTitle}
