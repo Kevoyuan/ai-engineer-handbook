@@ -80,6 +80,17 @@
   </div>
 </div>
 
+<div id="jev-dual-flow-slot" aria-label="Jev vs Generative LLM flow comparison">
+  <div class="jev-dfc-static-fallback">
+    <h3 class="sub"><span class="i18n-text" data-i18n-zh="FIG.6.C4 · 两条执行路径，对照阅读" data-i18n-en="FIG.6.C4 · Two execution paths side by side">FIG.6.C4 · 两条执行路径，对照阅读</span></h3>
+    <div class="bfs-grid bfs-g2">
+      <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">PATH A · GENERATIVE LLM</span></div><h3 class="bfs-card-title">User State → Prompt / Schema → Token Decode → JSON → Validate</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="先生成答案文本，后由应用还原决策。" data-i18n-en="Generate an answer string first; the application then recovers a decision.">先生成答案文本，后由应用还原决策。</span></div></div>
+      <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">PATH B · JEV</span></div><h3 class="bfs-card-title">User State → Typed Questions → Independent Judgments → Typed Values → Threshold</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="预先定义输出空间，直接返回可编程判断。" data-i18n-en="Predefine the output space and return decisions that software can use directly.">预先定义输出空间，直接返回可编程判断。</span></div></div>
+    </div>
+    <p class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="两条路径最后都经过 Runtime 的授权、策略和执行检查；只对互不依赖的判断讨论并行。" data-i18n-en="Both paths still pass runtime authorization, policy and execution checks; parallelism only applies to independent judgments.">两条路径最后都经过 Runtime 的授权、策略和执行检查；只对互不依赖的判断讨论并行。</span></p>
+  </div>
+</div>
+
 <h3 class="sub" id="jev-confidence-boundary"><span class="i18n-text" data-i18n-zh="Jev confidence 的含义" data-i18n-en="What Jev confidence means">Jev confidence 的含义</span></h3>
 <p><span class="i18n-text" data-i18n-zh="Choice confidence 是候选分布相对均匀分布的归一化集中度，并非正确率：confidence = (p_max − 1/n) / (1 − 1/n)。三个候选中 p_max = 0.6 时 confidence = 0.4。Score 还考虑等级距离，Noul 没有单独 confidence；概率校准仍需在本地留出集分片验证。" data-i18n-en="Choice confidence measures concentration relative to a uniform distribution, not correctness: confidence = (p_max − 1/n) / (1 − 1/n). With three options and p_max = 0.6, confidence = 0.4. Score also accounts for level distance; Noul has no separate confidence. Validate probability calibration on local held-out slices.">Choice confidence 是候选分布相对均匀分布的归一化集中度，并非正确率：confidence = (p_max − 1/n) / (1 − 1/n)。三个候选中 p_max = 0.6 时 confidence = 0.4。Score 还考虑等级距离，Noul 没有单独 confidence；概率校准仍需在本地留出集分片验证。</span></p>
 <h3 class="sub" id="decision-model-source-status"><span class="i18n-text" data-i18n-zh="产品状态与性能来源" data-i18n-en="Product status and performance sources">产品状态与性能来源</span></h3>
