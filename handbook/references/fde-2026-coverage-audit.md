@@ -197,6 +197,8 @@
 - **23 named owner-chapter items** were manually remapped to explicit heading evidence. A positive signal means **the concept now has a discoverable section**, not that it has passed rigorous model benchmarking or a hiring interview.
 - The runnable stdlib mini-lab includes positive and negative test cases. These cover narrow deterministic behavior but not customer deployment/real ML model performance.
 
+**Detailed first-party source and non-claim ledger:** [Stage 07 Q40–Q64 source provenance](./fde-2026-answers-07-provenance.md). Local example tests demonstrate only narrow deterministic correctness; no real cloud service was exercised.
+
 ## Stage 07 · Manual review of all previous 37 N entries
 
 **Interpretation:** Every previously N-marked topic now has an explicit term/approved synonym in its assigned canonical chapter heading, with reasoned content or an explicit pointer to existing coverage. **N=0 is a heading-location property, not “167 concepts complete”.** Some sections cover several concepts and are shorter than a dedicated tutorial; depth, correctness, hands-on proficiency and independent first-party validation require continued testing.
