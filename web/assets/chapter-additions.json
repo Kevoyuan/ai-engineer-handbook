@@ -101,6 +101,10 @@
     {
       "path": "/assets/ch09-fde-verified-evals.html",
       "id": "fde-verified-eval-harness"
+    },
+    {
+      "path": "/assets/ch09-context-cost-benchmark.html",
+      "id": "context-cost-benchmark"
     }
   ],
   "07-memory-context-engineering": [
@@ -111,6 +115,10 @@
     {
       "path": "/assets/ch07-enterprise-knowledge-context.html",
       "id": "enterprise-knowledge-context"
+    },
+    {
+      "path": "/assets/ch07-validated-context-optimization.html",
+      "id": "validated-context-optimization"
     }
   ],
   "10-serving-deployment-ai-platform": [
@@ -135,12 +143,22 @@
     {
       "path": "/assets/ch02-fde-verified-permission-rag.html",
       "id": "fde-verified-permission-rag"
+    },
+    {
+      "path": "/assets/ch02-enterprise-indexing-context.html",
+      "id": "enterprise-indexing-before-tokens"
     }
   ],
   "12-fde-customer-delivery": [
     {
       "path": "/assets/ch12-order-investigation-capstone.html",
       "id": "fde-order-investigation-capstone"
+    }
+  ],
+  "01-model-api-context-foundations": [
+    {
+      "path": "/assets/ch01-model-architecture-axes.html",
+      "id": "model-architecture-axes"
     }
   ]
 }
