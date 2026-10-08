@@ -126,8 +126,8 @@ Vercel deploys `web/site/` with `web/` as the configured project root.
 change
 → feature branch
 → pull request
-→ React preview build + structural audit + English audit
-→ Vercel Preview
+→ locally run React build + structural validation + English audit
+→ review published web/site artifact (+ Vercel Preview if available)
 → merge to main
 → Vercel production deployment
 → smoke-check the stable public URL
