@@ -133,6 +133,7 @@ The public FDEInterviews topic catalog is a **scope/index** only; the handbook d
 
 - [Q1–Q9 source and verification limits](references/fde-2026-verified-answer-ledger.md): CH02 access-aware retrieval, CH09 evals, CH10 idempotency/retries.
 - [Q10–Q23 source and verification limits](references/fde-2026-answers-02-04-provenance.md): CH10 production FDE system design (§10.26), CH11 Databricks/Data & SQL (§11.10).
+- [Q40–Q64 independently sourced topic-gap answers](references/fde-2026-answers-07-provenance.md): manual reconciliation of the previous 37 unlocated topics across CH01/02/03/06/07/10/11; H136/B31/N0 is **name-location evidence, not depth certification**.
 - [Q24–Q39 source and verification limits](references/fde-2026-answers-05-06-provenance.md): CH01 model/ML foundations, CH09 statistical evals, CH11 coding/data integrity, CH08 graph/tool tests.
 - [Runnable deterministic ML/coding mini-lab](../examples/fde-interview-engineering/): self-contained Python stdlib negative/positive tests.
 - [167 FDE topics → one canonical chapter each](references/fde-2026-concept-crosswalk.md).
