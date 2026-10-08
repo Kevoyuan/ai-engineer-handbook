@@ -638,7 +638,7 @@ function App() {
             >
               <SearchIcon />
               <span>{t("搜索图谱", "Search atlas")}</span>
-              <kbd>⌘ K</kbd>
+              <kbd>Ctrl / ⌘ K</kbd>
             </Button>
             {page === "reader" && (
               <div id="reader-top-actions" className="reader-top-actions" />
@@ -792,7 +792,7 @@ function App() {
                           )}
                         </span>
                       </button>
-                      <kbd>⌘ K</kbd>
+                      <kbd>Ctrl / ⌘ K</kbd>
                     </div>
                     <div className="popular">
                       <span>{t("快速定位", "Quick find")}</span>
