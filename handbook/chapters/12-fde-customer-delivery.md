@@ -370,9 +370,9 @@ The source curriculum lists **167 concepts in ten original FDE tracks**. The [si
 
 | Source-text audit grade | 2026-10-08 branch baseline | What it actually means |
 |---|---:|---|
-| H — owning chapter section heading | 99 | An explicit concept-specific name or reviewed alias occurs in a heading. **Not** a proof of deep coverage. |
+| H — owning chapter section heading | 136 | An explicit concept-specific name or reviewed alias occurs in a heading. **Not** a proof of deep coverage. |
 | B — owning chapter body | 31 | A concept name or reviewed alias is mentioned without a corresponding heading. Review for depth. |
-| N — no direct owner-chapter term signal | 37 | No reviewed English/alias term was found in that chapter. Could be a true content gap **or** Chinese/equivalent wording; manually check before calling it missing. |
+| N — no direct owner-chapter term signal | 0 | No reviewed English/alias term was found in that chapter. Could be a true content gap **or** Chinese/equivalent wording; manually check before calling it missing. |
 
 **This is a reproducible evidence-location scan, not a scored interview exam and not a verified 167-topic textbook.** Unlike a naive keyword-count completion chart, this audit does not label any concept “fully covered”. The next semantic audit should independently check whether each topic has:
 
@@ -391,8 +391,18 @@ The source curriculum lists **167 concepts in ten original FDE tracks**. The [si
 
 On the 2026-10-08 review branch, we added **independently researched Q24–Q39** across CH01/08/09/11, with an executable stdlib mini-lab. These cover ML optimization, leakage, calibrated prediction, rare-class metrics, synthetic evaluation, CSV input integrity, sliding windows, heap-based Top-K, DAG dependency validation and negative tool-authorization tests. See the [Q24–Q39 provenance ledger](../references/fde-2026-answers-05-06-provenance.md).
 
-**Audit updated:** 99 topic-heading signals, 31 body-mention signals, 37 no-direct-term signals out of 167. This is *not* a claim that 130 topics are completely taught. Some were already correctly explained using different terminology; the new sections add concrete counterexamples and first-party references, but no customer deployment or proprietary question-answer key was accessed.
+**Audit updated:** 136 heading signals, 31 body signals, zero remaining direct-name gaps out of 167. This is *not* a claim that 130 topics are completely taught. Some were already correctly explained using different terminology; the new sections add concrete counterexamples and first-party references, but no customer deployment or proprietary question-answer key was accessed.
 
 A strong FDE candidate still needs to solve an unseen problem under constraints: choose a safe data path, explain the failure mode, implement or sketch working code, and defend the metric and security boundary. A growing keyword index is not a substitute for those capabilities.
 
 The changes are retained on a **GitHub Draft PR only**. Do not infer Vercel publication from generated Reader content or a passing offline build.
+
+## 12.14 Stage 07: 37 previously unlocated concepts independently reviewed
+
+The 2026-10-08 branch previously had **37 N-class lexical/no-direct-title signals**. Manual owner-chapter review showed **four existing-but-mismatched naming cases** (Prompt Engineering, Tool/Function Calling, Context Window Management, Numerical Stability); the other 33 have now received domain-specific explanations and design/negative-test boundaries across CH01/02/03/06/07/10/11. Original technical questions **Q40–Q64** and first-party provenance are indexed in [the Stage-07 source ledger](../references/fde-2026-answers-07-provenance.md).
+
+The 167-row audit now reports **H136 / B31 / N0**, which means all 167 topic names or reviewed equivalent aliases are **locatable in their owning chapter**, not that every topic is complete, verified, production-implemented, or mastered. Several H rows share one topical heading and require their own future depth review. In particular, the Palantir Gotham content here is limited to grounded platform distinctions, not an exhaustive product entitlement audit.
+
+Verification assets: the [stdlib mini-lab](../../examples/fde-interview-engineering/) now adds negative tests for index/encoder version mismatch, ACL revocation, fair per-tenant token bucket and bitemporal feature training lookups. These tests simulate invariants; real identity verification, distributed concurrency, embedding quality, privacy compliance, EU legal interpretation and customer performance remain untested.
+
+**Release boundary:** Changes remain on Draft PR #70 only. Do not merge main, build web/site production assets or deploy/promote Vercel without explicit later user instructions.
