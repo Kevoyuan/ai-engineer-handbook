@@ -177,6 +177,10 @@
     {
       "path": "/assets/ch12-fde-coverage-audit.html",
       "id": "fde-coverage-audit-04"
+    },
+    {
+      "path": "/assets/ch12-fde-interview-readiness.html",
+      "id": "fde-readiness-audit-08"
     }
   ],
   "11-data-sql-engineering": [
