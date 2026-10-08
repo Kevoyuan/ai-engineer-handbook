@@ -92,6 +92,11 @@
 .architecture-overview .ae-outcome span {
   font-size: 0.75rem;
 }
+/* Outcome text remains neutral and readable against the semantic secondary surface. */
+.architecture-overview .ae-outcome > .ae-kicker,
+.architecture-overview .ae-outcome > span {
+  color: var(--foreground);
+}
 .architecture-overview .ae-outcome:after {
   height: 2.5rem;
   bottom: -2.5rem;
