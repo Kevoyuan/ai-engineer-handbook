@@ -3507,3 +3507,38 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .workspace.reader-workspace .topbar { transition: none; }
 }
+
+
+/* Reader keeps GitHub and the locale switch visible beside Search/Contents/More. */
+.reader-workspace .reader-direct-language,
+.reader-workspace .reader-direct-github {
+  flex: 0 0 auto;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+.reader-workspace .reader-direct-language {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
+  padding: 0 .5rem;
+  font-size: .75rem;
+}
+.reader-workspace .reader-direct-language > span { white-space: nowrap; }
+.reader-workspace .reader-direct-github {
+  width: 2.75rem;
+  padding: 0;
+}
+@media (max-width: 767px) {
+  .reader-workspace .reader-direct-language {
+    width: 2.75rem;
+    padding: 0;
+    gap: 0;
+  }
+  .reader-workspace .reader-direct-language > svg { display: none; }
+  .reader-top-identity .top-reading-percent { display: none; }
+  .reader-top-number { display: none; }
+  .reader-workspace .top-location { flex: 1 1 auto; min-width: 0; }
+  .reader-workspace .reader-top-title { max-width: 100%; }
+}
