@@ -1623,3 +1623,52 @@ observe_after_release:
 - [OpenAI: Evals API](https://platform.openai.com/docs/api-reference/evals) and [Graders](https://platform.openai.com/docs/api-reference/graders) — evaluation and grader primitives.
 
 **Cross-chapter:** CH02 owns retrieval/security candidate selection; CH04 owns refusal/evidence sufficiency; CH08 owns agent architecture; CH12 owns customer acceptance negotiation.
+
+
+## 9.24 Context Optimization Benchmark：压缩率、账单与任务成功必须分开测
+
+此节是 9.14 **Cost per Successful Task** 的评估补充，不重复 Context Compression 实现（CH07）或 Prefix Cache 实现（CH10）。
+
+**源文核验**：[AI Engineering 对 Headroom 的介绍 (2026-07-02)](https://aiengineering.beehiiv.com/p/reduce-ai-agent-token-costs-by-95) 引用工具输出压缩 60–95%；[Headroom 项目官方 README](https://github.com/headroomlabs-ai/headroom) 对代码 Agent、JSON 等负载使用不同口径；[Limitations](https://github.com/headroomlabs-ai/headroom/blob/main/wiki/LIMITATIONS.md) 说明 code / RAG context 可能直接透传。数值均不能无条件推广到端到端 API 账单。
+
+必须拆开四个指标：
+
+~~~text
+tool_output_reduction
+  = 1 - compressed_tool_output_tokens / original_tool_output_tokens
+
+billed_llm_cost
+  = uncached_input * price_input
+  + cached_input * price_cached
+  + output_tokens * price_output
+  + other_provider_charges
+
+end_to_end_task_cost
+  = billed_llm_cost + retrieval/indexing + tool/API + compute
+  + retry + human-review costs
+
+cost_per_successful_task
+  = sum(cost of all attempted tasks) / number of verified successes
+~~~
+
+**极端例子（示意，非文章实测）**：假设工具输出占全部未缓存输入的 40%，其中压缩 95%，其余输入、输出和价格不变，则整体输入 token 节省最多约 38%，并非 95%；如果任务为补漏多调两次工具，最终账单节省可能更少甚至倒退。Provider cache write/read 的实际定价和 eligibility 必须依当前合约计入。
+
+### 对照实验：必须保持问题、授权与成功标准一致
+
+1. 用固定的任务集覆盖：长 JSON、日志异常、代码调试、普通 RAG、跨源实体、多轮长期约束及高风险操作；记录原始来源版本/权限。
+2. 至少比较 Baseline、Index-first、Context-compression、Index+compression 四组；如果测 Prefix Cache，再固定/切换 prefix 布局，避免机制混杂。
+3. 对每个任务保存原始与压缩视图、可恢复指针、source coverage、trace、usage/cached token（若 provider 可提供）、调用次数、输出、延迟和结果裁判。
+4. 衡量 Accuracy / Task Success、required-evidence recall、constraint preservation、critical-error retention、ACL non-leakage、p50/p95 latency、TTFT、全成本及 cost/success。
+5. 采用相同任务和版本的 paired comparison，对长尾 slice 和失败任务单独分析；负样本和强制放大原件恢复路径同样要测。
+
+| 可以报告 | 不应推出 |
+|---|---|
+| JSON 工具输出在特定 fixture 中减少了 X% | 所有 Agent 成本都会减少 X% |
+| provider 计费输入 token 下降 | output / tool / infra / latency 必然下降 |
+| 某组任务 success 没有明显变化 | 已证明压缩不会损害关键约束或权限 |
+| 统一索引的 source coverage 上升 | 答案一定充分、完整或新鲜 |
+
+**发布门禁建议（Handbook 综合，非 Headroom 默认阈值）**：critical fact / identifier / error-line recall 不能回退；任一跨 tenant/ACL 泄漏、关键约束丢失、不可恢复原件均阻止发布。保留可审计的源数据，避免仅凭 LLM 对压缩摘要的主观评分认定“语义没丢”。
+
+交叉归属：CH02 的索引能优化候选证据、CH07 的压缩能缩短 Context、CH10 的 cache 能复用 prefill；评测需证明三个杠杆合用后 **Cost / Verified Success** 真正改善。
+
