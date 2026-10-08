@@ -58,6 +58,18 @@ Each of the five diagrams has an optional two-question practice panel. Installed
 Run `npm run test:learning` for scenario boundaries, correct/incorrect feedback, keyboard behavior, canonical content preservation and automated accessibility at 390, 1440 and 1728 in both locales and themes. Reports default to `/tmp/handbook-learning-audit`; `LEARNING_AUDIT_DIR` overrides that path. `LEARNING_CAPTURE_SCRIPT` supplies the Better Design spacing capture script. `npm run test:concepts` covers the node diagrams, including chapter 07. Chapter 06 now uses `node evidence/bento/check.cjs` for its terminal simulator.
 
 
+
+## Chapter 06 · Paired Jev / Generative LLM comparison
+
+The paired flows compare the same task from shared input to the shared Runtime authorization gate. Path A shows prompted structured generation, sequential token decoding, result parsing/validation, and decision recovery. Path B shows predefined typed questions, independent decision sampling in one query, typed values/probabilities, and software thresholding. It is an illustrative process comparison, not an independent latency or accuracy benchmark.
+
+The paired reader diagram remains visible without JavaScript through the registered fragment's static comparison. With the optional React player loaded, the replacement is a two-column, five-stage comparison. Playback starts only on explicit reader action and advances one stage every 2.8 seconds. Pause, replay, previous, next and direct stage selection use named 44px controls. The selected stage and connector change with finite 200ms visual feedback; illustrative sequential LLM tokens reveal one after another while independent Jev fields appear together. No unbounded animation runs.
+
+Playback stops at the final stage, on route unmount, when the document is hidden, or when the comparison leaves the viewport. Reduced-motion preference disables autoplay and spatial transitions but preserves all stages and manual step controls. Manual explanations are announced via a polite status region; automatic playback does not repeatedly announce intermediate stages. The two columns stack in reading panes narrower than 830px and must not cause page-level overflow at 390px. Bilingual reader state comes from the existing locale contract.
+
+The final gate is deterministic Runtime authorization, policy and host execution on both paths. Jev parallelism applies only to independent decisions over the same state, never to true upstream/downstream dependencies. The demo makes no external model calls, reports no measured speedup and does not turn model confidence into authorization.
+
+
 ## Generated content boundary
 
 Reader HTML and search payloads are generated presentation data. Internal authoring comments, separator markers, build notes, and other maintainer-only annotations are never user-facing content.
