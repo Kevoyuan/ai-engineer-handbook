@@ -196,6 +196,16 @@ The Atlas, Notebook, Concept, Architecture, Search, and all Reader chapters shar
 
 Across Atlas/Notebook/Concept routes, use a tighter vertical rhythm while preserving headings and the system spine's information hierarchy. Never compress interactive controls below 44px. Search's shortcut hint must describe both Ctrl+K and ⌘K since both are supported; screen layout must not imply a Mac-only binding.
 
+## Visualization V2 decision labs
+
+Chapter 10 and chapter 11 add optional, *static-first*, keyboard-operable decision diagrams beside canonical chapter material. CH10 compares token-compatible prefix reuse, early divergence and cache isolation; CH11 compares valid updates, duplicate deliveries, stale-version arrivals and unauthorized reads. Treat each scenario as a pedagogical model, not a production trace, cache-hit metric or database execution.
+
+The two diagrams use the existing paper/card/border, primary-green selection signal, monochrome metadata and restrained radius. Avoid newly invented role colors, invented latency or cost figures, decorative progress animation and generic four-box workflows. A selected scenario must alter the visible **decision and boundary state**, not simply its title. State is conveyed by explicit text and status marks in addition to color. Prefer controlled native buttons with `aria-pressed`, 44px targets, and `aria-live="polite"` for outcome changes; no automatic playback. Honor reduced motion.
+
+CH10's shared prefix tokens are only **eligible** to reuse subject to model/tokenizer/adapter identity, engine cache behavior, current cache availability and trust boundary. Different cache salt/namespace must not imply cross-tenant reuse. Never conflate Prefix KV with response or semantic caching. CH11 must show where duplicate effects are suppressed, stale versions blocked under a declared ordering contract, and read permissions enforced by the database rather than an LLM instruction.
+
+Both diagrams are lazy, inserted after stable canonical anchors (`#fig-10-1` and `#data-plane`), and share the Reader's `#concept-demo` direct-lab target. Canonical article HTML must remain readable if the optional chunk fails; neither lab may replace, edit or change its source meaning.
+
 ## Interactive concept diagrams
 
 Use interaction when it explains a decision, evidence relationship or feedback loop. Current examples are Query Routing (chapter 03), RAG evidence gates (04), progressive skill loading and authorization gates (06), governed memory retrieval (07) and bounded Agent loops (08). Place each teaching module beside the relevant original figure or after its owning section, retaining the full static diagram and article. A toolbar shortcut takes readers directly to the module.
