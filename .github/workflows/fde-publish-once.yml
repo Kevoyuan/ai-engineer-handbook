@@ -1,0 +1,62 @@
+name: One-time FDE chapter build and publish
+on:
+  push:
+    branches: [content/fde-curriculum-data-delivery-20261008]
+    paths:
+      - .github/workflows/fde-publish-once.yml
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Install content parser
+        run: python3 -m pip install beautifulsoup4
+      - name: Generate bilingual reader, search and production build
+        working-directory: preview/handbook-custom
+        run: |
+          npm install --no-audit --no-fund
+          npm run sync-content
+          npm run build
+          npm run publish:web
+      - name: Verify chapters, two-language sections and source-topic inventory
+        run: |
+          python3 - <<'PY'
+          import json, re
+          from pathlib import Path
+          from bs4 import BeautifulSoup
+          chapters=json.loads(Path('web/chapters.json').read_text())
+          assert len(chapters)==12, len(chapters)
+          mapping=Path('handbook/references/fde-2026-concept-crosswalk.md').read_text()
+          assert len(re.findall(r'^\| .* \| CH\d\d — ', mapping, re.M))==167, 'Source concept count != 167'
+          for directory in ('preview/handbook-custom/public/content','web/site/content'):
+              p=Path(directory)
+              search=json.loads((p/'search-index.json').read_text())
+              for chapter,num in (('11-data-sql-engineering',8),('12-fde-customer-delivery',10)):
+                  doc=json.loads((p/f'{chapter}.json').read_text())
+                  assert len(doc['sections'])>=num,(directory,chapter,len(doc['sections']))
+                  for language in ('zh','en'):
+                      assert len(BeautifulSoup(doc[language],'html.parser').get_text(' ',strip=True))>1600,(directory,chapter,language)
+                  assert all(s['id'] for s in doc['sections'])
+                  assert any(x.get('href','').startswith('#read/'+chapter+'/') for x in search),(directory,chapter,'search')
+                  print(directory,chapter,len(doc['sections']),'sections, bilingual search OK')
+              assert len(search)>100,(directory,len(search))
+          html=Path('web/site/index.html').read_text()
+          assert 'assets/' in html and ('script' in html), 'Missing publish bundle'
+          print('All chapter, catalog, search, published-bundle checks passed')
+          PY
+      - name: Commit generated content and production artifact
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add preview/handbook-custom/src/chapters.json preview/handbook-custom/src/search-index.json preview/handbook-custom/public/content preview/handbook-custom/evidence web/site
+          if ! git diff --cached --quiet; then
+            git commit -m "build: publish twelve-chapter bilingual FDE Atlas"
+            git push origin HEAD:content/fde-curriculum-data-delivery-20261008
+          fi
