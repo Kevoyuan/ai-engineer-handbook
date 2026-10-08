@@ -20,6 +20,11 @@ import {
 } from "@/components/ui/dialog";
 import { BookIcon, BookmarkIcon, ArrowRightIcon } from "@/components/icons";
 import chapters from "./chapters.json";
+import {
+  advanceScrollChrome,
+  makeScrollChromeState,
+  resetScrollChrome,
+} from "./reader-scroll-intent";
 const JevFlowComparison = lazy(() =>
   import("./jev-flow-comparison").then((module) => ({
     default: module.JevFlowComparison,
@@ -108,6 +113,7 @@ export function Reader({
   setFocus,
   onReadingContext,
   onChromeVisible,
+  chromeVisible,
   onToggleTheme,
   dark,
 }: {
@@ -119,14 +125,14 @@ export function Reader({
   setFocus: (value: boolean) => void;
   onReadingContext?: (value: ReadingContext) => void;
   onChromeVisible?: (visible: boolean) => void;
+  chromeVisible: boolean;
   onToggleTheme: () => void;
   dark: boolean;
 }) {
   const t = (zh: string, e: string) => (en ? e : zh);
   const chapter = chapters[index];
   const pane = useRef<HTMLDivElement>(null);
-  const lastDirectionPosition = useRef(0);
-  const scrollIntent = useRef(0);
+  const chromeMotion = useRef(makeScrollChromeState());
   const [moreOpen, setMoreOpen] = useState(false);
   const [topActionsTarget, setTopActionsTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -146,6 +152,18 @@ export function Reader({
       ? pane.current?.closest<HTMLElement>(".workspace")
       : pane.current;
   }
+  // The app shell can reveal chrome via keyboard focus or pointer entry.
+  // Synchronize that external change without reinstalling a scroll listener.
+  useEffect(() => {
+    if (chromeMotion.current.visible !== chromeVisible) {
+      resetScrollChrome(
+        chromeMotion.current,
+        scrollPane()?.scrollTop ?? 0,
+        chromeVisible,
+        performance.now(),
+      );
+    }
+  }, [chromeVisible]);
   const [data, setData] = useState<ChapterContent | null>(null),
     [diagramReady, setDiagramReady] = useState(false),
     [error, setError] = useState(false),
@@ -163,8 +181,7 @@ export function Reader({
     setError(false);
     setActive("");
     setProgress(0);
-    lastDirectionPosition.current = 0;
-    scrollIntent.current = 0;
+    resetScrollChrome(chromeMotion.current, 0, true, performance.now());
     onChromeVisible?.(true);
     fetch("/content/" + chapter.slug + ".json", { signal: controller.signal })
       .then((r) => {
@@ -190,9 +207,8 @@ export function Reader({
         target.getBoundingClientRect().top -
         scroller.getBoundingClientRect().top -
         (mobile ? 60 : 64);
-      // Programmatic jumps should not be mistaken for a swipe.
-      lastDirectionPosition.current = scroller.scrollTop;
-      scrollIntent.current = 0;
+      // Programmatic jumps are not a swipe; start new intent from this offset.
+      resetScrollChrome(chromeMotion.current, scroller.scrollTop, true, performance.now());
       onChromeVisible?.(true);
       setActive(id);
       target.setAttribute("tabindex", "-1");
@@ -232,10 +248,13 @@ export function Reader({
     if (!data || !pane.current) return;
     const el = scrollPane();
     if (!el) return;
-    // A viewport breakpoint or dialog change can switch the scroll owner.
-    // Treat its current offset as a fresh baseline, not a swipe.
-    lastDirectionPosition.current = el.scrollTop;
-    scrollIntent.current = 0;
+    // Viewport breakpoint/dialog changes can switch scroll owners.
+    resetScrollChrome(
+      chromeMotion.current,
+      el.scrollTop,
+      chromeMotion.current.visible,
+      performance.now(),
+    );
     const update = () => {
       let current = data.sections[0]?.id || "";
       for (const s of data.sections) {
@@ -256,29 +275,13 @@ export function Reader({
         Math.min(100, Math.round((el.scrollTop / maxScroll) * 100)),
       );
       setProgress((value) => (value === nextProgress ? value : nextProgress));
-      const position = Math.max(0, el.scrollTop);
-      const delta = position - lastDirectionPosition.current;
-      // Update the physical sample on *every* scroll event. Direction intent
-      // accumulates separately so subpixel jitter cannot reverse the chrome.
-      lastDirectionPosition.current = position;
-      if (position < 70 || moreOpen || tocOpen) {
-        scrollIntent.current = 0;
-        onChromeVisible?.(true);
-      } else if (Math.abs(delta) > 0.5) {
-        // A small reverse gesture cancels the previous travel before it can
-        // reopen a toolbar during momentum scrolling.
-        if (scrollIntent.current * delta < 0) scrollIntent.current = 0;
-        scrollIntent.current = Math.max(
-          -80, Math.min(80, scrollIntent.current + delta),
-        );
-        if (scrollIntent.current >= 32) {
-          onChromeVisible?.(false);
-          scrollIntent.current = 0;
-        } else if (scrollIntent.current <= -24) {
-          onChromeVisible?.(true);
-          scrollIntent.current = 0;
-        }
-      }
+      const nextVisible = advanceScrollChrome(
+        chromeMotion.current,
+        el.scrollTop,
+        performance.now(),
+        moreOpen || tocOpen,
+      );
+      if (nextVisible !== null) onChromeVisible?.(nextVisible);
     };
     el.addEventListener("scroll", update, { passive: true });
     update();
