@@ -1699,6 +1699,48 @@ Primary / first-party or original research sources:
 
 ---
 
+
+## 1.22 模型结构、训练目标与 Agent 系统架构：不要把八个标签当作并列模型类型
+
+阅读来源：[8 LLM Architectures clearly explained (2025-12-29)](https://aiengineering.beehiiv.com/p/8-llm-architectures-clearly-explained)。**来源事实**：文章列出 GPT、MoE、LRM、VLM、SLM、LAM、HLM、LCM 八个术语，强调可组合。**Handbook 修正**：这八项横跨不同分类轴，不构成互斥、穷尽或成熟度一致的模型架构分类。
+
+| 术语 | 应归属的维度 | 核心机制 / 工程含义 | 边界与风险 |
+|---|---|---|---|
+| GPT / decoder-only | 神经网络结构与自回归训练 | Causal self-attention；逐 token 生成 | GPT-style 不是所有生成模型的唯一形式；encoder–decoder 也可生成 |
+| MoE | 参数激活和计算结构 | Router 在部分层为 token 选择少数 expert FFN；总参数与激活参数分离 | 参数稀疏不自动等于端到端低延迟；通信、负载均衡、显存占用仍有成本 |
+| LRM / reasoning model | 训练目标和推理策略 | 为复杂任务配置 reasoning-oriented post-training / inference compute | 不是独立于 Transformer 的固定结构；不要求向用户展示内部推理 |
+| VLM | 输入与输出模态 | 视觉编码与语言模型融合，常见特征投影 / cross-attention / token fusion | 文档表格、坐标、OCR、视觉 grounding 能力需要独立评测 |
+| SLM | 模型规模、部署与效率约束 | 小模型配合蒸馏、量化、剪枝等策略 | 小模型不必采用特定 attention 结构；量化是独立优化维度 |
+| LAM / action-oriented model | 行动能力 / tool-use 训练及运行时契约 | 生成结构化操作，经工具执行器调用和反馈 | “LAM”非统一认可的基础模型架构；JSON/tool call 本身不会执行，也不提供授权 |
+| HLM / hierarchical control | Agent/Workflow 系统拓扑 | Planner → executor 等分层决策与委派 | 不一定意味着新的底层神经网络；计划、状态和权限由 Host 控制（详 CH08） |
+| LCM / Large Concept Model | 研究中的建模单位 | 在高于 token 的语义表示空间预测下一单元 | 不能定义成“基于知识图谱的概念推理”；Meta 的 LCM 实验在 SONAR 句子 embedding 空间自回归建模 |
+
+### 选择模型时先辨认“在改什么”
+
+~~~text
+Task contract
+  ├─ Input modality → text / image / audio / structured data?
+  ├─ Reliability depth → ordinary instruction / harder reasoning?
+  ├─ Compute constraints → dense vs sparse expert, large vs small, quantization?
+  ├─ Action needs → tool interface + authorization + deterministic executor?
+  └─ Long-horizon workflow → bounded planner, state, orchestration?
+            ↓
+Separate model choice from runtime architecture
+            ↓
+Run task-level quality, latency, cost, and policy eval
+~~~
+
+例如“**小型 MoE VLM**”并不矛盾：SLM 是规模取向，MoE 是内部计算结构，VLM 是模态。一个 reasoning-oriented VLM 也可能在层次化 Agent 系统里作为 planner 或感知模型运行；这些不是排他选项。
+
+**LCM 一手校正**：Meta AI 的 *Large Concept Models: Language Modeling in a Sentence Representation Space* (2024-12-11) 采用 SONAR 多语言句子表示作为概念代理，预测下一句子表示。它展示研究方向，而不是证明知识图谱推理已经替代 token-level LLM；模型与 graph-based enterprise indexing 应分开评价。
+
+**来源与验证边界**
+
+- [AI Engineering：8 LLM Architectures](https://aiengineering.beehiiv.com/p/8-llm-architectures-clearly-explained) — 二手分类提纲，不是标准 taxonomy。
+- [Meta AI：Large Concept Models](https://ai.meta.com/research/publications/large-concept-models-language-modeling-in-a-sentence-representation-space/) — 支持 LCM 实验的句子级 SONAR 定义，**不支持**将 LCM 等同知识图谱。
+- Cross-chapter：CH07 管 Context 分配；CH08 管 HLM 式工作流与工具权限；CH09 管任务级选型指标；CH10 管模型 serving。
+- **不能推断**某一标签天然更准确、更便宜或更安全。模型结构、训练能力和系统控制必须分别测试。
+
 ## Canonical rules
 
 > **Autoregressive generation predicts one next token at a time; Prefill and Decode have different performance characteristics.**

@@ -1,0 +1,18 @@
+<section id="context-cost-benchmark" aria-labelledby="context-cost-benchmark-title">
+<h2 class="sub" id="context-cost-benchmark-title"><span class="i18n-text" data-i18n-zh="Context 成本评估：95% 工具输出压缩不等于 95% 总成本下降" data-i18n-en="Context cost evaluation: 95% tool-output compression is not a 95% total cost reduction">Context 成本评估：95% 工具输出压缩不等于 95% 总成本下降</span> <small>§9.24</small></h2>
+<p class="lead"><span class="i18n-text" data-i18n-zh="区分压缩率、Provider 计费 Token、端到端任务成本和经验证的 Task Success；失败任务的成本也要进入分子。" data-i18n-en="Separate compression ratio, provider-billed tokens, end-to-end task cost, and verified task success. Include failed-task costs in the numerator.">区分压缩率、Provider 计费 Token、端到端任务成本和经验证的 Task Success；失败任务的成本也要进入分子。</span></p>
+<pre role="region" aria-label="Cost and compression formulas">Tool reduction = 1 - compressed_tool_tokens / raw_tool_tokens
+LLM bill = uncached_input * rate + cached_input * cached_rate
+         + output * output_rate + other charges
+Full task cost = LLM bill + tool/API + retrieval/index + review + retries
+Cost / success = cost of ALL task attempts / verified successful tasks</pre>
+<p><span class="i18n-text" data-i18n-zh="计算示例（不是厂商实测）：工具输出占输入 40%，仅该部分缩减 95%，则总输入最多缩减约 38%，仍未计入输出 Token 与其他账单。" data-i18n-en="Illustration (not vendor measurement): if tool outputs are 40% of input and that portion drops 95%, total input falls only about 38%, before output and other charges.">计算示例（不是厂商实测）：工具输出占输入 40%，仅该部分缩减 95%，则总输入最多缩减约 38%，仍未计入输出 Token 与其他账单。</span></p>
+<div class="tw"><table><thead><tr><th><span class="i18n-text" data-i18n-zh="对照组" data-i18n-en="Control arm">对照组</span></th><th><span class="i18n-text" data-i18n-zh="必需评估" data-i18n-en="Must evaluate">必需评估</span></th></tr></thead><tbody>
+<tr><td><span class="i18n-text" data-i18n-zh="基线" data-i18n-en="Baseline">基线</span></td><td><span class="i18n-text" data-i18n-zh="任务结果、延迟、成本、证据覆盖率" data-i18n-en="Task outcome, latency, cost and evidence coverage">任务结果、延迟、成本、证据覆盖率</span></td></tr>
+<tr><td><span class="i18n-text" data-i18n-zh="索引先行" data-i18n-en="Index-first">索引先行</span></td><td><span class="i18n-text" data-i18n-zh="必需来源召回、实体误合并" data-i18n-en="Required-source recall, false entity merges">必需来源召回、实体误合并</span></td></tr>
+<tr><td><span class="i18n-text" data-i18n-zh="仅压缩" data-i18n-en="Compress-only">仅压缩</span></td><td><span class="i18n-text" data-i18n-zh="约束、数字与关键异常保留" data-i18n-en="Constraint, number and critical error retention">约束、数字与关键异常保留</span></td></tr>
+<tr><td><span class="i18n-text" data-i18n-zh="索引 + 压缩" data-i18n-en="Index + Compression">索引 + 压缩</span></td><td><span class="i18n-text" data-i18n-zh="成功任务成本、质量与 ACL 无回退" data-i18n-en="Cost / verified success, quality and ACL non-regression">成功任务成本、质量与 ACL 无回退</span></td></tr>
+</tbody></table></div>
+<div class="co must"><span class="co-t"><span class="i18n-text" data-i18n-zh="发布门禁" data-i18n-en="Release gate">发布门禁</span></span><p><span class="i18n-text" data-i18n-zh="压缩率无法证明真实性：关键证据遗漏、越权、可恢复原件缺失以及长尾失败都必须挡住发布。" data-i18n-en="Compression ratio does not prove truth: critical missing evidence, authorization failures, missing recoverable originals and long-tail failures must block release.">压缩率无法证明真实性：关键证据遗漏、越权、可恢复原件缺失以及长尾失败都必须挡住发布。</span></p></div>
+<p><a href="https://aiengineering.beehiiv.com/p/reduce-ai-agent-token-costs-by-95">Article</a> · <a href="https://github.com/headroomlabs-ai/headroom/blob/main/wiki/LIMITATIONS.md">Official limitations</a></p>
+</section>

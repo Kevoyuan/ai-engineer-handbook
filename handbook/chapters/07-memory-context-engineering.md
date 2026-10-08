@@ -850,6 +850,99 @@ Sources:
 - https://okf.md/
 - https://okf.md/spec/
 
+
+## 7.12 Agent Context Optimization：检索前选择、工具输出压缩与可验证 Compaction
+
+这节扩展既有 7.4 Context Compression，不用新的 Memory 类型替代旧定义。**两类来源要分开**：
+
+1. [Reduce AI Agent Token Costs by 95% (2026-07-02)](https://aiengineering.beehiiv.com/p/reduce-ai-agent-token-costs-by-95) 介绍 Headroom 作为 Agent 与 LLM 之间的 Context Optimization Layer，包含 CacheAligner、ContentRouter 以及文章写作时的 IntelligentContext。
+2. [Your Token Problem Is an Indexing Problem (2026-08-07)](https://aiengineering.beehiiv.com/p/your-token-problem-is-an-indexing-problem) 的后半部分介绍 [Agentic Context Management (arXiv:2607.21503)](https://arxiv.org/abs/2607.21503)：以 architect / ingest / scope / anticipate / compact-and-consolidate 管理上下文生命周期，而不是把所有片段塞进可检索记忆库。
+
+### 三道优化闸门，不要混成一个“压缩算法”
+
+~~~text
+A. Evidence selection upstream       → CH02/03
+   Which authorized facts/sources must be retrieved?
+                   ↓
+B. Context packing and compaction    → CH07
+   Which retrieved spans, constraints and observations
+   must occupy this turn's context budget?
+                   ↓
+C. Provider prefill cache alignment  → CH01/10
+   Which exact token prefixes can be reused?
+                   ↓
+LLM decision → tool result → validated state update → next turn
+~~~
+
+A 决定“资料是否找到”；B 决定“找到后传多少且不丢条件”；C 决定“重复前缀计算能否复用”。C **不等于**降低传入的逻辑 token 数量或复用答案。
+
+### Headroom：按内容类型做有损压缩，保留原件恢复通道
+
+~~~text
+Tool outputs (JSON rows, logs, source code, prose)
+           ↓
+Guardrails: protected messages / active debugging context
+           ↓
+ContentRouter
+  ├─ structured arrays → sampling + anomalies + dedup
+  ├─ plain text        → content-dependent semantic compaction
+  └─ code              → AST-aware only when safe; often passthrough
+           ↓
+Small evidence view + pointer to original (CCR / retrieval)
+           ↓
+LLM may request original when summary is insufficient
+~~~
+
+**实现版本修正（2026-10-08 核对项目 README / LIMITATIONS）**：新闻稿提到的 IntelligentContext 已在上游项目后续版本退役；当前 README 明确将 CacheAligner → ContentRouter → compressors 作为流水线，并指出 CacheAligner 标记易变内容以保护精确 prefix，不应写成“自动修改任何 Prompt 就会提高 cache hit”。配置、压缩器与保护逻辑会随项目版本变化，部署时必须固定版本验证。
+
+[Headroom 官方限制文档](https://github.com/headroomlabs-ai/headroom/blob/main/wiki/LIMITATIONS.md) 给出的示例范围体现巨大类型差异：JSON 对象数组 86–100%、结构化日志 82–95%、纯文本文档约 43–46%，而某些代码及 RAG 文档上下文默认 passthrough；这些是**项目自报的分场景指标**，不是随机企业 Agent 的保证。该项目还保护近期代码和调试相关内容，以免删除正在排查的行与错误。
+
+### Agentic Context Management：为什么 Summarize Once 可能失败
+
+如果每一轮都将完整历史重新发送给按输入 token 计费的 API，且每轮平均新增约 m token，第 n 轮送入历史约为 O(nm)，累计历史输入为 O(mn²)。这是**特定重放机制**的复杂度：状态视图有界、prefix 缓存、截断和不同计价会改变真实账单，不能说“任何 Agent 成本都二次增长”。
+
+无验证地压成一段摘要也有损失约束和身份的风险。该论文报告一次 18,282 → 122 token 的压缩例子与后续准确率下降，并给出 LongMemEval 92% / LoCoMo 93.2% 的自身参考系统结果；**只作为该预印本的实验主张**，不作为标准 benchmark 或全行业压缩保证。其价值在于要求每次 Compaction 都给出可核验的结果。
+
+推荐的生产 Compaction Receipt：
+
+~~~yaml
+compaction:
+  source_event_range: [start_event_id, end_event_id]
+  input_context_hash: source_digest
+  compact_view_version: v3
+  preserved:
+    - active_goal
+    - confirmed_entities_with_source_ids
+    - nonnegotiable_constraints
+    - permission_and_scope_refs
+    - unresolved_questions
+    - critical_errors_and_tool_results
+  recoverable_sources: [event_log_pointer, artifact_pointer]
+  validation:
+    constraint_recall: pass
+    entity_and_number_checks: pass
+    source_pointer_integrity: pass
+    permission_scope_check: pass
+  on_failure: retry_with_more_context_or_reopen_raw
+~~~
+
+Receipt 是**本手册建议的实现契约**，并非文章或 Headroom 固定 API。原则是关键事实和 provenance 仍可从受控原文重建；摘要既不是授权来源，也不能覆盖最新的可信系统状态。
+
+### 上线验证与常见陷阱
+
+| 干预 | 预期收益 | 主要风险 | Eval |
+|---|---|---|---|
+| 先修 Index / Retrieval | 少召回噪声、更多有效证据 | missing source / false entity merge | required-evidence recall + authorized recall |
+| 压缩结构化工具输出 | 减少冗余数组和日志 | 丢 rare error、统计尾部、原始值 | anomaly/error recall + exact-field checks |
+| 压缩代码/诊断内容 | 控制长日志与重复文件 | 删关键行、堆栈、diff | replay debug/patch benchmark；默认保护 active code |
+| 滚动 Summary / Compaction | 约束长会话长度 | 约束、数字、决策链丢失 | long-horizon constraint / memory consistency |
+| Prefix Cache 对齐 | 复用相同前缀 prefill | 改写 prompt / 越租户共享 | exact-prefix hit / TTFT / tenant-isolation |
+
+**失败处理**：压缩置信不足或 source pointer 失效时，放大 context 或按权限重新取回原件；不能因为“压缩率漂亮”就跳过证据验证。
+
+**交叉归属**：CH02/03 管上游检索和 route；CH04 管证据充足性；CH09 管 cost-per-success 与受控 A/B；CH10 管 prefix KV cache、服务端隔离。**Token compression is not evidence selection, and neither is proof of task correctness.**
+
+
 ## Canonical rules
 
 > **The transcript is not the state.**
