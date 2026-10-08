@@ -156,3 +156,72 @@ source access change → ACL sync / index update / cache invalidation
 - [FDEInterviews concept inventory](https://www.fdeinterviews.com/concepts) — topic inspiration only.
 
 **Cross-chapter:** CH06 owns capability execution permissions; CH09 owns retrieval and leakage evals; CH10 owns trusted tenant identity and storage-level enforcement.
+
+
+## 2.8 Enterprise Indexing：优化 Token 从 Evidence Supply 开始
+
+**来源事实**：[Your Token Problem Is an Indexing Problem (2026-08-07)](https://aiengineering.beehiiv.com/p/your-token-problem-is-an-indexing-problem) 归纳了 Glean 的企业索引主张：跨系统覆盖（breadth）、保留结构/权限/活动信号（depth）、按资料类型组织的专用检索路径。其上游为 [Glean 官方说明 (2026-07-29)](https://www.glean.com/blog/enterprise-ai-indexing-context)。**注意：这是供应商提出的产品/架构主张，不是跨企业受控实验。**
+
+### 在 ingestion 做实体链接，但不要在 ingestion 固化不可更新的事实
+
+典型客服查询：同一客户的 CRM Account、Ticket、Call Note、Contract 分属四个系统。分别取 top-k 然后交给 LLM 解决身份、时间和权限冲突，会消耗上下文，也容易把同名客户误合并。
+
+~~~text
+Sources: CRM | Tickets | Docs | Code | Calendar
+                 ↓
+Connectors + CDC / refresh policy
+                 ↓
+Normalize identifiers, retain raw IDs + source pointers
+                 ↓
+Entity resolution (confidence, aliases, merge / unmerge provenance)
+                 ↓
+Field / ACL / tenant / time / lineage / activity index
+                 ↓
+Logical retrieval fabric
+  ├─ Exact / lexical: IDs, filenames, error codes
+  ├─ Dense / semantic: paraphrase, natural language
+  ├─ Structured query: CRM status, owner, amounts
+  ├─ Graph / relations: customer ↔ project ↔ incident
+  └─ Live federation: high-freshness or non-indexable data
+                 ↓
+Authorized candidates → rerank → sufficiency check
+                 ↓
+Compact evidence packet with citations → LLM
+~~~
+
+**设计修正：统一视图不要求“只有一个物理索引”。** 可以使用多个专用索引 + 统一身份映射、租户过滤、版本和协调层；反而把所有内容拍成一张向量表会丢失结构化语义。此处的 Graph/Entity Resolution 不等同于 GraphRAG 的社区摘要。
+
+最小 Evidence Record 应包含：
+
+~~~text
+source_system, source_record_id, entity_id, entity_link_confidence
+tenant_scope, acl_version / authorization_source
+field_name / relationship, source_updated_at, indexed_at
+document_version, provenance_url / raw_pointer, deletion_state
+retrieval_method, retrieval_score, evidence_span
+~~~
+
+执行时使用可信 Caller Identity 在候选生成或读取时强制授权；ACL 镜像可能滞后，敏感系统要在 fetch / action 边界重新核验有效权限。活动信号可以帮助排序，**不能代替事实正确性**；浏览量高的旧文档也可能是错的。
+
+### 为什么更好的 Index 可能省 Token
+
+~~~text
+Bad indexing → duplicate near-misses + identity reconciliation in prompt
+Good indexing → narrower, source-complete and permissioned evidence
+              → fewer irrelevant input tokens and re-retrieval turns
+~~~
+
+但“更好的索引必然更省 token”不成立：Recall/Sufficiency 可能要求补充证据，查询时的 live federation 也有计算/网络成本。尤其**未检索到并不等于不存在**；部分召回的答案可能被模型自信补齐，必须交给 CH04 的 Evidence Sufficiency / Abstention Gates 处理。
+
+### 生产验收：不要只看 Top-k 相似度
+
+| 维度 | 测量 | 不可跳过的坏例 |
+|---|---|---|
+| 跨系统覆盖 | authorized answer-evidence recall / required-source coverage | CRM 找到，合同例外条款漏掉 |
+| 实体解析 | precision / false-merge rate / unresolved rate | 同名客户跨 tenant 误连接 |
+| 时效和权限 | ingest lag / revocation-to-denial latency | 删除或撤权后依旧召回 |
+| Evidence Packet | citation correctness / sufficiency / input tokens | 相关但不充分的片段被拼成确定回答 |
+| 端到端 | task success / latency / cost per success | token 下降但错误决策上升 |
+
+**本手册综合**：先提高被授权的 Evidence Supply 质量，再调 Context Packing；二者是互补杠杆，不应互相替代。CH03 负责查询路由与 Retrieval Budget，CH04 负责 Evidence Sufficiency，CH07 负责压缩，CH09 负责端到端评估。
+
