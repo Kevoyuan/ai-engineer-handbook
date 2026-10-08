@@ -52,7 +52,7 @@ npm run dev -- --port 4180
 node evidence/surface-ui-audit.cjs
 ```
 
-The cross-surface audit covers Atlas, Notebook, Concept, system architecture and all ten Reader chapters: **14 routes × four viewport widths (390/768/1440/1728) × two paired language/theme states = 112 layout checks**, plus search/Notebook flows and representative WCAG checks. This is an explicit, runnable browser regression script; it is **not yet a required permanent CI gate**.
+The cross-surface audit covers Atlas, Notebook, Concept, system architecture and all ten Reader chapters: **14 routes × four viewport widths (390/768/1440/1728) × two paired language/theme states = 112 layout checks**, plus search/Notebook flows and representative WCAG checks. This is an explicit, runnable browser regression script; it is **a manual browser regression tool**, not an automatic GitHub Actions gate.
 
 For deeper behavior checks, run the relevant scripts:
 
