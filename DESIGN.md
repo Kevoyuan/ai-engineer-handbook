@@ -239,6 +239,14 @@ Role tokens are shared across both diagrams: `--diagram-evidence` (blue), `--dia
 The execution sequence uses numbered circles along a continuous line. Dependencies connect laterally on wide screens; compact layouts stack the execution core and dependency groups. The Agent flow preserves vertical connections when its three planes stack. All headings and prose use the handbook sans family; monospace is reserved for numerical step identifiers. Chapter links retain focus outlines and 44px mobile targets. No diagram navigation is fixed over the content.
 
 
+## Jev vs. Generative LLMs responsibility comparison
+
+Figure 6.C4 follows the **Before / After responsibility split** from the authored reference, not two mirrored five-step pipelines. The left column is a single generative model burdened with open-ended tasks and bounded decisions; the right column separates Generative Model (coding, research, planning, open generation), Jev (bounded routing, risk, progress and completion decisions with typed probabilities), and Runtime (permissions, budgets, allowlists and execution / block / retry). This is an architectural role comparison, not a model latency benchmark.
+
+The visible composition is a neutral gray Before panel and lightly mint-tinted After panel. The Before side has one dark Single LLM anchor amid compact task pills. The After side has three vertically grouped responsibility cards, with a distinctive dark Jev marker and quiet green hierarchy. Each side ends with one concise verdict band. Treat these relationships and relative grouping as part of the figure's information design; do not replace them with repeated generic process cards.
+
+Optional interaction is limited to selecting the three After roles to inspect their responsibility boundaries. Each is a real keyboard-operable button with a visible selected state; no automatic animation or invented telemetry. Keep an aligned two-column layout when the reading width permits and stack columns on narrow screens. Preserve a meaningful accessible static fallback when the interactive chunk cannot load.
+
 ## Skills terminal simulator
 
 The requested bento terminal style owns chapter 06's teaching simulator only. Its charcoal, black terminal, terracotta action, mono metadata and asymmetric 1:2 panes follow the supplied visual reference; the reader retains Interior components and Iconoir icons. `skill-simulator.tsx` is the single editable React source, including scoped styling. Installed Button, Tabs, onboarding underline indicator and Collapsible/RadioGroup practice primitives own controls and keyboard behavior. The 5-stage rail describes a running teaching workflow, not a dashboard overview.
