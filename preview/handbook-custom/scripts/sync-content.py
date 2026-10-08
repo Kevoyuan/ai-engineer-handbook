@@ -3,7 +3,16 @@ from pathlib import Path
 from bs4 import BeautifulSoup, Comment
 import json,re,shutil
 root=Path(__file__).resolve().parents[3]; project=Path(__file__).resolve().parents[1]; web=root/'web'
-chapters=json.loads((web/'chapters.json').read_text()); additions=json.loads((web/'assets/chapter-additions.json').read_text()); residual=json.loads((web/'assets/i18n-residuals.json').read_text()); search=[]; report=[]
+chapters=json.loads((web/'chapters.json').read_text())
+# Canonical chapter identity and titles belong to web/chapters.json.
+# Atlas presentation details have a separate authored registry, because src/chapters.json is generated.
+metadata=json.loads((project/'src/atlas-metadata.json').read_text())
+meta_by_slug={item['slug']:item for item in metadata}
+if len(meta_by_slug)!=len(metadata) or {c['slug'] for c in chapters}!=set(meta_by_slug):
+ raise RuntimeError('Atlas metadata registry must match every canonical chapter slug exactly once')
+chapters=[{**chapter, **{k:v for k,v in meta_by_slug[chapter['slug']].items() if k!='slug'}} for chapter in chapters]
+additions=json.loads((web/'assets/chapter-additions.json').read_text())
+residual=json.loads((web/'assets/i18n-residuals.json').read_text()); search=[]; report=[]
 def english(soup):
  for el in soup.select('[data-i18n-en]'): el.clear();el.append(el['data-i18n-en'])
  for text in list(soup.find_all(string=True)):
