@@ -7,9 +7,9 @@
   },
   {
     "slug": "02-enterprise-retrieval",
-    "sections": 9,
-    "supplements": 0,
-    "characters": 1670
+    "sections": 2,
+    "supplements": 1,
+    "characters": 2781
   },
   {
     "slug": "03-hybrid-retrieval-query-routing",
@@ -49,15 +49,15 @@
   },
   {
     "slug": "09-reliability-evaluation-observability",
-    "sections": 28,
-    "supplements": 8,
-    "characters": 36522
+    "sections": 29,
+    "supplements": 9,
+    "characters": 38044
   },
   {
     "slug": "10-serving-deployment-ai-platform",
-    "sections": 11,
-    "supplements": 3,
-    "characters": 10150
+    "sections": 12,
+    "supplements": 4,
+    "characters": 11072
   },
   {
     "slug": "11-data-sql-engineering",
