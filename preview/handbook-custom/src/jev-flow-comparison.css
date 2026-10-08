@@ -70,7 +70,7 @@
 .jev-dfc-control-plane strong { display: block; padding: 13px 10px; border: 1px solid var(--jev-line); border-radius: 6px; background: var(--jev-back); font: 700 12px/1.5 "Geist Mono Variable",monospace; }
 .jev-dfc-control-plane p { margin: 9px 0 0; font-size: 11px; line-height: 1.6; color: var(--jev-muted); }
 .jev-dfc-caption { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--jev-line); color: var(--jev-muted); font-size: 11px; line-height: 1.6; }
-#jev-dual-flow-slot .jev-dfc-static-fallback { display: none; }
+#jev-dual-flow-slot:has(.jev-dfc-root) .jev-dfc-static-fallback { display: none; }
 @media (max-width: 830px) {
   .jev-dfc-heading { flex-direction: column; align-items: stretch; }
   .jev-dfc-controls { width: 100%; }
