@@ -2059,3 +2059,65 @@ Codex 当前 Linux 源码使用 bubblewrap + seccomp；Cloud 默认禁网指 age
 补充一手资料（仅支持对应概念/实现，不证明整章方案普遍最优）：
 
 - [Codex Cloud internet phases](https://developers.openai.com/codex/cloud/internet-access)
+
+
+## 10.25 FDE verified answers · Retries, Idempotency and Load Shedding
+
+> **Provenance (2026-10-08):** Independently authored interview questions Q8–Q9 inspired by the publicly listed FDE production design topics. No paid question solution has been accessed. AWS Well-Architected and Stripe API documentation confirm platform-specific retry/idempotency behavior; engineering guidelines here are synthesis.
+
+### Q8 · A payment/CRM tool times out after an Agent calls it. Can the Agent safely retry?
+
+**Short answer:** A timeout means *the caller does not know whether the side effect committed*. It does not prove the first request failed. Record a stable **business-operation idempotency key**, retry only through a tool endpoint with a documented idempotent contract, and reconcile ambiguous outcomes rather than blindly issuing the operation again.
+
+```text
+Agent proposes create_invoice(order=123)
+ → trusted host assigns operation_id=invoice:tenantA:order123
+ → authorize + validate + durably record intent
+ → call tool with stable idempotency key
+ → network timeout (result unknown)
+ → query operation status OR retry same operation ID
+ → observe same receipt / reconcile
+ → commit one business effect, log trace
+```
+
+**Important vendor boundary:** Stripe's API reference states that its idempotency mechanism replays the first recorded response body and status for a key (including a `500`), checks parameter mismatches, and allows pruning keys once they are at least 24 hours old. Those details are **Stripe-specific**. Do not assume every CRM/queue/payment connector supports the same key retention or result semantics. A replayed `500` is not evidence that the user should create a fresh key automatically.
+
+| Situation | Host action | Why |
+|---|---|---|
+| Safe read / transient 503 | bounded retry with backoff | repeatable read; check freshness |
+| Write supports idempotency key | retry same key/parameters under deadline | avoids duplicate business effect |
+| Write has no idempotent contract | query/reconcile/compensate, possibly human review | unknown commit status |
+| Permission denied / invalid request | no retry | not transient; policy must hold |
+
+Metrics: duplicate-effect rate, idempotency conflict rate, unknown-outcome reconciliations, retry attempts per logical operation, and p95 successful-task latency.
+
+### Q9 · Why do exponential retries still melt a service under load?
+
+Every failed call still consumes capacity. If three layers each retry up to three times, the theoretical downstream attempts for one logical operation can compound to `3 × 3 × 3 = 27` (**illustrative maximum**, not an AWS measurement). Synchronized exponential delays without random jitter can produce periodic retry spikes. A robust host selects a **single retry-owning layer** where possible, caps both attempts and elapsed time, randomizes delay, and sheds load when overloaded.
+
+```text
+deadline budget + service retry policy
+        ↓
+classify retryable error / idempotency
+        ↓
+retry budget available?
+  no → fallback / queue with bound / fail visibly
+ yes → capped exponential backoff + jitter
+        ↓
+circuit breaker / concurrency limit
+        ↓
+call, trace attempts and final outcome
+```
+
+**Circuit breaker** prevents repeated calls to known-failing dependencies. **Backpressure** propagates capacity limits; **load shedding** rejects or degrades requests instead of growing an unbounded queue. Apply bounded retries to *safe/idempotent operations*, not to unknown side effects.
+
+Watch request amplification, queue age/depth, retry fraction, concurrency saturation, service 429/503 rates, p95/p99 latency, timeouts and cost per successful task. If saturation is already the dominant fault, **more retries can lower success**.
+
+**Primary sources:**
+
+- [AWS Well-Architected: Control and limit retry calls](https://docs.aws.amazon.com/wellarchitected/2023-04-10/framework/rel_mitigate_interaction_failure_limit_retries.html) — limit retry count/time; avoid stacked retries; favor jitter; verify idempotency.
+- [AWS Builders' Library: Timeouts, retries and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/) — production retry-load architecture.
+- [Stripe API: Idempotent requests](https://docs.stripe.com/api/idempotent_requests) — first-result semantics and parameter/key restrictions.
+- [FDEInterviews Concepts](https://www.fdeinterviews.com/concepts) — thematic source only.
+
+**Cross-chapter:** CH08 owns action selection and agent control loop; CH11 owns event-sink idempotency/CDC; CH12 owns customer-specific reliability SLO and incident agreement.
