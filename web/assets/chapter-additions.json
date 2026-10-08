@@ -97,6 +97,10 @@
     {
       "path": "/assets/ch09-guardrail-behavior-observability.html",
       "id": "guardrail-behavior-observability"
+    },
+    {
+      "path": "/assets/ch09-fde-verified-evals.html",
+      "id": "fde-verified-eval-harness"
     }
   ],
   "07-memory-context-engineering": [
@@ -121,6 +125,16 @@
     {
       "path": "/assets/ch10-agent-runtime-control-plane.html",
       "id": "agent-runtime-control-plane"
+    },
+    {
+      "path": "/assets/ch10-fde-verified-retries.html",
+      "id": "fde-verified-retry-idempotency"
+    }
+  ],
+  "02-enterprise-retrieval": [
+    {
+      "path": "/assets/ch02-fde-verified-permission-rag.html",
+      "id": "fde-verified-permission-rag"
     }
   ]
 }
