@@ -1,9 +1,9 @@
 [
   {
     "slug": "01-model-api-context-foundations",
-    "sections": 13,
-    "supplements": 0,
-    "characters": 6478
+    "sections": 14,
+    "supplements": 1,
+    "characters": 7622
   },
   {
     "slug": "02-enterprise-retrieval",
@@ -43,15 +43,15 @@
   },
   {
     "slug": "08-agent-orchestration",
-    "sections": 14,
-    "supplements": 9,
-    "characters": 27632
+    "sections": 15,
+    "supplements": 10,
+    "characters": 28207
   },
   {
     "slug": "09-reliability-evaluation-observability",
-    "sections": 29,
-    "supplements": 9,
-    "characters": 38044
+    "sections": 30,
+    "supplements": 10,
+    "characters": 38851
   },
   {
     "slug": "10-serving-deployment-ai-platform",
@@ -61,9 +61,9 @@
   },
   {
     "slug": "11-data-sql-engineering",
-    "sections": 9,
-    "supplements": 1,
-    "characters": 4397
+    "sections": 10,
+    "supplements": 2,
+    "characters": 5249
   },
   {
     "slug": "12-fde-customer-delivery",
