@@ -1529,3 +1529,97 @@ Seed 不保证确定性；A/B 需要随机分流而非仅按版本分组。TTFT 
 - [Judge bias](https://arxiv.org/abs/2306.05685)
 - [LangSmith cost tracking](https://docs.langchain.com/langsmith/cost-tracking)
 - [OpenTelemetry GenAI](https://opentelemetry.io/blog/2026/genai-observability/)
+
+
+## 9.23 FDE verified answers · Eval Harness, Agent Trajectory and Release Gates
+
+> **Provenance (2026-10-08):** These are original, independently researched interview answers to topics and selected *publicly visible* question titles from FDEInterviews. They do **not** reproduce nonpublic membership solutions. General architecture is handbook synthesis; vendor behaviors are labeled and linked to their first-party documentation.
+
+### Q4 · How would you evaluate a RAG system before letting a customer launch it?
+
+**Answer in an interview:** I would separate the test into **retrieval**, **generation**, **access-control**, and **operational** gates. Define a golden sample of real customer intents with document IDs, evidence spans and expected/acceptable answers. Measure whether the necessary authorized passages were retrieved; then grade whether the answer is supported by those passages and actually resolves the user question. A system can retrieve correctly and still hallucinate; it can generate a plausible answer from insufficient evidence. I would block launch on critical permission or safety failure rather than average quality.
+
+| Layer | Typical signals | What a failure tells me |
+|---|---|---|
+| Retrieval | authorized evidence recall@k, MRR/nDCG, freshness | retrieval/filter/index/chunking issue |
+| Generation | claim faithfulness, relevance, abstention correctness | grounding or answer construction issue |
+| Security | tenant isolation, access revocation, tool scope | release-blocking authorization defect |
+| Operations | p95 E2E latency, timeout, cost/success, rollback | service reliability or economics defect |
+
+**Caveat:** recall@k bounds success for answers that genuinely require retrieved evidence; it is **not a universal ceiling** on every generated answer, since other sources or prior knowledge may produce answers with no retrieved passage (potentially violating the product evidence contract). Evaluate under a declared evidence-required protocol.
+
+```text
+golden {query, user/tenant, authorized evidence IDs,
+        acceptable answer rubric, expected refusal}
+     → retrieve → measure authorized evidence recall
+     → generate → score faithfulness / relevance / refusal
+     → negative security + load + latency probes
+     → release decision based on critical slices + business value
+```
+
+### Q5 · Where does a golden dataset come from, and how can it lie?
+
+**Answer:** Sample from consented, representative real tasks; stratify by tenant, locale, query class, risk, source type and permission shape. Human experts adjudicate reference evidence and acceptable behavior. Maintain three distinct pools: a **training/development pool** for tuning, a **sealed holdout** for independent acceptance, and a **targeted stress/regression suite** for rare dangerous failures. Keep dataset versions and sampling weights. Refresh for drift but preserve an unchanged bridge sample to measure longitudinal change.
+
+The original FDEInterviews public golden-dataset page emphasizes representative usage, tuning holdout, versioning/refresh and CI gating. **Extra handbook distinction:** if the same fixed holdout is inspected after every failed PR and repeatedly tuned against, it becomes a de facto development set despite a “golden” label. Use fresh independent acceptance cases and freeze decision rules before examining results.
+
+**Common failure:** 95% pass in an easy pilot, 70% in production. Investigate sample selection, source drift, tenant mix, OCR quality, permission failures, index freshness, model/prompt versions and observability gaps before blaming model “intelligence.” The two percentages alone are insufficient for causal attribution.
+
+### Q6 · Why is final-answer accuracy insufficient for an Agent?
+
+An agent may return the correct answer **after** calling a destructive tool, accessing unauthorized data, retrying 30 times, or spending 100× the expected budget. Score observable trajectory and final outcome separately.
+
+```text
+Agent task
+ → [tool name, argument shape, authorization decision]
+ → [tool response, state transition, retry count]
+ → [artifact validation, output]
+ → outcome + trace-scoped risk and resource checks
+```
+
+| Grader | Good for | Not good enough alone |
+|---|---|---|
+| Deterministic code / policy | disallowed tool, schema violation, wrong tenant, budget overrun | semantic quality |
+| Reference trajectory checks | required approvals, workflow milestones, forbidden paths | cases with multiple equally valid paths |
+| Rubric LLM judge | semantic sufficiency, contextual relevance | security guarantee or calibrated truth |
+| Human adjudication | ambiguous high-impact failures | scaling to every event |
+
+Do **not** require every successful agent to call exactly the same tools in the same order unless that order is contractually necessary; score invariants and allowable paths. Do not treat the model's hidden reasoning as an auditable execution trace.
+
+**Evidence:** LangSmith documents offline regression/unit comparisons, online trace evaluation and deterministic/LLM evaluators, including expected tool-call checks for ReAct-like agents. That documentation supports evaluating trajectories, not a claim that any particular judge automatically proves safety.
+
+### Q7 · How would you implement CI gates without overfitting or false confidence?
+
+1. Lock input and version IDs: source snapshot, golden-set version, code, prompt, model, retriever and evaluator.
+2. Execute deterministic unit/policy checks and a stratified offline experiment against a stored baseline.
+3. Test critical slices individually (cross-tenant, “should refuse,” long PDFs, scanned tables, missing evidence) and reject any critical unauthorized action **independent of aggregate score**.
+4. Calibrate judge/rubric behavior against human labels; inspect disagreements, score variance and grader changes. If the judge changes, historical scores are not directly comparable without bridge evaluation.
+5. Enforce non-degradation tolerances/uncertainty appropriate to sample size; freeze the gating logic, and release through staged shadow/canary with rollback and online monitoring.
+6. Feed verified production failures into a *development regression pool* without contaminating the sealed acceptance set.
+
+**CI policy (illustrative, no invented vendor default thresholds):**
+
+```yaml
+block_release_if:
+  - any_unauthorized_tool_or_document_exposure
+  - any_critical_schema_or_policy_violation
+  - failure_on_mandatory_high_risk_regression
+  - unacceptable_drop_vs_frozen_baseline_on_key_slices
+observe_after_release:
+  - p95_latency_and_cost_per_successful_task
+  - abstention_and_user_correction_rates
+  - drift_and_customer_incident_regressions
+```
+
+**Evidence boundary:** Google Cloud's RAG evaluation guidance recommends well-curated reference questions, stakeholder involvement and repeatable metrics; LangSmith distinguishes offline benchmarking/regression from online quality monitoring. **The exact gate thresholds and CI policy above are handbook design recommendations**, not platform defaults or a universally validated numeric benchmark.
+
+**Primary sources:**
+
+- [FDEInterviews Golden Datasets (public)](https://www.fdeinterviews.com/concepts/golden-dataset) — topic framing, three rules and CI.
+- [FDEInterviews Evaluating RAG (public overview)](https://www.fdeinterviews.com/concepts/rag-evaluation) — layered evaluation and public question titles.
+- [Google Cloud: RAG evaluation practices](https://cloud.google.com/blog/products/ai-machine-learning/optimizing-rag-retrieval) — reference sets and evaluation discipline.
+- [LangSmith: Evaluation types](https://docs.langchain.com/langsmith/evaluation-types) — offline, online, code and model-based evaluation.
+- [LangSmith: Online model judges](https://docs.langchain.com/langsmith/online-evaluations-llm-as-judge) — sampled evaluator configurations.
+- [OpenAI: Evals API](https://platform.openai.com/docs/api-reference/evals) and [Graders](https://platform.openai.com/docs/api-reference/graders) — evaluation and grader primitives.
+
+**Cross-chapter:** CH02 owns retrieval/security candidate selection; CH04 owns refusal/evidence sufficiency; CH08 owns agent architecture; CH12 owns customer acceptance negotiation.
