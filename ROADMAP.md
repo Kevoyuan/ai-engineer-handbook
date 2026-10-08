@@ -58,7 +58,7 @@
 - [x] Add source-grounded Concept routes that connect canonical sections across chapters
 - [x] Add concept-first deterministic local search ranking and bilingual match-aware snippets
 - [x] Add Reader current-section trace, reading progress, and always-reachable Focus exit
-- [x] Prevent the Reader topbar from duplicating the full chapter title already shown in the page heading
+- [x] Keep the full visible chapter identity in the compact auto-hiding topbar, with a screen-reader-only article h1 and no duplicated visible chapter cover
 - [x] Strip internal HTML comments before locale transforms and reject leaked `===== CHn =====` markers
 - [ ] Extend Notebook from chapter-level saves to section/concept-level saves
 - [ ] Expand Concept coverage and relationship visualization without creating a second semantic source
