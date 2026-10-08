@@ -1,7 +1,7 @@
 ---
 name: AI Engineering Atlas
 description: An engineering knowledge atlas for exploring systems, learning deeply, and returning to evidence
-last_updated: "2026-10-07"
+last_updated: "2026-10-08"
 status: "active"
 colors:
   primary: "#2f6850"
@@ -188,6 +188,8 @@ Code keys, strings and numbers use theme-specific syntax tokens from `preview/ha
 
 The Atlas, Notebook, Concept, Architecture, Search, and all Reader chapters share one UI quality floor: content-first hierarchy, real semantic grouping, no accidental page-level horizontal overflow, and a 44px minimum touch target on actions. Review representative widths at 390, 768, 1440 and 1728px in both languages and themes; use actual browser geometry and keyboard/accessibility tests rather than CSS guesses.
 
+**Source reference fidelity comes first.** When reproducing an authored figure, keep its group hierarchy, comparison/branch/state topology, arrow semantics, and critical qualifications. A screenshot is evidence for meaning as well as appearance; do not translate a Before/After responsibility split into an arbitrary five-stage animation. The static version must remain legible and informative when reduced motion disables playback.
+
 **Vertical space is a budget.** Avoid fixed minimum heights on short explanations, unanswered practice feedback, and loaded-file preview panes. Concept node flows should remain visually connected but compact, with legible labels and visible directional arrows; mobile diagrams stack without oversized inter-node gutters. Do not change topology, source meaning, or make all different diagrams into generic cards.
 
 **Archify overview is a preview, not a second full-page diagram.** Keep a height-bounded thumbnail and one clearly labeled Open map action. The full diagram remains accessible through the viewer, including zoom and export. Do not duplicate the same destination through redundant clickable thumbnail and button.
@@ -200,7 +202,7 @@ Use interaction when it explains a decision, evidence relationship or feedback l
 
 Skill examples expose summary, instruction and reference layers through installed Tabs. Label loaded and unloaded states explicitly; inspection must not load a layer. Failed input or permission gates keep full instructions unloaded and tool execution blocked. These are illustrative sequences, not a universal runtime contract. Memory examples distinguish preferences, superseded facts and historical permission records; memory never grants authorization.
 
-Each diagram includes an optional two-question practice panel, using installed Collapsible and RadioGroup components. Give explanations for correct and incorrect answers, clear stale feedback on answer changes, and focus the next question after advancing. Do not save answers. Keep option rows at least 48px high, action buttons at least 44px high, and reserve feedback space to limit layout jumps. Explicitly register these component sources with Tailwind's scoped source list.
+Each diagram includes an optional two-question practice panel, using installed Collapsible and RadioGroup components. Give explanations for correct and incorrect answers, clear stale feedback on answer changes, and focus the next question after advancing. Do not save answers. Keep option rows at least 48px high and action buttons at least 44px high. Let unanswered feedback stay compact instead of reserving a tall blank box; preserve readable explanatory feedback when it appears and keep focus/scroll stable. Explicitly register these component sources with Tailwind's scoped source list.
 
 Each module has one labelled example selector, a connected node diagram, one current explanation, playback controls and a concise takeaway. Label examples as illustrative; do not imply real tool execution or invent confidence scores, benchmark results or business policies. Preserve authorization, version, failure and stopping boundaries even in simplified diagrams.
 
