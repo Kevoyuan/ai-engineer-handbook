@@ -279,36 +279,6 @@
 
 
 /* Connectors express responsibility routing, not decoration or a fixed three-call pipeline. */
-.jev-dfc-flow-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 9px 13px;
-  margin-top: 15px;
-}
-.jev-dfc-play {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 9px 14px;
-  border: 1px solid var(--jev-green-line);
-  border-radius: 8px;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font: 680 12px/1.35 "Geist Variable", sans-serif;
-  cursor: pointer;
-}
-.jev-dfc-play > span { font-size: 10px; }
-.jev-dfc-play:hover:not(:disabled) { filter: brightness(.95); }
-.jev-dfc-play:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
-.jev-dfc-play:disabled { opacity: .55; cursor: not-allowed; }
-.jev-dfc-flow-controls > span {
-  font: 500 11px/1.5 "Geist Mono Variable", monospace;
-  color: var(--jev-muted);
-}
 .jev-dfc-before-visual { gap: 8px; }
 .jev-dfc-before-link {
   display: flex;
@@ -373,60 +343,19 @@
 .jev-dfc-role--runtime {
   transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
-/* A finite 3.8-second, explicitly triggered trace. CSS does the animation;
-   React only toggles the run and stops it, never updates state per frame. */
-.jev-dfc-root.is-playing .jev-dfc-before-link--down .jev-dfc-arrow-track::before {
-  animation: jev-dfc-flight 650ms 150ms ease-in-out both;
+/* Selected roles emphasize their associated connector without playback or timing. */
+.jev-dfc-root.is-inspecting-decision .jev-dfc-handoff--decision .jev-dfc-arrow-track,
+.jev-dfc-root.is-inspecting-runtime .jev-dfc-handoff--runtime .jev-dfc-arrow-track {
+  background: var(--jev-green);
+  width: 3px;
 }
-.jev-dfc-root.is-playing .jev-dfc-before-link--up .jev-dfc-arrow-track::before {
-  animation: jev-dfc-flight 650ms 380ms ease-in-out both;
-}
-.jev-dfc-root.is-playing .jev-dfc-single-model {
-  animation: jev-dfc-node-pulse 660ms 620ms ease-out both;
-}
-.jev-dfc-root.is-playing .jev-dfc-role--generation {
-  animation: jev-dfc-role-pulse 700ms 1050ms ease-out both;
-}
-.jev-dfc-root.is-playing .jev-dfc-handoff--decision .jev-dfc-arrow-track::before {
-  animation: jev-dfc-flight 720ms 1510ms ease-in-out both;
-}
-.jev-dfc-root.is-playing .jev-dfc-role--decision {
-  animation: jev-dfc-role-pulse 700ms 1990ms ease-out both;
-}
-.jev-dfc-root.is-playing .jev-dfc-handoff--runtime .jev-dfc-arrow-track::before {
-  animation: jev-dfc-flight 720ms 2460ms ease-in-out both;
-}
-.jev-dfc-root.is-playing .jev-dfc-role--runtime {
-  animation: jev-dfc-role-pulse 700ms 2940ms ease-out both;
-}
-@keyframes jev-dfc-flight {
-  0% { opacity: 0; transform: translateY(0); }
-  25% { opacity: 1; }
-  75% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(16px); }
-}
-@keyframes jev-dfc-node-pulse {
-  0%, 100% { box-shadow: none; }
-  45% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--jev-green) 22%, transparent); }
-}
-@keyframes jev-dfc-role-pulse {
-  0%, 100% { filter: none; }
-  50% {
-    filter: brightness(1.035);
-    outline: 3px solid color-mix(in srgb, var(--jev-green) 55%, transparent);
-    outline-offset: 0;
-  }
+.jev-dfc-root.is-inspecting-decision .jev-dfc-handoff--decision .jev-dfc-handoff-label,
+.jev-dfc-root.is-inspecting-runtime .jev-dfc-handoff--runtime .jev-dfc-handoff-label {
+  color: var(--jev-green);
 }
 .dark .jev-dfc-handoff-label { color: #c6d5ca; }
 @container (max-width: 430px) {
-  .jev-dfc-flow-controls { justify-content: flex-start; }
   .jev-dfc-handoff-label { font-size: 9px; }
   .jev-dfc-handoff { grid-template-columns: .65fr auto 1fr; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .jev-dfc-root.is-playing .jev-dfc-arrow-track::before,
-  .jev-dfc-root.is-playing .jev-dfc-single-model,
-  .jev-dfc-root.is-playing .jev-dfc-role {
-    animation: none !important;
-  }
 }
