@@ -41,9 +41,9 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
           assert.match(await diagram.locator(".jev-dfc-handoff--runtime").innerText(),
             en ? /permission gate/ : /权限校验/);
           assert.equal(await diagram.locator(".jev-dfc-root.is-playing").count(), 0);
-          assert.equal(await diagram.getByRole("button", {
-            name: en ? "Animate responsibility handoff" : "演示职责流转",
-          }).isDisabled(), true, "reduced motion has static arrows but disables autoplay");
+          assert.equal(await diagram.locator(".jev-dfc-play").count(), 0, "no playback UI");
+          assert.equal(await diagram.locator(".jev-dfc-flow-controls").count(), 0, "no duration banner");
+          assert(!/3\\.8|单次/.test(await diagram.innerText()), "no timing copy");
           assert.equal(await page.locator("#jev-dual-flow-slot").count(), 1);
           assert.equal(await page.locator("#jev-dual-flow-slot .jev-dfc-static-fallback").isVisible(), false);
           const before = await diagram.locator(".jev-dfc-before").innerText();
@@ -77,41 +77,22 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
         }
       }
     }
-    // Explicit, finite motion: no automatic playback, animation on click,
-    // it ends by itself, and the user can replay.
-    const context = await browser.newContext({
-      viewport: { width: 1440, height: 950 },
-      reducedMotion: "no-preference",
-    });
-    await context.addInitScript(() => {
-      localStorage.setItem("preview-locale", "false");
-      window.__name = fn => fn;
-    });
+    // Static connectors are kept; selecting roles changes only their emphasis.
+    const context = await browser.newContext({ viewport: { width: 1440, height: 950 } });
     const page = await context.newPage();
     page.on("pageerror", error => errors.push(error.message));
     await page.goto(base + "#read/06-skills-routing");
     const diagram = page.locator(".jev-dfc-root");
     await diagram.waitFor();
-    assert.equal(await diagram.evaluate(node => node.classList.contains("is-playing")), false);
-    const play = diagram.getByRole("button", { name: "演示职责流转" });
-    await play.click();
-    assert.equal(await diagram.evaluate(node => node.classList.contains("is-playing")), true);
-    await page.waitForFunction(() =>
-      [...document.querySelectorAll(".jev-dfc-root .jev-dfc-role")].some(
-        node => node.getAnimations().some(animation => animation.playState === "running"),
-      ),
-      { timeout: 2800 },
-    );
-    await page.waitForFunction(() =>
-      !document.querySelector(".jev-dfc-root")?.classList.contains("is-playing"),
-      { timeout: 7000 },
-    );
-    assert.equal(await play.isEnabled(), true);
-    await play.click();
-    assert.equal(await diagram.evaluate(node => node.classList.contains("is-playing")), true);
-    await page.close();
+    assert.equal(await diagram.locator(".jev-dfc-arrow-track").count(), 4);
+    assert.equal(await diagram.locator(".jev-dfc-play").count(), 0);
+    await diagram.getByRole("button", { name: "查看 Runtime" }).click();
+    assert(await diagram.evaluate(node => node.classList.contains("is-inspecting-runtime")));
+    await diagram.getByRole("button", { name: "查看 Jev" }).click();
+    assert(await diagram.evaluate(node => node.classList.contains("is-inspecting-decision")));
+    assert.equal(await diagram.locator(".jev-dfc-role[aria-pressed=true]").count(), 1);
+    console.log("PASS static Jev connectors and selected-role highlighting");
     await context.close();
-    console.log("PASS explicit finite Jev connector animation and replay");
     assert.equal(errors.length, 0, "No runtime errors: " + errors.join("; "));
   } finally {
     await browser.close();
