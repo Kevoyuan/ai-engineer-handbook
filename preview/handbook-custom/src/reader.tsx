@@ -190,6 +190,9 @@ export function Reader({
         target.getBoundingClientRect().top -
         scroller.getBoundingClientRect().top -
         (mobile ? 60 : 16);
+      // Section navigation isn't a user scroll gesture: keep tools discoverable.
+      lastDirectionPosition.current = scroller.scrollTop;
+      onChromeVisible?.(true);
       setActive(id);
       target.setAttribute("tabindex", "-1");
       target.focus({ preventScroll: true });
