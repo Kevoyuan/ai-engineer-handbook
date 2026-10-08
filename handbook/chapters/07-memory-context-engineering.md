@@ -872,3 +872,35 @@ Sources:
 六层记忆是本手册 taxonomy。身份/权限来源于可信安全上下文；Memory 不授予权限。Append-only 不等于永久保留敏感内容；纠正、删除、保留期限和派生视图失效都需单独设计。
 
 核对依据：[LangGraph memory](https://docs.langchain.com/oss/python/langgraph/add-memory)。完整范围、逐节结论与未验证项见 [本次审计](../verification/2026-09-28.md)。
+
+
+## 7.12 FDE Context Window Management for Agents: budget without losing obligations (Q47)
+
+> **Semantic audit:** CH07 already explains context compression, read/write budgets and memory (§7.4, §7.7); the public FDE title did not literally occur. This adds an explicit testable decision rule, **not a claim that context management was absent**.
+
+### Q47 · 128k context window 就不用做 context engineering 了吗？
+
+No. Max tokens is a **capacity limit**, not a guarantee of retrieval quality, instruction priority or cost-effective use. A practical host separates:
+
+| Context category | Retain / drop policy | Can it be summarized? |
+|---|---|---|
+| Signed policy, trusted caller/tenant | trusted state outside generated prompt; attach authorized minimum | **Never** allow model summary to change identity or rights |
+| Current user task and protected exact entities | pin task ID, negation, order ID, deadlines | only after invariants verified |
+| Tool observations and cited evidence | provenance ID + version + source timestamp | summarize with reversible evidence pointers |
+| Chat history and optional examples | recency/relevance budgeting | yes, but validate fidelity and injection risk |
+| Memory learned from prior runs | explicit promotion rules and TTL | yes, after access scope and consent checks |
+
+~~~~text
+total_context_budget
+  = protected instructions + task + tool schemas
+  + authorized evidence + bounded history + response reserve
+
+if exhausted: omit low-value history → compact with provenance
+→ reretrieve authorized evidence → ask for clarification / abstain
+~~~~
+
+**Failure drill:** after several turns, user says “Actually order 43, NOT order 42.” Compression mistakenly retains 42. Tests must assert the new exact ID and negation survive, no previously authorized-but-now-revoked document persists in carried context, and essential evidence IDs remain verifiable.
+
+**Operational metrics:** overflow/refusal rate, context tokens per approved success, evidence citation retention, correction fidelity, p95 end-to-end latency and unauthorized-context rate. Large windows may lower routing complexity for small tasks, but do not fix stale document ACLs or non-relevant retrieved material.
+
+**Source/ownership:** CH01 §1.4 covers context capacity and lost-in-middle. CH07 §7.4/7.7 owns compression/memory policy. CH02 §2.8 owns index freshness. This is design synthesis to the public FDE topic, not a proprietary solution or quantitative benchmark.
