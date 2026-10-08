@@ -14,7 +14,7 @@
 - [x] Keep historical interview/reference material outside the core technical navigation
 - [x] Establish `preview/handbook-custom/` as the React application source
 - [x] Establish `web/site/` as the generated Vercel deployment artifact
-- [x] Add a React preview build gate for pull requests
+- [x] Establish a React build check for pull requests (historical; GitHub Actions workflows retired by choice, build remains a manual pre-merge check)
 - [x] Document that `npm run publish:web` is required to refresh the deployable artifact
 
 ## Phase 3 — Build the complete core knowledge spine
@@ -39,11 +39,11 @@
 ## Phase 4 — Engineering quality
 
 - [x] Add automated validation for canonical chapter coverage, fragment-manifest integrity, duplicate IDs and broken local references
-- [x] Add maintained JavaScript syntax checks to CI
+- [x] Add maintained JavaScript syntax checks (historically in GitHub Actions; now executed manually before release)
 - [x] Use one shared dynamic-fragment manifest across runtime injection, search and rebuild logic
 - [x] Remove the stale shadow `web/DESIGN.md`; root `DESIGN.md` is the only design contract
 - [x] Add browser-based responsive regression checks at the DESIGN.md validation widths (390 / 768 / 1440 / 1728) via `evidence/surface-ui-audit.cjs`
-- [ ] Make the cross-surface browser regression suite a permanent required CI gate rather than a manual/one-off PR check
+- [ ] Reconsider an optional, sustainable automated quality gate if needed; cross-surface browser regression remains runnable manually
 - [ ] Add source-figure visual parity checks for complex teaching diagrams (compare topology, labels, connectors, not only bounding boxes)
 - [ ] Add lightweight visual regression coverage for the architecture diagrams
 - [ ] Add a generated aggregate/export pipeline if a single-file manuscript is needed again
