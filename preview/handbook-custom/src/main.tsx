@@ -644,29 +644,36 @@ function App() {
               <div id="reader-top-actions" className="reader-top-actions" />
             )}
             {page !== "reader" && (
-              <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDark(!dark)}
+                aria-label={
+                  dark
+                    ? t("切换浅色模式", "Switch to light mode")
+                    : t("切换深色模式", "Switch to dark mode")
+                }
+                title={t("切换明暗主题", "Toggle theme")}
+              >
+                {dark ? <SunLightIcon /> : <HalfMoonIcon />}
+              </Button>
+            )}
             <Button
               variant="ghost"
-              size="icon"
-              onClick={() => setDark(!dark)}
-              aria-label={
-                dark
-                  ? t("切换浅色模式", "Switch to light mode")
-                  : t("切换深色模式", "Switch to dark mode")
-              }
-              title={t("切换明暗主题", "Toggle theme")}
-            >
-              {dark ? <SunLightIcon /> : <HalfMoonIcon />}
-            </Button>
-            <Button
-              variant="ghost"
+              className={page === "reader" ? "reader-direct-language" : undefined}
               onClick={() => setEn(!en)}
               aria-label={en ? "切换为中文" : "Switch to English"}
+              title={en ? "切换为中文" : "Switch to English"}
             >
               <LanguageIcon />
-              {en ? "中文" : "EN"}
+              <span>{en ? "中文" : "EN"}</span>
             </Button>
-            <Button asChild variant="ghost" size="icon">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className={page === "reader" ? "reader-direct-github" : undefined}
+            >
               <a
                 href="https://github.com/kevoyuan/ai-engineer-handbook"
                 target="_blank"
@@ -677,8 +684,6 @@ function App() {
                 <GithubIcon aria-hidden="true" />
               </a>
             </Button>
-              </>
-            )}
           </div>
           {page === "reader" && (
             <div className="reading-progress-line" aria-hidden="true">
@@ -1029,7 +1034,6 @@ function App() {
             onReadingContext={setReadingContext}
             onChromeVisible={setChromeVisible}
             onToggleTheme={() => setDark((value) => !value)}
-            onToggleLocale={() => setEn((value) => !value)}
             dark={dark}
           />
         )}
