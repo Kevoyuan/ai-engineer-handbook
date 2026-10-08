@@ -129,6 +129,10 @@
     {
       "path": "/assets/ch10-fde-verified-retries.html",
       "id": "fde-verified-retry-idempotency"
+    },
+    {
+      "path": "/assets/ch10-fde-system-design.html",
+      "id": "fde-system-design-02"
     }
   ],
   "02-enterprise-retrieval": [
@@ -141,6 +145,12 @@
     {
       "path": "/assets/ch12-order-investigation-capstone.html",
       "id": "fde-order-investigation-capstone"
+    }
+  ],
+  "11-data-sql-engineering": [
+    {
+      "path": "/assets/ch11-fde-databricks-drills.html",
+      "id": "fde-databricks-03"
     }
   ]
 }
