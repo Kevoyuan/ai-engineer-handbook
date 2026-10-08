@@ -72,17 +72,15 @@ def bounded_top_k(scored_documents, k, *, allowed_tenant):
         raise ValueError("trusted tenant scope required")
     if k == 0:
         return []
-    eligible = []
-    for score, tenant, doc_id in scored_documents:
-        if not math.isfinite(score):
-            raise ValueError("nonfinite score")
-        if tenant == allowed_tenant:
-            eligible.append((score, doc_id))
-    # nlargest accepts a bounded heap internally; this demonstration
-    # materializes eligible input for clarity, so working memory is O(N).
-    # A streaming O(k) version must avoid this list.
-    return sorted(heapq.nlargest(k, eligible, key=lambda x: (x[0], tuple(-ord(c) for c in x[1]))),
-                  key=lambda x: (-x[0], x[1]))
+    def eligible():
+        for score, tenant, doc_id in scored_documents:
+            if not math.isfinite(score):
+                raise ValueError("nonfinite score")
+            if tenant == allowed_tenant:
+                yield (-score, doc_id)  # ascending tuple -> best score, then ID
+    # nsmallest uses an O(k) auxiliary heap for k << N; exact within input.
+    best = heapq.nsmallest(k, eligible())
+    return [(-neg_score, doc_id) for neg_score, doc_id in best]
 
 
 def parse_orders_csv(raw_text):
