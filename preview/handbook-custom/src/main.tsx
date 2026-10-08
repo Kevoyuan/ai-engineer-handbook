@@ -110,7 +110,6 @@ const groups = [
     en: "Model foundations",
     descriptionZh: "理解模型、API 与上下文的基本约束。",
     descriptionEn: "Understand the constraints of models, APIs, and context.",
-    range: [0, 1],
   },
   {
     id: "retrieval",
@@ -119,7 +118,6 @@ const groups = [
     en: "Retrieval & RAG",
     descriptionZh: "从检索路径进入可靠、可追溯的知识系统。",
     descriptionEn: "Move from retrieval paths to reliable, traceable knowledge systems.",
-    range: [1, 5],
   },
   {
     id: "agent",
@@ -128,7 +126,6 @@ const groups = [
     en: "Agent engineering",
     descriptionZh: "组织工具、记忆与执行循环，让智能行为可控。",
     descriptionEn: "Coordinate tools, memory, and execution loops into controlled behavior.",
-    range: [5, 8],
   },
   {
     id: "production",
@@ -137,59 +134,7 @@ const groups = [
     en: "Evaluation & production",
     descriptionZh: "用评估、观测与平台能力把系统送进生产。",
     descriptionEn: "Move systems into production with evaluation, observability, and platform controls.",
-    range: [8, 12],
   },
-];
-const interactiveChapterNumbers = new Set(["03", "04", "06", "07", "08"]);
-const descriptions = [
-  [
-    "理解 Generation、Token、Context、Sampling、Embedding、Adaptation 与模型迁移。",
-    "Understand generation, tokens, context, sampling, embeddings, adaptation, and model migration.",
-  ],
-  [
-    "理解 Exact、BM25、Dense、Graph 与元数据过滤的边界。",
-    "Understand Exact, BM25, Dense, Graph and metadata filtering.",
-  ],
-  [
-    "组合词法与语义检索，为不同问题选择合适的路径。",
-    "Combine lexical and semantic retrieval with query routing.",
-  ],
-  [
-    "衡量证据质量，在回答与拒答之间做可靠决策。",
-    "Assess evidence and decide when to answer or abstain.",
-  ],
-  [
-    "从解析、分块到引用，构建可追溯的文档问答。",
-    "Build traceable document Q&A from parsing to citations.",
-  ],
-  [
-    "组织可复用能力，让任务找到合适的工具与执行方式。",
-    "Organize reusable skills, tools and task routing.",
-  ],
-  [
-    "管理工作状态、长期记忆与上下文预算。",
-    "Manage working state, long-term memory and context budgets.",
-  ],
-  [
-    "设计执行循环、工作流与多 Agent 协作。",
-    "Design execution loops, workflows and multi-agent collaboration.",
-  ],
-  [
-    "用评估、追踪与监控验证系统的真实表现。",
-    "Verify system behavior through evaluation, tracing and monitoring.",
-  ],
-  [
-    "理解推理服务、缓存、隔离与生产控制面。",
-    "Explore serving, caching, isolation and production control planes.",
-  ],
-  [
-    "设计可靠的 CDC、Lakehouse、Spark 和 SQL 数据流，提供可核验的 AI 数据基础。",
-    "Design dependable CDC, Lakehouse, Spark and SQL data pipelines for grounded AI systems.",
-  ],
-  [
-    "把客户需求变成受控的最小交付、明确验收与可运营的系统。",
-    "Turn customer ambiguity into controlled thin slices, measurable acceptance and operable systems.",
-  ],
 ];
 function read<T>(key: string, fallback: T): T {
   try {
@@ -326,6 +271,11 @@ function App() {
   const [saved, setSaved] = useState<string[]>(() =>
     read("preview-bookmarks", []),
   );
+  const [selectedAtlasSlug, setSelectedAtlasSlug] = useState<string>(
+    () => chapters.find((chapter) => chapter.number === "03")?.slug || chapters[0].slug,
+  );
+  const selectedAtlas =
+    chapters.find((chapter) => chapter.slug === selectedAtlasSlug) || chapters[0];
   const [resultLimit, setResultLimit] = useState(15);
   useEffect(() => setResultLimit(15), [query]);
   const [notice, setNotice] = useState("");
@@ -531,7 +481,7 @@ function App() {
         {groups.map((g) => (
           <SidebarGroup key={g.en}>
             <SidebarGroupLabel>{en ? g.en : g.zh}</SidebarGroupLabel>
-            {chapters.slice(...(g.range as [number, number])).map((ch) => (
+            {chapters.filter((ch) => ch.group === g.id).map((ch) => (
               <SidebarItem
                 key={ch.slug}
                 active={
@@ -741,7 +691,7 @@ function App() {
                   <div className="notebook-groups">
                     {groups.map((g) => {
                       const list = chapters
-                        .slice(...(g.range as [number, number]))
+                        .filter((ch) => ch.group === g.id)
                         .filter((ch) => saved.includes(ch.slug));
                       if (!list.length) return null;
                       return (
@@ -795,8 +745,8 @@ function App() {
                   </h1>
                   <p className="atlas-lede">
                     {t(
-                      "不是按顺序翻完十章，而是看清模型、检索、Agent 与生产系统之间为什么会连在一起。",
-                      "Do not just read ten chapters in order. See why models, retrieval, agents, and production systems connect.",
+                      "不是按顺序翻完所有章节，而是看清模型、检索、Agent 与生产系统之间为什么会连在一起。",
+                      "Do not just read chapters in order. See why models, retrieval, agents, and production systems connect.",
                     )}
                   </p>
                   <div className="atlas-search">
@@ -834,7 +784,7 @@ function App() {
                   <div className="atlas-meta" aria-label={t("图谱概览", "Atlas overview")}>
                     <span><strong>{chapters.length}</strong>{t(" 章", " chapters")}</span>
                     <span><strong>{groups.length}</strong>{t(" 个系统层", " system layers")}</span>
-                    <span><strong>{interactiveChapterNumbers.size}</strong>{t(" 个交互实验", " interactive labs")}</span>
+                    <span><strong>{chapters.filter((ch) => ch.interactive).length}</strong>{t(" 个交互实验", " interactive labs")}</span>
                   </div>
                 </header>
 
@@ -854,39 +804,47 @@ function App() {
                         </header>
                         <div className="atlas-nodes">
                           {chapters
-                            .slice(...(g.range as [number, number]))
+                            .filter((ch) => ch.group === g.id)
                             .map((ch) => {
                               const i = chapters.indexOf(ch);
-                              const interactive = interactiveChapterNumbers.has(ch.number);
+                              const interactive = ch.interactive;
                               return (
-                                <div className="atlas-node-row" key={ch.slug}>
-                                  <a className="atlas-node" href={chapterHref(i)}>
+                                <div
+                                  className={"atlas-node-row" + (selectedAtlasSlug === ch.slug ? " is-selected" : "")}
+                                  key={ch.slug}
+                                >
+                                  <a className="atlas-node" href={chapterHref(i)} onFocus={() => setSelectedAtlasSlug(ch.slug)}>
                                     <span className="atlas-node-marker" aria-hidden="true" />
                                     <span className="atlas-node-number">{ch.number}</span>
                                     <span className="atlas-node-copy">
                                       <strong>{en ? ch.en : ch.zh}</strong>
-                                      <span>{descriptions[i][en ? 1 : 0]}</span>
-                                      {interactive && (
-                                        <span className="atlas-node-lab">
-                                          ↳ {t("交互图解", "Interactive lab")}
-                                        </span>
-                                      )}
+                                      <span>{en ? ch.summaryEn : ch.summaryZh}</span>
                                     </span>
                                     <ArrowRightIcon />
                                   </a>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={saved.includes(ch.slug) ? "is-saved" : ""}
-                                    onClick={() => toggleSave(ch.slug)}
-                                    aria-label={
-                                      saved.includes(ch.slug)
+                                  <div className="atlas-node-actions">
+                                    <Button variant="ghost" size="icon" className="atlas-inspect-toggle"
+                                      aria-pressed={selectedAtlasSlug === ch.slug}
+                                      aria-label={t(`查看 ${ch.zh} 的知识关系`, `Inspect ${ch.en} relationships`)}
+                                      onClick={() => setSelectedAtlasSlug(ch.slug)}>
+                                      <span aria-hidden="true">i</span>
+                                    </Button>
+                                    {interactive && (
+                                      <a className="atlas-lab-link" href={chapterHref(i, "concept-demo")}
+                                        aria-label={t(`打开 ${ch.zh} 的交互图解`, `Open ${ch.en} interactive lab`)}
+                                        title={t("打开交互图解", "Open interactive lab")}>
+                                        {t("实验", "Lab")}
+                                      </a>
+                                    )}
+                                    <Button variant="ghost" size="icon"
+                                      className={saved.includes(ch.slug) ? "is-saved" : ""}
+                                      onClick={() => toggleSave(ch.slug)}
+                                      aria-label={saved.includes(ch.slug)
                                         ? t(`取消收藏 ${ch.zh}`, `Remove ${ch.en} from notebook`)
-                                        : t(`收藏 ${ch.zh}`, `Save ${ch.en} to notebook`)
-                                    }
-                                  >
-                                    <BookmarkIcon />
-                                  </Button>
+                                        : t(`收藏 ${ch.zh}`, `Save ${ch.en} to notebook`)}>
+                                      <BookmarkIcon />
+                                    </Button>
+                                  </div>
                                 </div>
                               );
                             })}
@@ -896,6 +854,38 @@ function App() {
                   </section>
 
                   <aside className="atlas-inspector">
+                    <section className="atlas-inspector-block atlas-context-inspector"
+                      id="atlas-inspector-selected"
+                      aria-label={t("章节知识关系", "Chapter relationships")}>
+                      <span className="atlas-eyebrow">INSPECT / {selectedAtlas.number}</span>
+                      <h2>{en ? selectedAtlas.en : selectedAtlas.zh}</h2>
+                      <p>{en ? selectedAtlas.summaryEn : selectedAtlas.summaryZh}</p>
+                      <dl className="atlas-inspector-details">
+                        <div>
+                          <dt>{t("工程决策", "ENGINEERING DECISION")}</dt>
+                          <dd>{en ? selectedAtlas.decisionEn : selectedAtlas.decisionZh}</dd>
+                        </div>
+                        <div>
+                          <dt>{t("典型失败", "FAILURE BOUNDARY")}</dt>
+                          <dd>{en ? selectedAtlas.failureEn : selectedAtlas.failureZh}</dd>
+                        </div>
+                      </dl>
+                      <div className="atlas-inspector-related">
+                        <span className="atlas-eyebrow">{t("相关章节", "RELATED CHAPTERS")}</span>
+                        {selectedAtlas.relatedNumbers.map((number) => {
+                          const related = chapters.find((chapter) => chapter.number === number);
+                          return related ? (
+                            <a href={chapterHref(chapters.indexOf(related))} key={related.slug}>
+                              <span>{related.number}</span>
+                              {en ? related.en : related.zh}
+                            </a>
+                          ) : null;
+                        })}
+                      </div>
+                      <a href={chapterHref(chapters.indexOf(selectedAtlas))} className="atlas-text-link">
+                        {t("进入核心章节", "Open chapter")}<ArrowRightIcon />
+                      </a>
+                    </section>
                     <div className="atlas-inspector-block">
                       <span className="atlas-eyebrow">SYSTEM / 00</span>
                       <h2>{t("先看系统，再看章节", "See the system before the chapters")}</h2>
@@ -921,15 +911,7 @@ function App() {
                         ))}
                       </div>
                     </div>
-                    <div className="atlas-inspector-block">
-                      <span className="atlas-eyebrow">READ / TRACE / RETURN</span>
-                      <p>
-                        {t(
-                          "Atlas 负责定位关系，Reader 负责深读，Search 负责即时查证，Notebook 负责回来复习。",
-                          "Atlas reveals relationships, Reader supports depth, Search retrieves evidence, and Notebook keeps what you return to.",
-                        )}
-                      </p>
-                    </div>
+
                   </aside>
                 </div>
               </div>
