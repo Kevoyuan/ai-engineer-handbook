@@ -1,0 +1,62 @@
+name: Validate and publish all-surface UI refinement
+
+on:
+  push:
+    branches:
+      - ux/complete-surface-audit
+
+permissions:
+  contents: write
+
+jobs:
+  browser-audit-and-publish:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ux/complete-surface-audit
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install React and test dependencies
+        working-directory: preview/handbook-custom
+        run: npm install --no-audit --no-fund
+
+      - name: Build React
+        working-directory: preview/handbook-custom
+        run: npm run build
+
+      - name: Install Chromium
+        working-directory: preview/handbook-custom
+        run: npx playwright install --with-deps chromium
+
+      - name: Audit all surfaces in the browser
+        working-directory: preview/handbook-custom
+        run: |
+          npm run dev -- --port 4180 > /tmp/handbook-vite.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4180/ >/dev/null; then break; fi
+            sleep 2
+          done
+          node evidence/surface-ui-audit.cjs
+
+      - name: Publish production web/site
+        working-directory: preview/handbook-custom
+        run: npm run publish:web
+
+      - name: Commit generated production site
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A web/site
+          if git diff --cached --quiet; then
+            echo "Generated artifact unchanged"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: publish all-surface UI refinement"
+          git push origin HEAD:ux/complete-surface-audit
