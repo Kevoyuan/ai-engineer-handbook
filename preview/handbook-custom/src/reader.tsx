@@ -109,7 +109,6 @@ export function Reader({
   onReadingContext,
   onChromeVisible,
   onToggleTheme,
-  onToggleLocale,
   dark,
 }: {
   index: number;
@@ -121,7 +120,6 @@ export function Reader({
   onReadingContext?: (value: ReadingContext) => void;
   onChromeVisible?: (visible: boolean) => void;
   onToggleTheme: () => void;
-  onToggleLocale: () => void;
   dark: boolean;
 }) {
   const t = (zh: string, e: string) => (en ? e : zh);
@@ -355,15 +353,6 @@ export function Reader({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={onToggleTheme}>
                   {dark ? t("浅色模式", "Light theme") : t("深色模式", "Dark theme")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={onToggleLocale}>
-                  {en ? "中文" : "English"}
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <a href="https://github.com/kevoyuan/ai-engineer-handbook"
-                     target="_blank" rel="noopener noreferrer">
-                    GitHub ↗
-                  </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
