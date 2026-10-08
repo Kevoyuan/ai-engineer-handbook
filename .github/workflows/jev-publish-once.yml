@@ -34,7 +34,7 @@ jobs:
               page=json.loads((Path(folder)/'06-skills-routing.json').read_text())
               index=json.loads((Path(folder)/'search-index.json').read_text())
               assert all('jev-agent-loop-gates' in page[language] for language in ('zh','en')), folder
-              assert any('Agent loop: five bounded decision checkpoints' in x.get('titleEn','') for x in index), folder
+              assert any('Agent loop: five bounded decision checkpoints' in x.get('textEn','') for x in index), folder
               print(folder, 'zh+en section and search OK')
           PY
       - name: Commit generated deploy artifacts to PR branch
