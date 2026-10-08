@@ -62,6 +62,10 @@
     {
       "path": "/assets/ch08-cancellation-steering.html",
       "id": "agent-cancellation-steering"
+    },
+    {
+      "path": "/assets/ch08-fde-agent-coding.html",
+      "id": "fde-agent-coding-06"
     }
   ],
   "09-reliability-evaluation-observability": [
@@ -101,6 +105,10 @@
     {
       "path": "/assets/ch09-fde-verified-evals.html",
       "id": "fde-verified-eval-harness"
+    },
+    {
+      "path": "/assets/ch09-fde-eval-foundations.html",
+      "id": "fde-eval-foundations-05"
     }
   ],
   "07-memory-context-engineering": [
@@ -155,6 +163,16 @@
     {
       "path": "/assets/ch11-fde-databricks-drills.html",
       "id": "fde-databricks-03"
+    },
+    {
+      "path": "/assets/ch11-fde-coding-craft.html",
+      "id": "fde-coding-craft-06"
+    }
+  ],
+  "01-model-api-context-foundations": [
+    {
+      "path": "/assets/ch01-fde-ml-foundations.html",
+      "id": "fde-ml-foundations-05"
     }
   ]
 }
