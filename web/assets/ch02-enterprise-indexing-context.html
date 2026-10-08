@@ -1,0 +1,26 @@
+<section id="enterprise-indexing-before-tokens" aria-labelledby="enterprise-indexing-before-tokens-title">
+<h2 class="sub" id="enterprise-indexing-before-tokens-title"><span class="i18n-text" data-i18n-zh="Token 效率先从 Indexing 与 Evidence Supply 开始" data-i18n-en="Token efficiency begins with indexing and evidence supply">Token 效率先从 Indexing 与 Evidence Supply 开始</span> <small>§2.8</small></h2>
+<p class="lead"><span class="i18n-text" data-i18n-zh="企业查询常跨 CRM、Ticket、代码与文档。只向量化正文，可能丢失实体身份、字段、权限、关系、时效与原始出处。" data-i18n-en="Enterprise queries cross CRM, tickets, code, and documents. Vectorizing text alone can lose entity identities, fields, permissions, relationships, freshness, and source provenance.">企业查询常跨 CRM、Ticket、代码与文档。只向量化正文，可能丢失实体身份、字段、权限、关系、时效与原始出处。</span></p>
+<pre role="region" aria-label="Evidence preparation architecture">Sources: CRM | Tickets | Docs | Code
+                ↓
+Connectors + refresh / CDC
+                ↓
+Normalize identifiers → resolve entities (confidence)
+                ↓
+ACL / tenant / lineage / time metadata
+                ↓
+Exact | Lexical | Dense | Structured | Graph | Live query
+                ↓
+Authorized candidates → evidence sufficiency
+                ↓
+Cited evidence packet → Agent</pre>
+<div class="tw"><table><thead><tr><th>Evidence shape</th><th>Best starting route</th><th>Failure to test</th></tr></thead><tbody>
+<tr><td>ID / error text</td><td>Exact / lexical</td><td>Near-identical identifiers confused</td></tr>
+<tr><td>Paraphrase</td><td>Dense + rerank</td><td>Relevant but insufficient evidence</td></tr>
+<tr><td>CRM status / entity relations</td><td>Structured / graph</td><td>False identity merge or lost field</td></tr>
+<tr><td>Current permissions / volatile facts</td><td>ACL enforced fetch / live query</td><td>Stale permission or outdated index</td></tr>
+</tbody></table></div>
+<p><span class="i18n-text" data-i18n-zh="统一逻辑检索层并不要求只有一个物理索引。Glean 的索引、图、Memory、Connector、Tool 五部分是供应商实现例，不是通用架构标准。" data-i18n-en="A unified logical retrieval layer need not have a single physical index. Glean's five-part index, graph, memory, connector and tool design is a vendor-specific example, not a universal standard.">统一逻辑检索层并不要求只有一个物理索引。Glean 的索引、图、Memory、Connector、Tool 五部分是供应商实现例，不是通用架构标准。</span></p>
+<div class="co must"><span class="co-t">Evaluation gate</span><p><span class="i18n-text" data-i18n-zh="测必需证据 Recall、实体误合并、ACL 撤权延迟和出处完整性；更长上下文无法找回从未检索到的资料。" data-i18n-en="Measure required-evidence recall, false merges, ACL revocation delay, and provenance integrity; longer context cannot recover documents that retrieval never found.">测必需证据 Recall、实体误合并、ACL 撤权延迟和出处完整性；更长上下文无法找回从未检索到的资料。</span></p></div>
+<p><a href="https://aiengineering.beehiiv.com/p/your-token-problem-is-an-indexing-problem">Your Token Problem Is an Indexing Problem</a> · <a href="https://www.glean.com/blog/enterprise-ai-indexing-context">Glean primary vendor explanation</a></p>
+</section>
