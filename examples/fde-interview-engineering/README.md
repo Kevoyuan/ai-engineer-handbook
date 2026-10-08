@@ -1,6 +1,6 @@
 # FDE ML Evaluation + Coding Craft — runnable mini-lab
 
-Independent educational fixtures supporting CH01 §1.21, CH09 §9.24, CH11 §11.11 and CH08 §8.18. These are **not** copied FDEInterviews answer keys, customer data, production security controls, trained ML models or benchmark results.
+Independent educational fixtures supporting CH01 §1.22, CH09 §9.24, CH11 §11.11 and CH08 §8.18. These are **not** copied FDEInterviews answer keys, customer data, production security controls, trained ML models or benchmark results.
 
 ## Run with Python 3 standard library
 
@@ -26,7 +26,7 @@ Run the same unittest command to additionally validate version-pinned index prom
 
 ## Read the canonical explanations
 
-- CH01 §1.21 — Gradient Descent, Bias/Variance, Overfitting, Information Theory, Loss/Activation/Norm, Semi-supervised learning, Forgetting, Optimization and Vision tasks.
+- CH01 §1.22 — Gradient Descent, Bias/Variance, Overfitting, Information Theory, Loss/Activation/Norm, Semi-supervised learning, Forgetting, Optimization and Vision tasks.
 - CH09 §9.24 — Precision/Recall/F1 for class imbalance, uncertainty calibration, synthetic eval leakage, bandit vs A/B choices.
 - CH11 §11.11 — Big-O, Heap Top-K, messy CSV, two-pointer windows, Python GIL/concurrency.
 - CH08 §8.18 — BFS/DFS versus topological scheduling, dependency injection and permission fakes.
