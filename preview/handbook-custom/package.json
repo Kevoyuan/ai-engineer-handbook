@@ -12,7 +12,8 @@
     "test:concepts": "node evidence/concept-diagrams.cjs",
     "test:learning": "node evidence/learning-interactions.cjs",
     "publish:web": "node scripts/publish-web.mjs",
-    "test:atlas": "node scripts/validate-atlas.mjs"
+    "test:atlas": "node scripts/validate-atlas.mjs",
+    "test:visualizations": "node scripts/validate-visualizations.mjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.9",
