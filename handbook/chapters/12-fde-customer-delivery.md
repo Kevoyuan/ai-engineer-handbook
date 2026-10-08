@@ -167,3 +167,199 @@ The exhaustive one-to-one owner index is in `handbook/references/fde-2026-concep
 
 - FDEInterviews: [Concepts curriculum](https://www.fdeinterviews.com/concepts), [Concept Map](https://www.fdeinterviews.com/map), accessed 2026-10-08. The source defines track/topic scope and highlights discovery, stakeholder communication and handling failed demos. All workflows, acceptance contracts and the municipal scenario here are handbook **engineering synthesis**; no paywalled course text is reproduced.
 - Cross-chapter: CH08 owns tool runtime/orchestration, CH09 metrics/evals, CH10 deployment and security, CH11 customer data plane.
+
+
+## 12.11 End-to-end capstone · Enterprise Order Investigation AI Copilot
+
+> **Status and provenance · 2026-10-08.** This is an **original, synthetic teaching case**, not a real customer implementation, FDEInterviews' paywalled exercise, measured benchmark, or deployed enterprise application. References support *specific component claims*; architecture choices, diagrams, example data, budgets and acceptance thresholds are design proposals. A standard-library Python + SQLite walking-skeleton implementation is maintained at \`examples/fde-order-copilot/\`; it intentionally does **not** implement a Delta Lake service, a hosted LLM, production authentication, or a real payment API.
+
+### 12.11.1 Customer problem, discovery and the decision not to start with multi-agent
+
+**Customer says:** “Our support team spends too long figuring out why an order says DELIVERED before the carrier recorded HANDOFF. Give every agent an AI copilot that investigates and tells them what to do.”
+
+Do not begin by selecting LangGraph, RAG, or a vector DB. First ask:
+
+| Discovery axis | Concrete question | Decision changed |
+|---|---|---|
+| Business outcome | Time from ticket opening to **human-verified** resolution? What is the current baseline? | whether AI improves the actual bottleneck |
+| System of record | Which of OMS, WMS and carrier feed owns each status? Are timestamps event time or ingestion time? | source precedence, ordering and uncertainty |
+| Identity | Can an agent work only on assigned orders? Are orders shared across subsidiaries? | row-level policy, query identities, log redaction |
+| Corrections | Are duplicate, late, reversed or deleted events expected? | CDC, dedup, versioning, reconciliation |
+| Customer action | Explain only, create a draft, or issue a refund? Who approves? | tool scope, human-in-the-loop and write idempotency |
+| Latency / freshness | How long after a carrier update is the investigation useful? | scheduled batch vs streaming CDC |
+| Deployment | SaaS acceptable? Customer data restricted to customer-managed VPC? | BYOC/private network and vendor feasibility |
+
+**Thin-slice contract (proposed, not customer-approved):** For an authenticated, authorized support user, investigate one known order across OMS + carrier timeline, return evidence-backed status and cited event IDs, **without modifying the order or issuing refunds**. One customer tenant, one task, one read-only deployment, one operational trace.
+
+**Explicit non-goals:** autonomous refunds, unrestricted SQL, multi-agent self-delegation, model fine-tuning, all-carrier integration, real-time guarantees without a freshness SLO.
+
+### 12.11.2 Four planes, seven boundaries: architecture before framework choice
+
+\`\`\`text
+                              CUSTOMER / WORKFLOW PLANE
+     human agent → SSO / IAM → trusted user & tenant → review UI / approval
+                                      │
+                                      ▼
+                                 CONTROL PLANE
+             policy decision → tool allowlist → deadlines / budgets
+                                      │
+       ┌──────────────────────────────┴─────────────────────────┐
+       ▼                                                        ▼
+   DATA PLANE                                               EXECUTION PLANE
+   OMS / carrier events                                     task router
+       ↓ CDC + checkpoints                                    ├─ exact order lookup
+   Bronze: raw + immutable provenance                          ├─ tenant-scoped SQL
+       ↓ schema / dedup / delete / replay                       └─ optional document RAG
+   Silver: versioned event timeline                                   ↓
+       ↓ business contract                                   evidence sufficiency check
+   Gold: authorized order state                               ↓ if missing → abstain
+       ↓ governed tenant read                                grounded explanation
+   (optional) document index                                 ↓ draft / human review
+                                      │
+                                      ▼
+                            EVIDENCE & OPERATIONS PLANE
+                trace IDs + source versions + golden eval + SLO
+                canary / rollback + incident runbook + cost/success
+\`\`\`
+
+No **identity**, **authoritative order state**, or **write permission** may originate from prompt text. Customer-facing final explanations must separate **observed facts** (event IDs/timestamps), **inference** (the anomaly), and **recommendation** (investigate upstream ordering). An event timestamp alone does not prove physical delivery chronology; clock skew and source semantics may produce apparent anomalies.
+
+| Layer | Owns | Failure / gate | Handbook owner |
+|---|---|---|---|
+| Discovery & acceptance | baseline, non-goals, human owner | wrong problem → stop project | CH12 |
+| CDC / Lakehouse | raw provenance, dedup, tombstones, replay | missing / duplicated / reordered events | CH11 |
+| Authorized retrieval | exact order lookup, optional BM25/semantic docs | cross-tenant / ungrounded evidence | CH02–05 |
+| Agent host | branch and tool execution, HITL | unsafe write / infinite retry | CH06, CH08 |
+| Evaluation | golden timelines, safety regression | no evidence or unacceptable slice regression | CH09 |
+| Serving & security | SSO, RLS, resilience, isolation | tenant leak, latency, queue saturation | CH10 |
+
+### 12.11.3 Data contract and state reconciliation
+
+**Illustrative event schema**:
+
+\`\`\`json
+{
+  "tenant_id": "tenant-a",
+  "source": "carrier",
+  "source_event_id": "c-102",
+  "order_id": "42",
+  "source_version": 2,
+  "event_type": "DELIVERED",
+  "event_time_utc": "2026-10-07T10:20:00Z",
+  "ingested_at_utc": "2026-10-07T10:35:00Z"
+}
+\`\`\`
+
+For this teaching case, the unique deduplication key is **(tenant_id, source, source_event_id)**. Conflicting payloads under the same event ID must be quarantined, not silently overwritten. \`source_version\` is comparable **within its declared source/order stream**, not necessarily across different vendors. Event-time order and ingestion order are different. The source-of-truth decision is a separate business contract.
+
+Bronze keeps raw source and offsets. Silver enforces schema and idempotent upserts of source events, preserving late events and tombstones. Gold exposes a consistent **point-in-time, permission-scoped** view of the order and its causal evidence. **Delta CDF only records changes after it is enabled and has finite retention; it is not automatically a permanent audit log.** Archive material if long-term replay is contractual.
+
+**Do not** compute status by a global \`MAX(event_time)\` if one carrier's clock is unreliable. If a delivered event appears at 10:20 and a handoff event at 10:30, the system should say “recorded order appears inconsistent,” not declare that delivery physically happened before handoff. If either event is missing, use \`INSUFFICIENT_EVIDENCE\`, not a fabricated chronology.
+
+### 12.11.4 Retrieval and authorization route
+
+\`\`\`text
+customer asks "Why was order 42 delivered before handoff?"
+ → detect exact order ID / structured workflow
+ → trusted policy: tenant, user, allowed order assignments
+ → read-only parameterized SQL / governed semantic view
+ → optional document retrieval only for carrier SLA/policy explanations
+ → validate source freshness, timestamp semantics and evidence IDs
+ → grounded answer / abstain
+\`\`\`
+
+**Why not vector-search everything?** An order ID requires exact, deterministic lookup. Embedding similarity cannot enforce unique order identity or permission. Dense/hybrid retrieval can help find **text policies** after identity-scoped SQL established the concrete order facts. Azure AI Search documents permission filtering and native ACL features (some are preview), but a string security filter is not authentication. Databricks Unity Catalog supports row filters, column masks and ABAC for governed query-time access. Application checks and storage enforcement should not be confused.
+
+A proposed OpenAI/LLM tool request such as \`{"tenant_id":"other", "order_id":"42"}\` must **not** override the authenticated principal. Every tool call receives a trusted scope from the host; deny when order assignment is missing. Partition caches, retrieval context and traces by policy/tenant boundary.
+
+### 12.11.5 Agent vs workflow: minimum necessary control flow
+
+Start with a **deterministic workflow**:
+1. Normalize the customer task and extract exact order identifier (validated).
+2. Authorize the user and relevant order **before retrieval**.
+3. Call read-only timeline service; validate source evidence and freshness.
+4. Classify: \`ANOMALY\` / \`CONSISTENT\` / \`INSUFFICIENT_EVIDENCE\`. Return observed evidence IDs.
+5. Optionally ask an LLM to **explain** the evidence in approved wording; pass validated, bounded facts only.
+6. If the customer requests an action, create a **draft** and obtain explicit human approval. The host—not the model—authorizes and executes any write.
+
+The example code does not call an LLM. This is deliberate: anomaly detection based on two typed events is deterministic and more testable than asking a model to improvise. A multi-agent graph would add state and coordination without an established gain. Add a durable workflow/checkpointer if work crosses approvals or long-running retries. A write timeout produces **unknown outcome**; consult operation status or retry only with a documented stable idempotency contract (CH10).
+
+### 12.11.6 A runnable walking skeleton: SQLite, not simulated “production Delta”
+
+The repository contains a **real executable** Python 3 standard-library fixture:
+
+\`\`\`bash
+cd examples/fde-order-copilot
+python3 -m unittest discover -s tests -v
+python3 copilot.py
+\`\`\`
+
+The example creates in-memory SQLite data for **two tenants that reuse the same order ID**; inserts out-of-order and duplicate events; uses a trusted actor scope (a test representation, **not an SSO implementation**) and parameterized SQL; applies read-only order scope; classifies a time-order anomaly with explicit evidence IDs and no LLM. Tests cover normal, anomaly, insufficient evidence, duplicates/conflicts, denied cross-tenant/assignment lookup and no unauthorized audit evidence. It is a *walking-skeleton logic exercise*, not a running cloud deployment or proof of data security. The test harness intentionally excludes external services, so it can be run without credentials.
+
+A production port would replace SQLite with a governed warehouse and tested identity provider, replace in-memory events with persisted CDC/Delta tables, attach a real index/document fetcher only when needed, and add traces/eval dashboards. **Do not promote demo assertions to real-service SLAs.**
+
+### 12.11.7 Failure matrix: fix the earliest wrong decision
+
+| Injected fault | Expected system behavior | Validation and repair |
+|---|---|---|
+| Carrier event arrives late | event-time timeline correct; ingest lag reported | replay out-of-order fixture, p95 source-to-query lag |
+| Duplicate or conflicting event ID | identical retry no-op; conflicting content rejected/quarantined | idempotency and conflict regression |
+| User asks for another tenant's ID | return denied, no tool prompt/cache exposure | negative tenant and cache replay suite |
+| Handoff evidence is absent | \`INSUFFICIENT_EVIDENCE\`; no chronology claim | refusal confusion matrix |
+| Source ACL revoked after indexing | refuse at read/fetch if policy stale | revoke-between-search-and-fetch test |
+| Warehouse / carrier unavailable | no fabricated answer; bounded timeout and graceful fallback | dependency-fault scenario, error budget |
+| LLM writes “refund approved” | text has no authority; host write gate denies | forbidden-tool-action eval |
+| Tool write times out (later phase) | unknown status; same idempotency key or reconcile | duplicate-effect negative tests |
+| High concurrent retries | bounded queue, backoff+jitter, circuit breaker / shedding | load and recovery test |
+
+### 12.11.8 Acceptance and cost model: numbers are targets to negotiate
+
+Define a **reviewed** case as successful only if it is authorized, grounded, correct by adjudicated business rules, and accepted by an eligible human. Denominator must include errors, timeouts and refusals as separately tagged outcomes.
+
+\`\`\`text
+task_success_rate = accepted_correct_tasks / all_eligible_tasks
+cost_per_successful_task = all_attributed_run_cost / accepted_correct_tasks
+source_freshness_lag = query_visible_time - source_commit_time
+\`\`\`
+
+| Gate | How to measure | Release decision |
+|---|---|---|
+| Permission and row isolation | every attempted cross-tenant/assignment negative case | any observed leak blocks |
+| Evidence completeness | gold event IDs vs retrieved IDs by risk slice | missing mandatory records → refuse |
+| Anomaly / abstention accuracy | sealed labeled cases; business adjudication | threshold must be customer-agreed |
+| Source freshness | per-source ingest-to-query lag distribution | stale state labeled or blocks high-risk action |
+| Latency | p50/p95/p99 **end to end** including SQL and review | compare to workflow objective |
+| Reliability | timeout, queue depth, retries and degraded-mode rate | staged canary/rollback |
+| Business benefit | median reviewed investigation minutes vs comparable baseline | stop if no operational improvement |
+| Economics | cost per approved successful investigation | compare with manual effort and alternatives |
+
+**Illustrative budget exercise (not measured):** suppose a human-only case averages 12 minutes and a copilot-assisted case is hypothesized to need 5 minutes including review. The **arithmetic saving would be 7 minutes** *if measured on comparable task cohorts*. The system is **not** validated merely because those assumptions were written down; a fair pilot must record the actual distribution and regression/safety incidents.
+
+### 12.11.9 Deployment choice: SaaS, BYOC or private/VPC
+
+| Decision | Start with | Switch when |
+|---|---|---|
+| Deployment | customer-acceptable managed SaaS for fastest pilot | residency, network, contractual constraints require BYOC/VPC/on-prem |
+| Storage/read access | governed row/column controls, trusted service identity | customer-managed keys or local-only access required |
+| Workflow execution | one host-controlled workflow | durable state / human approval / independent execution stages justify graph |
+| Retrieval | exact/SQL order facts | text-heavy policies require ACL-aware lexical/dense retrieval |
+| Model | no LLM for anomaly classification; optional explanation only | measured semantic ambiguity warrants model path |
+| CDC cadence | lowest-complexity batch that meets agreed freshness | proven lag requires streaming and checkpointed replay |
+
+The architecture must preserve auditability, security boundaries, rollback and customer ownership regardless of deployment venue. Provider portability is not free: authentication, network egress, policy distribution and observability must each be revalidated after switching.
+
+### 12.11.10 Customer handoff and five-minute FDE answer
+
+**Handoff artifact checklist:** scope and non-goals; source/tenant contracts; event identity and replay policy; runbook for delayed carrier feed; IAM/row policy matrix; golden cases and risk slices; trace schema and redaction; SLO/incident owner; cost budget; version + rollback; consent-approved demo identity; stakeholder sign-off.
+
+**Interview summary:** “I would first quantify where support investigation time is spent and verify which source system is authoritative. For the first thin slice, I would deliver an authorized read-only investigation of one order, using CDC/Lakehouse for traceable events and SQL exact lookup for structured IDs. I would compute the chronology deterministically and only use an LLM, if necessary, to explain vetted evidence. I would measure correctness, permission leakage, freshness, p95 latency and time saved against a baseline, with a human-reviewed acceptance gate. I would not add multi-agent autonomy or refund tools until we prove the workflow needs them. Then I would deploy to the customer-approved security boundary and hand over an eval suite, runbook and rollback plan.”
+
+**Source-verification boundaries (first-party, checked 2026-10-08):**
+- [Delta Lake CDF](https://docs.delta.io/delta-change-data-feed/) — opt-in, captures changes only after enablement, change data subject to retention.
+- [Delta streaming reads/writes](https://docs.delta.io/delta-streaming/) — checkpoint and \`txnAppId + txnVersion\` options for idempotent writer behavior, with restart caveats.
+- [Apache Spark Structured Streaming](https://spark.apache.org/docs/4.0.3/streaming/apis-on-dataframes-and-datasets.html) — late data/watermarks with operator-specific limits.
+- [Databricks Unity Catalog row filters and masks](https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks) — query-time row filtering, column masking and ABAC trade-offs.
+- [Azure AI Search document-level access](https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview) — trusted identity vs string filters; native ACL/RBAC preview/version limits.
+- [AWS Well-Architected retries](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_prevent_interaction_failure_idempotent.html) and [bounded backoff](https://docs.aws.amazon.com/wellarchitected/2023-04-10/framework/rel_mitigate_interaction_failure_limit_retries.html) — idempotent writes and limited retry amplification.
+
+This section is the **canonical system-level case owner**. Refer to CH11 for CDC/Spark/SQL detail, CH02–05 for authorized retrieval/grounding, CH08 for workflow orchestration, CH09 for evaluation and CH10 for runtime identity/serving. The presentation fragment in \`web/assets/ch12-order-investigation-capstone.html\` is **derived content**.
