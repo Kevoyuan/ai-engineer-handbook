@@ -24,6 +24,8 @@ jobs:
           npm install --no-audit --no-fund
           npm run sync-content
           npm run build
+      - name: Validate 167 provenance source pointers with stdlib
+        run: python3 scripts/verify_fde_coverage.py
       - name: Verify source coverage, bilingual QA fragments, search and markdown
         run: |
           python3 - <<'PY'
