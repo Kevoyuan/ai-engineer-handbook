@@ -46,7 +46,7 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
       assert.equal(await page.getByRole("menuitem", { name: /GitHub/ }).count(), 0);
       await page.keyboard.press("Escape");
       await page.getByRole("button", { name: "切换为中文" }).click();
-      assert.equal(await page.locator("html").getAttribute("lang"), "zh");
+      assert.equal(await page.locator("html").getAttribute("lang"), "zh-CN");
       console.log("PASS direct Reader GitHub/locale", width);
       await context.close();
     }
