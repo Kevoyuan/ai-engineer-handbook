@@ -421,3 +421,57 @@ When error rate = failures/eligible requests, specify the denominator (e.g., ten
 - [Spark Structured Streaming](https://spark.apache.org/docs/latest/streaming/index.html) — stateful event-time windowing beyond a stdlib deque.
 
 **Canonical ownership:** CH11 owns data parsing, correctness-oriented algorithms, windows and Python/SQL processing; CH02 owns production retrieval ANN/heap eligibility; CH08 owns workflow execution, dependency boundaries and DAG orchestration.
+
+
+## 11.12 FDE Feature Store and SQL vs NoSQL contracts (Q56–Q57)
+
+> **First-party verified (2026-10-08):** Databricks Feature Store feature engineering, point-in-time lookups and Model Registry links follow Databricks docs. Storage recommendations below are workload-specific engineering synthesis, not a measured customer benchmark.
+
+### Q56 · Feature Stores：为什么只有 Delta Table 还不够？
+
+A **feature store** defines reusable, discoverable, governed features with provenance plus training/serving lookup contracts. A normal Delta table can hold feature values but does **not automatically** guarantee point-in-time correctness, training-serving parity, a feature-spec contract or latency suitable for online inference.
+
+```text
+events/CDC → feature calculation/versioning → governed offline table
+                           ↓
+  training example (entity, label_time)
+    → AS-OF feature lookup (feature_time <= label_time)
+                           ↓
+             model registry / signature
+                           ↓
+  batch / online feature lookup under approved identity
+```
+
+**Time-series leakage trap**: for a churn label observed at 2026-10-08 12:00, a feature computed using 13:00 customer activity is future information. Joining on customer_id alone leaks it. If a timestamp is merely an ordinary key rather than declared as a time-series key, **do not assume** point-in-time lookup behavior: Databricks docs distinguish time-series columns and point-in-time joins.
+
+| Contract | Required test | Violation |
+|---|---|---|
+| Entity identity | tenant_id + entity_id + feature_definition_version | tenant-mixed feature |
+| Observation time | feature_available_at <= label_as_of | future label leakage |
+| Offline/online | same logical feature definition and window | training-serving skew |
+| Freshness | observed source-to-serving lag | stale signal masquerading as live |
+| Deletion/consent | revoke PII features and invalidate online copies | unauthorized retained feature |
+
+For time-dependent data, a robust as-of join may need both *event time* and *availability time* constraints: a late-arriving event may claim an earlier timestamp but not have been available to the model at its historical prediction time. State which historical question you are evaluating: “what actually happened” or “what could the model know then.” This bitemporal distinction is a general data-engineering design beyond any one Feature Store API.
+
+Databricks offers **Feature Views** (public preview as of the reviewed documentation) and table-based feature authoring; reference availability and runtime/version restrictions rather than assuming every workspace supports the same API.
+
+### Q57 · SQL vs NoSQL: Choosing a Data Store：什么时候换数据库反而更危险？
+
+Start with query patterns, consistency and transaction boundaries:
+
+| Workload | Candidate | Why | Counterexample |
+|---|---|---|---|
+| Authoritative order/payment rows | transactional SQL with constraints | joins, transactions, unique IDs | eventually consistent cache is not payment system of record |
+| Aggregation / analytics / governed AI data | Lakehouse/warehouse | batch history, SQL windows, lineage | transaction updates need explicit CDC/reconciliation |
+| Unstructured document retrieval | lexical/vector index | search ranking and embeddings | search index must not assign official financial status |
+| High-volume sparse key-value state | NoSQL/KV with documented guarantees | predictable keyed access, scaling | cross-record invariant may be difficult without transactions |
+| Relationship-heavy explanation | graph view/store if justified | multi-hop relations | graph doesn't grant user access to the linked resources |
+
+**FDE trade-off:** SQL versus NoSQL is not binary good/bad. “NoSQL scales better” ignores partition key skew, transaction model and operational consistency. “SQL cannot scale” ignores partitioning and managed distributed databases. Choose from actual cardinality, read/write shape, required atomicity, global presence, cost and tested operational expertise.
+
+**Failure injection:** the query cache returns stale order status while the transactional ledger has committed a refund reversal. The host must consult the source of record before any write or irreversible advice; annotate read-model freshness for customer explanations.
+
+**Primary verification:** [Databricks Feature Store overview](https://docs.databricks.com/aws/en/machine-learning/feature-store), [Feature Store point-in-time lookup semantics](https://docs.databricks.com/aws/en/machine-learning/feature-store/concepts), [Model lifecycle in UC](https://docs.databricks.com/aws/en/machine-learning/manage-model-lifecycle/). Storage choice matrix is handbook synthesis and must be validated with a workload benchmark.
+
+**Cross-chapter:** CH10 owns serving, model registry and transactions; CH11 owns features, point-in-time SQL and source ownership; CH02 owns document retrieval indexes.
