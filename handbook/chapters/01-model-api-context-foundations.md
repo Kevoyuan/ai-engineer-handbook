@@ -1726,3 +1726,86 @@ Primary / first-party or original research sources:
 > **Capacity, selection, and reuse are separate design axes.**
 
 > **Optimize cost per successful task, not price per token or GPU hour.**
+
+ 
+## 1.21 FDE ML foundations · 从优化机制到数据泄漏（Q24–Q29）
+
+> **独立研究边界 · 2026-10-08：** 这些题目是根据 [FDEInterviews 公开 Concepts](https://www.fdeinterviews.com/concepts) 独立组织的问答，**不是付费答案**。下述算式和教学数据是通用数学与原创例子；PyTorch/scikit-learn 行为以所附一手文档为准。模型学习示意不等于实测训练实验。
+
+### 1.21.1 Q24 · Gradient Descent & Learning Rate：loss 下降，为什么不保证验证集变好？
+
+**面试结论。** Gradient descent 在当前参数处沿负梯度方向更新：θ(next) = θ - η∇L(θ)，其中学习率 η 调整步长。它直接最小化选择的训练目标，不自动最小化客户任务风险。学习率过大可能振荡/发散，过小可能慢；非凸问题无法一般保证全局最优。
+
+- **优化层证据：** 看训练 loss、梯度范数、NaN、有效 batch size、学习率调度以及运行时的数值精度。
+- **泛化层证据：** 用固定、独立的 validation 按数据来源/时间/客户切片分析；不能用 test set 调学习率。
+- **工程选择：** 对知识过期导致的答错，先修 RAG/源数据；对模型输出格式或风格稳定性不足，才考虑有证据的微调。不要因为 loss 下降就宣布 production RAG 正确。
+- **反例：** 在过去一周的重复订单上训练得到更小 loss，却在下周未见过的 carrier 格式上变差。源分布和抽样不是同一回事。
+
+### 1.21.2 Q25 · Bias-Variance Tradeoff、Overfitting and Regularization：怎么诊断“线下 98%，线上 70%”？
+
+**Bias–variance 是分析近似概念而非每种网络都可完全拆成一个单一数字。** 高偏差（欠拟合）常在训练集和验证集都差；高方差（过拟合）常表现为训练好、独立验证差。但离线线上差异还可能来自**数据泄漏、源端漂移、用户群切换、标签错误和授权过滤**，不能只凭两个百分数确诊。
+
+| 根因假设 | 需要的证据 | 正确动作 |
+|---|---|---|
+| 欠拟合 / 高 bias | train、validation 均弱 | 检查标签和特征，再调容量/优化 |
+| 过拟合 / 高 variance | train 好、同分布 holdout 差 | 数据覆盖、正则化、早停/模型复杂度 |
+| 数据泄漏 | “未来”信息/同订单进入 train 和 test | 按时间、实体或客户划分；**先 split 后 fit preprocessing** |
+| 分布/概念漂移 | 不同周/客户错误集中 | 时间窗/客群切片 + 版本归因 |
+
+**关键反例：** 特征标准化若在全量数据上先 fit 再 train/test split，会把测试集统计信息泄漏给训练过程；scikit-learn 官方 Common Pitfalls 明确要求预处理参数只能在训练折里学习。时间序列则采用适合时间的数据分割与 gap，而不是随机打乱。正则化缓解过拟合，但**修不了泄漏**。
+
+### 1.21.3 Q26 · Information Theory：Entropy、Cross-Entropy、KL、Perplexity 与数值稳定
+
+- 熵 H(p) = -Σ p(x)log p(x)，刻画分布的不确定性（单位取决于对数底）。
+- 交叉熵 H(p,q) = -Σ p(x)log q(x)：用模型 q 为目标分布 p 编码的平均代价。在常见分类训练中衡量目标与预测差异。
+- KL(p||q) = Σ p(x)log[p(x)/q(x)] = H(p,q) - H(p)，**不对称**，不等于一种普通距离。
+- 语言模型 perplexity = exp(平均以自然对数计的 token NLL)，需要相同 tokenization、样本和归约定义才适合对比。
+
+**数值稳定：** 不要先手工算 exp(1000) 再除和，应该使用 log-sum-exp：
+~~~~python
+import math
+def logsumexp(values):
+    if not values:
+        raise ValueError("empty logits")
+    m = max(values)
+    return m + math.log(sum(math.exp(v - m) for v in values))
+~~~~
+对多个类使用 logits 输入 PyTorch CrossEntropyLoss；二分类以 logits 输入 BCEWithLogitsLoss，而不是先 sigmoid 再不稳定地计算两个 log。PyTorch 文档明确指出后者组合使用了 log-sum-exp 技巧。**困惑度下降 ≠ grounded RAG 成功率必然上升**。
+
+### 1.21.4 Q27 · Neural Network Basics, Activation Functions, Loss Functions, Batch vs Layer Normalization
+
+从最小 MLP 出发：
+~~~~text
+features x → Linear(Wx+b) → activation(ReLU/GELU) → Linear
+           → logits → task-specific loss → backprop/optimizer
+~~~~
+
+| 组件 | 作用 | 高频误解 |
+|---|---|---|
+| Linear / Perceptron → MLP | 学习特征的仿射映射与非线性组合 | 再堆 Linear 而无非线性仍只是仿射组合 |
+| ReLU / GELU / sigmoid | 非线性激活、输出形状受任务影响 | sigmoid 不是所有网络的默认 hidden activation |
+| CrossEntropyLoss | 多类目标，对原始 logits 求损失 | 不需要预先对 logits 做 softmax |
+| BCEWithLogitsLoss | 二分类/multilabel 的稳定 logits 损失 | naive sigmoid + log 会数值不稳定 |
+| BatchNorm | 依训练 batch 统计量；通常追踪运行统计用于 eval | 小批量分布变化可能影响行为 |
+| LayerNorm | 沿指定特征维归一化（每样本），无需批间统计 | 不代表“所有归一化都相同” |
+
+**选择原则：** 先搞清楚输出是什么——多类互斥、多个独立标签、回归还是 next-token prediction，再确定激活与 loss 的契约。batch/layer normalization 的轴、训练/推理状态不应凭直觉互换。
+
+### 1.21.5 Q28 · Catastrophic Forgetting、Semi-Supervised / Self-Training：新客户微调会有什么风险？
+
+**Catastrophic forgetting** 指顺序训练新任务后旧任务能力退化的现象；是否发生取决于模型、数据、训练设置，不是 fine-tuning 的必然定律。LoRA 等 PEFT 降低可训练参数量，**不能自动证明不遗忘**。必须在旧任务/新任务/越权拒绝/客户语言切片上保留回归测试。
+
+**Semi-supervised learning** 混合少量标签和大量未标注样本；**self-training** 用模型为未标注样本生成伪标签再迭代。最大风险是错误自增强与分布偏差，尤其当低置信度数据被无差别回写。合格流程：隔离 test holdout → 过滤/校准伪标签 → 人工抽检高风险切片 → 评估新旧任务 → 按回归门禁决定是否推广。对于订单事实错误，应先追踪数据库和事件定义，**不是默认采取自训练**。
+
+### 1.21.6 Q29 · Convex vs Non-Convex Optimization 与 Computer Vision 任务边界
+
+凸优化目标在定义域为凸且满足凸性时，局部最优也是全局最优；一般深层网络是非凸问题，训练能取得有用解不表示有严格全局最优保证。对生产 AI Engineer，更实际的问题是优化器/损失是否稳定、泛化是否可信、数据契约是否正确。
+
+Computer Vision 三种不同任务：**Classification** 输出图片类别；**Detection** 输出目标位置及类别；**Segmentation** 为像素分配标签/实例。文档影像 OCR/VLM 场景要选择与标注粒度一致的 metric（文档级准确率、bbox IoU、像素级 IoU、字段 exact match），不能拿图片分类 accuracy 代替表格抽取质量。
+
+**Source boundary & follow-ups (reviewed 2026-10-08):**
+- [scikit-learn Common Pitfalls and data leakage](https://scikit-learn.org/stable/common_pitfalls.html), [time-series split](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html): preprocessing and evaluation separation.
+- [PyTorch CrossEntropyLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html), [BCEWithLogitsLoss](https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html), [LayerNorm](https://docs.pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html), [BatchNorm1d](https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm1d.html): framework contracts.
+- The mathematical distinctions and synthetic scenarios are handbook teaching synthesis. **No training experiment or production performance claim was made.**
+
+**Ownership:** CH01 owns model/ML fundamentals. CH09 owns customer eval, metrics/calibration/experimental design. CH11 owns malformed data and time-aware SQL. The Python fixture at examples/fde-interview-engineering exercises deterministic algorithms, not a foundation-model training run.
