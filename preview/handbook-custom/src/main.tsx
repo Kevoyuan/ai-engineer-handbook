@@ -227,8 +227,18 @@ function App() {
   }, [page, chapterIndex]);
   useEffect(() => {
     if (page !== "reader") return;
+    // Only an intentional pointer movement INTO the screen's upper edge
+    // reveals hidden chrome. Tiny cursor jitter while scrolling must not.
+    let previousPointerY: number | null = null;
     const revealAtEdge = (event: MouseEvent) => {
-      if (event.clientY <= 16) setChromeVisible(true);
+      const previous = previousPointerY;
+      previousPointerY = event.clientY;
+      if (
+        previous !== null &&
+        previous > 36 &&
+        event.clientY <= 10 &&
+        event.movementY < 0
+      ) setChromeVisible(true);
     };
     const revealForKeyboard = (event: KeyboardEvent) => {
       if (event.key === "Tab") setChromeVisible(true);
@@ -1033,6 +1043,7 @@ function App() {
             setFocus={setFocus}
             onReadingContext={setReadingContext}
             onChromeVisible={setChromeVisible}
+            chromeVisible={chromeVisible}
             onToggleTheme={() => setDark((value) => !value)}
             dark={dark}
           />
