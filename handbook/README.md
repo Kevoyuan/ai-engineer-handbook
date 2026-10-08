@@ -125,3 +125,16 @@ Do not create a new semantic supplement next to an existing canonical chapter me
 ## FDEInterviews concept ownership (2026-10-08)
 
 The [167-concept routing inventory](references/fde-2026-concept-crosswalk.md) preserves the source's ten tracks and maps each item to exactly one of chapters 01–12. A mapping is a knowledge ownership plan, **not** an audited completeness claim. New CH11 owns the data plane; new CH12 owns the customer delivery process. Continue deepening existing chapters instead of duplicating their knowledge in the new files.
+
+
+## Independently researched FDE practice and 167-concept audit
+
+The public FDEInterviews topic catalog is a **scope/index** only; the handbook does not claim access to paid answer keys. Independent answer explanations are canonical chapter content, with product-specific claims verified against first-party sources and fictional scenarios labeled.
+
+- [Q1–Q9 source and verification limits](references/fde-2026-verified-answer-ledger.md): CH02 access-aware retrieval, CH09 evals, CH10 idempotency/retries.
+- [Q10–Q23 source and verification limits](references/fde-2026-answers-02-04-provenance.md): CH10 production FDE system design (§10.26), CH11 Databricks/Data & SQL (§11.10).
+- [167 FDE topics → one canonical chapter each](references/fde-2026-concept-crosswalk.md).
+- [167-item heading/body/no-direct-signal evidence audit](references/fde-2026-coverage-audit.md): 2026-10-08 review-branch baseline, **not a readiness/completion score**.
+- [Auditable evidence-pointer verifier](../scripts/verify_fde_coverage.py): no external service or paid content required.
+
+The delivery case remains in CH12 §12.11. Public-facing content changes still require generated bilingual assets plus the separate release process. A feature-branch push is **not** Vercel production publication.
