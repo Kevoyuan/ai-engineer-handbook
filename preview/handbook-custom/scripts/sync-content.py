@@ -34,6 +34,13 @@ for chapter in chapters:
  # so BeautifulSoup never turns markers such as <!-- CH7 --> into visible English text.
  for comment in main.find_all(string=lambda node: isinstance(node, Comment)):
   comment.extract()
+ # Verification boundaries are useful evidence notes, but they should not dominate reading flow.
+ # Convert them into native, keyboard-accessible disclosures that stay collapsed by default.
+ for note in main.select('aside.co.note[id^="verification-"]'):
+  note.name='details'
+  note['class']=list(dict.fromkeys(note.get('class',[])+['verification-note']))
+  title=note.select_one('.co-t')
+  if title:title.name='summary'
  # Keep trusted document structure and topology; remove executables and dead navigation.
  for el in main.find_all(True):
   for attr in list(el.attrs):
