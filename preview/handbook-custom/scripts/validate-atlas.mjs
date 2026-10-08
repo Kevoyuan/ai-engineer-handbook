@@ -3,6 +3,21 @@ import { readFileSync } from "node:fs";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const chapters = JSON.parse(read("../src/chapters.json"));
+const canonical = JSON.parse(read("../../../web/chapters.json"));
+const metadata = JSON.parse(read("../src/atlas-metadata.json"));
+assert.equal(metadata.length, canonical.length, "Authored Atlas metadata must match canonical chapter count");
+assert.equal(new Set(metadata.map((entry) => entry.slug)).size, canonical.length,
+  "Authored Atlas metadata slugs must be unique");
+assert.deepEqual(
+  chapters,
+  canonical.map((chapter) => {
+    const record = metadata.find((entry) => entry.slug === chapter.slug);
+    assert(record, chapter.slug + ": missing Atlas metadata");
+    const {slug, ...details} = record;
+    return {...chapter, ...details};
+  }),
+  "Generated chapters must exactly match canonical source + authored Atlas metadata",
+);
 const main = read("../src/main.tsx");
 const reader = read("../src/reader.tsx");
 const styles = read("../src/handbook.css");
