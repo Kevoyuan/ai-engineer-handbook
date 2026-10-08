@@ -2277,12 +2277,12 @@ body {
 .notebook-shell {
   width: min(100%, 1240px);
   margin: 0 auto;
-  padding: 3.5rem 4rem 5rem;
+  padding: 2.25rem 4rem 4rem;
 }
 
 .atlas-intro {
   max-width: 58rem;
-  padding-bottom: 3rem;
+  padding-bottom: 2rem;
 }
 
 .atlas-eyebrow,
@@ -2354,7 +2354,7 @@ body {
   display: grid;
   grid-template-columns: minmax(9rem, 11rem) minmax(0, 1fr);
   gap: 2rem;
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -2546,7 +2546,7 @@ body {
 
 .notebook-header {
   max-width: 44rem;
-  padding-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -2675,7 +2675,7 @@ body {
   }
 
   .atlas-intro {
-    padding-bottom: 2rem;
+    padding-bottom: 1.5rem;
   }
 
   .atlas-intro h1 {
@@ -3035,7 +3035,7 @@ body {
 .concept-shell {
   width: min(100%, 1060px);
   margin: 0 auto;
-  padding: 3rem 4rem 5rem;
+  padding: 2rem 4rem 4rem;
 }
 
 .concept-back {
@@ -3054,15 +3054,15 @@ body {
 .concept-header {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 1.1fr);
-  gap: 4rem;
+  gap: 2.5rem;
   align-items: end;
-  padding: 4rem 0 3rem;
+  padding: 2.25rem 0 2rem;
   border-bottom: 1px solid var(--border);
 }
 
 .concept-header h1 {
   margin-top: 0.75rem;
-  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
   line-height: 0.98;
   letter-spacing: -0.06em;
   font-weight: 590;
@@ -3085,7 +3085,7 @@ body {
   display: grid;
   grid-template-columns: 9rem minmax(0, 1fr);
   gap: 2rem;
-  padding: 2rem 0;
+  padding: 1.25rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -3137,8 +3137,8 @@ body {
 .concept-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 15rem;
-  gap: 4rem;
-  padding-top: 2.5rem;
+  gap: 2.5rem;
+  padding-top: 1.75rem;
 }
 
 .concept-sources header h2 {
@@ -3232,7 +3232,7 @@ body {
   }
 
   .concept-header {
-    padding: 2.5rem 0 2rem;
+    padding: 1.5rem 0 1.5rem;
   }
 
   .concept-header h1 {
