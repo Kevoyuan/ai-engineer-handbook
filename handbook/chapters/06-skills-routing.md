@@ -1339,9 +1339,43 @@ failure slices
 
 尤其要把“输出永远合法”与“输出足够正确”分别评估。
 
-### 6.10.7 Source boundary
+### 6.10.7 Agent Loop Decision Checkpoints：把 Jev 放在决策边界，而不是替代执行器
 
-本节最初由用户提供的视频总结触发；2026-10-07 又核对了 AI Engineering 的《Jev vs LLM Clearly Explained》。两份材料的共同核心是：Jev 面向预定义闭环决策，适合与传统 LLM 形成 System-One + System-Two 分工。后者进一步强调了 open-output vs bounded-decision 的对比，以及 decision model 在 agent harness 中用于 routing / gating / progress / completion checks 的位置。
+AI Engineering 2026-09-23 的 [《Jev Clearly Explained》](https://aiengineering.beehiiv.com/p/jev-clearly-explained) 从 Coding Agent 的运行过程解释 System-One 的位置。它不是一个 Jev 端到端实测，而是一个 **decision-layer architecture example**：主 LLM 负责找 Bug、读代码、提出修复；周围的 harness 反复做 bounded judgments，且必须保留确定性执行边界。
+
+| Agent stage | Bounded question（可交给 decision model） | Evidence / 输入状态 | 决策后仍由代码负责的边界 |
+|---|---|---|---|
+| **Pre-step routing** | 这一步适合哪个模型？哪些工具可能相关？ | 当前目标、步骤复杂度、工具描述、历史失败 | Tool allowlist、实际工具可见范围、model / cost budget |
+| **Pre-action gate** | 这次具体 Tool Call 风险多大？是否值得人工复核？ | **完整命令 + 参数 + 目标路径 + 任务上下文** | 文件权限、sandbox、删除禁令、审批策略；模型分数不能授权 |
+| **Post-tool check** | 返回结果是否足以继续？是否存在语义异常？ | Exit code、HTTP status、artifact、test result、trace | 先用确定性规则核验成功/失败，再对模糊质量作模型判断 |
+| **Loop control** | 是否在有效推进？是否重复搜索？是否该停止/升级？ | 唯一动作数、最近错误、进度增量、时间/token预算 | 最大循环次数、超时、成本上限、重试次数、人工接管 |
+| **Final acceptance** | 用户目标是否真正完成？最终回答是否有依据？ | 修复 diff、测试、需求验收项、引用 / evidence | 由测试与 acceptance contract 做最终验证；不能只信 Agent 自评 |
+
+把上面变成可落地的 harness，需要区分两种不同问题：
+
+~~~text
+"Does this proposed action look dangerous?"
+→ fuzzy bounded judgment（decision model）
+
+"Is this user authorized to execute this command?"
+→ deterministic authorization（code）
+
+"Did the shell process exit with code 0?"
+→ deterministic observation（code）
+
+"Does this outcome substantively satisfy the user's request?"
+→ bounded semantic evaluation + external evidence gate
+~~~
+
+例子：`rm -rf ./build` 在临时构建目录里可能合理，面对不受信任路径则可能危险。模型可以输出“需要审批”的**风险信号**，却不能把“97% safe”转换为绕过权限检查的执行许可。同样，连续执行 `search → open → search → open` 不等于有进展；可用语义判断辅助识别停滞，但硬性的 loop / spend cap 始终要在代码中生效。
+
+**Structured Output ≠ Decision Model：** 让通用 LLM 返回 `{"urgent": true}` 仍属于受 schema 约束的生成；Jev 的产品定位是直接对预定义问题返回类型化值及概率。无论哪一种，schema 合法都不能证明语义判断正确。对照实验应包含 routing quality、false approval / false block、stuck-loop recall、completion false-positive、P95 latency，以及下游 task success。
+
+> **Decision models produce evidence for a branch; the runtime owns the branch, permissions, and side effects.**
+
+### 6.10.8 Source boundary
+
+本节最初由用户提供的视频总结触发；2026-10-08 补充核对 AI Engineering 在 2026-09-23 发布的《Jev Clearly Explained》，并沿用 2026-10-07 对其 2026-09-25 后续文章《Jev vs LLM Clearly Explained》的核验。三份材料的共同核心是：Jev 面向预定义闭环决策，适合与传统 LLM 形成 System-One + System-Two 分工。后者进一步强调了 open-output vs bounded-decision 的对比，以及 decision model 在 agent harness 中用于 routing / gating / progress / completion checks 的位置。
 
 Handbook 对其做了以下工程化整理：
 
@@ -1353,10 +1387,11 @@ Handbook 对其做了以下工程化整理：
 - 明确 parallel sampling 只消除独立 decision 的不必要串行生成，不消除 workflow 的真实数据依赖；
 - 保留 confidence、fallback、authorization、evaluation 与 human review 边界。
 
-官方核对日期：2026-10-07（公开来源核验，未进行 live inference benchmark）。AI Engineering 文中的 Jev latency / price / speed 数字来自 TypeSafe 官方公开材料，Handbook 将其视为 vendor-reported evidence，不升级为跨地区 SLA 或独立 benchmark。
+官方核对日期：2026-10-08（补充核对 09-23 原文；公开来源核验，未进行 live inference benchmark）。同篇 newsletter 的 GitHub Voice Agent 是基于语音转录、LLM 工具调用和 GitHub API 的独立实作，并非 Jev 集成案例，不应用它推断 Jev 的性能。AI Engineering 文中的 Jev latency / price / speed 数字来自 TypeSafe 官方公开材料，Handbook 将其视为 vendor-reported evidence，不升级为跨地区 SLA 或独立 benchmark。
 
 Sources:
 
+- https://aiengineering.beehiiv.com/p/jev-clearly-explained
 - https://aiengineering.beehiiv.com/p/jev-vs-llm-clearly-explained
 - https://typesafe.ai/blog/introducing-system-one-models-and-jev
 - https://docs.typesafe.ai/introduction
