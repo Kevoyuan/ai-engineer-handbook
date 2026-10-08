@@ -30,6 +30,7 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
           headerTransition: getComputedStyle(document.querySelector(".reader-workspace .topbar")).transitionProperty,
           barPosition: getComputedStyle(document.querySelector(".reader-workspace .topbar")).position,
           spacerHeight: parseFloat(getComputedStyle(document.querySelector(".chapter-body"), "::before").height) || 0,
+          spacerDisplay: getComputedStyle(document.querySelector(".chapter-body"), "::before").display,
         }));
         const initial = await metrics();
         assert.equal(Math.round(initial.headerHeight), 52);
@@ -37,7 +38,7 @@ const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
           "Chrome transition must not animate layout: " + initial.headerTransition);
         assert.equal(initial.barPosition, width <= 767 ? "fixed" : "absolute");
         if (width > 767) assert(initial.spacerHeight >= 52, "Initial desktop clearance must scroll away");
-        if (width <= 767) assert.equal(initial.spacerHeight, 0);
+        if (width <= 767) assert.equal(initial.spacerDisplay, "none");
 
         await scroller.evaluate(el => { el.scrollTop = 1000; });
         await page.waitForTimeout(300);
