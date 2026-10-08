@@ -1,4 +1,4 @@
-name: Final production build for PR70 (no deployment in CI)
+name: Final production build for PR70 (verified canonical CH11–12)
 on:
   push:
     branches: [content/fde-02-04-system-data-audit-20261008]
