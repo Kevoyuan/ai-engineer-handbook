@@ -2395,3 +2395,42 @@ Enterprise IdP → verified OIDC/SAML exchange → trusted principal
 **Negative tests**: wrong aud token, expired token, tenant-switch request, token replay, removed group, revoked employee still holding a stale session, service principal broad access; no protected tool or retrieved document may enter the prompt on denial. Never implement production JWT verification from a model-generated code snippet without a trusted standard library, issuer discovery/key rotation and security review.
 
 [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html) is the normative OIDC reference; [SAML 2.0 OASIS](https://docs.oasis-open.org/security/saml/v2.0/) covers SAML specifications. CH10 §10.22/10.24 owns runtime policy execution; CH02 §2.7 protects retrieval; CH06 owns tool authorization.
+
+
+## 10.28 Distributed Training (FSDP, Parallelism) and Palantir platform architecture (Q63–Q64)
+
+> **Evidence boundary:** The technical behaviors below are drawn from the PyTorch FSDP2 API and Palantir's first-party platform documentation as of 2026-10-08. Q63–Q64 are original interview prompts, not official FDEInterviews answers. A documentation review does not prove performance or feature access in a specific customer environment.
+
+### Q63 · Distributed Training (FSDP, Parallelism)：Data Parallel、Tensor Parallel、Pipeline Parallel 谁解决显存？
+
+| Approach | Core idea | Typical limiting factor |
+|---|---|---|
+| DDP / replicated data parallel | each worker owns a full model replica, receives distinct samples; gradients synchronize | whole model/optimizer state replicated |
+| FSDP / ZeRO-style state sharding | partition parameter/gradient/optimizer states across workers, all-gather when needed | collective communication, activation memory, checkpoint/restoration |
+| Tensor parallel | split large layer operations across accelerator devices | intra-layer all-reduce, fast interconnect |
+| Pipeline parallel | split sequential layer stages across devices | pipeline bubbles, microbatch design, stage imbalance |
+
+**FSDP2** in PyTorch has a distinct `fully_shard()` API using distributed tensors and per-parameter sharding. It is **not** the same library interface as the original FSDP1 wrapper. The PyTorch docs recommend bottom-up application to submodules to overlap per-layer all-gather with compute; wrapping only root can prevent that overlap. Validate `model(input)` hooks, checkpoint restore, mixed precision, per-device OOM, network contention and world-size changes in a real cluster.
+
+**FDE decision:** if customer is **serving** a hosted LLM and not training large weights, distributed **training** parallelism may be irrelevant. First inspect request throughput, KV cache, prefill/decode and memory (CH10 §10.1–10.8, §10.27). Do not advocate FSDP as a generic inference speed optimization.
+
+[PyTorch FSDP1](https://docs.pytorch.org/docs/stable/fsdp.html) · [PyTorch FSDP2 fully_shard reference](https://docs.pytorch.org/docs/stable/distributed.fsdp.fully_shard.html).
+
+### Q64 · Palantir's Platform: Foundry, AIP, Gotham and Apollo：谁是数据层、Agent 层、交付层？
+
+Palantir's first-party documentation describes an **integrated stack**, not four interchangeable buzzwords:
+
+| Platform | Vendor-described primary role | Important qualification |
+|---|---|---|
+| **Foundry** | data operations, transformation, logic authoring, Ontology, analytics/workflows | ontology is not simply a vector database; objects, links, actions form a governed operational representation |
+| **AIP** | generative AI integration, agent/automation development, AI-enabled apps and evals | model connectivity does not by itself settle customer authorization or tool approval |
+| **Apollo** | continuous delivery and infrastructure management for integrated services | release/deployment plane, not the authoritative source of business ontology |
+| **Gotham** | defense/intelligence operational product/domain workflows | distinct domain-oriented applications and access models; verify specific product/enrollment entitlements |
+
+Palantir's official architecture center emphasizes **Foundry + AIP + Apollo** as the primary three platform architecture; Gotham is not simply a fourth layer in that same basic trio. The Ontology maps real objects, relationships and **Actions** to operational workflows, unlike a static GraphRAG evidence index.
+
+**FDE architecture comparison:** for the Order Investigation Copilot, map Delta/SQL/CDC to Foundry-like data/logic plane, a governed entity/action model to Ontology, agent tool flow to AIP-like execution, and managed rollout to Apollo-like delivery. This is an **architectural analogy**, not a statement that an independent Databricks/LangGraph stack implements Palantir product features or is API-compatible.
+
+**Key interview question:** “Which existing enterprise system owns the order, status semantics, tenant permissions and approval?” Determine that before prescribing any Palantir SKU or any generic LLM orchestration graph.
+
+**Sources:** [Palantir official AIP/Foundry/Apollo architecture](https://www.palantir.com/docs/foundry/architecture-center/platforms), [Foundry Ontology introductory concepts](https://www.palantir.com/docs/foundry/getting-started/introductory-concepts), [AIP architecture](https://www.palantir.com/docs/foundry/architecture-center/aip-architecture). Gotham product-specific capabilities are **not comprehensively audited** in this chapter and must be verified for each proposed deployment.
