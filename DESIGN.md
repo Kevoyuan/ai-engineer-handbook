@@ -184,6 +184,16 @@ Verification-boundary notes are supporting evidence metadata, not primary readin
 
 Code keys, strings and numbers use theme-specific syntax tokens from `preview/handbook-custom/src/handbook.css`. Inline role fills use a subtle mixed surface with the normal text foreground. Filled and hovered controls always pair `--primary` with `--primary-foreground`; never override only one side. Verify actual computed contrast on both themes: at least 4.5:1 for ordinary text and 3:1 for large text.
 
+## Cross-surface reading density and UI audit
+
+The Atlas, Notebook, Concept, Architecture, Search, and all Reader chapters share one UI quality floor: content-first hierarchy, real semantic grouping, no accidental page-level horizontal overflow, and a 44px minimum touch target on actions. Review representative widths at 390, 768, 1440 and 1728px in both languages and themes; use actual browser geometry and keyboard/accessibility tests rather than CSS guesses.
+
+**Vertical space is a budget.** Avoid fixed minimum heights on short explanations, unanswered practice feedback, and loaded-file preview panes. Concept node flows should remain visually connected but compact, with legible labels and visible directional arrows; mobile diagrams stack without oversized inter-node gutters. Do not change topology, source meaning, or make all different diagrams into generic cards.
+
+**Archify overview is a preview, not a second full-page diagram.** Keep a height-bounded thumbnail and one clearly labeled Open map action. The full diagram remains accessible through the viewer, including zoom and export. Do not duplicate the same destination through redundant clickable thumbnail and button.
+
+Across Atlas/Notebook/Concept routes, use a tighter vertical rhythm while preserving headings and the system spine's information hierarchy. Never compress interactive controls below 44px. Search's shortcut hint must describe both Ctrl+K and ⌘K since both are supported; screen layout must not imply a Mac-only binding.
+
 ## Interactive concept diagrams
 
 Use interaction when it explains a decision, evidence relationship or feedback loop. Current examples are Query Routing (chapter 03), RAG evidence gates (04), progressive skill loading and authorization gates (06), governed memory retrieval (07) and bounded Agent loops (08). Place each teaching module beside the relevant original figure or after its owning section, retaining the full static diagram and article. A toolbar shortcut takes readers directly to the module.

@@ -1455,6 +1455,10 @@ body,
   color: var(--muted-foreground);
   background: var(--secondary);
 }
+/* Tiny stage pills need full text contrast in both themes. */
+.chapter-body .bfs-stage-pill {
+  color: var(--foreground);
+}
 .chapter-body .bfs-strip {
   height: 2px;
   opacity: 0.6;
@@ -2117,20 +2121,20 @@ button[data-variant="default"] {
 }
 
 /* Concept teaching: motion communicates the selected stage, never delays reading. */
-.concept-slot { margin: 2rem 0; }
-.chapter-body .concept-demo { padding: 1.5rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card); color: var(--foreground); scroll-margin-top: 1rem; font-size: 1rem; }
+.concept-slot { margin: 1.25rem 0; }
+.chapter-body .concept-demo { padding: 1.125rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card); color: var(--foreground); scroll-margin-top: 1rem; font-size: 1rem; }
 .chapter-body .concept-heading h3 { margin: 0; font-size: 1.25rem; line-height: 1.5; font-weight: 650; color: var(--foreground); }
-.chapter-body .concept-heading p { margin: .5rem 0 1.5rem; color: var(--muted-foreground); font-size: .875rem; line-height: 1.65; }
+.chapter-body .concept-heading p { margin: .375rem 0 .875rem; color: var(--muted-foreground); font-size: .875rem; line-height: 1.65; }
 .concept-examples { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
 .concept-demo button { min-height: 44px; }
 .concept-examples button { border: 1px solid transparent; }
 .concept-examples button[aria-pressed="true"] { border-color: var(--border); color: var(--foreground); }
-.concept-input { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: baseline; padding: 1rem; background: var(--background); border-radius: .625rem; }
+.concept-input { display: grid; grid-template-columns: auto 1fr; gap: .75rem; align-items: baseline; padding: .75rem; background: var(--background); border-radius: .625rem; }
 .concept-input > span, .concept-outcome > span { color: var(--muted-foreground); font-size: .8125rem; }
 .chapter-body .concept-input p { margin: 0; font-size: .9375rem; line-height: 1.6; }
-.concept-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; margin: 1.5rem 0; }
+.concept-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.375rem; margin: 1rem 0; }
 .concept-node-wrap { min-width: 0; position: relative; }
-.concept-node { display: flex; flex-direction: column; gap: .5rem; justify-content: center; align-items: flex-start; position: relative; width: 100%; min-height: 132px; padding: 1rem; border: 1px solid var(--border); border-radius: .625rem; background: var(--background); color: var(--foreground); text-align: left; }
+.concept-node { display: flex; flex-direction: column; gap: .35rem; justify-content: center; align-items: flex-start; position: relative; width: 100%; min-height: 104px; padding: .75rem; border: 1px solid var(--border); border-radius: .625rem; background: var(--background); color: var(--foreground); text-align: left; }
 .concept-node[data-current="true"] { border-color: var(--primary); background: var(--accent); }
 .concept-node:hover { border-color: var(--primary); }
 .concept-node:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
@@ -2139,30 +2143,30 @@ button[data-variant="default"] {
 .concept-node .concept-node-status { font-size: .75rem; }
 .concept-node[data-current="true"] .concept-node-status { color: var(--primary); }
 .concept-node-marker { position: absolute; left: -1px; top: 25%; bottom: 25%; width: 3px; border-radius: 2px; background: var(--primary); }
-.concept-connector { position: absolute; display: grid; place-items: center; width: 2rem; height: 2rem; right: -2rem; top: calc(50% - 1rem); color: var(--muted-foreground); }
+.concept-connector { position: absolute; display: grid; place-items: center; width: 1.375rem; height: 2rem; right: -1.375rem; top: calc(50% - 1rem); color: var(--muted-foreground); }
 .concept-connector svg { width: 1rem; height: 1rem; }
 .concept-packet { position: absolute; width: .5rem; height: .5rem; border-radius: 50%; background: var(--primary); }
 .concept-loop { display: flex; gap: .75rem; align-items: center; border-bottom: 1px solid var(--border); padding: 0 0 1rem; margin-top: -.5rem; font-size: .8125rem; color: var(--muted-foreground); }
 .concept-loop > span { font-size: 1.5rem; }
 .concept-loop[data-return="true"] { color: var(--primary); }
-.concept-explanation { min-height: 120px; padding: 1rem 0; }
+.concept-explanation { min-height: 5.5rem; padding: .75rem 0; }
 .chapter-body .concept-explanation h4 { margin: 0 0 .5rem; font-size: 1rem; font-weight: 650; line-height: 1.5; color: var(--foreground); }
 .chapter-body .concept-explanation p { margin: 0; font-size: .9375rem; line-height: 1.75; color: var(--muted-foreground); max-width: 75ch; }
-.concept-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .5rem 0 1rem; }
+.concept-controls { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; padding: .375rem 0 .625rem; }
 .concept-transport { display: flex; flex-wrap: wrap; gap: .5rem; }
 .concept-position { font-size: .8125rem; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
-.concept-outcome { display: flex; gap: .75rem; flex-wrap: wrap; align-items: baseline; border-top: 1px solid var(--border); padding-top: 1rem; }
+.concept-outcome { display: flex; gap: .625rem; flex-wrap: wrap; align-items: baseline; border-top: 1px solid var(--border); padding-top: .75rem; }
 .concept-outcome strong { font-size: .875rem; font-weight: 600; }
 .chapter-body .concept-takeaway { margin: .75rem 0 0; font-size: .8125rem; line-height: 1.65; color: var(--muted-foreground); }
 @media (prefers-reduced-motion: no-preference) { .concept-demo button { transition: transform 160ms ease-out; } .concept-demo button:active:not(:disabled) { transform: scale(.98); } }
 @container (max-width: 767px) {
   .chapter-body .concept-demo { padding: 1rem; }
-  .concept-flow { grid-template-columns: 1fr; gap: 2rem; }
-  .concept-node { min-height: 96px; display: grid; grid-template-columns: 1fr auto; gap: .5rem 1rem; }
+  .concept-flow { grid-template-columns: 1fr; gap: 1.5rem; }
+  .concept-node { min-height: 72px; display: grid; grid-template-columns: 1fr auto; gap: .5rem 1rem; }
   .concept-node .concept-node-status { grid-column: 1 / -1; }
   .concept-node > span:not(.concept-node-status):not(.concept-node-marker) { text-align: right; }
-  .concept-connector { right: calc(50% - 1rem); top: auto; bottom: -2rem; transform: rotate(90deg); }
-  .concept-explanation { min-height: 160px; }
+  .concept-connector { right: calc(50% - 1rem); top: auto; bottom: -1.75rem; transform: rotate(90deg); }
+  .concept-explanation { min-height: 6rem; }
   .concept-input { grid-template-columns: 1fr; gap: .5rem; }
 }
 .concept-examples { align-items: center; gap: 1rem; }
@@ -2171,40 +2175,40 @@ button[data-variant="default"] {
 .concept-examples select:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 .concept-transport button { min-width: 44px; padding: .5rem 1rem; }
 .learning-caption { color: var(--muted-foreground); font-size: .8125rem; line-height: 1.6; }
-.chapter-body .archify-overview { margin: 0 0 2rem; padding: 0; border: 1px solid var(--border); border-radius: .75rem; background: var(--background); }
-.archify-overview-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem; }
+.chapter-body .archify-overview { margin: 0 0 1.25rem; padding: 0; border: 1px solid var(--border); border-radius: .75rem; background: var(--background); }
+.archify-overview-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 1rem; }
 .archify-kicker { font: 500 .6875rem/1.5 var(--font-mono); letter-spacing: .12em; color: var(--muted-foreground); }
 .chapter-body .archify-overview-heading h4 { font-size: 1.125rem; line-height: 1.5; color: var(--foreground); margin: .5rem 0 0; }
 .chapter-body .archify-overview-heading a { display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; padding: .5rem 1rem; flex-shrink: 0; color: var(--foreground); text-decoration: none; white-space: nowrap; }
 .chapter-body .archify-overview-heading a svg { width: 1rem; height: 1rem; flex: 0 0 1rem; }
-.archify-poster { display: block; background: #fff; border-block: 1px solid var(--border); }
+.archify-poster { display: grid; place-items: center; max-height: 17rem; overflow: hidden; background: #fff; border-block: 1px solid var(--border); }
 .archify-poster:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
-.archify-poster img { display: block; width: 100%; height: auto; }
+.archify-poster img { display: block; width: 100%; max-height: 17rem; height: auto; object-fit: contain; }
 .archify-poster .archify-dark { display: none; }
 .dark .archify-poster { background: #0b1020; }
 .dark .archify-poster .archify-light { display: none; }
 .dark .archify-poster .archify-dark { display: block; }
-.chapter-body .archify-overview figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1.5rem; padding: 1rem 1.5rem; text-align: left; }
+.chapter-body .archify-overview figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .375rem 1rem; padding: .75rem 1rem; text-align: left; }
 .chapter-body .archify-overview figcaption p { margin: 0; font-size: .875rem; line-height: 1.7; color: var(--foreground); }
 .archify-overview figcaption > span { color: var(--muted-foreground); font-size: .8125rem; line-height: 1.7; }
 @container (max-width: 767px) { .archify-overview-heading { align-items: flex-start; flex-direction: column; padding: 1rem; } .chapter-body .archify-overview figcaption { padding: 1rem; } }
-.skill-inspector { margin: 0 0 1.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: .625rem; background: var(--background); }
-.skill-context-heading { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+.skill-inspector { margin: 0 0 1rem; padding: .875rem; border: 1px solid var(--border); border-radius: .625rem; background: var(--background); }
+.skill-context-heading { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: .625rem; }
 .skill-context-heading strong { font-size: .9375rem; }
 .chapter-body .skill-file-tabs { display: flex; flex-wrap: wrap; width: fit-content; max-width: 100%; gap: .25rem; padding: .25rem; border-radius: .75rem; background: var(--secondary); box-shadow: var(--shadow-well); }
 .chapter-body .skill-file-tabs [role="tab"] { min-height: 44px; white-space: normal; gap: .5rem; padding: .5rem .75rem; border-radius: .5rem; background: transparent; }
 .chapter-body .skill-file-tabs [role="tab"][data-state="active"] { background: var(--card); color: var(--foreground); box-shadow: var(--shadow-cap); }
 .chapter-body .skill-file-tabs [role="tab"]:focus-visible { box-shadow: inset 0 0 0 2px var(--ring); }
 .skill-load-state { font-size: .75rem; }
-.skill-file-content { min-height: 180px; overflow-wrap: anywhere; }
+.skill-file-content { min-height: 0; overflow-wrap: anywhere; }
 .chapter-body .skill-file-content p { margin: 0 0 .75rem; font-size: .875rem; line-height: 1.7; }
 .chapter-body .skill-file-content pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8125rem; line-height: 1.8; margin: 0; color: var(--foreground); background: transparent; border: 0; padding: 0; }
 .chapter-body .skill-inspector > p { margin: 1rem 0 0; font-size: .8125rem; }
-.knowledge-check { border-top: 1px solid var(--border); margin-top: 1.5rem; padding-top: 1rem; }
+.knowledge-check { border-top: 1px solid var(--border); margin-top: 1rem; padding-top: .75rem; }
 .knowledge-trigger { min-height: 44px; max-width: 100%; padding: .5rem 1rem; white-space: normal; text-align: left; }
-.knowledge-content { margin-top: 1rem; }
+.knowledge-content { margin-top: .75rem; }
 .chapter-body .knowledge-content h4 { margin: .5rem 0 1rem; font-size: 1rem; line-height: 1.6; color: var(--foreground); }
-.knowledge-options { gap: .75rem; }
+.knowledge-options { gap: .5rem; }
 .knowledge-option { display: flex; align-items: center; gap: .75rem; min-height: 48px; padding: .75rem 1rem; border: 1px solid var(--border); border-radius: .625rem; cursor: pointer; font-size: .9375rem; line-height: 1.6; }
 .knowledge-option[data-selected="true"] { border-color: var(--primary); background: var(--accent); }
 .knowledge-option:focus-within { box-shadow: 0 0 0 2px var(--ring); }
@@ -2212,7 +2216,7 @@ button[data-variant="default"] {
 .knowledge-option [role="radio"]::before { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 5px; background: var(--input); box-shadow: var(--shadow-well); }
 .knowledge-option [role="radio"][data-state="checked"]::before { border-color: color-mix(in srgb, var(--primary) 20%, transparent); background: var(--card); box-shadow: none; }
 .knowledge-option [role="radio"] > span { position: relative; z-index: 1; }
-.knowledge-feedback { min-height: 132px; padding: 1rem 0; }
+.knowledge-feedback { min-height: 0; padding: .75rem 0; }
 .knowledge-feedback strong { font-size: .9375rem; }
 .chapter-body .knowledge-feedback p { margin: .5rem 0 0; font-size: .875rem; line-height: 1.75; color: var(--muted-foreground); }
 .learning-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
@@ -2221,12 +2225,12 @@ button[data-variant="default"] {
 @container (max-width: 767px) {
   .skill-file-tabs { width: 100%; }
   .skill-file-tabs button { flex: 1 1 100%; justify-content: space-between; }
-  .skill-file-content { min-height: 220px; }
-  .knowledge-feedback { min-height: 180px; }
+  .skill-file-content { min-height: 0; }
+  .knowledge-feedback { min-height: 0; }
 }
 .concept-examples select { padding-inline: 2rem; }
-.chapter-body .concept-node { min-height: 132px; }
-@container (max-width: 767px) { .chapter-body .concept-node { min-height: 96px; } }
+.chapter-body .concept-node { min-height: 104px; }
+@container (max-width: 767px) { .chapter-body .concept-node { min-height: 72px; } }
 
 
 /* 2026-10-07 Atlas redesign — engineering workbench × technical manual × system topology. */
@@ -2277,12 +2281,12 @@ body {
 .notebook-shell {
   width: min(100%, 1240px);
   margin: 0 auto;
-  padding: 3.5rem 4rem 5rem;
+  padding: 2.25rem 4rem 4rem;
 }
 
 .atlas-intro {
   max-width: 58rem;
-  padding-bottom: 3rem;
+  padding-bottom: 2rem;
 }
 
 .atlas-eyebrow,
@@ -2354,7 +2358,7 @@ body {
   display: grid;
   grid-template-columns: minmax(9rem, 11rem) minmax(0, 1fr);
   gap: 2rem;
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -2546,7 +2550,7 @@ body {
 
 .notebook-header {
   max-width: 44rem;
-  padding-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -2675,7 +2679,7 @@ body {
   }
 
   .atlas-intro {
-    padding-bottom: 2rem;
+    padding-bottom: 1.5rem;
   }
 
   .atlas-intro h1 {
@@ -3035,7 +3039,7 @@ body {
 .concept-shell {
   width: min(100%, 1060px);
   margin: 0 auto;
-  padding: 3rem 4rem 5rem;
+  padding: 2rem 4rem 4rem;
 }
 
 .concept-back {
@@ -3054,15 +3058,15 @@ body {
 .concept-header {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 1.1fr);
-  gap: 4rem;
+  gap: 2.5rem;
   align-items: end;
-  padding: 4rem 0 3rem;
+  padding: 2.25rem 0 2rem;
   border-bottom: 1px solid var(--border);
 }
 
 .concept-header h1 {
   margin-top: 0.75rem;
-  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
   line-height: 0.98;
   letter-spacing: -0.06em;
   font-weight: 590;
@@ -3085,7 +3089,7 @@ body {
   display: grid;
   grid-template-columns: 9rem minmax(0, 1fr);
   gap: 2rem;
-  padding: 2rem 0;
+  padding: 1.25rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -3137,8 +3141,8 @@ body {
 .concept-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 15rem;
-  gap: 4rem;
-  padding-top: 2.5rem;
+  gap: 2.5rem;
+  padding-top: 1.75rem;
 }
 
 .concept-sources header h2 {
@@ -3232,7 +3236,7 @@ body {
   }
 
   .concept-header {
-    padding: 2.5rem 0 2rem;
+    padding: 1.5rem 0 1.5rem;
   }
 
   .concept-header h1 {
