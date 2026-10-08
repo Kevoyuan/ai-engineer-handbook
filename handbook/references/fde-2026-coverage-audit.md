@@ -243,6 +243,10 @@
 | Coding & Engineering Craft | 8 | 2 | 0 | 10 |
 | The Customer-Facing Craft | 5 | 0 | 0 | 5 |
 
+## Separate six-dimensional interview-readiness review
+
+The [core 36-topic source-evidence review](./fde-2026-readiness-core36.md) is a **manual, provisional depth assessment** of a prioritized sample and includes 4 interview scenarios; [structured grading data](./fde-2026-readiness-core36.json) and [source-pointer tests](../../scripts/verify_fde_readiness.py) allow mechanical consistency verification. It is **not** a reclassification of all 167 topics; another **131 topics have no such depth score**. The previous H136/B31/N0 names-only signal remains unchanged and should never be described as full topic coverage.
+
 ## Audit method and limitations
 
 1. Each original concept is classified in the **assigned** canonical chapter only, using its source title and a finite declared alias dictionary; matches from a different chapter are intentionally not mistaken for owner coverage.
