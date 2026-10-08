@@ -80,7 +80,7 @@
 }
 .chapter-body .jev-dfc-side-head p {
   margin: 0;
-  color: var(--jev-muted);
+  color: #44534a;
   font-size: 13px;
   line-height: 1.55;
 }
@@ -126,8 +126,8 @@
   background: #27313f;
   text-align: center;
 }
-.jev-dfc-single-model strong { font-size: 15px; font-weight: 730; }
-.jev-dfc-single-model span { font-size: 12px; opacity: .82; }
+.chapter-body .jev-dfc-single-model strong { color: #fff; font-size: 15px; font-weight: 730; }
+.chapter-body .jev-dfc-single-model span { color: #edf1f4; font-size: 12px; }
 .jev-dfc-roles { display: grid; gap: 10px; align-content: start; flex: 1; }
 .jev-dfc-role {
   display: block;
@@ -244,6 +244,7 @@
   --jev-green: #a8d5b7;
   --jev-green-line: #547e62;
 }
+.dark .jev-dfc-side-head p { color: #c4d2c9; }
 .dark .jev-dfc-task,
 .dark .jev-dfc-role,
 .dark .jev-dfc-role-name strong { color: #e7eee9; }
