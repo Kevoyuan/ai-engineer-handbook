@@ -137,7 +137,7 @@ const groups = [
     en: "Evaluation & production",
     descriptionZh: "用评估、观测与平台能力把系统送进生产。",
     descriptionEn: "Move systems into production with evaluation, observability, and platform controls.",
-    range: [8, 10],
+    range: [8, 12],
   },
 ];
 const interactiveChapterNumbers = new Set(["03", "04", "06", "07", "08"]);
@@ -181,6 +181,14 @@ const descriptions = [
   [
     "理解推理服务、缓存、隔离与生产控制面。",
     "Explore serving, caching, isolation and production control planes.",
+  ],
+  [
+    "设计可靠的 CDC、Lakehouse、Spark 和 SQL 数据流，提供可核验的 AI 数据基础。",
+    "Design dependable CDC, Lakehouse, Spark and SQL data pipelines for grounded AI systems.",
+  ],
+  [
+    "把客户需求变成受控的最小交付、明确验收与可运营的系统。",
+    "Turn customer ambiguity into controlled thin slices, measurable acceptance and operable systems.",
   ],
 ];
 function read<T>(key: string, fallback: T): T {
