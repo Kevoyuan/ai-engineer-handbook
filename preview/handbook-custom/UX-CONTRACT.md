@@ -114,3 +114,16 @@ Downward movement must accumulate a meaningful distance before hiding the bar; u
 The supplied terminal reference replaces chapter 06's node-card player with a terminal/context split view. Scenario tabs reset running work and practice, and clear previous logs. Send starts an explicitly simulated 5-phase run; pause preserves the current transcript; single-step advances without a timer; reset clears the run. Missing inputs and authorization failures terminate at phase 2. A reset has no real-world effect. The component cancels stale timers on reset, scenario changes and unmount, and pauses when hidden or outside the visible reading area. Reduced motion keeps all controls usable and removes spatial animation.
 
 Internal-context content is an authored teaching model, not private model reasoning. Input token and cache figures are illustrative; the cost panel states that there are no real API calls. Full original context-layer descriptions remain behind a disclosure. Archify overview thumbnails are height-limited visual previews rather than duplicate navigation links; a single explicit Open map action opens the viewer in a new tab and discloses that behavior. Full zoom, export and topology remain available in the viewer. Memory's English reader labels its current Chinese-only visualization explicitly.
+
+
+## Structural decision labs · CH05 / CH09 / CH12
+
+Each of these canonical Reader chapters exposes exactly one additional chapter-local, lazy-mounted `#concept-demo`. The main article and static figure remain independent; if the optional React module fails, source content remains readable. The selected scenario affects only this illustration and never calls real PDF, trace, SQL or order APIs.
+
+- CH05 after `#fig-5-2`: three source-lineage scenarios reveal a valid source, a broken cross-page table, or unverified OCR/page provenance. A citation must resolve to the relevant source element and support the claim.
+- CH09 after `#fig-9-1`: three failure diagnosis scenarios mark a first suspicious run child and its separate offline-test and release consequences. No aggregate score is fabricated.
+- CH12 after the `#fde-framework` introduction: an editorial five-plane topology with seven named B1–B7 checks. Changes to canonical FDE semantics live in `handbook/chapters/12-fde-customer-delivery.md`, and the diagram states explicitly whether authorization or approval blocks the illustrative path.
+- Use one native scenario selector per lab; selected state uses `aria-pressed`, changed decision is one polite announcement. Reader deep links wait until portal mounting. Keep keyboard navigation, no autoplay, and text state markers.
+- Verify generated metadata from source, 10 registered Atlas labs, 4 viewport widths, both themes, both languages, 44px inputs, contrast and no clipping.
+- **Deployment boundary:** Git automatic Vercel deployment stays disabled; building in GitHub CI is not a Vercel publication.
+
