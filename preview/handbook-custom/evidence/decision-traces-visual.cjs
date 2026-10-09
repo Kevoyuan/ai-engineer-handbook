@@ -22,7 +22,7 @@ fs.mkdirSync(out,{recursive:true});
  const report=[];
  try {
   for(const config of cases) {
-   const context=await browser.newContext({viewport:{width:config.width,height:920},reducedMotion:"reduce"});
+   const context=await browser.newContext({viewport:{width:config.width,height:2200},reducedMotion:"reduce"});
    await context.addInitScript(({en,dark})=>{
      localStorage.setItem("preview-locale",JSON.stringify(en));
      localStorage.setItem("preview-theme",JSON.stringify(dark));
