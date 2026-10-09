@@ -57,6 +57,16 @@ Scrollbars retain their gutters while their thumbs stay transparent at rest. Scr
 - Preserve the canonical chapter in both locales without injecting new generated-source ownership. Failing diagrams must not hide or obstruct article material. Do not start timers, fetch files or execute tools from the educational diagrams.
 - CH10 and CH11 visualization coverage is additive. The five existing interactive lessons remain supported and keep their separate lesson/quiz behavior.
 
+## Decision Trace V2 · CH03, CH04 and CH08
+
+The current lesson player owns `example` and `step`. Its source-grounded trace is a pure visual projection of that state: it cannot navigate, fetch, execute tools, change policy, or auto-advance. The existing four nodes, previous/next, opt-in playback and two-question practice remain unchanged. Stage selection in CH08's second retry round must stay within the second round.
+
+- CH03 explains chosen versus skipped retrieval routes, an illustrative authorized candidate gate, and the *conditional* recovery route after insufficient evidence; changing the current frame updates which phases are checked/executed.
+- CH04 maps its four teaching frames onto Gate 0 → Gates 1–2 → Gate 3 → Gates 4–5; conflicting/insufficient evidence explicitly blocks an unqualified claim and guides the safe decision.
+- CH08 shows bounded Plan → Act → Observe → Check cycles, a conditional Retry edge only with remaining budget/permission, and distinct Verified Stop versus Incomplete Handoff.
+- A trace contains no second live region: the existing lesson explanation remains the single polite step announcement. All meaningful states have textual labels, and visual structure remains legible with reduced motion and without color.
+- Browser regression `npm run test:decision-traces` covers the three lessons at 390, 768, 1440 and 1728px, both locales and both themes. It verifies existing lab controls and practice still work.
+
 ## Article learning interactions
 
 Chapters 03, 04, 06, 07 and 08 expose the existing interactive-diagram shortcut. Chapters 10 and 11 now offer an independent optional Visualization V2 scenario lab using the same Reader and Atlas deep-link contract. Chapter 06 adds three illustrative skill-routing scenarios with inspectable summary, instruction and reference layers; input or authorization failures never display a simulated tool execution. Chapter 07 adds preference, superseded-knowledge and permission-memory scenarios. These examples derive from the canonical chapters and do not issue model or file requests.
