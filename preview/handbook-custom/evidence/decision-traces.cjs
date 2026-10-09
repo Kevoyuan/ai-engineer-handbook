@@ -44,6 +44,15 @@ const cases = [
               await example.selectOption(String(sample));
               assert.equal(await trace.getAttribute("data-scenario"), String(sample));
               assert.equal(await trace.getAttribute("data-step"), "0");
+              if (spec.kind === "query-routing")
+                assert.match(await trace.locator(".trace-decision strong").innerText(),
+                  en ? /not executed yet/ : /尚未执行检索/);
+              if (spec.kind === "evidence-gates")
+                assert.equal(await trace.locator(".trace-evidence-signal strong").innerText(),
+                  en ? "Not assessed" : "尚未评估");
+              if (spec.kind === "agent-loop")
+                assert.match(await trace.locator(".trace-round-head strong").first().innerText(),
+                  en ? /Awaiting tool evidence/ : /等待工具验证证据/);
               const total = spec.kind === "agent-loop" && sample === 1 ? 8 : 4;
               for (let step = 1; step < total; step++) {
                 await next.click();
@@ -70,6 +79,8 @@ const cases = [
                   await demo.locator(".concept-node").nth(2).click();
                   assert.equal(await trace.getAttribute("data-step"), "6",
                     "Clicking Observe in round two should stay in round two");
+                  assert.equal(await trace.locator('.trace-loop-exits [data-state="passed"] strong').innerText(),
+                    "RETRY", "A traversed retry is not the active transition");
                   await next.click();
                 }
               }
