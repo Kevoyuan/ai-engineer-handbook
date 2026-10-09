@@ -51,8 +51,24 @@ jobs:
         run: |
           test -f web/site/index.html
           test -d web/site/assets
-          grep -R -l 'When is prefix KV reusable' web/site/assets/ >/dev/null
-          grep -R -l 'Where does the data contract hold' web/site/assets/ >/dev/null
+          grep -R -l 'When is prefix KV reusable' web/site/preview-assets/ >/dev/null
+          grep -R -l 'Where does the data contract hold' web/site/preview-assets/ >/dev/null
+      - name: Install headless Chromium
+        run: cd preview/handbook-custom && npx playwright install --with-deps chromium
+      - name: Verify real browser interactions in two languages and themes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd preview/handbook-custom
+          npm run dev -- --port 4180 > /tmp/atlas-vite.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4180/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4180/ > /dev/null
+          HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/visualization-v2/smoke.cjs
       - name: Commit verified generated site to release branch
         shell: bash
         run: |
