@@ -289,3 +289,16 @@ Run, pause, single-step, reset and scenario switching control a bounded simulati
 Archify workflow specifications live in `preview/handbook-custom/diagrams/`. Delivered HTML owns standalone diagram layout and viewer behavior; do not hand-edit it. Inline PNGs and SVGs are native exports of that exact checked HTML. Chapter 06 places the map behind its full-context disclosure; chapter 07 keeps its overview. Archify's independent delivery, browser and image review receipts live in `evidence/archify/`. The English Memory candidate failed readability after two focused repairs and is not published; the English reader explicitly labels its Chinese diagram fallback.
 
 Before/after 390 and 1440 captures, a 1728 capture, runtime and accessibility checks, and measured spacing for the simulator live in `preview/handbook-custom/evidence/bento/`. `test:learning` covers all five lesson chapters and source-to-render canonical article preservation; `test:concepts` covers the four node diagrams. The terminal simulator additionally uses `node evidence/bento/check.cjs`.
+
+
+## Structural Visualization V3 · Evidence, diagnosis and responsibility
+
+CH05, CH09 and CH12 use three **different topologies** while retaining the same Knowledge Spine aesthetic, responsive text scale and semantic green signal.
+
+- **CH05 · Provenance lineage:** five source-grounded checks (`document → structure → evidence chunk → claim alignment → resolvable citation`). Display the earliest broken link, not a reassuring citation icon when the source cannot be reconstructed. A matching text span is not sufficient evidence for a table cell's row, unit or version.
+- **CH09 · Diagnostic trace tree plus evaluation return loop:** the root run contains observable child runs; trace storage is not the same as an offline golden dataset. Show first-fault investigation, privacy review, labeled regression, release policy and the conditional return of production evidence. A critical authorization regression blocks release regardless of average score.
+- **CH12 · Five responsibility planes plus B1–B7 review checks:** Customer / Workflow, Control, Data, Execution and Evidence / Operations. The previous markdown heading said "four" while its illustration named five. The revised chapter explicitly calls out the five names and enumerates B1–B7 as an authored capstone checklist, **not** universal interfaces.
+- Each chapter retains existing canonical figures. New teaching diagrams are optional lazy-mounted Reader elements and use the shared `#concept-demo` deep link. No second top-level app, no invented datasets or measured latency, and no live retrieval, parsing or execution.
+- Responsive geometry uses the *Reader content container*, not only viewport width. Each scenario control is a real, keyboard-accessible button with selected state, at least 44px high. Color never stands alone; reduced motion, light/dark, zh/en, static text, and readable source notes are required.
+- Keep the current Vercel policy `web/vercel.json → git.deploymentEnabled=false`. Source-only changes **must not** run `publish:web` or trigger automatic hosted builds.
+
