@@ -88,7 +88,8 @@ function RoutingTrace({scenario, step, en}: Omit<Props,"anchor"|"last">) {
     <div className="trace-decision" data-state={step>=2?"selected":"future"}>
       <span className="trace-label">{en?"ROUTE RATIONALE":"选路依据"}</span>
       <p>{txt(cfg.reason,en)}</p>
-      <strong>{txt(cfg.combine,en)}</strong>
+      <strong>{step >= 2 ? txt(cfg.combine,en) :
+        en ? "Planned path — not executed yet" : "已规划路径，尚未执行检索"}</strong>
     </div>
     <div className="trace-recovery" data-state={step===3?"current":"future"}>
       <span className="trace-label">{en?"IF EVIDENCE FAILS":"若证据检验未通过"}</span>
@@ -144,7 +145,9 @@ function EvidenceTrace({scenario,step,en}:Omit<Props,"anchor"|"last">) {
     <div className="trace-evidence-signal" data-state={step>=2?(scenario===0?"selected":"issue"):"future"}>
       <span className="trace-label">G3 / EVIDENCE STATE</span>
       <strong>{step>=2?c.signal:en?"Not assessed":"尚未评估"}</strong>
-      <small>{txt(c.label,en)}</small>
+      <small>{step >= 2 ? txt(c.label,en) :
+        en ? "Evaluate source relevance, authority and full claim support at Gate 3." :
+          "到 Gate 3 再判断来源是否相关、权威及能否完整支持结论。"}</small>
     </div>
     <div className="trace-policy-options" role="list" aria-label={en?"Possible policy outcomes":"可能的决策出口"}>
       {(["ANSWER","RESOLVE / ESCALATE","RETRIEVE_MORE / ABSTAIN"] as const).map((name,i)=>
@@ -155,7 +158,9 @@ function EvidenceTrace({scenario,step,en}:Omit<Props,"anchor"|"last">) {
     <div className="trace-decision">
       <span className="trace-label">G5 / DECISION POLICY</span>
       <strong>{step>=3?(en?c.decision:c.decisionZh):(en?"Await evidence and claim checks":"等待证据与 Claim 检查")}</strong>
-      <p>{txt(c.detail,en)}</p>
+      <p>{step >= 3 ? txt(c.detail,en) :
+        en ? "This scenario is still under review; a policy outcome has not been selected." :
+          "当前仍在检查证据，尚未作出最终策略决策。"}</p>
     </div>
     <p className="trace-source">{en?"Teaching illustration · CH04 §4.1, 4.3–4.5 · Six Gates are an engineering policy, not a proof.":"教学示意 · CH04 §4.1、4.3–4.5 · Six Gates 是工程策略，不是正确性的证明。"}</p>
   </div>;
