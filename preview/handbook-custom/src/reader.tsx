@@ -40,6 +40,17 @@ const VisualizationGuide = lazy(() =>
     default: module.VisualizationGuide,
   })),
 );
+const StructuralGuide = lazy(() =>
+  import("./structural-guides").then((module) => ({
+    default: module.StructuralGuide,
+  })),
+);
+const hasStructuralGuide = (slug: string) =>
+  [
+    "05-document-pdf-rag",
+    "09-reliability-evaluation-observability",
+    "12-fde-customer-delivery",
+  ].includes(slug);
 const hasVisualGuide = (slug: string) =>
   slug === "10-serving-deployment-ai-platform" || slug === "11-data-sql-engineering";
 const hasConceptDiagram = (slug: string) =>
@@ -249,7 +260,7 @@ export function Reader({
   // The interactive lesson mounts asynchronously after chapter HTML.
   // A direct Atlas link must resolve only after the concept-demo anchor exists.
   useEffect(() => {
-    if (!data || !diagramReady || !(hasConceptDiagram(chapter.slug) || hasVisualGuide(chapter.slug))) return;
+    if (!data || !diagramReady || !(hasConceptDiagram(chapter.slug) || hasVisualGuide(chapter.slug) || hasStructuralGuide(chapter.slug))) return;
     if (location.hash.split("/")[2] !== "concept-demo") return;
     const frame = requestAnimationFrame(() => jump("concept-demo"));
     return () => cancelAnimationFrame(frame);
@@ -457,6 +468,19 @@ export function Reader({
             <DiagramBoundary key={"visual-guide-" + chapter.slug + en} en={en}>
               <Suspense fallback={null}>
                 <VisualizationGuide
+                  key={chapter.slug + en}
+                  slug={chapter.slug}
+                  en={en}
+                  pane={pane}
+                  onReady={setDiagramReady}
+                />
+              </Suspense>
+            </DiagramBoundary>
+          )}
+          {data && !error && hasStructuralGuide(chapter.slug) && (
+            <DiagramBoundary key={"structural-guide-" + chapter.slug + en} en={en}>
+              <Suspense fallback={null}>
+                <StructuralGuide
                   key={chapter.slug + en}
                   slug={chapter.slug}
                   en={en}
