@@ -130,6 +130,7 @@
   padding:.55rem .35rem .55rem 0; border-radius:.35rem;
 }
 .chapter-body .struct-trace-tree li[data-state="block"] { background:var(--accent); outline:1px solid var(--primary); }
+.chapter-body .struct-trace-tree li[data-state="block"] small { color:var(--foreground); }
 .chapter-body .struct-trace-tree strong, .chapter-body .struct-eval-cycle strong { font-size:.8rem; font-weight:610; }
 .chapter-body .struct-trace-tree li > div,
 .chapter-body .struct-eval-cycle li { display:grid; gap:.2rem; }
