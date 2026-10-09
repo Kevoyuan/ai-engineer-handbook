@@ -59,7 +59,7 @@ try {
       assert.equal(await lab.locator(".struct-planes [data-plane]").count(),5);
       assert.equal(await lab.locator(".struct-boundaries li").count(),7);
       assert.equal(await lab.locator('.struct-boundaries li[data-state="block"]').count(),i===0?0:1);
-      assert.equal(await lab.locator('.struct-boundaries li[data-state="block"] .struct-step').first().innerText(),i===1?"B4":i===2?"B6":"B4");
+      if(i>0) assert.equal(await lab.locator('.struct-boundaries li[data-state="block"] .struct-step').first().innerText(),i===1?"B4":"B6");
     }
     tested++;
    }
