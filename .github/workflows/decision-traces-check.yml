@@ -57,10 +57,10 @@ jobs:
             sleep 1
           done
           curl -fsS http://127.0.0.1:4180/ >/dev/null
-          HANDBOOK_URL=http://127.0.0.1:4180/ npm run test:decision-traces
           DECISION_VISUAL_DIR="$PWD/evidence/decision-traces-review" \
             HANDBOOK_URL=http://127.0.0.1:4180/ \
             node evidence/decision-traces-visual.cjs
+          HANDBOOK_URL=http://127.0.0.1:4180/ npm run test:decision-traces
       - name: Preserve screenshot evidence for PR visual review
         if: always()
         uses: actions/upload-artifact@v4
