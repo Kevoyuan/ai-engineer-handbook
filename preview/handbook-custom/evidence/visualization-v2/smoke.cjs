@@ -1,6 +1,6 @@
 // Real-browser smoke gate for Visualization V2. Runs against Vite at port 4180.
 const assert = require("node:assert/strict");
-const { chromium } = require("../node_modules/playwright");
+const { chromium } = require("playwright");
 const base = process.env.HANDBOOK_URL || "http://127.0.0.1:4180/";
 const cases = [
   ["10-serving-deployment-ai-platform", 3],
@@ -37,7 +37,7 @@ const cases = [
               const control = controls.nth(i);
               await control.click();
               assert.equal(await control.getAttribute("aria-pressed"), "true");
-              assert.equal(await controls.locator('[aria-pressed="true"]').count(), 1);
+              assert.equal(await demo.locator('.v2-scenario[aria-pressed="true"]').count(), 1);
               assert((await demo.locator(".v2-insight strong").innerText()).trim().length > 15,
                 "Scenario must provide a meaningful decision");
               const box = await control.boundingBox();
