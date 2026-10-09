@@ -208,7 +208,6 @@
   .chapter-body .trace-loop-steps { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 390px) {
-  .chapter-body .trace-route-grid { grid-template-columns: minmax(0,1fr); }
   .chapter-body .trace-policy-options,.chapter-body .trace-loop-exits { grid-template-columns: minmax(0,1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -234,9 +233,13 @@
   }
 }
 @container decision-trace-layout (max-width: 345px) {
-  .chapter-body .trace-route-grid,
   .chapter-body .trace-policy-options,
   .chapter-body .trace-loop-exits {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container decision-trace-layout (max-width: 300px) {
+  .chapter-body .trace-route-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
