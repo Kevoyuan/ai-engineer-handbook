@@ -35,6 +35,13 @@ const ConceptDiagram = lazy(() =>
     default: module.ConceptDiagram,
   })),
 );
+const VisualizationGuide = lazy(() =>
+  import("./visualization-guides").then((module) => ({
+    default: module.VisualizationGuide,
+  })),
+);
+const hasVisualGuide = (slug: string) =>
+  slug === "10-serving-deployment-ai-platform" || slug === "11-data-sql-engineering";
 const hasConceptDiagram = (slug: string) =>
   [
     "03-hybrid-retrieval-query-routing",
@@ -239,6 +246,14 @@ export function Reader({
       window.removeEventListener("hashchange", onHash);
     };
   }, [data, en, chapter.slug, mobile]);
+  // The interactive lesson mounts asynchronously after chapter HTML.
+  // A direct Atlas link must resolve only after the concept-demo anchor exists.
+  useEffect(() => {
+    if (!data || !diagramReady || !(hasConceptDiagram(chapter.slug) || hasVisualGuide(chapter.slug))) return;
+    if (location.hash.split("/")[2] !== "concept-demo") return;
+    const frame = requestAnimationFrame(() => jump("concept-demo"));
+    return () => cancelAnimationFrame(frame);
+  }, [data, diagramReady, chapter.slug, mobile]);
   useEffect(() => {
     try {
       localStorage.setItem("handbook-reading-size", JSON.stringify(size));
@@ -366,7 +381,7 @@ export function Reader({
                 <DropdownMenuItem onSelect={toggle}>
                   {saved ? t("取消收藏章节", "Remove chapter bookmark") : t("收藏章节", "Save chapter")}
                 </DropdownMenuItem>
-                {hasConceptDiagram(chapter.slug) && (
+                {(hasConceptDiagram(chapter.slug) || hasVisualGuide(chapter.slug)) && (
                   <DropdownMenuItem
                     disabled={!diagramReady}
                     onSelect={() => { onChromeVisible?.(true); jump("concept-demo"); }}
@@ -429,6 +444,19 @@ export function Reader({
             <DiagramBoundary key={chapter.slug + en} en={en}>
               <Suspense fallback={null}>
                 <ConceptDiagram
+                  key={chapter.slug + en}
+                  slug={chapter.slug}
+                  en={en}
+                  pane={pane}
+                  onReady={setDiagramReady}
+                />
+              </Suspense>
+            </DiagramBoundary>
+          )}
+          {data && !error && hasVisualGuide(chapter.slug) && (
+            <DiagramBoundary key={"visual-guide-" + chapter.slug + en} en={en}>
+              <Suspense fallback={null}>
+                <VisualizationGuide
                   key={chapter.slug + en}
                   slug={chapter.slug}
                   en={en}

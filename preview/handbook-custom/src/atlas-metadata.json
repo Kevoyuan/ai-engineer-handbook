@@ -1,9 +1,6 @@
 [
   {
     "slug": "01-model-api-context-foundations",
-    "number": "01",
-    "zh": "Model / API / Context 基础",
-    "en": "Model / API / Context Foundations",
     "group": "model",
     "summaryZh": "理解 Generation、Token、Context、Sampling、Embedding、Adaptation 与模型迁移。",
     "summaryEn": "Understand generation, tokens, context, sampling, embeddings, adaptation, and model migration.",
@@ -19,9 +16,6 @@
   },
   {
     "slug": "02-enterprise-retrieval",
-    "number": "02",
-    "zh": "企业检索基础",
-    "en": "Enterprise Retrieval Foundations",
     "group": "retrieval",
     "summaryZh": "理解 Exact、BM25、Dense、Graph 与元数据过滤的边界。",
     "summaryEn": "Understand Exact, BM25, Dense, Graph and metadata filtering.",
@@ -37,9 +31,6 @@
   },
   {
     "slug": "03-hybrid-retrieval-query-routing",
-    "number": "03",
-    "zh": "混合检索与 Query Routing",
-    "en": "Hybrid Retrieval and Query Routing",
     "group": "retrieval",
     "summaryZh": "组合词法与语义检索，为不同问题选择合适的路径。",
     "summaryEn": "Combine lexical and semantic retrieval with query routing.",
@@ -55,9 +46,6 @@
   },
   {
     "slug": "04-rag-reliability-selective-answering",
-    "number": "04",
-    "zh": "RAG 可靠性与选择性回答",
-    "en": "RAG Reliability and Selective Answering",
     "group": "retrieval",
     "summaryZh": "衡量证据质量，在回答与拒答之间做可靠决策。",
     "summaryEn": "Assess evidence and decide when to answer or abstain.",
@@ -74,9 +62,6 @@
   },
   {
     "slug": "05-document-pdf-rag",
-    "number": "05",
-    "zh": "生产级 PDF RAG",
-    "en": "Production-grade PDF RAG",
     "group": "retrieval",
     "summaryZh": "从解析、分块到引用，构建可追溯的文档问答。",
     "summaryEn": "Build traceable document Q&A from parsing to citations.",
@@ -92,9 +77,6 @@
   },
   {
     "slug": "06-skills-routing",
-    "number": "06",
-    "zh": "Skills 与路由",
-    "en": "Skills and Routing",
     "group": "agent",
     "summaryZh": "组织可复用能力，让任务找到合适的工具与执行方式。",
     "summaryEn": "Organize reusable skills, tools and task routing.",
@@ -111,9 +93,6 @@
   },
   {
     "slug": "07-memory-context-engineering",
-    "number": "07",
-    "zh": "Memory 与上下文工程",
-    "en": "Memory and Context Engineering",
     "group": "agent",
     "summaryZh": "管理工作状态、长期记忆与上下文预算。",
     "summaryEn": "Manage working state, long-term memory and context budgets.",
@@ -129,9 +108,6 @@
   },
   {
     "slug": "08-agent-orchestration",
-    "number": "08",
-    "zh": "Agent 编排与内容生成",
-    "en": "Agent Orchestration and Content Generation",
     "group": "agent",
     "summaryZh": "设计执行循环、工作流与多 Agent 协作。",
     "summaryEn": "Design execution loops, workflows and multi-agent collaboration.",
@@ -147,9 +123,6 @@
   },
   {
     "slug": "09-reliability-evaluation-observability",
-    "number": "09",
-    "zh": "可靠性、评估与可观测性",
-    "en": "Reliability, Evaluation, and Observability",
     "group": "production",
     "summaryZh": "用评估、追踪与监控验证系统的真实表现。",
     "summaryEn": "Verify system behavior through evaluation, tracing and monitoring.",
@@ -166,9 +139,6 @@
   },
   {
     "slug": "10-serving-deployment-ai-platform",
-    "number": "10",
-    "zh": "推理服务、部署、安全与 AI 平台",
-    "en": "Inference Serving, Deployment, Security, and AI Platform",
     "group": "production",
     "summaryZh": "理解推理服务、缓存、隔离与生产控制面。",
     "summaryEn": "Explore serving, caching, isolation and production control planes.",
@@ -185,9 +155,6 @@
   },
   {
     "slug": "11-data-sql-engineering",
-    "number": "11",
-    "zh": "数据与 SQL 工程",
-    "en": "Data & SQL Engineering",
     "group": "production",
     "summaryZh": "设计可靠的 CDC、Lakehouse、Spark 和 SQL 数据流，提供可核验的 AI 数据基础。",
     "summaryEn": "Design dependable CDC, Lakehouse, Spark and SQL data pipelines for grounded AI systems.",
@@ -204,9 +171,6 @@
   },
   {
     "slug": "12-fde-customer-delivery",
-    "number": "12",
-    "zh": "FDE 客户交付与需求工程",
-    "en": "FDE Customer Delivery & Engineering Craft",
     "group": "production",
     "summaryZh": "把客户需求变成受控的最小交付、明确验收与可运营的系统。",
     "summaryEn": "Turn customer ambiguity into controlled thin slices, measurable acceptance and operable systems.",
