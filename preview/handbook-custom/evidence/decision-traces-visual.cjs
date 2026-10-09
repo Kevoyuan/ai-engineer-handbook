@@ -59,6 +59,10 @@ fs.mkdirSync(out,{recursive:true});
    assert(audit.right<=audit.viewport+2,config.short+" viewport clipped");
    assert.deepEqual(audit.overflowing,[],config.short+" leaf overflow");
    assert.deepEqual(runtime,[],config.short+" runtime exceptions");
+   if(axe.violations.length) console.error("WCAG_DETAILS",config.short,
+     JSON.stringify(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({
+       target:n.target,summary:n.failureSummary,html:n.html
+     }))}))));
    assert.deepEqual(axe.violations.map(v=>v.id),[],config.short+" WCAG issues: "+JSON.stringify(axe.violations.map(v=>v.id)));
    await context.close();
   }
