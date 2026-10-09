@@ -127,3 +127,18 @@ Each of these canonical Reader chapters exposes exactly one additional chapter-l
 - Verify generated metadata from source, 10 registered Atlas labs, 4 viewport widths, both themes, both languages, 44px inputs, contrast and no clipping.
 - **Deployment boundary:** Git automatic Vercel deployment stays disabled; building in GitHub CI is not a Vercel publication.
 
+
+
+## All-chapter Atlas Lab contract · context, permission, memory and data
+
+Every canonical chapter 01–12 now exposes one primary `#concept-demo`, but **only** 01 and 02 are newly added here. Chapter 07 and Chapter 11 have their original primary lessons and a second optional `#concept-extension` mental-model view. New labs must be lazily mounted into existing authored sections and must not delete authored figures or canonical content.
+
+- CH01 anchored to `#context-budget`: Context responsibility (not percentage), capacity vs effective use, omission of constraints during compression.
+- CH02 anchored to `#fig-2-1`: Authorized candidate prefilter, retrieval, and resource-level ACL recheck under source permission churn.
+- CH07 anchored to `#memory-promotion-compaction`: Write / Read lanes for consent, validity, conflict, scope; corrected explicit versions invalidate stale views.
+- CH11 anchored to `#data-etl-cdc`: Independent source-order, ingestion-order and SCD2 sequence-domain tracks; dedup and delete semantics are conditional on the source contract.
+- Keep a single primary deep-link target per chapter; custom ports are created with `createPortal` only after canonical content mounts. If an optional lab fails, article content remains readable.
+- The Atlas metadata still originates in `src/atlas-metadata.json`, the generated `src/chapters.json` is an output of `sync-content`. Twelve authored `interactive=true` flags must survive regeneration.
+- `test:mental-browser` covers 208 scenario state assertions at 390/768/1440/1728px, zh/en, light/dark. Automated source and Chromium tests do not replace manual screen-reader and touch review.
+- Git integration to Vercel stays disabled (`web/vercel.json`); CI is *not* a release workflow.
+
