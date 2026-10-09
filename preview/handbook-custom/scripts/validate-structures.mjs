@@ -6,6 +6,13 @@ const canonical={
   "09-reliability-evaluation-observability": ["fig-9-1","CH09",3],
   "12-fde-customer-delivery": ["fde-framework","CH12",3],
 };
+const mentalCases={
+  "01-model-api-context-foundations":"context-budget",
+  "02-enterprise-retrieval":"fig-2-1",
+  "07-memory-context-engineering":"memory-promotion-compaction",
+  "11-data-sql-engineering":"data-etl-cdc",
+};
+const mental=read("../src/concept-atlas-guides.tsx");
 const chapters=JSON.parse(read("../src/chapters.json"));
 const meta=JSON.parse(read("../src/atlas-metadata.json"));
 const reader=read("../src/reader.tsx");
@@ -21,6 +28,18 @@ for (const [slug,[anchor,,scenarioCount]] of Object.entries(canonical)) {
   assert(ui.includes('"#'+anchor+'"'),slug+": portal anchor missing");
   assert.equal(scenarioCount,3);
 }
+for(const [slug,anchor] of Object.entries(mentalCases)){
+  assert(read("../../../web/chapters/"+slug+"/index.html").includes('id="'+anchor+'"'),slug+": concept anchor missing");
+  assert(reader.includes('"'+slug+'"'),slug+": reader concept registration missing");
+  assert(mental.includes('"#'+anchor+'"'),slug+": portal anchor missing");
+}
+for(const token of ["ContextBudget","RetrievalBoundary","MemoryLifecycle","CdcTimeline",
+ 'id="concept-demo"', 'id="concept-extension"',
+ 'aria-pressed={i===current}', 'aria-live="polite"',
+ "source sequence", "Scope / ACL", "SCD Type 2"]){
+ assert(mental.includes(token),"Missing chapter-concept guard: "+token);
+}
+assert(chapters.every(x=>x.interactive),"All 12 Atlas chapters have a primary Lab");
 for(const token of [
  "ProvenanceGuide","EvaluationGuide","DeliveryGuide",
  'id="concept-demo"','aria-pressed={current === index}', 'aria-live="polite"',
@@ -36,4 +55,4 @@ assert(style.includes("prefers-reduced-motion: reduce"),"Must support reduced mo
 assert(source12.includes("Five responsibility planes, seven explicit checks"),"Canonical chapter plane count mismatch");
 for(let i=1;i<=7;i++)assert(source12.includes("**B"+i+" ·"),"Missing CH12 explicit B"+i+" boundary");
 assert(!ui.includes("Math.random")&&!ui.includes("fetch("),"Teaching diagrams must not fabricate observed data or call remote tools");
-console.log("Structural Guide V3 source contract PASS: CH05/09/12 canonical anchors, ten Atlas labs, 3×3 scoped scenarios, deep links, boundaries and accessibility hooks.");
+console.log("Structural Guide V3 source contract PASS: CH05/09/12 canonical anchors, twelve Atlas labs, 3×3 scoped scenarios, deep links, boundaries and accessibility hooks.");
