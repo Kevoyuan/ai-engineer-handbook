@@ -124,9 +124,6 @@
     }
   ],
   "git": {
-    "deploymentEnabled": {
-      "main": false,
-      "design/decision-traces-ch03-04-08-20261009": false
-    }
+    "deploymentEnabled": false
   }
 }
