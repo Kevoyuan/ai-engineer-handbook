@@ -24,9 +24,10 @@ const styles = read("../src/handbook.css");
 const demo = read("../src/concept-diagrams.tsx");
 const simulator = read("../src/skill-simulator.tsx");
 const visualGuides = read("../src/visualization-guides.tsx");
+const structuralGuides = read("../src/structural-guides.tsx");
 
 const expectedGroups = ["model", "retrieval", "agent", "production"];
-const expectedLabs = ["03", "04", "06", "07", "08", "10", "11"];
+const expectedLabs = ["03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 const numbers = new Set(chapters.map((chapter) => chapter.number));
 const slugs = new Set(chapters.map((chapter) => chapter.slug));
 
@@ -60,9 +61,9 @@ assert(main.includes("selectedAtlas.relatedNumbers"), "Inspector must use regist
 assert(main.includes('chapterHref(i, "concept-demo")'), "Atlas labs need direct chapter deep links");
 assert(reader.includes('location.hash.split("/")[2] !== "concept-demo"'),
   "Reader must defer the lab deep link until lazy content is ready");
-assert(demo.includes('id="concept-demo"') && simulator.includes('id="concept-demo"') && visualGuides.includes('id="concept-demo"'),
+assert(demo.includes('id="concept-demo"') && simulator.includes('id="concept-demo"') && visualGuides.includes('id="concept-demo"') && structuralGuides.includes('id="concept-demo"'),
   "Both regular diagrams and the skill simulator must expose the deep-link anchor");
 assert(styles.includes(".atlas-inspector-details") && styles.includes(".atlas-node-actions"),
   "Inspector and node actions must have shared styles");
 
-console.log("Atlas contract OK: 12 chapters, 4 layers, 7 labs, valid bilingual metadata and links.");
+console.log("Atlas contract OK: 12 chapters, 4 layers, 10 labs, valid bilingual metadata and links.");
