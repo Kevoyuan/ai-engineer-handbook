@@ -182,8 +182,10 @@ const memoryRead:readonly Copy[]=[
 ];
 function MemoryLifecycle({en}:{en:boolean}){
   const [choice,setChoice]=useState(0);const c=memoryCases[choice];
-  const lanes=[{key:"WRITE",name:["写入 / 晋升","Write / promotion"],parts:memoryWrite,states:c.write},
-    {key:"READ",name:["读取 / 上下文","Read / context"],parts:memoryRead,states:c.read}];
+  const lanes: readonly {key:string;name:Copy;parts:readonly Copy[];states:readonly State[]}[]=[
+    {key:"WRITE",name:["写入 / 晋升","Write / promotion"],parts:memoryWrite,states:c.write},
+    {key:"READ",name:["读取 / 上下文","Read / context"],parts:memoryRead,states:c.read},
+  ];
   return <section className="atlas-mental atlas-memory" id="concept-extension" data-mental-chapter="07"
     data-scenario={choice} aria-label={en?"Memory lifecycle and policy map":"记忆生命周期与策略地图"}>
     <Title code="07 / MEMORY · LEDGER & VIEWS" en={en}
