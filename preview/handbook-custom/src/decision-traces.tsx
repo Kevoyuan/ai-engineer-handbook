@@ -73,7 +73,7 @@ function RoutingTrace({scenario, step, en}: Omit<Props,"anchor"|"last">) {
         ? en?"Illustrative tenant / role / ACL / version checks precede retrieval.":"示例中租户、角色、ACL 与版本约束先于检索。"
         : en?"Retriever routes are planned only; permission checks come first.":"当前只是路径计划，必须先检查访问权限。"}</small></p>
     </div>
-    <div className="trace-route-grid" role="list" aria-label={en?"Candidate retrieval routes":"候选检索路径"}>
+    <div className="trace-route-grid" role="list" aria-label={en?"Retrieval routes and supporting evidence sources":"检索路径与支持证据来源"}>
       {routeLanes.map((lane,i) => {
         const active=cfg.selected.includes(i),executed=step>=2;
         return <div role="listitem" className="trace-route" key={lane.name}
@@ -110,7 +110,7 @@ const evidenceCases: ReadonlyArray<{signal:string; decision:string; decisionZh: 
   {signal:"SUPPORT",decision:"ANSWER",decisionZh:"附条件回答",
     detail:["核对生效范围与每条 Claim 的引用；回答必须保留限定条件。","Verify applicable conditions and claim-level citations; preserve qualifications."],
     label:["证据与 Claim 对齐","Evidence supports claims"]},
-  {signal:"CONFLICT",decision:"ESCALATE",decisionZh:"核对版本 / 升级",
+  {signal:"CONFLICT",decision:"RESOLVE / ESCALATE",decisionZh:"核对权威版本 / 必要时升级",
     detail:["比较版本、生效期、权威来源与地区；不能用检索排名代替冲突消解。","Compare versions, effective dates, authority and regions; rank does not resolve conflict."],
     label:["权威版本未消解","Authority unresolved"]},
   {signal:"INSUFFICIENT",decision:"RETRIEVE_MORE / ABSTAIN",decisionZh:"补检索 / 无法确认",
@@ -147,7 +147,7 @@ function EvidenceTrace({scenario,step,en}:Omit<Props,"anchor"|"last">) {
       <small>{txt(c.label,en)}</small>
     </div>
     <div className="trace-policy-options" role="list" aria-label={en?"Possible policy outcomes":"可能的决策出口"}>
-      {(["ANSWER","ESCALATE","RETRIEVE_MORE / ABSTAIN"] as const).map((name,i)=>
+      {(["ANSWER","RESOLVE / ESCALATE","RETRIEVE_MORE / ABSTAIN"] as const).map((name,i)=>
         <div role="listitem" key={name} data-state={i===scenario&&step>=3?"selected":"inactive"}>
           <span>{name}</span><strong>{i===scenario&&step>=3?en?"Chosen":"选中":en?"Not chosen":"未选"}</strong>
         </div>)}
@@ -176,7 +176,8 @@ const loopCases: ReadonlyArray<{observations:readonly Copy[]; conclusion:Copy; n
 function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
   const cfg=loopCases[scenario]??loopCases[0];
   const rounds=scenario===1?2:1;
-  const retryEdge=scenario===1&&step>=3;
+  const retryAvailable=scenario===1&&step===3;
+  const retryCompleted=scenario===1&&step>=4;
   const terminal=scenario===2?"HANDOFF":"STOP";
   return <div className="decision-trace decision-trace-agent" data-trace="agent-loop" data-scenario={scenario} data-step={step}>
     <header className="trace-head"><span className="trace-kicker">08 / BOUNDED LOOP</span>
@@ -185,7 +186,9 @@ function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
       {Array.from({length:rounds},(_,round)=>(
         <div className="trace-loop-round" key={round} data-state={step>=round*4?"visited":"future"}>
           <div className="trace-round-head"><span>{en?"ROUND":"轮次"} {String(round+1).padStart(2,"0")}</span>
-            <strong>{txt(cfg.observations[round],en)}</strong></div>
+            <strong>{step >= round*4+2
+              ? txt(cfg.observations[round],en)
+              : en ? "Awaiting tool evidence" : "等待工具验证证据"}</strong></div>
           <ol className="trace-loop-steps">
             {loopStages.map((stage,index)=>{
               const position=round*4+index;
@@ -196,7 +199,8 @@ function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
               </li>;
             })}
           </ol>
-          {scenario===1 && round===0 && <div className="trace-return-edge" data-state={retryEdge?"selected":"future"}>
+          {scenario===1 && round===0 && <div className="trace-return-edge"
+            data-state={retryAvailable ? "selected" : retryCompleted ? "passed" : "future"}>
             <span aria-hidden="true">↶</span>
             <strong>{en?"RETRY → revise Plan":"RETRY → 修正计划"}</strong>
             <small>{en?"Only if permission and remaining budget allow":"仅在权限与剩余预算允许时回环"}</small>
@@ -206,16 +210,21 @@ function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
     </div>
     <div className="trace-loop-exits" role="list" aria-label={en?"Terminal and retry transitions":"终止与重试转移"}>
       {(["STOP","RETRY","HANDOFF"] as const).map(path=>{
-        const selected=path===terminal&&last || path==="RETRY"&&retryEdge&&!last;
-        return <div role="listitem" key={path} data-state={selected?"selected":"inactive"}>
-          <strong>{path}</strong><span>{selected?(en?"Current edge":"当前路径"):(en?"Alternative":"其他出口")}</span>
+        const selected=(path===terminal&&last) || (path==="RETRY"&&retryAvailable);
+        const passed=path==="RETRY"&&retryCompleted;
+        return <div role="listitem" key={path} data-state={selected?"selected":passed?"passed":"inactive"}>
+          <strong>{path}</strong>
+          <span>{selected ? (en?"Current transition":"当前转移") :
+            passed ? (en?"Traversed":"已经过") : (en?"Alternative":"其他出口")}</span>
         </div>;
       })}
     </div>
     <div className="trace-decision" data-state={last?"selected":"future"}>
       <span className="trace-label">{en?"TERMINAL CONDITION":"终止条件"}</span>
       <strong>{last?txt(cfg.conclusion,en):en?"Not yet at a terminal state":"当前尚未到达终态"}</strong>
-      <p>{txt(cfg.next,en)}</p>
+      <p>{last ? txt(cfg.next,en) :
+        en ? "Await observed results, authorization and budget checks before choosing a terminal transition." :
+          "先核对真实反馈、执行权限与预算，再选择终止或重试路径。"}</p>
     </div>
     <p className="trace-source">{en?"Teaching illustration · CH08 §8.6 · A local Agent loop is not automatically a multi-agent graph.":"教学示意 · CH08 §8.6 · 局部 Agent Loop 不等于多 Agent Graph。"}</p>
   </div>;
