@@ -35,6 +35,9 @@ fs.mkdirSync(out,{recursive:true});
         await lab.waitFor();
         assert.equal(await lab.count(),1);
         assert.equal(await lab.getAttribute("data-mental-chapter"),spec.chapter);
+        // The supplemental CH07/11 portal can settle before the original
+        // primary lab's independent lazy chunk. Await both mount points.
+        await page.locator("#concept-demo").waitFor({timeout:15000});
         assert.equal(await page.locator("#concept-demo").count(),1,
           "All chapters keep exactly one primary Atlas Lab anchor");
         assert.equal(await lab.locator(".atlas-examples button").count(),spec.count);
