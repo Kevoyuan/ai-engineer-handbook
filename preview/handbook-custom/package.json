@@ -16,7 +16,8 @@
     "test:visualizations": "node scripts/validate-visualizations.mjs",
     "test:decision-traces": "node evidence/decision-traces.cjs",
     "test:structures": "node scripts/validate-structures.mjs",
-    "test:structure-browser": "node evidence/structural-guides-browser.cjs"
+    "test:structure-browser": "node evidence/structural-guides-browser.cjs",
+    "test:mental-browser": "node evidence/concept-atlas-browser.cjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.9",
