@@ -90,6 +90,7 @@ function ContextBudget({en}:{en:boolean}){
         <small>{tr(states[c.status[i]],en)}</small></div>)}
     </div>
     <div className="atlas-mental-focus"><span>{en?"RELIABILITY BOUNDARY":"可靠性边界"}</span><strong>{tr(c.watch,en)}</strong></div>
+    <Legend en={en}/>
     <Conclusion c={c} en={en}/>
     <p className="atlas-mental-source">{en?"CH01 §§1.4–1.4.2 and CH07 §7.4 · Conceptual allocation, not a quantitative benchmark.":
       "来源：CH01 §1.4–1.4.2、CH07 §7.4。仅示意职责，不是定量基准测试。"}</p>
@@ -147,6 +148,7 @@ function RetrievalBoundary({en}:{en:boolean}){
       </li>)}
     </ol>
     <div className="atlas-mental-focus"><span>{en?"LEGAL CANDIDATES":"合法候选范围"}</span><strong>{tr(c.scope,en)}</strong></div>
+    <Legend en={en}/>
     <Conclusion c={c} en={en}/>
     <p className="atlas-mental-source">{en?"CH02 §§2.1–2.7 · ACL is a host/data-plane contract, not an LLM instruction. No live access checks.":
       "来源：CH02 §2.1–2.7。ACL 属于受信系统/数据面的契约，而不是 LLM Prompt；未执行真实授权检查。"}</p>
@@ -200,6 +202,7 @@ function MemoryLifecycle({en}:{en:boolean}){
       </div>)}
     </div>
     <div className="atlas-mental-focus"><span>{en?"DECISIVE BOUNDARY":"决定性边界"}</span><strong>{tr(c.focus,en)}</strong></div>
+    <Legend en={en}/>
     <Conclusion c={c} en={en}/>
     <p className="atlas-mental-source">{en?"CH07 §§7.2–7.10 · Append-only ledger is a proposed audit design, not a requirement for every memory system.":
       "来源：CH07 §7.2–7.10。Append-only Ledger 是建议的审计设计，并非所有 Memory 系统必需。"}</p>
@@ -275,6 +278,7 @@ function CdcTimeline({en}:{en:boolean}){
         <strong>{tr(stage,en)}</strong><small>{tr(states[c.stages[i]],en)}</small></li>)}
     </ol>
     <div className="atlas-mental-focus"><span>{en?"EFFECT / CURRENT VIEW":"效果 / 当前视图"}</span><strong>{tr(c.effect,en)}</strong></div>
+    <Legend en={en}/>
     <Conclusion c={c} en={en}/>
     <p className="atlas-mental-source">{en?"CH11 §§11.2–11.5 and §11.10.1 · Teaching sequence IDs only; actual SCD2 ordering, replay and delete semantics depend on source and platform contracts.":
       "来源：CH11 §11.2–11.5、§11.10.1。序列号仅作教学；实际 SCD2 的顺序、回放和删除语义取决于来源及平台契约。"}</p>
