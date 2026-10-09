@@ -738,11 +738,6 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
           <p>{t(frame.text)}</p>
         </motion.div>
       </div>
-      {(lesson.anchor === "dg2-query-routing" ||
-        lesson.anchor === "fig-4-1" ||
-        lesson.anchor === "fig-8-loop-vs-graph") && (
-        <DecisionTrace anchor={lesson.anchor} scenario={example} step={step} last={last} en={en} />
-      )}
       <div className="concept-controls">
         <div className="concept-transport">
           {!reduce && (
@@ -785,6 +780,11 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
           {last ? (en ? " · Complete" : " · 完成") : ""}
         </span>
       </div>
+      {(lesson.anchor === "dg2-query-routing" ||
+        lesson.anchor === "fig-4-1" ||
+        lesson.anchor === "fig-8-loop-vs-graph") && (
+        <DecisionTrace anchor={lesson.anchor} scenario={example} step={step} last={last} en={en} />
+      )}
       {lesson.anchor === "capability-architecture-title" && (
         <SkillContextInspector key={"skill-" + example} example={example} step={step} en={en} />
       )}
