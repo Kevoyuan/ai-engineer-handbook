@@ -10,6 +10,8 @@
   font-size: 0.8125rem;
   line-height: 1.6;
   min-width: 0;
+  container-type: inline-size;
+  container-name: decision-trace-layout;
 }
 .chapter-body .decision-trace * { box-sizing: border-box; }
 .chapter-body .trace-head { margin-bottom: 0.95rem; }
@@ -215,4 +217,44 @@
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* The Reader column can be narrow even on a wide laptop with side panels.
+   Breakpoints must follow the actual teaching pane, not viewport width alone. */
+@container decision-trace-layout (max-width: 700px) {
+  .chapter-body .trace-route-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .chapter-body .trace-gates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chapter-body .trace-phase-track,
+  .chapter-body .trace-loop-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container decision-trace-layout (max-width: 345px) {
+  .chapter-body .trace-route-grid,
+  .chapter-body .trace-policy-options,
+  .chapter-body .trace-loop-exits {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.chapter-body .trace-route-top span,
+.chapter-body .trace-route p,
+.chapter-body .trace-gate-content p,
+.chapter-body .trace-gate-status,
+.chapter-body .trace-loop-steps li small,
+.chapter-body .trace-policy-options > div strong,
+.chapter-body .trace-loop-exits > div span {
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+.chapter-body .trace-loop-exits > div[data-state="passed"] {
+  border-style: dashed;
+  color: var(--muted-foreground);
+}
+.chapter-body .trace-return-edge[data-state="passed"] {
+  border-color: var(--muted-foreground);
+  color: var(--muted-foreground);
 }
