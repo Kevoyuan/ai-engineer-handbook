@@ -238,7 +238,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
-@container decision-trace-layout (max-width: 300px) {
+@container decision-trace-layout (max-width: 260px) {
   .chapter-body .trace-route-grid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -260,4 +260,18 @@
 .chapter-body .trace-return-edge[data-state="passed"] {
   border-color: var(--muted-foreground);
   color: var(--muted-foreground);
+}
+
+/* Muted body text on selected pale-green surfaces missed WCAG AA for small type.
+   Keep the existing tokens but ensure text on selected accents uses full foreground contrast. */
+.chapter-body .trace-gates li[data-state="current"] .trace-gate-id,
+.chapter-body .trace-gates li[data-state="current"] .trace-gate-content p,
+.chapter-body .trace-gates li[data-state="decision"] .trace-gate-id,
+.chapter-body .trace-gates li[data-state="decision"] .trace-gate-content p,
+.chapter-body .trace-route[data-state="selected"] .trace-route-top span,
+.chapter-body .trace-route[data-state="selected"] p,
+.chapter-body .trace-policy-options > div[data-state="selected"] strong,
+.chapter-body .trace-loop-exits > div[data-state="selected"] span,
+.chapter-body .trace-loop-steps li[data-state="current"] small {
+  color: var(--foreground);
 }
