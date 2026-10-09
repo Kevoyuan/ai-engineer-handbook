@@ -206,6 +206,15 @@ CH10's shared prefix tokens are only **eligible** to reuse subject to model/toke
 
 Both diagrams are lazy, inserted after stable canonical anchors (`#fig-10-1` and `#data-plane`), and share the Reader's `#concept-demo` direct-lab target. Canonical article HTML must remain readable if the optional chunk fails; neither lab may replace, edit or change its source meaning.
 
+## Decision-trace extensions · CH03 / CH04 / CH08
+
+The existing canonical four-node lessons remain the primary reading and playback interaction. Chapters 03, 04 and 08 may add a secondary, step-synchronized **Decision Trace** directly after the explanation and playback controls. It is a technical diagnosis layer, not another autonomous simulator. Use the same example and current-frame state; do not create duplicate selectors, timers, independent scroll views, invented percentages, or a separate content authority.
+
+- **CH03 Query Routing:** distinguish the *query evidence shape* from chosen retrievers. Display exactly which path is selected, which is skipped and why. Authorization/ACL filtering precedes retrieval. Show a fallback boundary (alias or query revision, alternative route, clarify or stop) as a *contingency*, never as an action that was executed in a successful scenario.
+- **CH04 Evidence Gates:** render all six canonical gates **0–5**, even though the existing lesson groups them into four explanatory frames. Make `SUPPORT`, `CONFLICT` and `INSUFFICIENT` explicit. Conflict or insufficiency must not show `Claim Verification` as passed; the final policy distinguishes answer, version resolution/escalation, and retrieve-more/abstain.
+- **CH08 Agent Loop:** distinguish visited/current/future steps and (when the lesson revisits them) the first and second execution rounds. Render a *conditional* feedback edge only when the retry scenario reaches the budget gate. STOP requires verification; HANDOFF means incomplete after budget exhaustion. Never suggest retries are infinite or that a local loop is equivalent to a graph.
+- **Presentation:** neutral cards, fine border connectors and primary-green selected state only. Every visual state has textual meaning without reliance on color. Keep playback controls adjacent to frame explanation; mobile traces stack without horizontal clipping. Preserve the canonical article, original scenario selector, native keyboard-accessible node controls, two-question knowledge check and reduced-motion behavior.
+
 ## Interactive concept diagrams
 
 Use interaction when it explains a decision, evidence relationship or feedback loop. Current examples are Query Routing (chapter 03), RAG evidence gates (04), progressive skill loading and authorization gates (06), governed memory retrieval (07) and bounded Agent loops (08). Place each teaching module beside the relevant original figure or after its owning section, retaining the full static diagram and article. A toolbar shortcut takes readers directly to the module.
