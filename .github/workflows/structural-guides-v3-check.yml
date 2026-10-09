@@ -62,11 +62,16 @@ jobs:
           STRUCTURAL_SCREENSHOT_DIR="$PWD/evidence/structural-v3-review" \
             HANDBOOK_URL=http://127.0.0.1:4180/ \
             npm run test:structure-browser
+          CONCEPT_ATLAS_SHOTS="$PWD/evidence/concept-atlas-review" \
+            HANDBOOK_URL=http://127.0.0.1:4180/ \
+            npm run test:mental-browser
       - name: Save visual evidence (source branch only)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: structural-v3-visual-review
-          path: preview/handbook-custom/evidence/structural-v3-review
+          path: |
+            preview/handbook-custom/evidence/structural-v3-review
+            preview/handbook-custom/evidence/concept-atlas-review
           if-no-files-found: warn
           retention-days: 14
