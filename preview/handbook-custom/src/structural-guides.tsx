@@ -277,7 +277,7 @@ export function StructuralGuide({slug,en,pane,onReady}:{
     const insertion=chapter==="12"&&anchor.nextElementSibling?.tagName==="P" ? anchor.nextElementSibling : anchor;
     insertion.after(slot);
     setHost(slot);
-    return ()=>{slot.remove();setHost(null);};
+    return ()=>slot.remove();
   },[chapter,en,pane]);
   useLayoutEffect(()=>{onReady(Boolean(host));return ()=>onReady(false);},[host,onReady]);
   if(!host)return null;
