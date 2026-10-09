@@ -58,3 +58,14 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4180/ >/dev/null
           HANDBOOK_URL=http://127.0.0.1:4180/ npm run test:decision-traces
+          DECISION_VISUAL_DIR="$PWD/evidence/decision-traces-review" \
+            HANDBOOK_URL=http://127.0.0.1:4180/ \
+            node evidence/decision-traces-visual.cjs
+      - name: Preserve screenshot evidence for PR visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: decision-traces-visual-review
+          path: preview/handbook-custom/evidence/decision-traces-review/
+          if-no-files-found: warn
+          retention-days: 14
