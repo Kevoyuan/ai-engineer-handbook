@@ -193,7 +193,7 @@ Do not begin by selecting LangGraph, RAG, or a vector DB. First ask:
 
 **Explicit non-goals:** autonomous refunds, unrestricted SQL, multi-agent self-delegation, model fine-tuning, all-carrier integration, real-time guarantees without a freshness SLO.
 
-### 12.11.2 Four planes, seven boundaries: architecture before framework choice
+### 12.11.2 Five responsibility planes, seven explicit checks: architecture before framework choice
 
 \`\`\`text
                               CUSTOMER / WORKFLOW PLANE
@@ -221,6 +221,18 @@ Do not begin by selecting LangGraph, RAG, or a vector DB. First ask:
                 trace IDs + source versions + golden eval + SLO
                 canary / rollback + incident runbook + cost/success
 \`\`\`
+
+**Interpretation boundary:** The diagram above names five responsibility planes: Customer/Workflow, Control, Data, Execution, and Evidence/Operations. The following **seven explicit checks** are an authored review checklist for this capstone, **not** seven universally standardized interfaces:
+
+1. **B1 · Trusted identity:** User, tenant and session context must come from SSO/IAM, not the prompt.
+2. **B2 · Tool authorization and budget:** The host validates capability, permission, deadline and execution budget before calling tools.
+3. **B3 · Source event correctness:** CDC, deduplication, late-event policy, version scope and replay preserve data provenance.
+4. **B4 · Tenant-scoped read:** Exact, SQL and document fetches enforce current tenant/assignment/row permissions, including rechecks after indexing.
+5. **B5 · Evidence sufficiency:** The answer must be supported by identifiable source events and versioned records; missing causal evidence requires qualification or abstention.
+6. **B6 · Controlled side effects:** Human approval and the host's write gate authorize any consequential operation; LLM prose is never an order mutation.
+7. **B7 · Evaluation and release safety:** Golden regressions, safety gates, observability, rollback and runbooks determine deployment readiness.
+
+These checks link the planes but are **not** an assertion that each plane is a service or each check a single API call.
 
 No **identity**, **authoritative order state**, or **write permission** may originate from prompt text. Customer-facing final explanations must separate **observed facts** (event IDs/timestamps), **inference** (the anomaly), and **recommendation** (investigate upstream ordering). An event timestamp alone does not prove physical delivery chronology; clock skew and source semantics may produce apparent anomalies.
 
