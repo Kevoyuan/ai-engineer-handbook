@@ -14,7 +14,9 @@
     "publish:web": "node scripts/publish-web.mjs",
     "test:atlas": "node scripts/validate-atlas.mjs",
     "test:visualizations": "node scripts/validate-visualizations.mjs",
-    "test:decision-traces": "node evidence/decision-traces.cjs"
+    "test:decision-traces": "node evidence/decision-traces.cjs",
+    "test:structures": "node scripts/validate-structures.mjs",
+    "test:structure-browser": "node evidence/structural-guides-browser.cjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.9",
