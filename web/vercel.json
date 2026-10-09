@@ -122,5 +122,8 @@
       "destination": "/#home",
       "permanent": false
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": false
+  }
 }

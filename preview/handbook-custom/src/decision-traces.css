@@ -1,0 +1,277 @@
+/* Source-grounded teaching traces for CH03, CH04 and CH08.
+   Uses the project's existing paper/ink/primary tokens; no new brand colors. */
+.chapter-body .decision-trace {
+  color: var(--foreground);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  margin: 0.4rem 0 1.2rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  min-width: 0;
+  container-type: inline-size;
+  container-name: decision-trace-layout;
+}
+.chapter-body .decision-trace * { box-sizing: border-box; }
+.chapter-body .trace-head { margin-bottom: 0.95rem; }
+.chapter-body .trace-kicker, .chapter-body .trace-label,
+.chapter-body .trace-phase-track span, .chapter-body .trace-round-head > span,
+.chapter-body .trace-loop-steps li > span, .chapter-body .trace-gate-id {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+.chapter-body .trace-kicker, .chapter-body .trace-label, .chapter-body .trace-source {
+  color: var(--muted-foreground);
+}
+.chapter-body .trace-head h4 {
+  margin: 0.35rem 0 0;
+  font-weight: 620;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.chapter-body .decision-trace p { margin: 0; }
+.chapter-body .trace-phase-track {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.85rem;
+  display: grid;
+  gap: 0.375rem;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+}
+.chapter-body .trace-phase-track li {
+  min-width: 0;
+  border-top: 2px solid var(--border);
+  padding: 0.55rem 0.25rem 0;
+  display: grid;
+  gap: 0.22rem;
+}
+.chapter-body .trace-phase-track li strong { font-weight: 580; line-height: 1.4; }
+.chapter-body .trace-phase-track li[data-state="current"] {
+  border-color: var(--primary);
+  color: var(--foreground);
+}
+.chapter-body .trace-phase-track li[data-state="passed"] { border-color: var(--muted-foreground); }
+.chapter-body .trace-phase-track li[data-state="future"] { color: var(--muted-foreground); }
+.chapter-body .trace-auth {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem 0;
+  border-block: 1px solid var(--border);
+}
+.chapter-body .trace-auth > span {
+  flex: 0 0 1.5rem; width: 1.5rem; height: 1.5rem;
+  border-radius: 50%; border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 0.75rem;
+}
+.chapter-body .trace-auth[data-state="passed"] > span { border-color: var(--primary); color: var(--primary); }
+.chapter-body .trace-auth p { display: grid; gap: 0.2rem; min-width: 0; }
+.chapter-body .trace-auth strong { font-weight: 590; }
+.chapter-body .trace-auth small { color: var(--muted-foreground); font-size: 0.75rem; line-height: 1.6; }
+.chapter-body .trace-route-grid {
+  display: grid;
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 0.35rem;
+  margin: 0.85rem 0;
+}
+.chapter-body .trace-route {
+  min-width: 0; border: 1px solid var(--border); border-radius: 0.4rem;
+  background: var(--card); padding: 0.6rem;
+}
+.chapter-body .trace-route[data-state="selected"] {
+  background: var(--accent); border-color: var(--primary);
+}
+.chapter-body .trace-route[data-state="inactive"] { color: var(--muted-foreground); }
+.chapter-body .trace-route-top { display: grid; gap: 0.24rem; }
+.chapter-body .trace-route-top strong { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 640; overflow-wrap: anywhere; }
+.chapter-body .trace-route-top span { font-size: 0.6875rem; color: var(--muted-foreground); }
+.chapter-body .trace-route[data-state="selected"] .trace-route-top span { color: var(--primary); }
+.chapter-body .trace-route p { font-size: 0.71875rem; line-height: 1.5; margin-top: 0.4rem; }
+.chapter-body .trace-decision {
+  display: grid; gap: 0.35rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--border);
+}
+.chapter-body .trace-decision strong { font-size: 0.8125rem; font-weight: 620; line-height: 1.6; }
+.chapter-body .trace-decision p, .chapter-body .trace-recovery p { color: var(--muted-foreground); font-size: 0.75rem; line-height: 1.75; }
+.chapter-body .trace-recovery {
+  display: grid; gap: 0.35rem; padding: 0.75rem 0.85rem;
+  border: 1px dashed var(--border); border-radius: 0.4rem;
+}
+.chapter-body .trace-recovery[data-state="current"] { border-color: var(--primary); }
+.chapter-body .trace-source {
+  font-size: 0.6875rem; padding-top: 0.8rem; margin-top: 0.8rem !important;
+  border-top: 1px solid var(--border); line-height: 1.6;
+}
+.chapter-body .trace-gates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem; list-style: none; padding: 0; margin: 0 0 0.85rem;
+}
+.chapter-body .trace-gates li {
+  display: grid; grid-template-columns: 1.5rem minmax(0,1fr);
+  gap: 0.25rem 0.5rem;
+  min-width: 0; padding: 0.75rem;
+  border: 1px solid var(--border); border-radius: 0.45rem; background: var(--card);
+}
+.chapter-body .trace-gates li[data-state="current"],
+.chapter-body .trace-gates li[data-state="decision"] { border-color: var(--primary); background: var(--accent); }
+.chapter-body .trace-gates li[data-state="issue"],
+.chapter-body .trace-gates li[data-state="blocked"] { border-style: dashed; border-color: var(--foreground); }
+.chapter-body .trace-gates li[data-state="future"] { color: var(--muted-foreground); }
+.chapter-body .trace-gate-id { color: var(--muted-foreground); }
+.chapter-body .trace-gate-content { min-width: 0; }
+.chapter-body .trace-gate-content strong { font-size: 0.75rem; font-weight: 610; line-height: 1.45; }
+.chapter-body .trace-gate-content p { color: var(--muted-foreground); font-size: 0.7rem; line-height: 1.55; margin-top: 0.22rem; }
+.chapter-body .trace-gate-status {
+  grid-column: 2; justify-self: start; font-size: 0.6875rem;
+  font-family: var(--font-mono); overflow-wrap: anywhere;
+  border-top: 1px solid var(--border); padding-top: 0.3rem;
+}
+.chapter-body .trace-evidence-signal {
+  display: grid; gap: 0.23rem;
+  margin-bottom: 0.7rem; padding: 0.7rem 0.85rem;
+  border-inline-start: 3px solid var(--border); background: var(--card);
+}
+.chapter-body .trace-evidence-signal[data-state="selected"] { border-color: var(--primary); }
+.chapter-body .trace-evidence-signal[data-state="issue"] { border-color: var(--foreground); }
+.chapter-body .trace-evidence-signal strong { font-family: var(--font-mono); font-weight: 650; font-size: 0.9rem; }
+.chapter-body .trace-evidence-signal small { font-size: 0.75rem; color: var(--muted-foreground); }
+.chapter-body .trace-policy-options, .chapter-body .trace-loop-exits {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+.chapter-body .trace-policy-options > div,
+.chapter-body .trace-loop-exits > div {
+  min-width: 0; display: grid; gap: 0.25rem;
+  padding: 0.7rem 0.55rem; background: var(--card);
+  border: 1px solid var(--border); border-radius: 0.4rem;
+}
+.chapter-body .trace-policy-options > div[data-state="selected"],
+.chapter-body .trace-loop-exits > div[data-state="selected"] {
+  background: var(--accent); border-color: var(--primary);
+}
+.chapter-body .trace-policy-options > div span,
+.chapter-body .trace-loop-exits > div strong {
+  font-family: var(--font-mono); font-size: 0.69rem;
+  overflow-wrap: anywhere;
+}
+.chapter-body .trace-policy-options > div strong,
+.chapter-body .trace-loop-exits > div span {
+  color: var(--muted-foreground); font-size: 0.68rem; font-weight: 450;
+}
+.chapter-body .trace-loop-rounds { display: grid; gap: 0.7rem; }
+.chapter-body .trace-loop-round {
+  border: 1px solid var(--border); border-radius: 0.55rem;
+  background: var(--card); padding: 0.75rem;
+}
+.chapter-body .trace-loop-round[data-state="future"] { color: var(--muted-foreground); }
+.chapter-body .trace-round-head {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.35rem 0.75rem;
+  margin-bottom: 0.65rem;
+}
+.chapter-body .trace-round-head > span { color: var(--muted-foreground); white-space: nowrap; }
+.chapter-body .trace-round-head > strong { font-weight: 585; font-size: 0.75rem; }
+.chapter-body .trace-loop-steps {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0.35rem;
+}
+.chapter-body .trace-loop-steps li {
+  min-width: 0; display: grid; gap: 0.2rem;
+  padding: 0.45rem 0.35rem; border-top: 2px solid var(--border);
+}
+.chapter-body .trace-loop-steps li[data-state="current"] { border-color: var(--primary); background: var(--accent); }
+.chapter-body .trace-loop-steps li[data-state="passed"] { border-color: var(--muted-foreground); }
+.chapter-body .trace-loop-steps li strong { font-size: 0.75rem; font-weight: 585; overflow-wrap: anywhere; }
+.chapter-body .trace-loop-steps li small { font-size: 0.6875rem; color: var(--muted-foreground); }
+.chapter-body .trace-return-edge {
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: 0.2rem 0.65rem; padding: 0.6rem 0.25rem 0.1rem;
+  margin-top: 0.5rem; border-top: 1px dashed var(--border);
+  font-size: 0.75rem; color: var(--muted-foreground);
+}
+.chapter-body .trace-return-edge[data-state="selected"] { color: var(--primary); border-color: var(--primary); }
+.chapter-body .trace-return-edge > span { font-size: 1.2rem; line-height: 1; }
+.chapter-body .trace-return-edge small { color: var(--muted-foreground); font-size: 0.7rem; }
+@container (max-width: 760px) {
+  .chapter-body .trace-route-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .chapter-body .trace-gates { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 760px) {
+  .chapter-body .trace-route-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .chapter-body .trace-gates { grid-template-columns: minmax(0,1fr); }
+  .chapter-body .trace-phase-track { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .chapter-body .trace-loop-steps { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 390px) {
+  .chapter-body .trace-policy-options,.chapter-body .trace-loop-exits { grid-template-columns: minmax(0,1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-body .decision-trace *, .chapter-body .decision-trace *::before,
+  .chapter-body .decision-trace *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* The Reader column can be narrow even on a wide laptop with side panels.
+   Breakpoints must follow the actual teaching pane, not viewport width alone. */
+@container decision-trace-layout (max-width: 700px) {
+  .chapter-body .trace-route-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .chapter-body .trace-gates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chapter-body .trace-phase-track,
+  .chapter-body .trace-loop-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container decision-trace-layout (max-width: 345px) {
+  .chapter-body .trace-policy-options,
+  .chapter-body .trace-loop-exits {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container decision-trace-layout (max-width: 260px) {
+  .chapter-body .trace-route-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.chapter-body .trace-route-top span,
+.chapter-body .trace-route p,
+.chapter-body .trace-gate-content p,
+.chapter-body .trace-gate-status,
+.chapter-body .trace-loop-steps li small,
+.chapter-body .trace-policy-options > div strong,
+.chapter-body .trace-loop-exits > div span {
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+.chapter-body .trace-loop-exits > div[data-state="passed"] {
+  border-style: dashed;
+  color: var(--muted-foreground);
+}
+.chapter-body .trace-return-edge[data-state="passed"] {
+  border-color: var(--muted-foreground);
+  color: var(--muted-foreground);
+}
+
+/* Muted body text on selected pale-green surfaces missed WCAG AA for small type.
+   Keep the existing tokens but ensure text on selected accents uses full foreground contrast. */
+.chapter-body .trace-gates li[data-state="current"] .trace-gate-id,
+.chapter-body .trace-gates li[data-state="current"] .trace-gate-content p,
+.chapter-body .trace-gates li[data-state="decision"] .trace-gate-id,
+.chapter-body .trace-gates li[data-state="decision"] .trace-gate-content p,
+.chapter-body .trace-route[data-state="selected"] .trace-route-top span,
+.chapter-body .trace-route[data-state="selected"] p,
+.chapter-body .trace-policy-options > div[data-state="selected"] strong,
+.chapter-body .trace-loop-exits > div[data-state="selected"] span,
+.chapter-body .trace-loop-steps li[data-state="current"] small {
+  color: var(--foreground);
+}

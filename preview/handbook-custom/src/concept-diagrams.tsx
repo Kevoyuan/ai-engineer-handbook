@@ -15,6 +15,7 @@ import { ArrowRightIcon } from "@/components/icons";
 import { extraLessons, type Copy, type Frame, type Lesson } from "./learning-content";
 import { KnowledgeCheck, SkillContextInspector } from "./learning-interactions";
 import { ArchifyOverview } from "./archify-overview";
+import { DecisionTrace } from "./decision-traces";
 import { SkillSimulator } from "./skill-simulator";
 const f = (node: number, title: Copy, text: Copy): Frame => ({
   node,
@@ -669,9 +670,16 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
               className="concept-node"
               data-current={frame.node === i}
               aria-pressed={frame.node === i}
-              onClick={() =>
-                seek(scenario.frames.findIndex((f) => f.node === i))
-              }
+              onClick={() => {
+                // A retry scenario can revisit the same node. When already in
+                // round two, inspect that round instead of jumping back to one.
+                const roundStart =
+                  lesson.anchor === "fig-8-loop-vs-graph" && step >= 4 ? 4 : 0;
+                const target = scenario.frames.findIndex(
+                  (f, frameIndex) => frameIndex >= roundStart && f.node === i,
+                );
+                seek(target >= 0 ? target : scenario.frames.findIndex((f) => f.node === i));
+              }}
             >
               <span className="concept-node-status">
                 {frame.node === i
@@ -779,6 +787,11 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
           {last ? (en ? " · Complete" : " · 完成") : ""}
         </span>
       </div>
+      {(lesson.anchor === "dg2-query-routing" ||
+        lesson.anchor === "fig-4-1" ||
+        lesson.anchor === "fig-8-loop-vs-graph") && (
+        <DecisionTrace anchor={lesson.anchor} scenario={example} step={step} last={last} en={en} />
+      )}
       {lesson.anchor === "capability-architecture-title" && (
         <SkillContextInspector key={"skill-" + example} example={example} step={step} en={en} />
       )}
