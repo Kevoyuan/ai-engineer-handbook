@@ -302,3 +302,16 @@ CH05, CH09 and CH12 use three **different topologies** while retaining the same 
 - Responsive geometry uses the *Reader content container*, not only viewport width. Each scenario control is a real, keyboard-accessible button with selected state, at least 44px high. Color never stands alone; reduced motion, light/dark, zh/en, static text, and readable source notes are required.
 - Keep the current Vercel policy `web/vercel.json → git.deploymentEnabled=false`. Source-only changes **must not** run `publish:web` or trigger automatic hosted builds.
 
+
+
+## Concept Atlas V3.1 · 12/12 chapter labs and dual-layer diagrams
+
+The canonical Atlas now registers **a primary Lab in every chapter**. The two remaining gaps are CH01 and CH02. CH07 and CH11 also gain separate, narrowly scoped **supplemental** visual models; these must not duplicate the original `#concept-demo` anchor.
+
+- **CH01**: A context-responsibility rail, not a fake token-percentage meter. Preserve system/developer constraints and output reserve; identify compressible history, retrieved evidence and durable working state. The Lost-in-the-Middle effect is contextual and requires measurement, not a guaranteed ranking rule.
+- **CH02**: Trust-boundary funnel `Trusted Identity → Candidate ACL → Retrieve/Rerank → Fetch ACL Recheck → Evidence`. When the indexed ACL is stale, fail at source fetch; when tenants differ, reject before the candidate set enters search. The model never grants permission.
+- **CH07**: Two distinct governance lanes, `Write / Promotion` and `Read / Context`. An explicit correction can supersede a scoped version. Inferred facts must never casually override an explicit user constraint; audit/retention policy determines event storage.
+- **CH11**: Three visually distinct rows for source logical sequence, observed arrival order, and SCD2 version intervals. The sequence domain is deliberately *not* presented as physical event time. Duplicate deliveries, out-of-order changes and tombstones each trigger different contract behavior.
+
+Use distinctive geometry for each mental model instead of reusing the generic four-stage timeline. All visual cases are illustrative, with source notes from chapter section numbers; no fabricated benchmark, real customer order or live API call. Keep existing Chapter 07 and 11 Labs untouched while adding second views at `#concept-extension` with no new global Atlas link. New CH01 and 02 Labs use `#concept-demo` and existing Reader deep-link readiness. Enforce 44px controls, labels alongside color, scoped WCAG checks, light/dark, Chinese/English, keyboard and reduced motion. Preserve `git.deploymentEnabled=false` and never run `publish:web` during source iteration.
+
