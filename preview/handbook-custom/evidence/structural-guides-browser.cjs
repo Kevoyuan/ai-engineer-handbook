@@ -8,8 +8,8 @@ const AxeBuilder=require("@axe-core/playwright").default;
 const base=process.env.HANDBOOK_URL||"http://127.0.0.1:4180/";
 const out=process.env.STRUCTURAL_SCREENSHOT_DIR||"/tmp/structural-guide-screenshots";
 const chapters=[
- ["05-document-pdf-rag","05",5],
- ["09-reliability-evaluation-observability","09",4],
+ ["05-document-pdf-rag","05",7],
+ ["09-reliability-evaluation-observability","09",11],
  ["12-fde-customer-delivery","12",7],
 ];
 const checks=[];
@@ -46,20 +46,46 @@ try {
     assert((await lab.locator(".struct-decision strong").innerText()).trim().length>6);
     const box=await button.boundingBox();
     assert(box && box.height>=43.5,"44px scenario touch target");
+    const graph=lab.locator(".atlas-graph");
+    assert.equal(await graph.count(),1,"Semantic graph required for source-backed architecture");
+    assert.equal(await graph.locator(".atlas-graph-svg").count(),1,"Edges must use SVG");
     if(ch==="05"){
-      assert.equal(await lab.locator(".struct-lineage li").count(),stages);
-      assert.equal(await lab.locator('.struct-lineage li[data-state="block"]').count(),i===0?0:1);
+      assert.equal(await graph.locator('[data-node]').count(),7);
+      assert.equal(await graph.locator('[data-edge^="cite-"]').count(),4);
+      assert.equal(await graph.locator('[data-edge="table-review"]').getAttribute("data-state"),i===1?"blocked":"idle");
+      assert.equal(await graph.locator('[data-edge="scan-review"]').getAttribute("data-state"),i===2?"blocked":"idle");
+      assert.equal(await graph.locator('[data-node="citation"]').getAttribute("data-state"),i===0?"active":"idle");
     }
     if(ch==="09"){
-      assert.equal(await lab.locator(".struct-trace-tree li").count(),stages);
-      assert.equal(await lab.locator('.struct-trace-tree li[data-state="block"]').count(),1);
-      assert.equal(await lab.locator(".struct-eval-cycle li").count(),4);
+      assert.equal(await graph.locator('[data-node]').count(),11);
+      assert.equal(await graph.locator('[data-edge^="trace-"]').count(),4);
+      assert.equal(await graph.locator('[data-node="release"]').getAttribute("data-state"),i===2?"blocked":"pending");
+      assert.equal(await graph.locator('[data-edge="release-canary"]').getAttribute("data-state"),"idle");
     }
     if(ch==="12"){
-      assert.equal(await lab.locator(".struct-planes [data-plane]").count(),5);
+      assert.equal(await graph.locator('[data-node]').count(),7);
+      assert.equal(await graph.locator('[data-edge="plane-2"]').getAttribute("data-state"),i===1?"blocked":"active");
+      assert.equal(await graph.locator('[data-edge="write-approval"]').getAttribute("data-state"),i===2?"blocked":"idle");
       assert.equal(await lab.locator(".struct-boundaries li").count(),7);
       assert.equal(await lab.locator('.struct-boundaries li[data-state="block"]').count(),i===0?0:1);
       if(i>0) assert.equal(await lab.locator('.struct-boundaries li[data-state="block"] .struct-step').first().innerText(),i===1?"B4":"B6");
+    }
+    // The graph must not silently turn into an un-positioned card list.
+    const geom=await graph.evaluate(el=>{
+      const nodes=[...el.querySelectorAll(".atlas-graph-node")];
+      return {
+        firstPosition:getComputedStyle(nodes[0]).position,
+        svgWidth:el.querySelector("svg")?.getBoundingClientRect().width,
+        nodeCount:nodes.length,
+      };
+    });
+    assert.equal(geom.firstPosition,"absolute");
+    assert(geom.svgWidth>120);
+    if((width===390&&!dark&&!en)||(width===1440&&dark&&en)){
+      if(i===0){
+        const pathName=ch+"-"+width+"-"+(en?"en":"zh")+"-"+(dark?"dark":"light")+"-happy-path.png";
+        await graph.screenshot({path:path.join(out,pathName),animations:"disabled"});
+      }
     }
     tested++;
    }
