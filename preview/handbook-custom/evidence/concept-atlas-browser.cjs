@@ -58,6 +58,27 @@ fs.mkdirSync(out,{recursive:true});
           const graph=lab.locator(".atlas-graph");
           assert.equal(await graph.count(),1,"Graph canvas replaces card layout");
           assert.equal(await graph.locator(".atlas-graph-svg").count(),1);
+          const geometry=await graph.evaluate(el=>{
+            const stage=el.querySelector(".atlas-graph-stage");
+            const nodes=[...el.querySelectorAll(".atlas-graph-node")];
+            const first=nodes[0],second=nodes[1];
+            const a=first.getBoundingClientRect(),b=second.getBoundingClientRect(),c=stage.getBoundingClientRect();
+            const npos=getComputedStyle(first).position;
+            const center=(r)=>[r.left+r.width/2,r.top+r.height/2];
+            return {position:npos,layout:el.dataset.layout,
+              a:center(a),b:center(b),stage:{left:c.left,top:c.top,width:c.width,height:c.height}};
+          });
+          assert.equal(geometry.position,"absolute","Graph nodes MUST use absolute positioning aligned to SVG paths");
+          if(spec.chapter==="02"){
+            if(geometry.layout==="wide"){
+              assert(geometry.b[0]-geometry.a[0]>75,"Desktop permission graph requires horizontal nodes, not stacked cards");
+              assert(Math.abs(geometry.b[1]-geometry.a[1])<10,"Desktop permission nodes share a lane");
+            } else {
+              assert(geometry.b[1]-geometry.a[1]>60,"Compact permission graph requires vertical flow");
+              assert(Math.abs(geometry.b[0]-geometry.a[0])<10,"Compact permission nodes share a vertical spine");
+            }
+          }
+
           assert((await graph.getAttribute("data-active-edges")||"0")!=="0");
           const counts={"01":8,"02":8,"07":10};
           if(counts[spec.chapter]){
