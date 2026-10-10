@@ -88,7 +88,12 @@ fs.mkdirSync(out,{recursive:true});
           }
           if(spec.chapter==="01"){
             assert.equal(await graph.locator('[data-edge^="allocate-"]').count(),5);
+            assert.equal(await graph.locator('[data-edge^="include-"]').count(),0,
+              "No fake resource-to-output merging lines");
+            assert.equal(await graph.locator('[data-edge="allocator-assemble"]').getAttribute("data-state"),"active");
             assert.equal(await graph.locator('[data-node="allocator"]').getAttribute("data-state"),"active");
+            if(i===2)assert.equal(await graph.locator('[data-node="history"] .atlas-graph-node-state').innerText(),
+              en?"Summary loss":"摘要失真","Compression loss must not display as ACL denial");
           }
           if(spec.chapter==="02"){
             assert.equal(await graph.locator('[data-edge="acl-reject"]').getAttribute("data-state"),
@@ -108,10 +113,18 @@ fs.mkdirSync(out,{recursive:true});
             assert.equal(await graph.locator('[data-edge="source-arrival-0"]').count(),1);
             if(i===1){
               const p=await graph.locator('[data-edge="source-arrival-0"] path').getAttribute("d");
-              assert(p?.includes("M"),"Late event requires source-to-arrival mapping");
+              assert(p?.includes(" C "),"Out-of-order CDC identity mapping must have a curved cross-lane edge");
             }
             if(i===2)assert.equal(await graph.locator('[data-edge="source-arrival-2"]').getAttribute("data-state"),
               "blocked","Duplicate CDC event highlights rejected duplicate edge");
+          }
+          if((width===390&&!en&&!dark)||(width===1440&&en&&dark)){
+            if((spec.chapter==="11"&&i===1)||(spec.chapter==="01"&&i===0)||
+               (spec.chapter==="02"&&i===2)){
+              const fname=spec.chapter+"-"+width+"-"+(en?"en":"zh")+"-"+(dark?"dark":"light")+
+                "-selected-path-"+i+".png";
+              await graph.screenshot({path:path.join(out,fname),animations:"disabled"});
+            }
           }
           validations++;
         }
