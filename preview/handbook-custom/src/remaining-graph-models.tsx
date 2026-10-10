@@ -151,7 +151,7 @@ function skillLayout(compact:boolean,scenario:number,step:number):GraphLayout{
  const xx=compact?[115,115,115,115,115,115]:[82,243,404,565,726,887];
  const yy=compact?[62,155,248,341,434,527]:[139,139,139,139,139,139];
  const nodes=skillPath.map((v,i)=>node(v,xx[i],yy[i],compact?165:143,compact?70:81,
-   scenario===0?(i<=step+1?A:I):
+   scenario===0?(step>=[0,0,1,2,3,3][i]?A:I):
    i<=2?(i<=step? (i===2?B:A):I):I));
  const ex=compact?[278,278]:[352,541],ey=compact?[682,794]:[331,331];
  nodes.push(...skillExits.map((v,i)=>node(v,ex[i],ey[i],compact?139:153,compact?74:82,
@@ -257,12 +257,12 @@ function prefixLayout(compact:boolean,scenario:number):GraphLayout {
  const xs=compact?[116,116,116,116,116,116]:[95,252,409,566,723,880];
  const ys=compact?[68,164,260,356,452,548]:[159,159,159,159,159,159];
  const nodes=prefixNames.map((v,i)=>node(v,xs[i],ys[i],compact?168:148,compact?72:81,
-  scenario===2?(i<=1?i===1?B:A:i===4||i===5?A:I):A));
+  scenario===2?(i===0||i===5?A:i===1?B:I):A));
  nodes.push(node(isolation,compact?281:405,compact?677:329,
   compact?137:167,75,scenario===2?A:I));
  const edges:GraphEdgeData[]=prefixNames.slice(0,-1).map((v,i)=>
   edge("prefix-"+i,v.id,prefixNames[i+1].id,
-    scenario===2?(i===0?B:i===4?A:I):A,
+    scenario===2?(i===0?A:I):A,
     compact?{fromPort:"bottom",toPort:"top"}:{}));
  edges.push(edge("namespace-isolation","scope","isolation",scenario===2?B:I,
   compact?{kind:"branch",fromPort:"right",toPort:"top",
