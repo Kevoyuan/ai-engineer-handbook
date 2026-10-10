@@ -81,6 +81,10 @@ const cases = [
                 assert.equal(await trace.locator(".trace-loop-round").count(), sample === 1 ? 2 : 1);
                 assert.equal(await trace.locator('.trace-loop-exits [data-state="selected"]').count(), 1);
                 if (sample === 1) {
+                  const seekDetails=demo.locator(".concept-step-inspector");
+                  assert.equal(await seekDetails.getAttribute("open"),null,
+                    "Graph-first stage map is collapsed by default");
+                  await seekDetails.locator("summary").click();
                   await demo.locator(".concept-node").nth(2).click();
                   assert.equal(await trace.getAttribute("data-step"), "6",
                     "Clicking Observe in round two should stay in round two");
