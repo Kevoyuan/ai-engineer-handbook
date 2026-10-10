@@ -128,7 +128,7 @@ export function GraphCanvas({id,desktop,mobile,en,summary}:{
           const label=tx(note.text,en);
           // Plate lane labels above mapping curves, never cross through a caption.
           const visualWidth=[...label].reduce((sum,char)=>
-            sum+(/[\\u0080-\\uFFFF]/.test(char)?11:6.6),0)+24;
+            sum+((char.codePointAt(0)??0)>127?11:6.6),0)+24;
           return <g className="atlas-graph-annotation-group" key={i}>
             <rect className="atlas-graph-annotation-plate"
               x={note.x-visualWidth/2} y={note.y-15}
