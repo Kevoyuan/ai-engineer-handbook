@@ -15,7 +15,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 38
     steps:
       - name: Checkout source branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -68,6 +68,8 @@ jobs:
           REMAINING_GRAPH_SHOTS="$PWD/evidence/graph-v34-review" \
             HANDBOOK_URL=http://127.0.0.1:4180/ \
             npm run test:remaining-graphs
+          HANDBOOK_URL=http://127.0.0.1:4180/ npm run test:decision-traces
+          HANDBOOK_URL=http://127.0.0.1:4180/ npm run test:concepts
       - name: Save visual evidence (source branch only)
         if: always()
         uses: actions/upload-artifact@v4
