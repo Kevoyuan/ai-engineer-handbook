@@ -38,6 +38,11 @@
 .chapter-body .atlas-graph-edgetag rect {
   fill:var(--background);stroke:var(--border);stroke-width:1;
 }
+.chapter-body .atlas-graph-annotation-plate {
+  fill:var(--background);
+  stroke:var(--border);
+  stroke-width:.6;
+}
 .chapter-body .atlas-graph-edgetag text,
 .chapter-body .atlas-graph-annotation {
   font-family:var(--font-mono,monospace);
