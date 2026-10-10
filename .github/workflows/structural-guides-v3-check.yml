@@ -65,6 +65,9 @@ jobs:
           CONCEPT_ATLAS_SHOTS="$PWD/evidence/concept-atlas-review" \
             HANDBOOK_URL=http://127.0.0.1:4180/ \
             npm run test:mental-browser
+          REMAINING_GRAPH_SHOTS="$PWD/evidence/graph-v34-review" \
+            HANDBOOK_URL=http://127.0.0.1:4180/ \
+            npm run test:remaining-graphs
       - name: Save visual evidence (source branch only)
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,5 +76,6 @@ jobs:
           path: |
             preview/handbook-custom/evidence/structural-v3-review
             preview/handbook-custom/evidence/concept-atlas-review
+            preview/handbook-custom/evidence/graph-v34-review
           if-no-files-found: warn
           retention-days: 14
