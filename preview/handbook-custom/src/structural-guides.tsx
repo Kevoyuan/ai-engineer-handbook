@@ -8,6 +8,7 @@
 import { useLayoutEffect, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import "./structural-guides.css";
+import { CitationGraph, TraceEvaluationGraph, FdeArchitectureGraph } from "./structural-graph-models";
 
 type Copy = readonly [string, string];
 type State = "pass" | "hold" | "block" | "idle";
@@ -79,13 +80,6 @@ function ProvenanceGuide({en}: {en:boolean}) {
     },
   ];
   const example=examples[selected];
-  const pipeline: readonly {tag:string; title:Copy; detail:Copy}[] = [
-    {tag:"01",title:["原始文档","Original document"],detail:["版本 · 页 · 坐标","Version · page · bbox"]},
-    {tag:"02",title:["结构恢复","Structure"],detail:["表头 · 单元格 · 图注","Header · cell · caption"]},
-    {tag:"03",title:["证据片段","Evidence chunk"],detail:["段落 / 表格 ID · 来源","Paragraph / table ID · locator"]},
-    {tag:"04",title:["证据对齐","Claim alignment"],detail:["支持 / 冲突 / 缺失","Support / conflict / missing"]},
-    {tag:"05",title:["可核验的引用","Resolvable citation"],detail:["引用有效 ≠ 仅有引用","Correct, not merely present"]},
-  ];
   return <section className="structural-guide struct-provenance" id="concept-demo"
     data-structural-version="3" data-chapter="05" data-scenario={selected} aria-labelledby="struct-guide-title">
     <Header eyebrow="05 / DOCUMENT PROVENANCE" en={en}
@@ -95,13 +89,7 @@ function ProvenanceGuide({en}: {en:boolean}) {
     <Selector cases={examples} current={selected} onChange={setSelected} en={en}/>
     <p className="struct-input"><span>{en?"INPUT":"输入"}</span>{t(example.input,en)}</p>
     <div className="struct-caption">{en?"CLAIM → SOURCE LINEAGE":"CLAIM → SOURCE 证据谱系"}</div>
-    <ol className="struct-lineage" aria-label={en?"Source provenance stages":"来源溯源检查阶段"}>
-      {pipeline.map((node,index)=> <li key={node.tag} data-state={example.stageStates[index]}>
-        <span className="struct-step">{node.tag}</span>
-        <div><strong>{t(node.title,en)}</strong><small>{t(node.detail,en)}</small></div>
-        <span className="struct-status">{t(status[example.stageStates[index]],en)}</span>
-      </li>)}
-    </ol>
+    <CitationGraph scenario={selected} en={en}/>
     <div className="struct-focus"><span className="struct-kicker">{en?"EARLIEST FAILURE / SOURCE":"最早的失败 / 来源"}</span>
       <strong>{t(example.focus,en)}</strong></div>
     <Outcome item={example} en={en}/>
@@ -138,12 +126,6 @@ function EvaluationGuide({en}: {en:boolean}) {
       action:["隔离事件 → 权限回归 → 人工审查","Isolate → access regression → human review"],
     },
   ];
-  const spans: readonly {id:string; title:Copy; detail:Copy}[]=[
-    {id:"llm",title:["LLM Run","LLM Run"],detail:["候选结论与版本","Proposed output & version"]},
-    {id:"retrieval",title:["Retriever Run","Retriever Run"],detail:["候选 / 元数据 / 来源","Candidates / ACL / provenance"]},
-    {id:"tool",title:["Tool Run","Tool Run"],detail:["调用 / 反馈 / 副作用","Call / feedback / side effects"]},
-    {id:"policy",title:["Validator / Policy Run","Validator / Policy Run"],detail:["输出检查 / 权限决策","Validation / authorization"]},
-  ];
   const example=examples[selected];
   return <section className="structural-guide struct-evaluation" id="concept-demo"
     data-structural-version="3" data-chapter="09" data-scenario={selected} aria-labelledby="struct-guide-title">
@@ -153,29 +135,7 @@ function EvaluationGuide({en}: {en:boolean}) {
         "A root run contains observable child runs. Offline datasets and runtime trajectories are different data planes."]}/>
     <Selector cases={examples} current={selected} onChange={setSelected} en={en}/>
     <p className="struct-input"><span>{en?"OBSERVED CASE · ILLUSTRATION":"示例故障"}</span>{t(example.input,en)}</p>
-    <div className="struct-eval-grid">
-      <div>
-        <div className="struct-caption">{en?"RUNTIME TRACE · DIAGNOSTIC TREE":"RUNTIME TRACE · 故障树"}</div>
-        <div className="struct-trace-root"><span className="struct-kicker">ROOT RUN</span>
-          <strong>{en?"Single request execution":"一次请求的执行记录"}</strong></div>
-        <ol className="struct-trace-tree">
-          {spans.map(s=><li key={s.id} data-state={s.id===example.origin?"block":"idle"}>
-            <span className="struct-trace-branch" aria-hidden="true">└─</span>
-            <div><strong>{t(s.title,en)}</strong><small>{t(s.detail,en)}</small></div>
-            {s.id===example.origin&&<span className="struct-trace-flag">{en?"INVESTIGATE":"重点排查"}</span>}
-          </li>)}
-        </ol>
-      </div>
-      <div>
-        <div className="struct-caption">{en?"EVALUATION & RELEASE CONTROL":"评估与发布决策"}</div>
-        <ol className="struct-eval-cycle">
-          <li><strong>{en?"Trace triage":"Trace 分诊"}</strong><small>{en?"Identify earliest wrong decision":"定位最早错误节点"}</small></li>
-          <li><strong>{en?"Privacy review / label":"脱敏审核 / 标注"}</strong><small>{en?"Curated cases, not raw trace copying":"受审案例，不是直接复制原始 Trace"}</small></li>
-          <li><strong>{en?"Offline regression":"离线回归"}</strong><small>{t(example.action,en)}</small></li>
-          <li data-state={selected===2?"block":"hold"}><strong>{en?"Release policy":"发布门禁"}</strong><small>{t(example.release,en)}</small></li>
-        </ol>
-      </div>
-    </div>
+    <TraceEvaluationGraph scenario={selected} en={en}/>
     <div className="struct-eval-return"><span aria-hidden="true">↶</span>
       {en?"Only verified changes may proceed to shadow / canary; new traces feed the next review.":"只有验证通过的变更才能进入 Shadow / Canary；新 Trace 回流下一轮评估。"}</div>
     <Outcome item={example} en={en}/>
@@ -212,13 +172,6 @@ function DeliveryGuide({en}: {en:boolean}) {
       focus:["B6 · Human / Host write approval","B6 · 人工 / Host 写入审批"],
     },
   ];
-  const planes:readonly {id:string; title:Copy; description:Copy}[]=[
-    {id:"customer",title:["客户 / 工作流平面","Customer / workflow"],description:["真实用户 · SSO · 审批 UI","User · SSO · approval UI"]},
-    {id:"control",title:["控制平面","Control"],description:["策略 · 工具白名单 · 预算","Policy · allowlist · budget"]},
-    {id:"data",title:["数据平面","Data"],description:["CDC → Bronze / Silver / Gold","CDC → Bronze / Silver / Gold"]},
-    {id:"execution",title:["执行平面","Execution"],description:["路由 · SQL / Exact · 证据判断","Router · SQL / Exact · evidence"]},
-    {id:"operations",title:["证据与运维平面","Evidence / operations"],description:["Trace · Eval · Canary / Rollback","Trace · Eval · Canary / rollback"]},
-  ];
   const boundaries:readonly {id:string; title:Copy}[]=[
     {id:"B1",title:["可信身份和会话","Trusted identity and session"]},
     {id:"B2",title:["工具权限 / 成本约束","Tool authorization and budget"]},
@@ -238,11 +191,7 @@ function DeliveryGuide({en}: {en:boolean}) {
     <Selector cases={examples} current={selected} onChange={setSelected} en={en}/>
     <p className="struct-input"><span>{en?"CASE":"场景"}</span>{t(example.input,en)}</p>
     <div className="struct-caption">{en?"FDE SYSTEM · RESPONSIBILITY PLANES":"FDE SYSTEM · 责任平面拓扑"}</div>
-    <div className="struct-planes" role="list" aria-label={en?"Five responsibility planes":"五个责任平面"}>
-      {planes.map(p=><div role="listitem" key={p.id} data-plane={p.id}>
-        <span>{p.id.toUpperCase()}</span><strong>{t(p.title,en)}</strong><small>{t(p.description,en)}</small>
-      </div>)}
-    </div>
+    <FdeArchitectureGraph scenario={selected} en={en}/>
     <div className="struct-caption">{en?"ARCHITECTURE REVIEW CHECKS · B1–B7":"架构审查边界 · B1–B7"}</div>
     <ol className="struct-boundaries">
       {boundaries.map((gate,index)=><li key={gate.id} data-state={example.gates[index]}>
