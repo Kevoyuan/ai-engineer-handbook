@@ -188,35 +188,53 @@ const budgetResources:readonly NodeText[]=[
 ];
 const request:NodeText={id:"request",title:["请求 + 任务","Request + task"],detail:["当前问题","Current objective"],kind:"source"};
 const allocator:NodeText={id:"allocator",title:["Context Allocator","Context allocator"],detail:["容量 / 有效证据","Budget + utility"],kind:"decision"};
-const assembled:NodeText={id:"assemble",title:["可用 Context","Assembled context"],detail:["约束 + 证据 + 预留","Constraints + evidence"],kind:"terminal"};
+const assembled:NodeText={id:"assemble",title:["已组装 Context","Assembled context"],detail:["核对来源 · 留出输出预算","Sourced inputs · output reserved"],kind:"terminal"};
+/**
+ * A single assembly spine plus five policy branches. Earlier V3.2 connected
+ * every leaf back to the output, producing overlapping spaghetti edges and
+ * incorrectly suggesting that the output reservation becomes prompt content.
+ * Policy branches express allocation decisions, not token flow percentages.
+ */
 function budgetLayout(compact:boolean,scenario:number,priorities:readonly GraphState[]):GraphLayout{
- const width=compact?360:930,height=compact?960:555;
- const nodes:GraphNodeData[]=[];
- nodes.push(node(request,compact?174:94,compact?73:264,compact?175:170,compact?69:78,active));
- nodes.push(node(allocator,compact?174:298,compact?178:264,compact?185:170,compact?76:78,active));
- const px=compact?[111,270,111,270,111]:[557,557,557,557,557];
- const py=compact?[319,319,468,468,616]:[68,165,262,359,456];
- const w=compact?145:172;
- for(let i=0;i<5;i++)nodes.push(node(budgetResources[i],px[i],py[i],w,compact?87:76,priorities[i]));
- nodes.push(node(assembled,compact?170:826,compact?814:264,compact?180:168,compact?73:80,active));
- const edges:GraphEdgeData[]=[
-   edge("request-allocator","request","allocator",active,
-       compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"right",toPort:"left"}),
- ];
- for(let i=0;i<5;i++){
-   const state=priorities[i]===active?active:priorities[i]===blocked?blocked:priorities[i]===pending?pending:idle;
-   edges.push(edge("allocate-"+budgetResources[i].id,"allocator",budgetResources[i].id,state,{
-      kind:"branch",fromPort:compact?"bottom":"right",toPort:compact?"top":"left",
-      ...(!compact?{via:[[412,264],[412,py[i]]]}:{}),
-   }));
-   edges.push(edge("include-"+budgetResources[i].id,budgetResources[i].id,"assemble",state,{
-      kind:"mapping",fromPort:compact?"bottom":"right",toPort:compact?"top":"left",
-      ...(!compact?{via:[[702,py[i]],[702,264]]}:{}),
-   }));
- }
- return {width,height,nodes,edges,notes:compact?[]:[
-   {x:554,y:25,text:["选择性取证 / 剪裁 / 保留","SELECTIVE KEEP · REDUCE · RETRIEVE"]},
- ]};
+  const width=compact?360:930,height=compact?818:655;
+  const nodes:GraphNodeData[]=[];
+  nodes.push(node(request,compact?178:101,compact?61:315,compact?168:170,compact?68:78,active));
+  nodes.push(node(allocator,compact?178:307,compact?161:315,compact?186:172,compact?76:80,active));
+  const x=compact?[100,260,100,260,100]:[619,619,619,619,619];
+  const y=compact?[301,301,432,432,562]:[103,203,303,403,503];
+  const w=compact?135:181,h=compact?78:75;
+  for(let i=0;i<budgetResources.length;i++)
+    nodes.push(node(budgetResources[i],x[i],y[i],w,h,priorities[i]));
+  nodes.push(node(assembled,compact?178:825,compact?733:602,compact?185:174,compact?76:74,active));
+  const edges:GraphEdgeData[]=[
+    edge("request-allocator","request","allocator",active,
+      compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"right",toPort:"left"}),
+    // The direct assembly path represents the outcome of policy decisions:
+    // resources are not fake individually-merged pipes, and reserve is budget,
+    // not an extra source of prompt evidence.
+    edge("allocator-assemble","allocator","assemble",active,
+      compact?{fromPort:"bottom",toPort:"top",
+        via:[[178,655],[178,655]]}:
+        {fromPort:"bottom",toPort:"left",via:[[307,602],[738,602]]}),
+  ];
+  for(let i=0;i<budgetResources.length;i++){
+    const state=priorities[i];
+    const options:Partial<GraphEdgeData>=compact?
+      {kind:"branch",fromPort:"bottom",toPort:"top",
+        via:[[178,y[i]-56],[x[i],y[i]-56]]}:
+      {kind:"branch",fromPort:"right",toPort:"left",
+        via:[[471,315],[471,y[i]]]};
+    edges.push(edge("allocate-"+budgetResources[i].id,"allocator",
+      budgetResources[i].id,state,options));
+  }
+  const notes:GraphLayout["notes"]=compact?[
+    {x:180,y:241,text:["预算分流 / 按任务分配","POLICY BRANCHES"]},
+    {x:180,y:675,text:["↓ 决策后组装","↓ ASSEMBLY"]},
+  ]:[
+    {x:615,y:35,text:["上下文来源 / 分配处理策略","INPUT RESPONSIBILITY / ALLOCATION POLICY"]},
+    {x:820,y:553,text:["策略结果 / 保留生成空间","RESULT / OUTPUT RESERVED"]},
+  ];
+  return {width,height,nodes,edges,notes};
 }
 export function ContextGraph({scenario,en,status}:{
   scenario:number;en:boolean;status:readonly ("pass"|"hold"|"block"|"idle")[];
