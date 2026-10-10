@@ -124,8 +124,19 @@ export function GraphCanvas({id,desktop,mobile,en,summary}:{
             })()}
           </g>;
         })}
-        {layout.notes?.map((note,i)=><text key={i} className="atlas-graph-annotation"
-          x={note.x} y={note.y} textAnchor="middle">{tx(note.text,en)}</text>)}
+        {layout.notes?.map((note,i)=>{
+          const label=tx(note.text,en);
+          // Plate lane labels above mapping curves, never cross through a caption.
+          const visualWidth=[...label].reduce((sum,char)=>
+            sum+(/[\\u0080-\\uFFFF]/.test(char)?11:6.6),0)+24;
+          return <g className="atlas-graph-annotation-group" key={i}>
+            <rect className="atlas-graph-annotation-plate"
+              x={note.x-visualWidth/2} y={note.y-15}
+              width={visualWidth} height="22" rx="4"/>
+            <text className="atlas-graph-annotation"
+              x={note.x} y={note.y} textAnchor="middle">{label}</text>
+          </g>;
+        })}
       </svg>
       <div className="atlas-graph-nodes" role="list" aria-label={en?"Architecture nodes and their states":"架构节点及状态"}>
         {layout.nodes.map(node=>{
