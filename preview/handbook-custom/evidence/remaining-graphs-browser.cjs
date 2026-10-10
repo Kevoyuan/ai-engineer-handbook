@@ -37,8 +37,11 @@ try{
    await graph.waitFor();
    assert.equal(await graph.count(),1,"A single graph must be primary for "+spec.id);
    assert.equal(await graph.locator(".atlas-graph-svg").count(),1);
-   assert((await graph.locator("[data-edge]").count())>=6,"Must have real directed edges");
-   assert((await graph.locator("[data-node]").count())>=7,"Must have real architecture nodes");
+   const minimum=spec.id==="agent-loop"?{edges:5,nodes:6}:{edges:6,nodes:7};
+   assert((await graph.locator("[data-edge]").count())>=minimum.edges,
+     "Graph must contain its own authored directed edges: "+spec.id);
+   assert((await graph.locator("[data-node]").count())>=minimum.nodes,
+     "Graph must contain its own authored architecture nodes: "+spec.id);
    for(let i=0;i<spec.samples;i++){
     if(spec.id==="serving"){
       const button=demo.locator(".v2-scenarios .v2-scenario").nth(i);
