@@ -158,7 +158,7 @@ CI validates source contracts, TypeScript/Vite build, 144 CH05/09/12 scenario ch
 
 ## Graph-first V3.4 interactions · CH03/04/06/08/10
 
-The original `LessonPlayer` owns scenario/step/seek/autoplay/quiz for CH03, CH04, CH06 and CH08. Its graph is a **pure view**, not a second step/state controller. CH10 retains its `PrefixGuide` scenario selector. A graph state must not claim a tool was actually run; examples are teaching simulations grounded in canonical chapter paragraphs.
+The original `LessonPlayer` owns scenario/step/seek/autoplay/quiz for CH03, CH04 and CH08. CH06 is governed by its **separate SkillSimulator** with scenario tabs and phases (initial, discovery, access/input, instruction, reference, execution); the graph subscribes to that owner instead of inventing an independent LessonPlayer. All graphs are **pure views**, not a second step/state controller. CH10 retains its `PrefixGuide` scenario selector. A graph state must not claim a tool was actually run; examples are teaching simulations grounded in canonical chapter paragraphs.
 
 - CH03: real route graph with only the chosen 2 of 5 paths selected once execution phase begins; candidate fusion feeds evidence gate.
 - CH04: gates G0–G5 with blocked Claim Verification under CONFLICT and INSUFFICIENT; safe policy branches only at the policy frame.
