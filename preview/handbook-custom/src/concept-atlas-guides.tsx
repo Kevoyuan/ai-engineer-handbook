@@ -8,6 +8,7 @@
 import { useLayoutEffect, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import "./concept-atlas-guides.css";
+import { ContextGraph, PermissionGraph, MemoryGraph, CDCGraph } from "./graph-models";
 
 type Copy = readonly [string, string];
 type State = "pass" | "hold" | "block" | "idle";
@@ -66,13 +67,6 @@ const budgets:readonly (Scenario&{status:readonly State[];watch:Copy})[]=[
     watch:["摘要 ≠ 权威状态","Summary ≠ authoritative state"],
   },
 ];
-const budgetParts:readonly {id:string;name:Copy;responsibility:Copy}[]=[
-  {id:"constraints",name:["系统约束","System / policy"],responsibility:["不可随意删减","Protected"]},
-  {id:"history",name:["历史记录","History"],responsibility:["筛选与去重","Prune / dedup"]},
-  {id:"evidence",name:["检索证据","Retrieved evidence"],responsibility:["按任务选择","Route / rerank"]},
-  {id:"state",name:["工作状态","Working state"],responsibility:["结构化保留","Structured view"]},
-  {id:"output",name:["输出预留","Output reservation"],responsibility:["留足空间","Reserve capacity"]},
-];
 function ContextBudget({en}:{en:boolean}){
   const [choice,setChoice]=useState(0);const c=budgets[choice];
   return <section className="atlas-mental atlas-context" id="concept-demo" data-mental-chapter="01"
@@ -84,11 +78,7 @@ function ContextBudget({en}:{en:boolean}){
     <Controls items={budgets} current={choice} onSelect={setChoice} en={en}/>
     <p className="atlas-mental-input"><strong>{en?"CONSTRAINT":"问题"}</strong>{tr(c.premise,en)}</p>
     <div className="atlas-mental-label">{en?"CONTEXT BUDGET · RESPONSIBILITY, NOT PERCENTAGES":"CONTEXT BUDGET · 责任分配而非百分比"}</div>
-    <div className="atlas-budget-rail" role="list" aria-label={en?"Context allocation responsibilities":"上下文构成与处理边界"}>
-      {budgetParts.map((p,i)=><div role="listitem" key={p.id} data-state={c.status[i]}>
-        <span>{tr(p.name,en)}</span><strong>{tr(p.responsibility,en)}</strong>
-        <small>{tr(states[c.status[i]],en)}</small></div>)}
-    </div>
+    <ContextGraph scenario={choice} en={en} status={c.status}/>
     <div className="atlas-mental-focus"><span>{en?"RELIABILITY BOUNDARY":"可靠性边界"}</span><strong>{tr(c.watch,en)}</strong></div>
     <Legend en={en}/>
     <Conclusion c={c} en={en}/>
@@ -122,13 +112,6 @@ const authorization:readonly (Scenario&{checks:readonly State[];scope:Copy})[]=[
     scope:["合法候选空间为空","No authorized candidates"],
   },
 ];
-const authorizeStages:readonly {code:string;label:Copy;detail:Copy}[]=[
-  {code:"01",label:["可信身份","Trusted identity"],detail:["SSO / Tenant / Role","SSO / tenant / role"]},
-  {code:"02",label:["候选权限","Candidate ACL"],detail:["预过滤 / 版本","Prefilter / version"]},
-  {code:"03",label:["检索与重排","Retrieve & rerank"],detail:["Exact / BM25 / Dense / Graph","Exact / BM25 / Dense / Graph"]},
-  {code:"04",label:["来源权限复核","Fetch recheck"],detail:["实时授权 / 资源","Current resource policy"]},
-  {code:"05",label:["证据入 Context","Context entry"],detail:["可追溯 / 可回答","Grounded, approved evidence"]},
-];
 function RetrievalBoundary({en}:{en:boolean}){
   const [choice,setChoice]=useState(0);const c=authorization[choice];
   return <section className="atlas-mental atlas-retrieval" id="concept-demo" data-mental-chapter="02"
@@ -140,13 +123,7 @@ function RetrievalBoundary({en}:{en:boolean}){
     <Controls items={authorization} current={choice} onSelect={setChoice} en={en}/>
     <p className="atlas-mental-input"><strong>{en?"QUERY":"请求"}</strong>{tr(c.premise,en)}</p>
     <div className="atlas-mental-label">{en?"TRUSTED EXECUTION BOUNDARY":"受信执行边界"}</div>
-    <ol className="atlas-auth-funnel">
-      {authorizeStages.map((stage,i)=><li key={stage.code} data-state={c.checks[i]}>
-        <span className="atlas-mental-index">{stage.code}</span>
-        <div><strong>{tr(stage.label,en)}</strong><small>{tr(stage.detail,en)}</small></div>
-        <span className="atlas-mental-state">{tr(states[c.checks[i]],en)}</span>
-      </li>)}
-    </ol>
+    <PermissionGraph scenario={choice} en={en}/>
     <div className="atlas-mental-focus"><span>{en?"LEGAL CANDIDATES":"合法候选范围"}</span><strong>{tr(c.scope,en)}</strong></div>
     <Legend en={en}/>
     <Conclusion c={c} en={en}/>
@@ -174,18 +151,8 @@ const memoryCases:readonly (Scenario&{path:"write"|"read"|"correction";write:rea
    path:"correction",write:["pass","pass","pass","pass"],read:["pass","pass","pass","pass"],
    focus:["纠正 → 版本化 → View 失效 / 重建","Correction → version → view invalidation"]},
 ];
-const memoryWrite:readonly Copy[]=[
-  ["候选提取","Extract candidate"],["稳定性 / 价值","Stability & value"],["冲突 / 写入许可","Conflict & write policy"],["版本 / 来源保存","Versioned, sourced store"],
-];
-const memoryRead:readonly Copy[]=[
-  ["当前任务路由","Decision routing"],["Scope / ACL / 有效期","Scope, ACL, validity"],["受控检索 / 解决冲突","Retrieve / resolve conflict"],["组装 Context View","Assemble context view"],
-];
 function MemoryLifecycle({en}:{en:boolean}){
   const [choice,setChoice]=useState(0);const c=memoryCases[choice];
-  const lanes: readonly {key:string;name:Copy;parts:readonly Copy[];states:readonly State[]}[]=[
-    {key:"WRITE",name:["写入 / 晋升","Write / promotion"],parts:memoryWrite,states:c.write},
-    {key:"READ",name:["读取 / 上下文","Read / context"],parts:memoryRead,states:c.read},
-  ];
   return <section className="atlas-mental atlas-memory" id="concept-extension" data-mental-chapter="07"
     data-scenario={choice} aria-label={en?"Memory lifecycle and policy map":"记忆生命周期与策略地图"}>
     <Title code="07 / MEMORY · LEDGER & VIEWS" en={en}
@@ -194,15 +161,7 @@ function MemoryLifecycle({en}:{en:boolean}){
         "Separate durable promotion from scoped context retrieval. Corrections preserve provenance."]}/>
     <Controls items={memoryCases} current={choice} onSelect={setChoice} en={en}/>
     <p className="atlas-mental-input"><strong>{en?"TURN":"会话"}</strong>{tr(c.premise,en)}</p>
-    <div className="atlas-memory-lanes">
-      {lanes.map(l=><div className="atlas-memory-lane" key={l.key}>
-        <div className="atlas-memory-lane-label"><span>{l.key}</span><strong>{tr(l.name,en)}</strong></div>
-        <ol>{l.parts.map((part,i)=><li key={i} data-state={l.states[i]}>
-          <span className="atlas-mental-index">{String(i+1).padStart(2,"0")}</span>
-          <strong>{tr(part,en)}</strong><small>{tr(states[l.states[i]],en)}</small>
-        </li>)}</ol>
-      </div>)}
-    </div>
+    <MemoryGraph scenario={choice} en={en}/>
     <div className="atlas-mental-focus"><span>{en?"DECISIVE BOUNDARY":"决定性边界"}</span><strong>{tr(c.focus,en)}</strong></div>
     <Legend en={en}/>
     <Conclusion c={c} en={en}/>
@@ -247,10 +206,6 @@ const cdcCases:readonly CdcCase[]=[
    effect:["最新状态标记删除 / 不可见","Latest view is deleted or unavailable"],
    history:["[1, 2)","[2, 3)","DELETE ≥ 3"],stages:["pass","pass","pass","hold"]},
 ];
-const cdcStages:readonly Copy[]=[
-  ["原始事件 / Offset","Raw + offset"],["重复 / 冲突检查","Dedup / conflict"],
-  ["序列化合并","Version merge"],["授权消费视图","Authorized read"],
-];
 function CdcTimeline({en}:{en:boolean}){
   const [choice,setChoice]=useState(0);const c=cdcCases[choice];
   return <section className="atlas-mental atlas-cdc" id="concept-extension"
@@ -262,23 +217,8 @@ function CdcTimeline({en}:{en:boolean}){
         "Compare late, duplicate and delete events. Example SCD2 intervals use source sequence—not wall-clock time."]}/>
     <Controls items={cdcCases} current={choice} onSelect={setChoice} en={en}/>
     <p className="atlas-mental-input"><strong>{en?"EVENT":"事件"}</strong>{tr(c.premise,en)}</p>
-    <div className="atlas-cdc-tracks">
-      <div className="atlas-cdc-track"><span className="atlas-mental-label">{en?"DECLARED SOURCE ORDER":"SOURCE ORDER · 源声明序列"}</span>
-        <div role="list" aria-label={en?"Source logical sequence":"源逻辑顺序"}>
-          {c.expected.map((x,i)=><span role="listitem" key={i}>{x}</span>)}
-        </div></div>
-      <div className="atlas-cdc-track"><span className="atlas-mental-label">{en?"OBSERVED ARRIVAL ORDER":"INGESTION ORDER · 实际到达顺序"}</span>
-        <div role="list" aria-label={en?"Observed ingestion sequence":"实际入库顺序"}>
-          {c.arrival.map((x,i)=><span role="listitem" key={i}
-            data-state={choice===1&&i===0||choice===2&&i===2?"hold":"pass"}>{x}</span>)}</div></div>
-      <div className="atlas-cdc-track"><span className="atlas-mental-label">{en?"ILLUSTRATIVE SCD2 VERSION INTERVALS":"SCD2 · 示例版本区间（seq 域）"}</span>
-        <div role="list" aria-label={en?"Historical version intervals":"历史版本区间"}>
-          {c.history.map((x,i)=><span role="listitem" key={i}>{x}</span>)}</div></div>
-    </div>
-    <ol className="atlas-cdc-gates" aria-label={en?"Event processing checks":"事件处理边界"}>
-      {cdcStages.map((stage,i)=><li key={i} data-state={c.stages[i]}>
-        <strong>{tr(stage,en)}</strong><small>{tr(states[c.stages[i]],en)}</small></li>)}
-    </ol>
+    <CDCGraph scenario={choice} en={en} expected={c.expected}
+      arrival={c.arrival} history={c.history}/>
     <div className="atlas-mental-focus"><span>{en?"EFFECT / CURRENT VIEW":"效果 / 当前视图"}</span><strong>{tr(c.effect,en)}</strong></div>
     <Legend en={en}/>
     <Conclusion c={c} en={en}/>
