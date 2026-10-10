@@ -37,6 +37,12 @@ try{
    await graph.waitFor();
    assert.equal(await graph.count(),1,"A single graph must be primary for "+spec.id);
    assert.equal(await graph.locator(".atlas-graph-svg").count(),1);
+   if(["routing","evidence-gates","agent-loop"].includes(spec.id)){
+     const steps=demo.locator(".concept-step-inspector");
+     assert.equal(await steps.count(),1,"Old four-stage navigation remains accessible");
+     assert.equal(await steps.getAttribute("open"),null,
+       "Old flow cards are not a competing primary diagram");
+   }
    const minimum=spec.id==="agent-loop"?{edges:5,nodes:6}:{edges:6,nodes:7};
    assert((await graph.locator("[data-edge]").count())>=minimum.edges,
      "Graph must contain its own authored directed edges: "+spec.id);
