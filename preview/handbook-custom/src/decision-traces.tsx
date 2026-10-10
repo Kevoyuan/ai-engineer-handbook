@@ -1,3 +1,4 @@
+import { QueryRoutingGraph, EvidenceGatesGraph, AgentLoopGraph, SkillBoundaryGraph } from "./remaining-graph-models";
 /**
  * Optional explanation of *branching*, not a second canonical lesson.
  * CH03/04/08 models follow handbook/chapters/{03,04,08}-*.md;
@@ -61,6 +62,9 @@ function RoutingTrace({scenario, step, en}: Omit<Props,"anchor"|"last">) {
       <span className="trace-kicker">03 / ROUTE TO EVIDENCE</span>
       <h4>{en ? "Selected paths, not every retriever" : "按证据形状选路，不是所有检索器都跑"}</h4>
     </header>
+    <QueryRoutingGraph scenario={scenario} step={step} en={en}/>
+    <details className="trace-inspection">
+      <summary>{en?"Inspect selected retrievers and routing evidence":"展开已选检索器与选路依据"}</summary>
     <ol className="trace-phase-track" aria-label={en ? "Query execution phases" : "查询处理阶段"}>
       {phases.map((phase,i) => <li key={i} data-state={step===i?"current":step>i?"passed":"future"}>
         <span>{String(i+1).padStart(2,"0")}</span><strong>{txt(phase,en)}</strong>
@@ -95,6 +99,7 @@ function RoutingTrace({scenario, step, en}: Omit<Props,"anchor"|"last">) {
       <span className="trace-label">{en?"IF EVIDENCE FAILS":"若证据检验未通过"}</span>
       <p>{txt(cfg.fallback,en)}</p>
     </div>
+    </details>
     <p className="trace-source">{en?"Teaching illustration · CH03 §§3.1–3.5 · No live retrieval.":"教学示意 · CH03 §3.1–3.5 · 未执行真实检索。"}</p>
   </div>;
 }
@@ -132,6 +137,9 @@ function EvidenceTrace({scenario,step,en}:Omit<Props,"anchor"|"last">) {
   return <div className="decision-trace decision-trace-evidence" data-trace="evidence-gates" data-scenario={scenario} data-step={step}>
     <header className="trace-head"><span className="trace-kicker">04 / SIX GATES</span>
       <h4>{en?"Which gate prevents an unsupported claim?":"哪一道 Gate 阻止缺证据的结论？"}</h4></header>
+    <EvidenceGatesGraph scenario={scenario} step={step} en={en}/>
+    <details className="trace-inspection">
+      <summary>{en?"Inspect Gate 0–5 evidence and release policy":"展开 G0–G5 证据状态与策略"}</summary>
     <ol className="trace-gates">
       {gates.map(g=>{
         const status=gateStatus(g.id,scenario,step);
@@ -162,6 +170,7 @@ function EvidenceTrace({scenario,step,en}:Omit<Props,"anchor"|"last">) {
         en ? "This scenario is still under review; a policy outcome has not been selected." :
           "当前仍在检查证据，尚未作出最终策略决策。"}</p>
     </div>
+    </details>
     <p className="trace-source">{en?"Teaching illustration · CH04 §4.1, 4.3–4.5 · Six Gates are an engineering policy, not a proof.":"教学示意 · CH04 §4.1、4.3–4.5 · Six Gates 是工程策略，不是正确性的证明。"}</p>
   </div>;
 }
@@ -187,6 +196,9 @@ function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
   return <div className="decision-trace decision-trace-agent" data-trace="agent-loop" data-scenario={scenario} data-step={step}>
     <header className="trace-head"><span className="trace-kicker">08 / BOUNDED LOOP</span>
       <h4>{en?"Feedback determines the next transition":"工具反馈决定下一条转移边"}</h4></header>
+    <AgentLoopGraph scenario={scenario} step={step} last={last} en={en}/>
+    <details className="trace-inspection">
+      <summary>{en?"Inspect detailed rounds and stop/retry evidence":"展开各轮次与终止证据"}</summary>
     <div className="trace-loop-rounds">
       {Array.from({length:rounds},(_,round)=>(
         <div className="trace-loop-round" key={round} data-state={step>=round*4?"visited":"future"}>
@@ -231,7 +243,22 @@ function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
         en ? "Await observed results, authorization and budget checks before choosing a terminal transition." :
           "先核对真实反馈、执行权限与预算，再选择终止或重试路径。"}</p>
     </div>
+    </details>
     <p className="trace-source">{en?"Teaching illustration · CH08 §8.6 · A local Agent loop is not automatically a multi-agent graph.":"教学示意 · CH08 §8.6 · 局部 Agent Loop 不等于多 Agent Graph。"}</p>
+  </div>;
+}
+
+function SkillRouteTrace({scenario,step,en}:Omit<Props,"anchor"|"last">){
+  return <div className="decision-trace decision-trace-skills" data-trace="skill-boundaries"
+    data-scenario={scenario} data-step={step}>
+    <header className="trace-head">
+      <span className="trace-kicker">06 / CAPABILITY → POLICY → TOOL</span>
+      <h4>{en?"A Skill explains how; the host decides whether tools may run":"Skill 提供方法，Host 才能授权工具执行"}</h4>
+    </header>
+    <SkillBoundaryGraph scenario={scenario} step={step} en={en}/>
+    <p className="trace-source">{en
+      ?"Illustrative graph · CH06 §§6.1–6.5 · MCP is an optional tool protocol, not the skill contract."
+      :"教学示意 · CH06 §6.1–6.5 · MCP 可以承载工具协议，但 Skill 本身不等于工具或权限。"}</p>
   </div>;
 }
 
@@ -239,5 +266,6 @@ export function DecisionTrace({anchor,scenario,step,last,en}:Props) {
   if (anchor==="dg2-query-routing") return <RoutingTrace scenario={scenario} step={step} en={en}/>;
   if (anchor==="fig-4-1") return <EvidenceTrace scenario={scenario} step={step} en={en}/>;
   if (anchor==="fig-8-loop-vs-graph") return <AgentTrace scenario={scenario} step={step} last={last} en={en}/>;
+  if (anchor==="capability-architecture-title") return <SkillRouteTrace scenario={scenario} step={step} en={en}/>;
   return null;
 }
