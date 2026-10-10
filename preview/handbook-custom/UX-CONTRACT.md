@@ -154,3 +154,18 @@ For dense graphs, nodes must remain absolutely aligned with SVG paths, including
 
 CI validates source contracts, TypeScript/Vite build, 144 CH05/09/12 scenario checks and 208 CH01/02/07/11 checks in Chromium across four widths, both locales and themes, with scoped WCAG audits on representative light/dark screenshots. Manual whole-page accessibility and visual reviews are separate. **No Vercel deployment** until intentionally released.
 
+
+
+## Graph-first V3.4 interactions · CH03/04/06/08/10
+
+The original `LessonPlayer` owns scenario/step/seek/autoplay/quiz for CH03, CH04, CH06 and CH08. Its graph is a **pure view**, not a second step/state controller. CH10 retains its `PrefixGuide` scenario selector. A graph state must not claim a tool was actually run; examples are teaching simulations grounded in canonical chapter paragraphs.
+
+- CH03: real route graph with only the chosen 2 of 5 paths selected once execution phase begins; candidate fusion feeds evidence gate.
+- CH04: gates G0–G5 with blocked Claim Verification under CONFLICT and INSUFFICIENT; safe policy branches only at the policy frame.
+- CH06: Skill Registry matching, input/access Gate, SKILL.md method loading and actual authorized Host tool are distinct nodes, with CLARIFY / REJECT exits.
+- CH08: round-aware node identities, selected retry back-edge only after permission/budget checks, separate verified STOP vs incomplete HANDOFF.
+- CH10: cache key and namespace gate, exact-prefix matching, cached KV vs independent Prefill, still a Decode stage. Legacy token comparison and stages remain under disclosure.
+- Preserve old technical detail panels in `<details>`, one chapter `#concept-demo`, evidence provenance notes and original optional quiz. Test expanded inspection as well as collapsed graph-first presentation.
+- Browser test both node geometry and SVG `data-edge` semantics across 4 reader widths, 2 languages, both themes, reduced motion, keyboard; screenshots on compact zh/light and wide en/dark. A component axe scan is scoped, not whole-site certification.
+- **CI never publishes Vercel**, and generated production `web/site` remains unchanged.
+
