@@ -74,7 +74,7 @@ function ContextBudget({en}:{en:boolean}){
     <Title code="01 / CONTEXT · ALLOCATION" en={en}
       heading={["上下文容量不等于可靠使用","Context capacity is not reliable evidence use"]}
       about={["按任务决定什么必须保留、什么可以压缩、什么需要重检索。以下不表示具体 token 占比。",
-        "Separate required, compressible and on-demand context. These cards are not measured token shares."]}/>
+        "Separate required, compressible and on-demand context. This graph is not a measured token allocation."]}/>
     <Controls items={budgets} current={choice} onSelect={setChoice} en={en}/>
     <p className="atlas-mental-input"><strong>{en?"CONSTRAINT":"问题"}</strong>{tr(c.premise,en)}</p>
     <div className="atlas-mental-label">{en?"CONTEXT BUDGET · RESPONSIBILITY, NOT PERCENTAGES":"CONTEXT BUDGET · 责任分配而非百分比"}</div>
