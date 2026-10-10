@@ -96,10 +96,13 @@ fs.mkdirSync(out, { recursive: true });
                     await stageMap.locator("summary").click();
                 }
                 await demo.locator(".concept-node").first().click();
-                assert.match(
-                  await demo.locator(".concept-position").innerText(),
-                  /^1 \/ /,
-                );
+                const jumpPosition=await demo.locator(".concept-position").innerText();
+                // CH08 remains in the second round after a retry; Plan is
+                // round-aware and must seek to step 5/8, never silently 1/8.
+                if(slug.startsWith("08")&&example==="1")
+                  assert.match(jumpPosition,/^5 \/ 8/,
+                    "Retry scenario stage seeks must stay in round two");
+                else assert.match(jumpPosition,/^1 \/ /);
               }
               await demo.locator("select").selectOption("0");
               await page.waitForTimeout(250);
