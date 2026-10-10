@@ -142,3 +142,15 @@ Every canonical chapter 01–12 now exposes one primary `#concept-demo`, but **o
 - `test:mental-browser` covers 208 scenario state assertions at 390/768/1440/1728px, zh/en, light/dark. Automated source and Chromium tests do not replace manual screen-reader and touch review.
 - Git integration to Vercel stays disabled (`web/vercel.json`); CI is *not* a release workflow.
 
+
+
+## Graph-first V3.3 Reader contracts
+
+CH01/02/05/07/09/11/12 now use React HTML-node/SVG-edge graphs; existing canonical chapter text and earlier first-party Labs remain intact. CH07 and CH11 graph modules remain supplemental at `#concept-extension`; each canonical chapter has exactly one primary `#concept-demo`. Diagram modules are lazy portals anchored to source headings.
+
+Each scenario must activate the **correct edges** and textual node states, not only a scenario caption. Browser tests check CH02 ACL vs fetch deny; CH05 document/structure failure forks; CH07 read denial and correction back-edge; CH09 culprit Trace Run and blocked release; CH11 source-arrival identity mapping and duplicate rejection; CH12 B4/B6 denied branches. CH01 output reserve is capacity, not an evidence flow merged into a prompt.
+
+For dense graphs, nodes must remain absolutely aligned with SVG paths, including under Reader width changes; desktop CH02 flows horizontally, compact flows vertically. Offscreen and accessibility summaries must expose labeled nodes and directed connections even when the decorative SVG is hidden from assistive technology. The optional graph does not replace its underlying canonical article or create simulated execution.
+
+CI validates source contracts, TypeScript/Vite build, 144 CH05/09/12 scenario checks and 208 CH01/02/07/11 checks in Chromium across four widths, both locales and themes, with scoped WCAG audits on representative light/dark screenshots. Manual whole-page accessibility and visual reviews are separate. **No Vercel deployment** until intentionally released.
+
