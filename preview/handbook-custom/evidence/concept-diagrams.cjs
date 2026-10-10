@@ -47,15 +47,10 @@ fs.mkdirSync(out, { recursive: true });
                 e.scrollIntoView({ block: "start", behavior: "instant" }),
               );
               assert.equal(await page.locator("#concept-demo").count(), 1);
-              assert.equal(
-                await page
-                  .getByRole("button", {
-                    name: en ? "Interactive diagram" : "交互图解",
-                    exact: true,
-                  })
-                  .isEnabled(),
-                true,
-              );
+              assert.equal(await demo.locator("#concept-title").isVisible(),true,
+                "The current Reader routes directly to the chapter's interactive Lab");
+              assert.equal(await demo.locator(".concept-examples #concept-example").count(),1,
+                "Scenario selection is available in the actual Reader, not a legacy nav button");
               for (const example of ["0", "1", "2"]) {
                 await demo.locator("select").selectOption(example);
                 assert.match(
