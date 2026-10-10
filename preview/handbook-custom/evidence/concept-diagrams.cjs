@@ -133,6 +133,11 @@ fs.mkdirSync(out, { recursive: true });
                 .include("#concept-demo")
                 .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
                 .analyze();
+              if(axe.violations.length)
+                console.error("CONCEPT AXE DETAIL",slug,width,{en,dark,reduce},
+                  JSON.stringify(axe.violations.map(v=>({
+                    id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))
+                  }))));
               assert.deepEqual(
                 axe.violations.map((v) => ({
                   id: v.id,
