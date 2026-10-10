@@ -93,6 +93,12 @@ fs.mkdirSync(out, { recursive: true });
                   await demo.locator(".concept-position").innerText(),
                   new RegExp("^" + (count - 1) + " /"),
                 );
+                const stageMap=demo.locator(".concept-step-inspector");
+                if(await stageMap.count()){
+                  assert.equal(await stageMap.getAttribute("open"),null,
+                    "Duplicate 4-card topology is collapsed by default");
+                  await stageMap.locator("summary").click();
+                }
                 await demo.locator(".concept-node").first().click();
                 assert.match(
                   await demo.locator(".concept-position").innerText(),
