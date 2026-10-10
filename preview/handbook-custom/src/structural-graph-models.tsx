@@ -82,9 +82,10 @@ function traceLayout(compact:boolean,scenario:number):GraphLayout {
  nodes.push(n(rollout,compact?293:853,compact?1161:579,compact?124:139,68,I));
  const edges:GraphEdgeData[]=[];
  for(const span of runSpans)edges.push(e("trace-"+span.id,"root",span.id,span.id===selected?A:I,
-  compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"bottom",toPort:"top"}));
+  compact?{fromPort:"left",toPort:"left",via:[[14,ry[runSpans.findIndex(r=>r.id===span.id)]]]}:
+    {fromPort:"bottom",toPort:"top"}));
  edges.push(e("first-error",selected,"triage",A,
-  compact?{fromPort:"bottom",toPort:"top"}:
+  compact?{fromPort:"right",toPort:"right",via:[[330,ry[runSpans.findIndex(r=>r.id===selected)]],[330,590]]}:
   {fromPort:"bottom",toPort:"top",via:[[rx[runSpans.findIndex(r=>r.id===selected)],321],[146,321]]}));
  for(let i=0;i<3;i++)edges.push(e("eval-"+i,evalPipeline[i].id,evalPipeline[i+1].id,A,
     compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"right",toPort:"left"}));
@@ -92,12 +93,13 @@ function traceLayout(compact:boolean,scenario:number):GraphLayout {
   compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"bottom",toPort:"top"}));
  edges.push(e("release-canary","release","rollout",I,
   compact?{fromPort:"right",toPort:"top"}:{fromPort:"bottom",toPort:"top"}));
- return {width,height,nodes,edges,notes:compact?[
-  {x:125,y:530,text:["TRACE → EVALUATION","TRACE → EVALUATION"]},
+ const notes:GraphLayout["notes"]=compact?[
+  {x:125,y:535,text:["TRACE → EVALUATION","TRACE → EVALUATION"]},
  ]:[
-  {x:460,y:319,text:["TRACE 证据 → 脱敏整理后的离线回归","TRACE EVIDENCE → CURATED OFFLINE REGRESSION"]},
-  {x:755,y:528,text:["门禁未通过时不能进入 Canary","NO CANARY WITHOUT PASSING THE GATE"]},
- ]};
+  {x:460,y:352,text:["TRACE → 已脱敏的离线回归","TRACE → CURATED OFFLINE REGRESSION"]},
+  {x:755,y:528,text:["未过门禁不可进入 Canary","NO CANARY WITHOUT A PASS"]},
+ ];
+ return {width,height,nodes,edges,notes};
 }
 export function TraceEvaluationGraph({scenario,en}:{scenario:number;en:boolean}){
  const labels:readonly GraphText[]=[
@@ -147,7 +149,7 @@ function deliveryLayout(compact:boolean,scenario:number):GraphLayout{
     compact?{fromPort:"bottom",toPort:"top"}:
     {fromPort:i===2?"bottom":i===4?"bottom":"right",
      toPort:i===2?"top":i===4?"right":"left",
-     ...(i===4?{via:[[766,523]]}:{})}));
+     ...(i===4?{via:[[640,361],[640,523]]}:{})}));
  edges.push(E("write-approval","execution","write-gate",scenario===2?B:I,
   compact?{kind:"branch",fromPort:"bottom",toPort:"top",via:[[127,606],[269,606]]}:
     {kind:"branch",fromPort:"bottom",toPort:"top"}));
@@ -156,8 +158,9 @@ function deliveryLayout(compact:boolean,scenario:number):GraphLayout{
     via:[[13,780],[13,188]]}:
     {kind:"return",fromPort:"left",toPort:"bottom",
      via:[[235,523],[235,240],[332,240]]}));
- return {width,height,nodes,edges,
-  notes:compact?[]:[{x:462,y:48,text:["五个责任平面 + 两个显式的业务 Gate","FIVE RESPONSIBILITY PLANES · TWO TRUST GATES"]}]};
+ const notes:GraphLayout["notes"]=compact?[]:
+    [{x:462,y:48,text:["五个责任平面 + 两个显式 Gate","FIVE PLANES · TWO EXPLICIT TRUST GATES"]}];
+ return {width,height,nodes,edges,notes};
 }
 export function FdeArchitectureGraph({scenario,en}:{scenario:number;en:boolean}){
  const labels:readonly GraphText[]=[
