@@ -110,6 +110,11 @@
    graph's primary path green instead of inheriting the terminal's orange UI. */
 .chapter-body .skill-terminal .skill-graph-layer {
   --primary:var(--success);
+  --foreground:var(--sim-ink);
+  --muted-foreground:var(--sim-muted);
+  --background:var(--sim-terminal);
+  --card:var(--sim-panel);
+  --border:var(--sim-border);
   --accent:var(--sim-raised);
   margin:1rem 0;
   padding:.75rem;
@@ -124,4 +129,13 @@
   font-weight:650;
   letter-spacing:.035em;
   margin:0 0 .45rem;
+}
+
+/* Skill terminal's enclosing lesson can supply a global strong color; make
+   the graph node's contrast source explicit in both themes. */
+.chapter-body .skill-terminal .skill-graph-layer .atlas-graph-node strong {
+  color:var(--sim-ink);
+}
+.chapter-body .skill-terminal .skill-graph-layer .atlas-graph-node small {
+  color:var(--sim-muted);
 }
