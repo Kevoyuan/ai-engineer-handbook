@@ -36,6 +36,11 @@ const cases = [
             assert.equal(await demo.locator(".knowledge-trigger").count(), 1,
               "Original optional practice remains available");
             assert.equal(await trace.count(), 1);
+            assert.equal(await trace.locator(".atlas-graph").count(), 1,
+              "CH03/04/08 keep one authoritative node-edge visualization");
+            await trace.locator(".trace-inspection > summary").click();
+            assert.equal(await trace.locator(".trace-inspection").getAttribute("open"), "",
+              "Legacy detailed evidence is available on demand");
             const example = demo.locator("#concept-example");
             const next = demo.getByRole("button", {
               name: en ? "Next" : "下一步", exact: true,
