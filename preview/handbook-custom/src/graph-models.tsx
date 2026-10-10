@@ -2,7 +2,6 @@ import { GraphCanvas, type GraphLayout, type GraphNodeData, type GraphEdgeData, 
 
 const active:GraphState="active",idle:GraphState="idle",blocked:GraphState="blocked",pending:GraphState="pending";
 type NodeText={id:string;title:GraphText;detail:GraphText;kind?:GraphNodeData["kind"]};
-type Point=readonly [number,number];
 function node(t:NodeText,x:number,y:number,w:number,h=70,state:GraphState=idle):GraphNodeData{
   return {...t,x,y,width:w,height:h,state};
 }
@@ -115,9 +114,6 @@ export function MemoryGraph({scenario,en}:{scenario:number;en:boolean}){
     mobile={memoryLayout(true,scenario)} summary={captions[scenario]}/>;
 }
 
-const cdcNames:readonly GraphText[]=[
-  ["seq 1","seq 1"],["seq 2","seq 2"],["seq 3","seq 3"],
-];
 type CDCInput={expected:readonly string[];arrival:readonly string[];history:readonly string[]};
 function normalize(v:string):string {
   const match=v.match(/seq\s*([123])/i);
@@ -134,7 +130,7 @@ function cdcLayout(compact:boolean,scenario:number,input:CDCInput):GraphLayout {
   const rowIds=["source","arrival","history"];
   for(let row=0;row<3;row++)for(let i=0;i<rows[row].length;i++){
     const value=rows[row][i];
-    const tail= row===0?["源序列","Source order"]:row===1?["入库时序","Arrival order"]:["版本区间","History interval"];
+    const tail:GraphText= row===0?["源序列","Source order"]:row===1?["入库时序","Arrival order"]:["版本区间","History interval"];
     const warn=row===1&&(scenario===1&&i===0||scenario===2&&i===2);
     nodes.push(node({id:rowIds[row]+i,title:[value,value],detail:tail,kind:kinds[row]},
       centers[i],yy[row],w,h,warn?pending:active));
@@ -158,7 +154,7 @@ function cdcLayout(compact:boolean,scenario:number,input:CDCInput):GraphLayout {
         active,{kind:"mapping",fromPort:"bottom",toPort:"top"}));
     }
   }
-  const notes=compact?[
+  const notes:GraphLayout["notes"]=compact?[
     {x:180,y:34,text:["SOURCE SEQUENCE · 源顺序","SOURCE SEQUENCE"]},
     {x:180,y:263,text:["INGESTION · 实际到达","INGESTION ORDER"]},
     {x:180,y:481,text:["SCD2 · 序列域区间","SCD2 · SEQUENCE DOMAIN"]},
