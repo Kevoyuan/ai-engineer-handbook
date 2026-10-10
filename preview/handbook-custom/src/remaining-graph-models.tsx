@@ -23,13 +23,13 @@ const routeCore:readonly N[]=[
 ];
 const routesChosen=[[0,1],[1,2],[3,4]];
 function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
-  const width=compact?360:980,height=compact?1140:565;
+  const width=compact?360:980,height=compact?925:565;
   const cn=compact?[
-    node(routeCore[0],132,64,173,69,step>=0?A:I),
-    node(routeCore[1],132,160,173,69,step>=1?A:I),
-    node(routeCore[2],132,256,173,69,step>=2?A:P),
-    node(routeCore[3],132,950,173,69,step>=2?A:I),
-    node(routeCore[4],132,1050,173,69,step>=3?A:I),
+    node(routeCore[0],132,58,173,69,step>=0?A:I),
+    node(routeCore[1],132,143,173,69,step>=1?A:I),
+    node(routeCore[2],132,228,173,69,step>=2?A:P),
+    node(routeCore[3],132,720,173,69,step>=2?A:I),
+    node(routeCore[4],132,817,173,69,step>=3?A:I),
   ]:[
     node(routeCore[0],93,262,157,80,A),
     node(routeCore[1],282,262,157,80,step>=1?A:I),
@@ -38,7 +38,7 @@ function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
     node(routeCore[4],881,408,160,76,step>=3?A:I),
   ];
   const xs=compact?[102,259,102,259,102]:[693,693,693,693,693];
-  const ys=compact?[401,401,565,565,730]:[83,171,259,347,435];
+  const ys=compact?[353,353,471,471,589]:[83,171,259,347,435];
   const chosen=routesChosen[scenario]??routesChosen[0];
   const nodes=[...cn,...routeNames.map((v,i)=>node(v,xs[i],ys[i],
     compact?139:147,compact?73:70,chosen.includes(i)&&step>=2?A:I))];
@@ -50,19 +50,19 @@ function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
     edges.push(edge("route-"+item.id,"router",item.id,chosen.includes(i)&&step>=2?A:I,
       compact?{kind:"branch",
         fromPort:i%2===0?"left":"right",toPort:i%2===0?"left":"right",
-        via:i%2===0?[[18,256],[18,ys[i]]]:[[343,256],[343,ys[i]]]}:
+        via:i%2===0?[[18,228],[18,ys[i]]]:[[343,228],[343,ys[i]]]}:
         {kind:"branch",fromPort:"right",toPort:"left",via:[[583,262],[583,ys[i]]]}));
     edges.push(edge("candidate-"+item.id,item.id,"merge",chosen.includes(i)&&step>=2?A:I,
       compact?{kind:"mapping",
         fromPort:i%2===0?"left":"right",toPort:"top",
-        via:i%2===0?[[18,ys[i]],[18,845],[132,845]]:
-          [[343,ys[i]],[343,845],[132,845]]}:
+        via:i%2===0?[[18,ys[i]],[18,659],[132,659]]:
+          [[343,ys[i]],[343,659],[132,659]]}:
         {kind:"mapping",fromPort:"right",toPort:"top",
          via:[[791,ys[i]],[791,182],[881,182]]}));
   });
   edges.push(edge("fusion-evidence","merge","evidence",step>=3?A:I,compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"bottom",toPort:"top"}));
   return {width,height,nodes,edges,notes:compact?[
-    {x:180,y:340,text:["仅高亮选中路线","ONLY SELECTED ROUTES"]},
+    {x:180,y:301,text:["仅高亮选中路线","ONLY SELECTED ROUTES"]},
   ]:[
     {x:688,y:29,text:["可选检索路径 / 仅高亮当前选择","RETRIEVAL OPTIONS · SELECTED PATHS HIGHLIGHTED"]},
     {x:878,y:517,text:["融合排名 ≠ Claim 支持","FUSION SCORE ≠ CLAIM SUPPORT"]},
@@ -92,7 +92,7 @@ const policyOptions:readonly N[]=[
   {id:"abstain",title:["RETRIEVE / ABSTAIN","RETRIEVE / ABSTAIN"],detail:["证据不足","Insufficient evidence"],kind:"terminal"},
 ];
 function gatesLayout(compact:boolean,scenario:number,step:number):GraphLayout {
-  const width=compact?360:980,height=compact?1125:485;
+  const width=compact?360:980,height=compact?1020:485;
   const x=compact?[135,135,135,135,135,135]:[90,250,410,570,730,890];
   const y=compact?[65,163,261,359,457,555]:[131,131,131,131,131,131];
   const states:GraphState[]=gateNames.map((_,i)=>{
@@ -153,7 +153,7 @@ const skillExits:readonly N[]=[
  {id:"reject",title:["REJECT","REJECT"],detail:["跨租户 / 无授权","Unauthorized scope"],kind:"terminal"},
 ];
 function skillLayout(compact:boolean,scenario:number,step:number):GraphLayout{
- const width=compact?360:970,height=compact?900:465;
+ const width=compact?360:970,height=compact?865:465;
  const xx=compact?[115,115,115,115,115,115]:[82,243,404,565,726,887];
  const yy=compact?[62,155,248,341,434,527]:[139,139,139,139,139,139];
  const nodes=skillPath.map((v,i)=>node(v,xx[i],yy[i],compact?165:143,compact?70:81,
@@ -259,7 +259,7 @@ const prefixNames:readonly N[]=[
 ];
 const isolation: N={id:"isolation",title:["独立 Prefill","Isolated prefill"],detail:["不跨命名空间共享","No cross-tenant reuse"],kind:"terminal"};
 function prefixLayout(compact:boolean,scenario:number):GraphLayout {
- const width=compact?360:980,height=compact?810:420;
+ const width=compact?360:980,height=compact?765:420;
  const xs=compact?[116,116,116,116,116,116]:[95,252,409,566,723,880];
  const ys=compact?[68,164,260,356,452,548]:[159,159,159,159,159,159];
  const nodes=prefixNames.map((v,i)=>node(v,xs[i],ys[i],compact?168:148,compact?72:81,
