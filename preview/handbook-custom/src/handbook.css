@@ -3680,3 +3680,9 @@ body {
   margin:0;
 }
 /* Graph-first V3.5 four-phase inspection */
+
+/* V3.5: muted small text on light active-accent panels has sub-AA contrast.
+   Keep status text in primary but make the accompanying phase explanation ink. */
+.chapter-body .concept-node[data-current="true"] > span:not(.concept-node-status):not(.concept-node-marker) {
+  color:var(--foreground);
+}
