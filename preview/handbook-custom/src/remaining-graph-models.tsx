@@ -204,9 +204,9 @@ function loopLayout(compact:boolean,scenario:number,step:number,last:boolean):Gr
  const states=(index:number):GraphState=>step>=index?A:I;
  const nodes=loopStages.map((v,i)=>node(v,fx[i],fy[i],compact?168:174,compact?78:84,states(i)));
  if(two)nodes.push(...second.map((v,i)=>node(v,sx[i],sy[i],compact?168:174,compact?78:84,states(i+4))));
- nodes.push(node(exitNames[0],compact?112:762,compact?(two?1182:650):570,
+ nodes.push(node(exitNames[0],compact?112:683,compact?(two?1182:650):570,
     compact?149:156,74,scenario!==2&&last?A:I));
- nodes.push(node(exitNames[1],compact?286:947,compact?(two?1182:650):570,
+ nodes.push(node(exitNames[1],compact?286:875,compact?(two?1182:650):570,
     compact?132:154,74,scenario===2&&last?B:I));
  const edges:GraphEdgeData[]=[];
  for(let i=0;i<3;i++)edges.push(edge("first-"+i,loopStages[i].id,loopStages[i+1].id,
