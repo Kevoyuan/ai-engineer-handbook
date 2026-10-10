@@ -44,6 +44,12 @@ function pathFor(e:GraphEdgeData,nodes:Map<string,GraphNodeData>):string {
   const [from,to]=ends(a,b,e);
   const start=point(a,from),end=point(b,to);
   const via=e.via??[];
+  // CDC identity mappings must visibly cross when arrival order differs.
+  // Use smooth cubic curves only for un-routed cross-lane mappings.
+  if(e.kind==="mapping" && !via.length){
+    const dy=end[1]-start[1];
+    return `M ${start[0]} ${start[1]} C ${start[0]} ${start[1]+dy*.42}, ${end[0]} ${end[1]-dy*.42}, ${end[0]} ${end[1]}`;
+  }
   const sequence:[number,number][]=[start,...via.map(p=>[p[0],p[1]] as [number,number]),end];
   if(!via.length && Math.abs(start[0]-end[0])>8 && Math.abs(start[1]-end[1])>8){
     // Orthogonal graph edge rather than a visually ambiguous diagonal arrow.
