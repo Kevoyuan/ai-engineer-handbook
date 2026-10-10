@@ -227,10 +227,7 @@ function budgetLayout(compact:boolean,scenario:number,priorities:readonly GraphS
     edges.push(edge("allocate-"+budgetResources[i].id,"allocator",
       budgetResources[i].id,state,options));
   }
-  const notes:GraphLayout["notes"]=compact?[
-    {x:180,y:241,text:["预算分流 / 按任务分配","POLICY BRANCHES"]},
-    {x:180,y:675,text:["↓ 决策后组装","↓ ASSEMBLY"]},
-  ]:[
+  const notes:GraphLayout["notes"]=compact?[]:[
     {x:615,y:35,text:["上下文来源 / 分配处理策略","INPUT RESPONSIBILITY / ALLOCATION POLICY"]},
     {x:820,y:553,text:["策略结果 / 保留生成空间","RESULT / OUTPUT RESERVED"]},
   ];
