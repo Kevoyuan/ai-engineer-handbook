@@ -789,7 +789,8 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
       </div>
       {(lesson.anchor === "dg2-query-routing" ||
         lesson.anchor === "fig-4-1" ||
-        lesson.anchor === "fig-8-loop-vs-graph") && (
+        lesson.anchor === "fig-8-loop-vs-graph" ||
+        lesson.anchor === "capability-architecture-title") && (
         <DecisionTrace anchor={lesson.anchor} scenario={example} step={step} last={last} en={en} />
       )}
       {lesson.anchor === "capability-architecture-title" && (
