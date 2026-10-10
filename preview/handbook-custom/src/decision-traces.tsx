@@ -1,4 +1,4 @@
-import { QueryRoutingGraph, EvidenceGatesGraph, AgentLoopGraph, SkillBoundaryGraph } from "./remaining-graph-models";
+import { QueryRoutingGraph, EvidenceGatesGraph, AgentLoopGraph } from "./remaining-graph-models";
 /**
  * Optional explanation of *branching*, not a second canonical lesson.
  * CH03/04/08 models follow handbook/chapters/{03,04,08}-*.md;
@@ -248,24 +248,9 @@ function AgentTrace({scenario,step,last,en}:Omit<Props,"anchor">) {
   </div>;
 }
 
-function SkillRouteTrace({scenario,step,en}:Omit<Props,"anchor"|"last">){
-  return <div className="decision-trace decision-trace-skills" data-trace="skill-boundaries"
-    data-scenario={scenario} data-step={step}>
-    <header className="trace-head">
-      <span className="trace-kicker">06 / CAPABILITY → POLICY → TOOL</span>
-      <h4>{en?"A Skill explains how; the host decides whether tools may run":"Skill 提供方法，Host 才能授权工具执行"}</h4>
-    </header>
-    <SkillBoundaryGraph scenario={scenario} step={step} en={en}/>
-    <p className="trace-source">{en
-      ?"Illustrative graph · CH06 §§6.1–6.5 · MCP is an optional tool protocol, not the skill contract."
-      :"教学示意 · CH06 §6.1–6.5 · MCP 可以承载工具协议，但 Skill 本身不等于工具或权限。"}</p>
-  </div>;
-}
-
 export function DecisionTrace({anchor,scenario,step,last,en}:Props) {
   if (anchor==="dg2-query-routing") return <RoutingTrace scenario={scenario} step={step} en={en}/>;
   if (anchor==="fig-4-1") return <EvidenceTrace scenario={scenario} step={step} en={en}/>;
   if (anchor==="fig-8-loop-vs-graph") return <AgentTrace scenario={scenario} step={step} last={last} en={en}/>;
-  if (anchor==="capability-architecture-title") return <SkillRouteTrace scenario={scenario} step={step} en={en}/>;
   return null;
 }
