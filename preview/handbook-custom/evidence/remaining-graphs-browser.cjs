@@ -44,6 +44,16 @@ try{
       const button=demo.locator(".v2-scenarios .v2-scenario").nth(i);
       await button.click();
       assert.equal(await button.getAttribute("aria-pressed"),"true");
+    }else if(spec.id==="skills"){
+      // CH06 is owned by SkillSimulator, not the generic LessonPlayer.
+      const tab=demo.locator(".sim-scenarios button").nth(i);
+      await tab.click();
+      assert.equal(await tab.getAttribute("data-state"),"active");
+      const forward=demo.getByRole("button",{name:en?"Step forward":"单步执行",exact:true});
+      for(let k=0;k<(i===0?5:2);k++)await forward.click();
+      assert.equal(await forward.isDisabled(),true,
+        "Skill input/permission gates terminate the simulator early");
+      assert.equal(await demo.locator(".knowledge-trigger").count(),1);
     }else{
       await demo.locator("#concept-example").selectOption(String(i));
       const next=demo.getByRole("button",{name:en?"Next":"下一步",exact:true});
