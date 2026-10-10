@@ -48,22 +48,49 @@ fs.mkdirSync(out,{recursive:true});
           assert.equal(await lab.locator('.atlas-examples button[aria-pressed="true"]').count(),1);
           assert.equal(await lab.getAttribute("data-scenario"),String(i));
           assert((await lab.locator(".atlas-mental-outcome strong").innerText()).length>8);
+          if(i===spec.count-1){
+            await button.focus();
+            await page.keyboard.press("Space");
+            assert.equal(await button.getAttribute("aria-pressed"),"true","Native keyboard scenario selection must work");
+          }
           const box=await button.boundingBox();
           assert(box&&box.height>=43.5,"Touch target must be at least 44px");
-          if(spec.chapter==="01"){
-            assert.equal(await lab.locator(".atlas-budget-rail > div").count(),5);
-          }else if(spec.chapter==="02"){
-            assert.equal(await lab.locator(".atlas-auth-funnel li").count(),5);
-            assert.equal(await lab.locator('.atlas-auth-funnel li[data-state="block"]').count(),i===0?0:1);
-          }else if(spec.chapter==="07"){
-            assert.equal(await lab.locator(".atlas-memory-lane").count(),2);
-            assert.equal(await lab.locator(".atlas-memory-lane li").count(),8);
-            assert.equal(await lab.locator('.atlas-memory-lane li[data-state="block"]').count(),i===1?1:0);
+          const graph=lab.locator(".atlas-graph");
+          assert.equal(await graph.count(),1,"Graph canvas replaces card layout");
+          assert.equal(await graph.locator(".atlas-graph-svg").count(),1);
+          assert((await graph.getAttribute("data-active-edges")||"0")!=="0");
+          const counts={"01":8,"02":8,"07":10};
+          if(counts[spec.chapter]){
+            assert.equal(await graph.locator('[data-node]').count(),counts[spec.chapter]);
           }else{
-            assert.equal(await lab.locator(".atlas-cdc-track").count(),3);
-            assert.equal(await lab.locator(".atlas-cdc-gates li").count(),4);
-            if(i===1) assert.equal(await lab.locator(".atlas-cdc-track").nth(1).locator('[role="listitem"]').first().innerText(),"seq 3");
-            if(i===2) assert.equal(await lab.locator(".atlas-cdc-track").nth(1).locator('[role="listitem"]').last().innerText(),"seq 2");
+            assert((await graph.locator('[data-node]').count())>=7);
+          }
+          if(spec.chapter==="01"){
+            assert.equal(await graph.locator('[data-edge^="allocate-"]').count(),5);
+            assert.equal(await graph.locator('[data-node="allocator"]').getAttribute("data-state"),"active");
+          }
+          if(spec.chapter==="02"){
+            assert.equal(await graph.locator('[data-edge="acl-reject"]').getAttribute("data-state"),
+              i===2?"blocked":"idle","Cross-tenant denial must select ACL reject edge");
+            assert.equal(await graph.locator('[data-edge="fetch-reject"]').getAttribute("data-state"),
+              i===1?"blocked":"idle","Stale ACL must select source recheck denial edge");
+            assert.equal(await graph.locator('[data-node="evidence"]').getAttribute("data-state"),
+              i===0?"active":"idle","Denied evidence must not enter context");
+          }
+          if(spec.chapter==="07"){
+            assert.equal(await graph.locator('[data-edge="read-denied"]').getAttribute("data-state"),
+              i===1?"blocked":"idle","Unauthorized memory read is visibly denied");
+            assert.equal(await graph.locator('[data-edge="correction-version"]').getAttribute("data-state"),
+              i===2?"active":"idle","Correction back-edge must highlight only for a correction");
+          }
+          if(spec.chapter==="11"){
+            assert.equal(await graph.locator('[data-edge="source-arrival-0"]').count(),1);
+            if(i===1){
+              const p=await graph.locator('[data-edge="source-arrival-0"] path').getAttribute("d");
+              assert(p?.includes("M"),"Late event requires source-to-arrival mapping");
+            }
+            if(i===2)assert.equal(await graph.locator('[data-edge="source-arrival-2"]').getAttribute("data-state"),
+              "blocked","Duplicate CDC event highlights rejected duplicate edge");
           }
           validations++;
         }
