@@ -118,9 +118,42 @@ try{
       }).map(n=>n.dataset.node);
       return {position:getComputedStyle(nodes[0]).position,
        stageWidth:el.querySelector(".atlas-graph-stage").clientWidth,
+       stageHeight:el.querySelector(".atlas-graph-stage").clientHeight,
        right:rect.right,viewport:innerWidth,scroll:el.scrollWidth,client:el.clientWidth,
        outside};
     });
+    if(spec.id==="routing"&&width===390)
+      assert(geometry.stageHeight<=930,
+        "CH03 mobile selected-route graph should be compact, not the prior 1140px tall layout");
+    if(spec.id==="routing"&&width===390){
+      const collisions=await graph.evaluate(el=>{
+        const svg=el.querySelector("svg"),nodes=[...el.querySelectorAll(".atlas-graph-node")];
+        const blocked=[];
+        for(const group of el.querySelectorAll('svg g[data-state="active"][data-edge]')){
+          const id=group.dataset.edge;
+          if(!id.startsWith("route-")&&!id.startsWith("candidate-"))continue;
+          const end=id.slice(id.indexOf("-")+1);
+          const ignore=new Set([end,id.startsWith("route-")?"router":"merge"]);
+          const path=group.querySelector("path"),matrix=path.getScreenCTM(),len=path.getTotalLength();
+          if(!matrix)continue;
+          for(let t=7;t<len-7;t+=7){
+            const p=path.getPointAtLength(t);
+            const screen=new DOMPoint(p.x,p.y).matrixTransform(matrix);
+            for(const other of nodes){
+              if(ignore.has(other.dataset.node))continue;
+              const r=other.getBoundingClientRect();
+              if(screen.x>r.left+3&&screen.x<r.right-3&&
+                 screen.y>r.top+3&&screen.y<r.bottom-3){
+                blocked.push(id+" crosses "+other.dataset.node);break;
+              }
+            }
+            if(blocked.length)break;
+          }
+        }
+        return blocked;
+      });
+      assert.deepEqual(collisions,[],"Active CH03 edges may not cross unrelated node text");
+    }
     assert.equal(geometry.position,"absolute","Node positions must align to SVG viewBox");
     assert.equal(geometry.outside.length,0,"Nodes must remain within canvas "+JSON.stringify({spec:spec.id,width,geometry}));
     assert(geometry.scroll<=geometry.client+2,"Graph overflow "+JSON.stringify({spec:spec.id,width,geometry}));
