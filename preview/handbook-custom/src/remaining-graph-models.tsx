@@ -48,12 +48,15 @@ function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
   ];
   routeNames.forEach((item,i)=>{
     edges.push(edge("route-"+item.id,"router",item.id,chosen.includes(i)&&step>=2?A:I,
-      compact?{kind:"branch",fromPort:"bottom",toPort:"top",
-        via:[[132,329],[xs[i],329]]}:
+      compact?{kind:"branch",
+        fromPort:i%2===0?"left":"right",toPort:i%2===0?"left":"right",
+        via:i%2===0?[[18,256],[18,ys[i]]]:[[343,256],[343,ys[i]]]}:
         {kind:"branch",fromPort:"right",toPort:"left",via:[[583,262],[583,ys[i]]]}));
     edges.push(edge("candidate-"+item.id,item.id,"merge",chosen.includes(i)&&step>=2?A:I,
-      compact?{kind:"mapping",fromPort:"bottom",toPort:"top",
-        via:[[xs[i],818],[132,818]]}:
+      compact?{kind:"mapping",
+        fromPort:i%2===0?"left":"right",toPort:"top",
+        via:i%2===0?[[18,ys[i]],[18,845],[132,845]]:
+          [[343,ys[i]],[343,845],[132,845]]}:
         {kind:"mapping",fromPort:"right",toPort:"top",
          via:[[791,ys[i]],[791,182],[881,182]]}));
   });
@@ -98,7 +101,7 @@ function gatesLayout(compact:boolean,scenario:number,step:number):GraphLayout {
     return A;
   });
   const nodes=gateNames.map((v,i)=>node(v,x[i],y[i],compact?170:143,compact?71:78,states[i]));
-  const outx=compact?[92,273,92]:[290,564,827],outy=compact?[715,819,923]:[332,332,332];
+  const outx=compact?[92,273,92]:[290,564,827],outy=compact?[715,715,885]:[332,332,332];
   nodes.push(...policyOptions.map((v,i)=>node(v,outx[i],outy[i],compact?150:195,compact?76:84,
     step>=3&&scenario===i?(i===0?A:B):I)));
   const edges:GraphEdgeData[]=[];
@@ -116,8 +119,11 @@ function gatesLayout(compact:boolean,scenario:number,step:number):GraphLayout {
   }
   policyOptions.forEach((v,i)=>edges.push(edge("policy-"+v.id,"g5",v.id,
     step>=3&&scenario===i?(i===0?A:B):I,
-    compact?{kind:"branch",fromPort:"bottom",toPort:"top",
-      via:[[135,639],[outx[i],639]]}:
+    compact?(i===2?{kind:"branch",fromPort:"left",toPort:"left",
+       via:[[9,555],[9,outy[i]]]}:
+       i===1?{kind:"branch",fromPort:"right",toPort:"right",
+       via:[[354,555],[354,outy[i]]]}:
+       {kind:"branch",fromPort:"bottom",toPort:"top",via:[[135,637],[92,637]]}):
       {kind:"branch",fromPort:"bottom",toPort:"top",
        via:[[890,266],[outx[i],266]]})));
   return {width,height,nodes,edges,notes:compact?[]:[
@@ -162,7 +168,7 @@ function skillLayout(compact:boolean,scenario:number,step:number):GraphLayout{
     compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"right",toPort:"left"}));
  skillExits.forEach((v,i)=>edges.push(edge("skill-exit-"+v.id,"policy",v.id,
    i===scenario-1&&step>=1?B:I,
-   compact?{kind:"branch",fromPort:"right",toPort:"top",via:[[291,248],[291,ey[i]-58],[ex[i],ey[i]-58]]}:
+   compact?{kind:"branch",fromPort:"right",toPort:"right",via:[[353,248],[353,ey[i]]]}:
    {kind:"branch",fromPort:"bottom",toPort:"top",
       via:[[404,255],[ex[i],255]]})));
  return {width,height,nodes,edges,notes:compact?[]:[
