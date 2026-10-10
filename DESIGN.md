@@ -347,3 +347,12 @@ All 12 chapters retain one primary Lab; **CH03, CH04, CH06, CH08 and CH10 now ex
 - **Visual truth:** Nodes must align with SVG edge endpoints and remain within the stage at 390/768/1440/1728px across zh/en and light/dark. Use text alongside edge style; show blocked, pending and alternative routes distinctly. Browser audits must inspect **specific edge IDs** and selected states—not merely count card elements. Preserve source terms, correct step timing, keyboard/motion/44px controls, chapter anchors and quiz.
 - **Release:** All work is Draft PR source only; keep `web/vercel.json` `git.deploymentEnabled: false`, do not run `publish:web`, merge or trigger Vercel without explicit user request.
 
+
+
+## Graph-first V3.5 · density and duplication review
+
+Visual review of 390px Reader screenshots found CH03 routing's compact stage unnecessarily tall (1140px), with unused air between five route choices and fusion. The refined compact stage is **925px**; all five choices, exactly two selected routes, authorization scope, candidate fusion, and evidence verification stay readable with left/right edge corridors. CH04, CH06 and CH10 trim unused canvas tails as their authored layouts allow. This is visual density improvement, not measured runtime performance.
+
+Avoid a second large node/card diagram immediately above a GraphCanvas teaching the same stages. On CH03/CH04/CH08 the old four-stage seek cards remain usable inside native `concept-step-inspector` disclosures, closed by default. Their step/next/previous/autoplay/round-two seeking logic remains owned by the original LessonPlayer; don't duplicate that state. Claim, provenance, token, and trust-boundary **detail panels remain available** via their established disclosures. Keep CH06/CH07 optional zoomable Archify maps; those are a distinct source-backed deep-inspection experience, not disposable duplicate assets.
+
+For compact branching graphs, test the actual **selected SVG edge segments** against the bounding boxes of unrelated HTML nodes, not only horizontal overflow. A clear flow needs whitespace around boundaries, not arbitrary whitespace between every node. V3.5 evidence and chapter-by-chapter disposition: `preview/handbook-custom/evidence/graph-duplication-audit.md`. Production pipeline remains disabled until explicitly released.
