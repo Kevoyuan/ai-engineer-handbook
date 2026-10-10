@@ -114,3 +114,43 @@ Downward movement must accumulate a meaningful distance before hiding the bar; u
 The supplied terminal reference replaces chapter 06's node-card player with a terminal/context split view. Scenario tabs reset running work and practice, and clear previous logs. Send starts an explicitly simulated 5-phase run; pause preserves the current transcript; single-step advances without a timer; reset clears the run. Missing inputs and authorization failures terminate at phase 2. A reset has no real-world effect. The component cancels stale timers on reset, scenario changes and unmount, and pauses when hidden or outside the visible reading area. Reduced motion keeps all controls usable and removes spatial animation.
 
 Internal-context content is an authored teaching model, not private model reasoning. Input token and cache figures are illustrative; the cost panel states that there are no real API calls. Full original context-layer descriptions remain behind a disclosure. Archify overview thumbnails are height-limited visual previews rather than duplicate navigation links; a single explicit Open map action opens the viewer in a new tab and discloses that behavior. Full zoom, export and topology remain available in the viewer. Memory's English reader labels its current Chinese-only visualization explicitly.
+
+
+## Structural decision labs · CH05 / CH09 / CH12
+
+Each of these canonical Reader chapters exposes exactly one additional chapter-local, lazy-mounted `#concept-demo`. The main article and static figure remain independent; if the optional React module fails, source content remains readable. The selected scenario affects only this illustration and never calls real PDF, trace, SQL or order APIs.
+
+- CH05 after `#fig-5-2`: three source-lineage scenarios reveal a valid source, a broken cross-page table, or unverified OCR/page provenance. A citation must resolve to the relevant source element and support the claim.
+- CH09 after `#fig-9-1`: three failure diagnosis scenarios mark a first suspicious run child and its separate offline-test and release consequences. No aggregate score is fabricated.
+- CH12 after the `#fde-framework` introduction: an editorial five-plane topology with seven named B1–B7 checks. Changes to canonical FDE semantics live in `handbook/chapters/12-fde-customer-delivery.md`, and the diagram states explicitly whether authorization or approval blocks the illustrative path.
+- Use one native scenario selector per lab; selected state uses `aria-pressed`, changed decision is one polite announcement. Reader deep links wait until portal mounting. Keep keyboard navigation, no autoplay, and text state markers.
+- Verify generated metadata from source, 10 registered Atlas labs, 4 viewport widths, both themes, both languages, 44px inputs, contrast and no clipping.
+- **Deployment boundary:** Git automatic Vercel deployment stays disabled; building in GitHub CI is not a Vercel publication.
+
+
+
+## All-chapter Atlas Lab contract · context, permission, memory and data
+
+Every canonical chapter 01–12 now exposes one primary `#concept-demo`, but **only** 01 and 02 are newly added here. Chapter 07 and Chapter 11 have their original primary lessons and a second optional `#concept-extension` mental-model view. New labs must be lazily mounted into existing authored sections and must not delete authored figures or canonical content.
+
+- CH01 anchored to `#context-budget`: Context responsibility (not percentage), capacity vs effective use, omission of constraints during compression.
+- CH02 anchored to `#fig-2-1`: Authorized candidate prefilter, retrieval, and resource-level ACL recheck under source permission churn.
+- CH07 anchored to `#memory-promotion-compaction`: Write / Read lanes for consent, validity, conflict, scope; corrected explicit versions invalidate stale views.
+- CH11 anchored to `#data-etl-cdc`: Independent source-order, ingestion-order and SCD2 sequence-domain tracks; dedup and delete semantics are conditional on the source contract.
+- Keep a single primary deep-link target per chapter; custom ports are created with `createPortal` only after canonical content mounts. If an optional lab fails, article content remains readable.
+- The Atlas metadata still originates in `src/atlas-metadata.json`, the generated `src/chapters.json` is an output of `sync-content`. Twelve authored `interactive=true` flags must survive regeneration.
+- `test:mental-browser` covers 208 scenario state assertions at 390/768/1440/1728px, zh/en, light/dark. Automated source and Chromium tests do not replace manual screen-reader and touch review.
+- Git integration to Vercel stays disabled (`web/vercel.json`); CI is *not* a release workflow.
+
+
+
+## Graph-first V3.3 Reader contracts
+
+CH01/02/05/07/09/11/12 now use React HTML-node/SVG-edge graphs; existing canonical chapter text and earlier first-party Labs remain intact. CH07 and CH11 graph modules remain supplemental at `#concept-extension`; each canonical chapter has exactly one primary `#concept-demo`. Diagram modules are lazy portals anchored to source headings.
+
+Each scenario must activate the **correct edges** and textual node states, not only a scenario caption. Browser tests check CH02 ACL vs fetch deny; CH05 document/structure failure forks; CH07 read denial and correction back-edge; CH09 culprit Trace Run and blocked release; CH11 source-arrival identity mapping and duplicate rejection; CH12 B4/B6 denied branches. CH01 output reserve is capacity, not an evidence flow merged into a prompt.
+
+For dense graphs, nodes must remain absolutely aligned with SVG paths, including under Reader width changes; desktop CH02 flows horizontally, compact flows vertically. Offscreen and accessibility summaries must expose labeled nodes and directed connections even when the decorative SVG is hidden from assistive technology. The optional graph does not replace its underlying canonical article or create simulated execution.
+
+CI validates source contracts, TypeScript/Vite build, 144 CH05/09/12 scenario checks and 208 CH01/02/07/11 checks in Chromium across four widths, both locales and themes, with scoped WCAG audits on representative light/dark screenshots. Manual whole-page accessibility and visual reviews are separate. **No Vercel deployment** until intentionally released.
+

@@ -289,3 +289,47 @@ Run, pause, single-step, reset and scenario switching control a bounded simulati
 Archify workflow specifications live in `preview/handbook-custom/diagrams/`. Delivered HTML owns standalone diagram layout and viewer behavior; do not hand-edit it. Inline PNGs and SVGs are native exports of that exact checked HTML. Chapter 06 places the map behind its full-context disclosure; chapter 07 keeps its overview. Archify's independent delivery, browser and image review receipts live in `evidence/archify/`. The English Memory candidate failed readability after two focused repairs and is not published; the English reader explicitly labels its Chinese diagram fallback.
 
 Before/after 390 and 1440 captures, a 1728 capture, runtime and accessibility checks, and measured spacing for the simulator live in `preview/handbook-custom/evidence/bento/`. `test:learning` covers all five lesson chapters and source-to-render canonical article preservation; `test:concepts` covers the four node diagrams. The terminal simulator additionally uses `node evidence/bento/check.cjs`.
+
+
+## Structural Visualization V3 · Evidence, diagnosis and responsibility
+
+CH05, CH09 and CH12 use three **different topologies** while retaining the same Knowledge Spine aesthetic, responsive text scale and semantic green signal.
+
+- **CH05 · Provenance lineage:** five source-grounded checks (`document → structure → evidence chunk → claim alignment → resolvable citation`). Display the earliest broken link, not a reassuring citation icon when the source cannot be reconstructed. A matching text span is not sufficient evidence for a table cell's row, unit or version.
+- **CH09 · Diagnostic trace tree plus evaluation return loop:** the root run contains observable child runs; trace storage is not the same as an offline golden dataset. Show first-fault investigation, privacy review, labeled regression, release policy and the conditional return of production evidence. A critical authorization regression blocks release regardless of average score.
+- **CH12 · Five responsibility planes plus B1–B7 review checks:** Customer / Workflow, Control, Data, Execution and Evidence / Operations. The previous markdown heading said "four" while its illustration named five. The revised chapter explicitly calls out the five names and enumerates B1–B7 as an authored capstone checklist, **not** universal interfaces.
+- Each chapter retains existing canonical figures. New teaching diagrams are optional lazy-mounted Reader elements and use the shared `#concept-demo` deep link. No second top-level app, no invented datasets or measured latency, and no live retrieval, parsing or execution.
+- Responsive geometry uses the *Reader content container*, not only viewport width. Each scenario control is a real, keyboard-accessible button with selected state, at least 44px high. Color never stands alone; reduced motion, light/dark, zh/en, static text, and readable source notes are required.
+- Keep the current Vercel policy `web/vercel.json → git.deploymentEnabled=false`. Source-only changes **must not** run `publish:web` or trigger automatic hosted builds.
+
+
+
+## Concept Atlas V3.1 · 12/12 chapter labs and dual-layer diagrams
+
+The canonical Atlas now registers **a primary Lab in every chapter**. The two remaining gaps are CH01 and CH02. CH07 and CH11 also gain separate, narrowly scoped **supplemental** visual models; these must not duplicate the original `#concept-demo` anchor.
+
+- **CH01**: A context-responsibility rail, not a fake token-percentage meter. Preserve system/developer constraints and output reserve; identify compressible history, retrieved evidence and durable working state. The Lost-in-the-Middle effect is contextual and requires measurement, not a guaranteed ranking rule.
+- **CH02**: Trust-boundary funnel `Trusted Identity → Candidate ACL → Retrieve/Rerank → Fetch ACL Recheck → Evidence`. When the indexed ACL is stale, fail at source fetch; when tenants differ, reject before the candidate set enters search. The model never grants permission.
+- **CH07**: Two distinct governance lanes, `Write / Promotion` and `Read / Context`. An explicit correction can supersede a scoped version. Inferred facts must never casually override an explicit user constraint; audit/retention policy determines event storage.
+- **CH11**: Three visually distinct rows for source logical sequence, observed arrival order, and SCD2 version intervals. The sequence domain is deliberately *not* presented as physical event time. Duplicate deliveries, out-of-order changes and tombstones each trigger different contract behavior.
+
+Use distinctive geometry for each mental model instead of reusing the generic four-stage timeline. All visual cases are illustrative, with source notes from chapter section numbers; no fabricated benchmark, real customer order or live API call. Keep existing Chapter 07 and 11 Labs untouched while adding second views at `#concept-extension` with no new global Atlas link. New CH01 and 02 Labs use `#concept-demo` and existing Reader deep-link readiness. Enforce 44px controls, labels alongside color, scoped WCAG checks, light/dark, Chinese/English, keyboard and reduced motion. Preserve `git.deploymentEnabled=false` and never run `publish:web` during source iteration.
+
+
+
+## Graph-first Architecture V3.3 · node/edge readability contract
+
+User-directed upgrade from cardinal teaching panels to **architecture node-edge graphs**. Graphs should explain actual causal, authorization and evidence relationships, not paint decorative arrows between cards.
+
+- Reuse `GraphCanvas`, HTML `GraphNodeData` and directed SVG `GraphEdgeData` from `preview/handbook-custom/src/graph-primitives.tsx` with source-scoped layouts from `graph-models.tsx` and `structural-graph-models.tsx`. Keep nodes and SVG edges on the **same authored viewBox coordinate grid**; node CSS must remain `position:absolute`. Different geometry for desktop and compact Reader containers; never merely shrink wide topology.
+- Edge semantics: forward sequence, conditional branch, denied/blocked path, cross-lane identity mapping, and explicit feedback. Active states highlight **both nodes and edges**; an optional/unselected edge remains visible but subordinate. A blocked edge does not certify a call occurred. Unknown or not-highlighted nodes must not be described as “not executed” without evidence.
+- CH01: input task → context allocator → five allocation policy branches, with **one separate assembly spine**. Output reserve is not an extra prompt evidence source; removing all five fake converging “include” arrows both improves readability and prevents a wrong mental model. No quantitative token shares.
+- CH02: Trusted identity → candidate ACL gate → authorized set → retrieval → source-level recheck → evidence in context, with separate rejection branches at candidate and fetch authorization.
+- CH05: PDF version/page → structure → evidence element → claim support → resolvable citation. Broken table and uncertain OCR cases lead to explicit source repair/review, not invented citations.
+- CH07: Memory promotion and permission-filtered read are distinct connected lanes. The versioned store connects read/write; explicit correction returns to versioned memory and forces view re-evaluation.
+- CH09: A root trace with four possible diagnostic child Runs leads through trace triage, privacy-reviewed dataset curation, slice regression and a release gate. Safety regressions **block**; no failed gate may enter Shadow / Canary. “Not highlighted” does not assert an unobserved execution step was skipped.
+- CH11: Source version/sequence, observed ingestion order and SCD2 **sequence-domain** history are three independent lanes. Use identity-matched curved mapping edges for out-of-order events instead of overlaying ambiguous mid-lane elbow lines; duplicate delivery has a rejection edge, tombstone follows the documented delete contract.
+- CH12: Five canonical responsibility planes and two visible trust gates B4 (tenant-scoped read) / B6 (write approval) form a graph; seven B1–B7 review checks remain readable below it. Separate the real feedback edge from any imagined host write authorization.
+- For every diagram verify 390/768/1440/1728px and zh/en, both themes, keyboard scenario controls, 44px minimum touch targets, 0 horizontal clipping. Use actual screenshot review **in addition to** component-scoped axe checks; a passing DOM test alone does not guarantee aligned edges. Annotate invented scenarios as instructional, not live events.
+- Source-only iteration. Preserve `web/vercel.json` with `git.deploymentEnabled=false`; do not trigger `publish:web`, merge `main`, or publish Vercel until the user explicitly requests.
+

@@ -40,6 +40,27 @@ const VisualizationGuide = lazy(() =>
     default: module.VisualizationGuide,
   })),
 );
+const StructuralGuide = lazy(() =>
+  import("./structural-guides").then((module) => ({
+    default: module.StructuralGuide,
+  })),
+);
+const ConceptAtlasGuide = lazy(() =>
+  import("./concept-atlas-guides").then((module) => ({
+    default: module.ConceptAtlasGuide,
+  })),
+);
+const hasConceptAtlasGuide = (slug: string) =>
+  ["01-model-api-context-foundations", "02-enterprise-retrieval",
+    "07-memory-context-engineering", "11-data-sql-engineering"].includes(slug);
+const hasNewAtlasLab = (slug: string) =>
+  slug === "01-model-api-context-foundations" || slug === "02-enterprise-retrieval";
+const hasStructuralGuide = (slug: string) =>
+  [
+    "05-document-pdf-rag",
+    "09-reliability-evaluation-observability",
+    "12-fde-customer-delivery",
+  ].includes(slug);
 const hasVisualGuide = (slug: string) =>
   slug === "10-serving-deployment-ai-platform" || slug === "11-data-sql-engineering";
 const hasConceptDiagram = (slug: string) =>
@@ -249,7 +270,7 @@ export function Reader({
   // The interactive lesson mounts asynchronously after chapter HTML.
   // A direct Atlas link must resolve only after the concept-demo anchor exists.
   useEffect(() => {
-    if (!data || !diagramReady || !(hasConceptDiagram(chapter.slug) || hasVisualGuide(chapter.slug))) return;
+    if (!data || !diagramReady || !(hasConceptDiagram(chapter.slug) || hasVisualGuide(chapter.slug) || hasStructuralGuide(chapter.slug) || hasNewAtlasLab(chapter.slug))) return;
     if (location.hash.split("/")[2] !== "concept-demo") return;
     const frame = requestAnimationFrame(() => jump("concept-demo"));
     return () => cancelAnimationFrame(frame);
@@ -457,6 +478,32 @@ export function Reader({
             <DiagramBoundary key={"visual-guide-" + chapter.slug + en} en={en}>
               <Suspense fallback={null}>
                 <VisualizationGuide
+                  key={chapter.slug + en}
+                  slug={chapter.slug}
+                  en={en}
+                  pane={pane}
+                  onReady={setDiagramReady}
+                />
+              </Suspense>
+            </DiagramBoundary>
+          )}
+          {data && !error && hasConceptAtlasGuide(chapter.slug) && (
+            <DiagramBoundary key={"concept-atlas-" + chapter.slug + en} en={en}>
+              <Suspense fallback={null}>
+                <ConceptAtlasGuide
+                  key={chapter.slug + en}
+                  slug={chapter.slug}
+                  en={en}
+                  pane={pane}
+                  onReady={hasNewAtlasLab(chapter.slug) ? setDiagramReady : undefined}
+                />
+              </Suspense>
+            </DiagramBoundary>
+          )}
+          {data && !error && hasStructuralGuide(chapter.slug) && (
+            <DiagramBoundary key={"structural-guide-" + chapter.slug + en} en={en}>
+              <Suspense fallback={null}>
+                <StructuralGuide
                   key={chapter.slug + en}
                   slug={chapter.slug}
                   en={en}

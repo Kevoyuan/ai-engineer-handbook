@@ -1,0 +1,107 @@
+/* Architecture graph-first primitive: HTML semantic nodes + scaled SVG connectors.
+   Connected edges are the visual grammar; cards are only node enclosures.
+   COLORS are the existing DESIGN.md tokens; state always has text equivalents. */
+.chapter-body .atlas-graph {
+  background:var(--background);
+  border:1px solid var(--border);
+  border-radius:.65rem;
+  overflow:hidden;
+  margin:.6rem 0 .95rem;
+  min-width:0;
+}
+.chapter-body .atlas-graph-stage {
+  position:relative; width:100%;
+  background-image:radial-gradient(var(--border) .65px,transparent .65px);
+  background-size:20px 20px;
+  background-position:10px 10px;
+}
+.chapter-body .atlas-graph-svg,
+.chapter-body .atlas-graph-nodes {position:absolute;inset:0;width:100%;height:100%;}
+.chapter-body .atlas-graph-svg {z-index:1;overflow:visible;pointer-events:none;}
+.chapter-body .atlas-graph-nodes {z-index:2;pointer-events:none;}
+.chapter-body .atlas-graph-svg .atlas-graph-edge {
+  fill:none;stroke:var(--muted-foreground);stroke-width:1.65;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.42;
+  vector-effect:non-scaling-stroke;
+}
+.chapter-body .atlas-graph-svg [data-state="active"] .atlas-graph-edge {
+  stroke:var(--primary);stroke-width:2.7;opacity:1;
+}
+.chapter-body .atlas-graph-svg [data-state="blocked"] .atlas-graph-edge {
+  stroke:var(--foreground);stroke-width:2.25;stroke-dasharray:6 5;opacity:1;
+}
+.chapter-body .atlas-graph-svg [data-state="pending"] .atlas-graph-edge,
+.chapter-body .atlas-graph-svg [data-state="warning"] .atlas-graph-edge {
+  stroke:var(--foreground);stroke-width:2;stroke-dasharray:3 4;opacity:.65;
+}
+.chapter-body .atlas-graph-svg [data-kind="mapping"] .atlas-graph-edge {stroke-dasharray:4 4;}
+.chapter-body .atlas-graph-edgetag rect {
+  fill:var(--background);stroke:var(--border);stroke-width:1;
+}
+.chapter-body .atlas-graph-annotation-plate {
+  fill:var(--background);
+  stroke:var(--border);
+  stroke-width:.6;
+}
+.chapter-body .atlas-graph-edgetag text,
+.chapter-body .atlas-graph-annotation {
+  font-family:var(--font-mono,monospace);
+  font-size:11px;font-weight:650;fill:var(--foreground);
+}
+.chapter-body .atlas-graph-svg [data-state="idle"] .atlas-graph-edgetag {opacity:.5;}
+.chapter-body .atlas-graph-node {
+  position:absolute; /* position HTML nodes on the same graph coordinates as SVG edges */
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  overflow:hidden;gap:.18rem;min-width:0;
+  padding:.42rem .54rem;box-shadow:0 1px 5px rgb(0 0 0 / .035);
+  background:var(--card); color:var(--foreground);
+  border:1.5px solid var(--border);border-radius:.42rem;
+  text-align:left;overflow-wrap:anywhere;
+}
+.chapter-body .atlas-graph-node strong{
+  font-size:.76rem;line-height:1.35;font-weight:650;max-width:100%;
+}
+.chapter-body .atlas-graph-node small{
+  font-size:.675rem;line-height:1.32;color:var(--muted-foreground);max-width:100%;
+}
+.chapter-body .atlas-graph-node-state{
+  font-size:.625rem;line-height:1.25;color:var(--muted-foreground);
+  font-family:var(--font-mono,monospace);
+}
+.chapter-body .atlas-graph-node[data-kind="gate"] {border-radius:.2rem;border-left-width:4px;}
+.chapter-body .atlas-graph-node[data-kind="store"] {border-style:double;border-width:3px;}
+.chapter-body .atlas-graph-node[data-kind="terminal"] {border-radius:1rem;}
+.chapter-body .atlas-graph-node[data-state="active"] {
+  border-color:var(--primary);background:var(--accent);color:var(--foreground);
+}
+.chapter-body .atlas-graph-node[data-state="active"] .atlas-graph-node-state,
+.chapter-body .atlas-graph-node[data-state="active"] small {color:var(--foreground);}
+.chapter-body .atlas-graph-node[data-state="blocked"] {
+  border-color:var(--foreground);border-style:dashed;background:var(--card);
+}
+.chapter-body .atlas-graph-node[data-state="blocked"] .atlas-graph-node-state {color:var(--foreground);font-weight:700;}
+.chapter-body .atlas-graph-node[data-state="idle"] {opacity:.72;}
+.chapter-body .atlas-graph-node[data-state="pending"],
+.chapter-body .atlas-graph-node[data-state="warning"] {border-color:var(--foreground);border-style:dotted;}
+.chapter-body .atlas-graph-caption {
+  display:flex;gap:.6rem;align-items:flex-start;justify-content:space-between;
+  flex-wrap:wrap;padding:.75rem .85rem;background:var(--card);border-top:1px solid var(--border);
+  font-size:.74rem;line-height:1.65;color:var(--foreground);
+}
+.chapter-body .atlas-graph-key {display:flex;gap:.85rem;flex-wrap:wrap;font-size:.7rem;color:var(--muted-foreground);}
+.chapter-body .atlas-graph-key span:before {
+  content:"";display:inline-block;vertical-align:middle;margin-right:.3rem;
+  width:20px;height:0;border-top:2px solid var(--muted-foreground);
+}
+.chapter-body .atlas-graph-key .atlas-graph-key-active:before{border-color:var(--primary);border-top-width:3px;}
+.chapter-body .atlas-graph-key .atlas-graph-key-blocked:before{border-color:var(--foreground);border-top-style:dashed;}
+.chapter-body .atlas-graph-key .atlas-graph-key-idle:before{opacity:.6;}
+@container (max-width:520px) {
+  .chapter-body .atlas-graph-node {padding:.28rem .37rem;}
+  .chapter-body .atlas-graph-node strong {font-size:.715rem;}
+  .chapter-body .atlas-graph-node small {font-size:.62rem;}
+  .chapter-body .atlas-graph-node-state {font-size:.575rem;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .chapter-body .atlas-graph * {animation:none!important;transition:none!important;}
+}
