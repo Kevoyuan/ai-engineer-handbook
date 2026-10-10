@@ -169,3 +169,10 @@ The original `LessonPlayer` owns scenario/step/seek/autoplay/quiz for CH03, CH04
 - Browser test both node geometry and SVG `data-edge` semantics across 4 reader widths, 2 languages, both themes, reduced motion, keyboard; screenshots on compact zh/light and wide en/dark. A component axe scan is scoped, not whole-site certification.
 - **CI never publishes Vercel**, and generated production `web/site` remains unchanged.
 
+
+
+## V3.5 collapsed stage navigation
+
+On the graph-first CH03, CH04 and CH08 Labs, the original `.concept-flow` four-stage button map is wrapped in `<details class="concept-step-inspector">` and **closed by default**. Readers may expand it to jump to a named stage; step highlights, round-two seek behavior, Next/Previous, reduced motion and quiz must remain unaffected. Native disclosure semantics give keyboard and screen reader access. The GraphCanvas is the only default visual topology; the old detailed evidence pane remains another intentionally optional inspection layer.
+
+CH03 compact GraphCanvas stage height is 925px, down from 1140px in V3.4, without hiding any Retriever or the candidate-fusion/evidence nodes. Automated browser test asserts this limit and samples active SVG route/candidate connectors to verify they do not intersect unrelated HTML nodes. CH04/06/10 tail whitespace is reduced. Keep all source-authored chapter figures and optional standalone linked maps as separate evidence/deep-zoom content.
