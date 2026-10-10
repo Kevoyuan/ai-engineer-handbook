@@ -18,6 +18,8 @@ const meta=JSON.parse(read("../src/atlas-metadata.json"));
 const reader=read("../src/reader.tsx");
 const ui=read("../src/structural-guides.tsx");
 const style=read("../src/structural-guides.css");
+const topology=read("../src/structural-graph-models.tsx");
+const graph=read("../src/graph-primitives.tsx");
 const source12=read("../../../handbook/chapters/12-fde-customer-delivery.md");
 for (const [slug,[anchor,,scenarioCount]] of Object.entries(canonical)) {
   const html=read("../../../web/chapters/"+slug+"/index.html");
@@ -44,9 +46,16 @@ for(const token of [
  "ProvenanceGuide","EvaluationGuide","DeliveryGuide",
  'id="concept-demo"','aria-pressed={current === index}', 'aria-live="polite"',
  "data-structural-version","useLayoutEffect","setHost(slot)",
- "Structure Reconstruction","Retriever Run","Policy Run",
- "source locator","cross-tenant","Human / Host write approval",
+ "Structure Reconstruction","source locator","cross-tenant",
+ "Human / Host write approval",
+ "CitationGraph","TraceEvaluationGraph","FdeArchitectureGraph",
 ]) assert(ui.includes(token),"Missing semantic UI contract: "+token);
+for(const token of ["CitationGraph","TraceEvaluationGraph","FdeArchitectureGraph",
+ "source-review","structure-review","Retriever run","Policy run",
+ "release-canary","read-gate","write-gate","operations-feedback"])
+ assert(topology.includes(token),"Missing source-grounded graph contract: "+token);
+for(const token of ["GraphCanvas","atlas-graph-edge","data-node","data-edge","pathFor"])
+ assert(graph.includes(token),"Graph primitive missing: "+token);
 assert(reader.includes('hasStructuralGuide(chapter.slug)'),"Reader has to mount structural diagrams");
 assert(reader.includes('|| hasStructuralGuide(chapter.slug)'),"Lab deep link must defer until lazy diagram");
 assert(style.includes("container-type: inline-size"),"Responsive breakpoints must use Reader width");
@@ -55,4 +64,4 @@ assert(style.includes("prefers-reduced-motion: reduce"),"Must support reduced mo
 assert(source12.includes("Five responsibility planes, seven explicit checks"),"Canonical chapter plane count mismatch");
 for(let i=1;i<=7;i++)assert(source12.includes("**B"+i+" ·"),"Missing CH12 explicit B"+i+" boundary");
 assert(!ui.includes("Math.random")&&!ui.includes("fetch("),"Teaching diagrams must not fabricate observed data or call remote tools");
-console.log("Structural Guide V3 source contract PASS: CH05/09/12 canonical anchors, twelve Atlas labs, 3×3 scoped scenarios, deep links, boundaries and accessibility hooks.");
+console.log("Graph-first Structural Guide V3.3 contract PASS: CH05/09/12 canonical anchors, twelve Atlas labs, 3×3 scoped scenarios, deep links, boundaries and accessibility hooks.");
