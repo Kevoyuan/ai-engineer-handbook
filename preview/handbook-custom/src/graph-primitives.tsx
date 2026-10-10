@@ -5,7 +5,7 @@ export type GraphText = readonly [string,string];
 export type GraphState = "active" | "idle" | "blocked" | "pending" | "warning";
 export type GraphKind = "source" | "process" | "gate" | "store" | "terminal" | "decision";
 export type GraphNodeData = {
-  id:string; title:GraphText; detail?:GraphText; kind?:GraphKind;
+  id:string; title:GraphText; detail?:GraphText; kind?:GraphKind; stateLabel?:GraphText;
   x:number; y:number; width:number; height?:number; state?:GraphState;
 };
 export type GraphEdgeData = {
@@ -138,16 +138,16 @@ export function GraphCanvas({id,desktop,mobile,en,summary}:{
           };
           const stateText:GraphText=
             state==="active"?["当前路径","Current path"]:
-            state==="blocked"?["阻断 / 拒绝","Blocked / denied"]:
+            state==="blocked"?["已阻断","Blocked"]:
             state==="pending"?["待核对","Review"]:
-            state==="warning"?["风险节点","Risk node"]:["未走路径","Not traversed"];
+            state==="warning"?["需注意","Attention"]:["未高亮","Not highlighted"];
           return <div key={node.id} role="listitem"
             className="atlas-graph-node" data-node={node.id}
             data-kind={node.kind??"process"} data-state={state} style={style}
-            aria-label={`${tx(node.title,en)}; ${tx(stateText,en)}`}>
+            aria-label={`${tx(node.title,en)}; ${tx(node.stateLabel??stateText,en)}`}>
             <strong>{tx(node.title,en)}</strong>
             {node.detail&&<small>{tx(node.detail,en)}</small>}
-            <span className="atlas-graph-node-state">{tx(stateText,en)}</span>
+            <span className="atlas-graph-node-state">{tx(node.stateLabel??stateText,en)}</span>
           </div>;
         })}
       </div>
@@ -155,7 +155,7 @@ export function GraphCanvas({id,desktop,mobile,en,summary}:{
     <figcaption className="atlas-graph-caption">{tx(summary,en)}
       <span className="atlas-graph-key">
         <span className="atlas-graph-key-active">{en?"Current flow":"当前路径"}</span>
-        <span className="atlas-graph-key-blocked">{en?"Denied branch":"拒绝分支"}</span>
+        <span className="atlas-graph-key-blocked">{en?"Blocked branch":"阻断分支"}</span>
         <span className="atlas-graph-key-idle">{en?"Other path":"其他路径"}</span>
       </span>
     </figcaption>
