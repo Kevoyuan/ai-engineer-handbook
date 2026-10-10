@@ -7,9 +7,6 @@ type N={id:string;title:GraphText;detail:GraphText;kind?:GraphNodeData["kind"]};
 const A:GraphState="active",I:GraphState="idle",B:GraphState="blocked",P:GraphState="pending";
 const node=(v:N,x:number,y:number,width:number,height:number,state:GraphState=I):GraphNodeData=>({...v,x,y,width,height,state});
 const edge=(id:string,from:string,to:string,state:GraphState=I,opts:Partial<GraphEdgeData>={}):GraphEdgeData=>({id,from,to,state,...opts});
-const positions=(compact:boolean,xWide:readonly number[],yWide:readonly number[],xNarrow:readonly number[],yNarrow:readonly number[])=>({
-  x:compact?xNarrow:xWide,y:compact?yNarrow:yWide
-});
 const routeNames:readonly N[]=[
   {id:"exact",title:["Exact","Exact"],detail:["稳定 ID","Identifier"]},
   {id:"bm25",title:["BM25","BM25"],detail:["术语 / 关键词","Lexical terms"]},
