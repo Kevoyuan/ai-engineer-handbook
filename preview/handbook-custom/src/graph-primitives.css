@@ -105,3 +105,23 @@
 @media (prefers-reduced-motion:reduce) {
   .chapter-body .atlas-graph * {animation:none!important;transition:none!important;}
 }
+
+/* The Skill Simulator is intentionally a dark terminal. Keep the architecture
+   graph's primary path green instead of inheriting the terminal's orange UI. */
+.chapter-body .skill-terminal .skill-graph-layer {
+  --primary:var(--success);
+  --accent:var(--sim-raised);
+  margin:1rem 0;
+  padding:.75rem;
+  background:var(--sim-terminal);
+  border:1px solid var(--sim-border);
+  border-radius:.7rem;
+}
+.chapter-body .skill-terminal .skill-graph-kicker {
+  color:var(--sim-muted);
+  font-family:var(--font-mono,monospace);
+  font-size:.7rem;
+  font-weight:650;
+  letter-spacing:.035em;
+  margin:0 0 .45rem;
+}
