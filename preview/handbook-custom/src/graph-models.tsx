@@ -203,8 +203,13 @@ function budgetLayout(compact:boolean,scenario:number,priorities:readonly GraphS
   const x=compact?[100,260,100,260,100]:[619,619,619,619,619];
   const y=compact?[301,301,432,432,562]:[103,203,303,403,503];
   const w=compact?135:181,h=compact?78:75;
-  for(let i=0;i<budgetResources.length;i++)
-    nodes.push(node(budgetResources[i],x[i],y[i],w,h,priorities[i]));
+  for(let i=0;i<budgetResources.length;i++){
+    const item=node(budgetResources[i],x[i],y[i],w,h,priorities[i]);
+    // Compression failure is lost fidelity, not a tenant/ACL denial.
+    if(i===1&&scenario===2)item.stateLabel=["摘要失真","Summary loss"];
+    if(i===4)item.stateLabel=["输出已预留","Output reserved"];
+    nodes.push(item);
+  }
   nodes.push(node(assembled,compact?178:825,compact?733:602,compact?185:174,compact?76:74,active));
   const edges:GraphEdgeData[]=[
     edge("request-allocator","request","allocator",active,
