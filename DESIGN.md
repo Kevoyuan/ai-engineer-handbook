@@ -315,3 +315,21 @@ The canonical Atlas now registers **a primary Lab in every chapter**. The two re
 
 Use distinctive geometry for each mental model instead of reusing the generic four-stage timeline. All visual cases are illustrative, with source notes from chapter section numbers; no fabricated benchmark, real customer order or live API call. Keep existing Chapter 07 and 11 Labs untouched while adding second views at `#concept-extension` with no new global Atlas link. New CH01 and 02 Labs use `#concept-demo` and existing Reader deep-link readiness. Enforce 44px controls, labels alongside color, scoped WCAG checks, light/dark, Chinese/English, keyboard and reduced motion. Preserve `git.deploymentEnabled=false` and never run `publish:web` during source iteration.
 
+
+
+## Graph-first Architecture V3.3 · node/edge readability contract
+
+User-directed upgrade from cardinal teaching panels to **architecture node-edge graphs**. Graphs should explain actual causal, authorization and evidence relationships, not paint decorative arrows between cards.
+
+- Reuse `GraphCanvas`, HTML `GraphNodeData` and directed SVG `GraphEdgeData` from `preview/handbook-custom/src/graph-primitives.tsx` with source-scoped layouts from `graph-models.tsx` and `structural-graph-models.tsx`. Keep nodes and SVG edges on the **same authored viewBox coordinate grid**; node CSS must remain `position:absolute`. Different geometry for desktop and compact Reader containers; never merely shrink wide topology.
+- Edge semantics: forward sequence, conditional branch, denied/blocked path, cross-lane identity mapping, and explicit feedback. Active states highlight **both nodes and edges**; an optional/unselected edge remains visible but subordinate. A blocked edge does not certify a call occurred. Unknown or not-highlighted nodes must not be described as “not executed” without evidence.
+- CH01: input task → context allocator → five allocation policy branches, with **one separate assembly spine**. Output reserve is not an extra prompt evidence source; removing all five fake converging “include” arrows both improves readability and prevents a wrong mental model. No quantitative token shares.
+- CH02: Trusted identity → candidate ACL gate → authorized set → retrieval → source-level recheck → evidence in context, with separate rejection branches at candidate and fetch authorization.
+- CH05: PDF version/page → structure → evidence element → claim support → resolvable citation. Broken table and uncertain OCR cases lead to explicit source repair/review, not invented citations.
+- CH07: Memory promotion and permission-filtered read are distinct connected lanes. The versioned store connects read/write; explicit correction returns to versioned memory and forces view re-evaluation.
+- CH09: A root trace with four possible diagnostic child Runs leads through trace triage, privacy-reviewed dataset curation, slice regression and a release gate. Safety regressions **block**; no failed gate may enter Shadow / Canary. “Not highlighted” does not assert an unobserved execution step was skipped.
+- CH11: Source version/sequence, observed ingestion order and SCD2 **sequence-domain** history are three independent lanes. Use identity-matched curved mapping edges for out-of-order events instead of overlaying ambiguous mid-lane elbow lines; duplicate delivery has a rejection edge, tombstone follows the documented delete contract.
+- CH12: Five canonical responsibility planes and two visible trust gates B4 (tenant-scoped read) / B6 (write approval) form a graph; seven B1–B7 review checks remain readable below it. Separate the real feedback edge from any imagined host write authorization.
+- For every diagram verify 390/768/1440/1728px and zh/en, both themes, keyboard scenario controls, 44px minimum touch targets, 0 horizontal clipping. Use actual screenshot review **in addition to** component-scoped axe checks; a passing DOM test alone does not guarantee aligned edges. Annotate invented scenarios as instructional, not live events.
+- Source-only iteration. Preserve `web/vercel.json` with `git.deploymentEnabled=false`; do not trigger `publish:web`, merge `main`, or publish Vercel until the user explicitly requests.
+
