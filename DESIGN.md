@@ -333,3 +333,17 @@ User-directed upgrade from cardinal teaching panels to **architecture node-edge 
 - For every diagram verify 390/768/1440/1728px and zh/en, both themes, keyboard scenario controls, 44px minimum touch targets, 0 horizontal clipping. Use actual screenshot review **in addition to** component-scoped axe checks; a passing DOM test alone does not guarantee aligned edges. Annotate invented scenarios as instructional, not live events.
 - Source-only iteration. Preserve `web/vercel.json` with `git.deploymentEnabled=false`; do not trigger `publish:web`, merge `main`, or publish Vercel until the user explicitly requests.
 
+
+
+## Graph-first V3.4 · Remaining architecture chapters
+
+All 12 chapters retain one primary Lab; **CH03, CH04, CH06, CH08 and CH10 now expose graph-node/edge topology** on the existing primary interactive lesson, building on the earlier seven-chapter graph-first upgrade. Use the same system GraphCanvas, CSS tokens, responsive viewBox layouts and accessible HTML node labels. The graph appears first; previous high-density inspection panels are preserved **inside native details/summary disclosures**, not deleted or exposed as a redundant second main graphic.
+
+- **CH03 / Query Routing:** Query analysis → trusted ACL/tenant/version scope → route planner. Five optional paths (Exact, BM25, Dense, Graph, source documents) lead into candidate fusion, then evidence validation. Scenario selection highlights exactly two relevant branches; raw BM25 and cosine scores cannot be added, and RRF ranking does not prove any claim.
+- **CH04 / Six Evidence Gates:** G0–G5 connect to separate ANSWER, RESOLVE/ESCALATE, and RETRIEVE_MORE/ABSTAIN outcomes. With CONFLICT or INSUFFICIENT evidence, **G4 Claim Verification remains blocked**; G5 policy may still choose a safe non-answer decision. Do not depict those cases as verified claims.
+- **CH06 / Skill, Tool and MCP:** Task → Skill Registry match → trusted input/ACL Gate → on-demand SKILL.md → authorized Host tool (MCP only when applicable) → verification. Missing input goes to CLARIFY; cross-tenant attempts to REJECT before loading instructions or invoking tools. Skill matching ≠ authorization; skill method ≠ API/tool protocol.
+- **CH08 / Bounded Agent Loop:** Show Plan → Act → Observe → Check with actual controlled retry/back-edge for the scenario with a second round; graph tracks existing lesson step. STOP requires verified criteria; budget exhaustion leads to HANDOFF, not fictitious success. Retried tools always require remaining budget and authorization.
+- **CH10 / Prefix KV Serving:** Request tokens → cache namespace/key Gate → exact token prefix → cached prefix KV blocks (if present) → suffix Prefill → independent Decode. In isolated-tenant scenarios, deny cache cross-scope reuse and use independent Prefill. Prefix cache is not cross-user mutable Agent session state.
+- **Visual truth:** Nodes must align with SVG edge endpoints and remain within the stage at 390/768/1440/1728px across zh/en and light/dark. Use text alongside edge style; show blocked, pending and alternative routes distinctly. Browser audits must inspect **specific edge IDs** and selected states—not merely count card elements. Preserve source terms, correct step timing, keyboard/motion/44px controls, chapter anchors and quiz.
+- **Release:** All work is Draft PR source only; keep `web/vercel.json` `git.deploymentEnabled: false`, do not run `publish:web`, merge or trigger Vercel without explicit user request.
+
