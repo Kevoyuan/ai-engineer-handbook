@@ -23,13 +23,13 @@ const routeCore:readonly N[]=[
 ];
 const routesChosen=[[0,1],[1,2],[3,4]];
 function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
-  const width=compact?360:980,height=compact?925:565;
+  const width=compact?360:980,height=compact?840:565;
   const cn=compact?[
     node(routeCore[0],132,58,173,69,step>=0?A:I),
     node(routeCore[1],132,143,173,69,step>=1?A:I),
     node(routeCore[2],132,228,173,69,step>=2?A:P),
-    node(routeCore[3],132,720,173,69,step>=2?A:I),
-    node(routeCore[4],132,817,173,69,step>=3?A:I),
+    node(routeCore[3],132,661,173,69,step>=2?A:I),
+    node(routeCore[4],132,755,173,69,step>=3?A:I),
   ]:[
     node(routeCore[0],93,262,157,80,A),
     node(routeCore[1],282,262,157,80,step>=1?A:I),
@@ -38,7 +38,7 @@ function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
     node(routeCore[4],881,408,160,76,step>=3?A:I),
   ];
   const xs=compact?[102,259,102,259,102]:[693,693,693,693,693];
-  const ys=compact?[353,353,471,471,589]:[83,171,259,347,435];
+  const ys=compact?[328,328,438,438,548]:[83,171,259,347,435];
   const chosen=routesChosen[scenario]??routesChosen[0];
   const nodes=[...cn,...routeNames.map((v,i)=>node(v,xs[i],ys[i],
     compact?139:147,compact?73:70,chosen.includes(i)&&step>=2?A:I))];
@@ -55,14 +55,14 @@ function routerLayout(compact:boolean,scenario:number,step:number):GraphLayout {
     edges.push(edge("candidate-"+item.id,item.id,"merge",chosen.includes(i)&&step>=2?A:I,
       compact?{kind:"mapping",
         fromPort:i%2===0?"left":"right",toPort:"top",
-        via:i%2===0?[[18,ys[i]],[18,659],[132,659]]:
-          [[343,ys[i]],[343,659],[132,659]]}:
+        via:i%2===0?[[18,ys[i]],[18,609],[132,609]]:
+          [[343,ys[i]],[343,609],[132,609]]}:
         {kind:"mapping",fromPort:"right",toPort:"top",
          via:[[791,ys[i]],[791,182],[881,182]]}));
   });
   edges.push(edge("fusion-evidence","merge","evidence",step>=3?A:I,compact?{fromPort:"bottom",toPort:"top"}:{fromPort:"bottom",toPort:"top"}));
   return {width,height,nodes,edges,notes:compact?[
-    {x:180,y:301,text:["仅高亮选中路线","ONLY SELECTED ROUTES"]},
+    {x:180,y:284,text:["仅高亮选中路线","ONLY SELECTED ROUTES"]},
   ]:[
     {x:688,y:29,text:["可选检索路径 / 仅高亮当前选择","RETRIEVAL OPTIONS · SELECTED PATHS HIGHLIGHTED"]},
     {x:878,y:517,text:["融合排名 ≠ Claim 支持","FUSION SCORE ≠ CLAIM SUPPORT"]},
@@ -92,16 +92,16 @@ const policyOptions:readonly N[]=[
   {id:"abstain",title:["RETRIEVE / ABSTAIN","RETRIEVE / ABSTAIN"],detail:["证据不足","Insufficient evidence"],kind:"terminal"},
 ];
 function gatesLayout(compact:boolean,scenario:number,step:number):GraphLayout {
-  const width=compact?360:980,height=compact?1020:485;
+  const width=compact?360:980,height=compact?915:485;
   const x=compact?[135,135,135,135,135,135]:[90,250,410,570,730,890];
-  const y=compact?[65,163,261,359,457,555]:[131,131,131,131,131,131];
+  const y=compact?[62,151,240,329,418,507]:[131,131,131,131,131,131];
   const states:GraphState[]=gateNames.map((_,i)=>{
     const time=[0,1,1,2,3,3][i];if(step<time)return I;
     if(i===4&&scenario!==0)return B;
     return A;
   });
   const nodes=gateNames.map((v,i)=>node(v,x[i],y[i],compact?170:143,compact?71:78,states[i]));
-  const outx=compact?[92,273,92]:[290,564,827],outy=compact?[715,715,885]:[332,332,332];
+  const outx=compact?[92,273,92]:[290,564,827],outy=compact?[655,655,793]:[332,332,332];
   nodes.push(...policyOptions.map((v,i)=>node(v,outx[i],outy[i],compact?150:195,compact?76:84,
     step>=3&&scenario===i?(i===0?A:B):I)));
   const edges:GraphEdgeData[]=[];
@@ -113,17 +113,17 @@ function gatesLayout(compact:boolean,scenario:number,step:number):GraphLayout {
   });
   if(scenario!==0){
     edges.push(edge("conflict-to-policy","g3","g5",step>=3?A:I,
-      compact?{kind:"branch",fromPort:"right",toPort:"right",via:[[333,359],[333,555]]}:
+      compact?{kind:"branch",fromPort:"right",toPort:"right",via:[[333,329],[333,507]]}:
         {kind:"branch",fromPort:"bottom",toPort:"bottom",
          via:[[570,251],[890,251]]}));
   }
   policyOptions.forEach((v,i)=>edges.push(edge("policy-"+v.id,"g5",v.id,
     step>=3&&scenario===i?(i===0?A:B):I,
     compact?(i===2?{kind:"branch",fromPort:"left",toPort:"left",
-       via:[[9,555],[9,outy[i]]]}:
+       via:[[9,507],[9,outy[i]]]}:
        i===1?{kind:"branch",fromPort:"right",toPort:"right",
-       via:[[354,555],[354,outy[i]]]}:
-       {kind:"branch",fromPort:"bottom",toPort:"top",via:[[135,637],[92,637]]}):
+       via:[[354,507],[354,outy[i]]]}:
+       {kind:"branch",fromPort:"bottom",toPort:"top",via:[[135,584],[92,584]]}):
       {kind:"branch",fromPort:"bottom",toPort:"top",
        via:[[890,266],[outx[i],266]]})));
   return {width,height,nodes,edges,notes:compact?[]:[
