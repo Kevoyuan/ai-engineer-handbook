@@ -155,6 +155,14 @@ try{
       assert.deepEqual(collisions,[],"Active CH03 edges may not cross unrelated node text");
     }
     assert.equal(geometry.position,"absolute","Node positions must align to SVG viewBox");
+    if(width===390 && spec.id==="routing"){
+      const h=await graph.locator(".atlas-graph-stage").evaluate(n=>n.getBoundingClientRect().height);
+      assert(h<=850,"Compact CH03 layout must not regress into excessively tall route branches");
+    }
+    if(width===390 && spec.id==="evidence-gates"){
+      const h=await graph.locator(".atlas-graph-stage").evaluate(n=>n.getBoundingClientRect().height);
+      assert(h<=925,"CH04 six-gate compact policy exits must stay readable but concise");
+    }
     assert.equal(geometry.outside.length,0,"Nodes must remain within canvas "+JSON.stringify({spec:spec.id,width,geometry}));
     assert(geometry.scroll<=geometry.client+2,"Graph overflow "+JSON.stringify({spec:spec.id,width,geometry}));
     assert(geometry.right<=geometry.viewport+2,"Graph clips viewport");
