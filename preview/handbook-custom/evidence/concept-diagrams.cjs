@@ -248,14 +248,18 @@ fs.mkdirSync(out, { recursive: true });
     assert.deepEqual(errors, []);
     // A failed optional module must not take down the chapter.
     const failurePage = await browser.newPage();
+    // Vite dev requests /src/concept-diagrams.tsx, whereas production
+    // bundles request concept-diagrams-<hash>.js. Exercise the same
+    // optional-chunk error boundary in either environment.
+    const conceptChunk = /\\/(?:src\\/)?concept-diagrams(?:-[^/?]+)?\\.(?:tsx|js)(?:\\?|$)/;
     const blockModule = r => r.abort("failed");
-    await failurePage.route("**/concept-diagrams-*.js", blockModule);
+    await failurePage.route(conceptChunk, blockModule);
     await failurePage.goto(base + "#read/" + routes[0]);
     await failurePage.getByRole("alert").waitFor();
     assert.equal(await failurePage.locator(".canonical-content").isVisible(), true);
     assert.equal(await failurePage.locator("#concept-demo").count(),0,
       "Failed optional Lab must not create an invalid interactive shell");
-    await failurePage.unroute("**/concept-diagrams-*.js", blockModule);
+    await failurePage.unroute(conceptChunk, blockModule);
     await failurePage.getByRole("button", { name: "重新加载", exact: true }).click();
     await failurePage.locator("#concept-demo").waitFor();
     assert.equal(await failurePage.locator("#concept-title").isVisible(),true,
