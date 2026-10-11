@@ -251,7 +251,7 @@ fs.mkdirSync(out, { recursive: true });
     // Vite dev requests /src/concept-diagrams.tsx, whereas production
     // bundles request concept-diagrams-<hash>.js. Exercise the same
     // optional-chunk error boundary in either environment.
-    const conceptChunk = url => url.includes("/concept-diagrams.tsx") || (url.includes("/concept-diagrams-") && url.split("?")[0].endsWith(".js"));
+    const conceptChunk = target => { const url = String(target); return url.includes("/concept-diagrams.tsx") || (url.includes("/concept-diagrams-") && url.split("?")[0].endsWith(".js")); };
     const blockModule = r => r.abort("failed");
     await failurePage.route(conceptChunk, blockModule);
     await failurePage.goto(base + "#read/" + routes[0]);
