@@ -233,3 +233,153 @@ score(q,d) ≈ Σ over query tokens [max over d_j similarity(q_i,d_j)]
 **When to test:** rare terminology or multi-concept evidence that single-vector compression misses. **When not default:** if exact IDs, permission filters, data freshness or lexical synonyms already explain the error; use simpler routes first. Evaluate authorized recall/nDCG, index size, CPU/GPU cost, search p95 and evidence-support rate. Published paper benchmark speedups apply to its measured setup; no universal production improvement is claimed here.
 
 **Sources and boundary:** [Azure vector filtering](https://learn.microsoft.com/en-us/azure/search/vector-search-filters) and [document permissions](https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview) are provider-specific. [ColBERT original paper](https://arxiv.org/abs/2004.12832) defines late interaction and comparative experiments. Architecture tests above are design recommendations, not a verified enterprise rollout.
+
+
+## 2.9 Graph Retrieval Runtime：Cypher 安全与多跳成本治理
+
+> 触发材料：用户提供的“币安远程 AI Agent 岗位三面核心考察内容”搜索整理稿（未提供面试原始记录）。本节只抽取可复用的图查询工程问题，不宣称它们是币安真实面试原题。技术实现边界依据 Neo4j 官方 Cypher / Operations / Java Driver 文档核实（2026-10-11）。
+
+### 2.9.1 先定义查询权力：Graph Query 不等于自由生成 Cypher
+
+高风险反例：
+
+~~~text
+User text / retrieved document
+  → LLM freely generates Cypher
+  → general-purpose database credential
+  → unrestricted MATCH / CALL / WRITE
+  → graph data returned directly to LLM
+~~~
+
+生产的可信控制路径应是：
+
+~~~text
+User request
+  ↓
+Trusted tenant / actor / purpose
+  ↓
+Intent + query-template selection
+  ↓
+Server-owned schema allowlist / query AST policy
+  ↓
+Bind value parameters
+  ↓
+Tenant / ACL predicate (trusted, non-removable)
+  ↓
+Query budget: hop / rows / timeout / fan-out / bytes
+  ↓
+Dedicated least-privilege graph principal
+  ↓
+Neo4j read transaction
+  ↓
+Redaction / provenance / bounded result
+  ↓
+Evidence for Agent
+~~~
+
+**Trust boundary:** Model 只能提出要找的关系和条件；可信服务拥有查询模板、schema policy、权限上下文、参数绑定、资源预算和最终执行。不要让模型决定 tenant_id、凭据、能否绕过 ACL 或是否升级为写操作。
+
+Neo4j 的 built-in reader 角色默认可读多个数据库的图数据，未必足够符合单租户最小授权；PUBLIC 的默认 procedure/function 权限也须核对。生产中应检查当前版本、Edition、默认角色与自定义权限，并通过受限身份与测试证明真正可达的数据范围。
+
+**参数化不等于完整安全。** 值参数可以防止把用户数据拼进查询文本；schema 动态元素、procedure 调用、路径形状及资源消耗仍需单独治理。不同 Cypher 版本对动态 label / relationship type 的表达能力不同，不能简单说“label 永远不能参数化”。最稳健的业务路径是 server-owned query template 或受约束的 AST / schema allowlist，再对值做参数绑定。
+
+也不能仅靠字符串黑名单拦截 MERGE / DELETE / CALL：注释、大小写、子查询、动态构造和 procedure 行为可能绕过文本规则。**权限应由数据库 + 执行层强制**，查询结构由解析器或已批准模板控制，黑名单最多是 defense-in-depth。
+
+Java / LangGraph 节点实现示意（伪代码，接口与策略需按实际库版本适配）：
+
+~~~java
+GraphQueryNode.run(TrustedContext ctx, GraphLookupRequest request) {
+    QueryTemplate template = registry.getApproved(request.intent());
+    validateSchemaAndHopBudget(template, request);
+    Map<String,Object> values = bindValues(request);
+    values.put("tenantId", ctx.tenantId()); // never use model-supplied tenant
+
+    return graphDriver.withScopedReadPrincipal(ctx).executeRead(
+        template.cypherWithMandatoryScope(),
+        values,
+        timeoutPolicy.forTenant(ctx.tenantId())
+    ).map(result -> validateBoundedEvidence(result, ctx));
+}
+~~~
+
+这里 executeRead 是**路由/事务意图，不是授权边界**：Neo4j 官方 Java Driver 文档明确提醒，read access mode 本身不是数据修改防护的安全保证。真正的防护是数据库凭据权限、schema/AST policy、资源预算及每条分支的访问控制。
+
+一个有边界的查询形状：
+
+~~~cypher
+MATCH (a:Service {tenantId: $tenantId, serviceId: $serviceId})
+MATCH (a)-[:DEPENDS_ON*1..2]->(b:Service {tenantId: $tenantId})
+RETURN DISTINCT b.serviceId AS dependency
+LIMIT 50
+~~~
+
+仅为 Neo4j/Cypher 查询示例：应用必须对每个节点/边和返回属性落实真实 ACL；WHERE tenantId 过滤本身并不代表完整租户授权。建议把合法查询形状限制在经过审核的模板集合，避免把任意可变长度、路径类型、返回列交给 LLM 自由拼接。
+
+### 2.9.2 图数据库慢在哪里：先找起点，再看扩张率
+
+多跳遍历可能发生指数级候选扩张。粗略思路：
+
+~~~text
+degree ≈ b
+hop depth = d
+explored candidates can grow toward O(b^d)
+~~~
+
+这是没有严格剪枝时的直观风险模型，不是任意 Neo4j 查询的实际复杂度承诺。
+
+排查顺序：
+
+1. **Anchor selectivity**：是否先通过 tenant + 高选择性的 ID / entity index 锚定小集合？还是从大范围 label scan 开始？
+2. **Topology**：关系类型、方向、跳数是否受限？是否出现高出度 hub、重复路径、cycle 或 path explosion？
+3. **Predicate pushdown**：实体、边属性及时间有效性约束能否在遍历中剪枝，而非所有路径枚举完成后再过滤？
+4. **Plan evidence**：EXPLAIN 看估计计划，PROFILE 在隔离测试环境观察 Rows、DB Hits、Memory、Page Cache、Expand / Eager / Sort。**PROFILE 会执行查询，写语句也可能真的修改数据**。
+5. **Result shaping**：返回是否只取所需属性、是否去重及分页，输出 bytes 与 evidence budget 是否受控？LIMIT 只限制返回行数，不保证此前扫描/展开成本小。
+6. **Ingestion consistency**：区分 source commit、CDC / stream ack、graph write applied、index online、query visibility；写入滞后不是“再调大搜索 TopK”能解决的。
+7. **Capacity**：连接池、活跃事务、CPU、I/O、page cache 与写放大是否到瓶颈？是否有高并发查询互相挤占？
+
+**预算约束**包括 hop、expand fan-out、visited nodes、候选行、timeout、返回字节、并发和 tenant quota。具体实现层不同，可通过模板预审、事务超时、队列与应用端截断等组合，不应把 LIMIT 当成唯一控制。
+
+### 2.9.3 什么时候不该用图查询？
+
+~~~text
+订单号查订单状态
+→ authoritative API / exact lookup
+
+问“退款条款怎么理解”
+→ lexical / semantic retrieval
+
+问“服务 A 会通过哪些依赖影响部署 B”
+→ graph relationship traversal
+
+问“我是否有权限执行交易”
+→ policy / authorization engine
+  (not LLM or graph similarity judgment)
+~~~
+
+Graph Retrieval 输出的**路径**只是证据，需要 provenance、版本、权限与业务约束校验，不能直接升级成动作授权。
+
+### 2.9.4 Graph Query Evaluation 与 Failure Injection
+
+**功能质量**：实体链接正确率、关系边有效率、查询路由精确率、证据路径可追溯性、grounded answer accuracy。
+
+**可靠性与成本**：P50/P95/P99 read latency、Rows / DB Hits、扩张节点数、timeout/cancel rate、graph freshness lag、index-online lag、connection-pool saturation、tenant-level throughput/cost。
+
+**安全测试**：prompt injection 想扩展 hop / label / procedure；跨租户实体同名；动态 schema；绕过 tenant predicate；CALL/写能力越权；高出度节点导致 OOM；Graph index stale；凭据错误配置。要求系统 fail closed 或显式走受控降级。
+
+### 2.9.5 Source boundary
+
+**来源整理稿的考点**：Cypher 只读权限、白名单、参数化、注入拦截、结果数量/跳数限制，以及 Neo4j 多跳查询慢/写入滞后。
+
+**Handbook 补充的工程抽象**：Query-Template/AST Policy、Trusted Context、真实数据库权限与资源配额、PROFILE 的执行风险、读路径与 ingest freshness 分离、图检索结果不是授权。
+
+**Neo4j 官方依据**（核对 2026-10-11）：
+
+- https://neo4j.com/docs/operations-manual/current/authentication-authorization/built-in-roles/
+- https://neo4j.com/docs/operations-manual/current/authentication-authorization/privileges-reads/
+- https://neo4j.com/docs/java-manual/current/transactions/
+- https://neo4j.com/docs/cypher-manual/current/patterns/variable-length-paths/
+- https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/execution-plans/
+- https://neo4j.com/docs/cypher-manual/current/indexes/performance-indexes/using-indexes/
+- https://neo4j.com/docs/cypher-manual/current/clauses/match/
+
+**不要把本节示例数字（2 hops、50 rows）解释成币安参数或 Neo4j 官方建议值。**
