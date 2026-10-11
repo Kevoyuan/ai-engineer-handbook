@@ -203,15 +203,11 @@ fs.mkdirSync(out, { recursive: true });
       await r.continue();
     });
     await page.goto(base + "#read/" + routes[0]);
-    const shortcut = page.getByRole("button", {
-      name: "交互图解",
-      exact: true,
-    });
-    await shortcut.waitFor();
-    if (!(await page.locator("#concept-demo").count()))
-      assert.equal(await shortcut.isDisabled(), true);
+    // The current Reader mounts its optional Lab automatically at the
+    // canonical section: the former "Interactive diagram" nav shortcut
+    // no longer exists. Delayed chunks must still become interactive.
     await page.locator("#concept-demo").waitFor();
-    await shortcut.click();
+    assert.equal(await page.locator("#concept-title").isVisible(),true);
     const demo = page.locator("#concept-demo");
     await demo.getByRole("button", { name: "播放", exact: true }).click();
     await assert.doesNotReject(() =>
@@ -257,11 +253,13 @@ fs.mkdirSync(out, { recursive: true });
     await failurePage.goto(base + "#read/" + routes[0]);
     await failurePage.getByRole("alert").waitFor();
     assert.equal(await failurePage.locator(".canonical-content").isVisible(), true);
-    assert.equal(await failurePage.getByRole("button", { name: "交互图解", exact: true }).isDisabled(), true);
+    assert.equal(await failurePage.locator("#concept-demo").count(),0,
+      "Failed optional Lab must not create an invalid interactive shell");
     await failurePage.unroute("**/concept-diagrams-*.js", blockModule);
     await failurePage.getByRole("button", { name: "重新加载", exact: true }).click();
     await failurePage.locator("#concept-demo").waitFor();
-    assert.equal(await failurePage.getByRole("button", { name: "交互图解", exact: true }).isEnabled(), true);
+    assert.equal(await failurePage.locator("#concept-title").isVisible(),true,
+      "Recovery should restore the Lab in the current Reader");
     await failurePage.close();
     fs.writeFileSync(
       out + "/results.json",
