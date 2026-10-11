@@ -1,0 +1,45 @@
+<section id="graph-query-governance" aria-labelledby="graph-query-governance-title">
+  <h2 class="sub" id="graph-query-governance-title">
+    <span class="i18n-text" data-i18n-zh="Graph Query Governance：Graph Retrieval 不等于自由执行 Cypher" data-i18n-en="Graph Query Governance: graph retrieval is not unrestricted Cypher">Graph Query Governance：Graph Retrieval 不等于自由执行 Cypher</span>
+    <small>§2.G</small>
+  </h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="生产图检索的关键是把 LLM 提议与实际查询执行分开：模型表达想找的关系，可信系统决定能查什么、查多深、查多久、能返回哪些数据。" data-i18n-en="Production graph retrieval separates model proposals from query authority: the model proposes relationships; trusted infrastructure determines which data, depth, time and output are allowed.">生产图检索的关键是把 LLM 提议与实际查询执行分开：模型表达想找的关系，可信系统决定能查什么、查多深、查多久、能返回哪些数据。</span></p>
+  <div class="bfs-canvas" id="fig-2-g1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.2.G1 · GOVERNED GRAPH QUERY</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="可信身份 → 受控查询 → 有界图证据" data-i18n-en="Trusted identity → constrained query → bounded graph evidence">可信身份 → 受控查询 → 有界图证据</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="这是一条权限和资源预算控制路径，不是模型对任意 Cypher 的自然语言承诺。" data-i18n-en="This is an enforced authorization and resource-budget path, not a model's natural-language promise about arbitrary Cypher.">这是一条权限和资源预算控制路径，不是模型对任意 Cypher 的自然语言承诺。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-flow-container">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">MODEL PROPOSES</span></div><h3 class="bfs-card-title">Intent / Relationship Request</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="例如：哪些服务通过 DEPENDS_ON 关联到当前项目？模型不可直接改写 tenant_id。" data-i18n-en="Example: which services connect through DEPENDS_ON in this project? The model cannot rewrite tenant_id.">例如：哪些服务通过 DEPENDS_ON 关联到当前项目？模型不可直接改写 tenant_id。</span></div></div>
+        <div style="text-align:center;color:var(--mut);padding:5px">↓</div>
+        <div class="bfs-grid bfs-g3">
+          <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">01 · TRUST</span></div><h3 class="bfs-card-title">Tenant / Actor / ACL</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="可信认证上下文，非 Prompt 指定。" data-i18n-en="Trusted authentication context, not a prompt field.">可信认证上下文，非 Prompt 指定。</span></div></div>
+          <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">02 · SHAPE</span></div><h3 class="bfs-card-title">Approved Cypher Template</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="受审核的关系类型、属性、参数与 procedure allowlist。" data-i18n-en="Approved relationship types, fields, parameters and procedure allowlist.">受审核的关系类型、属性、参数与 procedure allowlist。</span></div></div>
+          <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">03 · BUDGET</span></div><h3 class="bfs-card-title">Hops / Fan-out / Timeout</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="限制遍历、行数、时延、结果体积与并发。" data-i18n-en="Bound traversal, rows, latency, response bytes and concurrency.">限制遍历、行数、时延、结果体积与并发。</span></div></div>
+        </div>
+        <div style="text-align:center;color:var(--mut);padding:5px">↓</div>
+        <div class="bfs-card bfs-emerald"><div class="bfs-card-head"><span class="bfs-stage-pill">DATABASE ENFORCES</span></div><h3 class="bfs-card-title">Least-Privilege Graph Principal</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="数据库角色必须真实限制可读数据与可执行操作；Driver 的 read-routing 不是权限保证。" data-i18n-en="Database privileges must enforce accessible data and operations; driver read-routing is not an authorization guarantee.">数据库角色必须真实限制可读数据与可执行操作；Driver 的 read-routing 不是权限保证。</span></div></div>
+        <div style="text-align:center;color:var(--mut);padding:5px">↓</div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">EVIDENCE ONLY</span></div><h3 class="bfs-card-title">Bounded Rows + Provenance / Version</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="返回授权范围内的有界证据；查询命中不能自动授权实际业务动作。" data-i18n-en="Return bounded evidence within authorized scope; retrieval results cannot authorize downstream actions.">返回授权范围内的有界证据；查询命中不能自动授权实际业务动作。</span></div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="工程边界" data-i18n-en="Engineering boundary">工程边界</span></span><p class="say">The model proposes query intent; the trusted runtime owns query shape, access scope and resource budget.</p></div>
+    </div>
+  </div>
+  <div class="bfs-canvas" id="fig-2-g2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.2.G2 · MULTI-HOP COST</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Neo4j 多跳查询：为什么 LIMIT 不等于低成本" data-i18n-en="Neo4j multi-hop queries: why LIMIT does not guarantee low cost">Neo4j 多跳查询：为什么 LIMIT 不等于低成本</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">ANCHOR</span></div><h3 class="bfs-card-title">Indexed Entity Lookup</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="tenant + 高选择性实体 ID，先找到正确起点。" data-i18n-en="Start from tenant and selective entity ID instead of scanning a wide label.">tenant + 高选择性实体 ID，先找到正确起点。</span></div></div>
+        <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">EXPANSION</span></div><h3 class="bfs-card-title">Relation / Direction / Hop</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="高出度节点和宽泛可变长度路径造成路径爆炸；要提前剪枝。" data-i18n-en="High-degree hubs and broad variable-length paths can explode; prune while traversing.">高出度节点和宽泛可变长度路径造成路径爆炸；要提前剪枝。</span></div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">PLAN EVIDENCE</span></div><h3 class="bfs-card-title">EXPLAIN → PROFILE</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="观察 Rows、DB Hits、Expand、内存；PROFILE 会执行查询，仅在受控环境操作。" data-i18n-en="Inspect Rows, DB Hits, Expand and memory. PROFILE executes queries; use it only in a controlled setting.">观察 Rows、DB Hits、Expand、内存；PROFILE 会执行查询，仅在受控环境操作。</span></div></div>
+      </div>
+      <div class="co note" style="margin-top:14px"><span class="co-t"><span class="i18n-text" data-i18n-zh="同时追踪新鲜度" data-i18n-en="Track freshness separately">同时追踪新鲜度</span></span><p>Source commit → CDC → Graph write visible → Index online → Authorized query</p></div>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:16px"><span class="i18n-text" data-i18n-zh="图示源自工程面试问题的可复用抽象，不代表币安内部 Neo4j / LangGraph 架构。数据库权限、PROFILE 和可变长度遍历边界已对照 2026-10-11 的 Neo4j 官方文档核验。" data-i18n-en="These diagrams are reusable engineering patterns prompted by interview topics, not a claim about Binance's internal Neo4j/LangGraph architecture. Database privileges, PROFILE, and variable-length path behavior were checked against Neo4j documentation on 2026-10-11.">图示源自工程面试问题的可复用抽象，不代表币安内部 Neo4j / LangGraph 架构。数据库权限、PROFILE 和可变长度遍历边界已对照 2026-10-11 的 Neo4j 官方文档核验。</span></p>
+</section>
