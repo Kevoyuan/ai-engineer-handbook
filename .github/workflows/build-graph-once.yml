@@ -24,8 +24,6 @@ jobs:
           cache-dependency-path: preview/handbook-custom/package-lock.json
       - name: Install HTML parser
         run: python3 -m pip install beautifulsoup4
-      - name: Rebuild legacy index
-        run: node web/rebuild.mjs
       - name: Install React dependencies
         working-directory: preview/handbook-custom
         run: npm ci
