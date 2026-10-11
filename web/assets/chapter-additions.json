@@ -167,6 +167,10 @@
     {
       "path": "/assets/fde-stage07-retrieval.html",
       "id": "fde-stage07-retrieval"
+    },
+    {
+      "path": "/assets/ch02-graph-query-governance.html",
+      "id": "graph-query-governance"
     }
   ],
   "12-fde-customer-delivery": [
