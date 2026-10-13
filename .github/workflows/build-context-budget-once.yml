@@ -49,7 +49,7 @@ jobs:
               assert fid in data['zh'] and fid in data['en']
           assert 'Compaction' in data['en'] and 'Offloading' in data['en']
           search=json.loads(Path('web/site/content/search-index.json').read_text())
-          assert any('07-memory-context-engineering' in item.get('href','') and 'context-budget-prefix-cache' in item.get('href','') for item in search)
+          assert any('07-memory-context-engineering' in item.get('href','') and 'context-budget-cache-title' in item.get('href','') for item in search)
           print('PASS: bilingual diagrams + section search')
           PY
       - name: Commit generated artifacts
