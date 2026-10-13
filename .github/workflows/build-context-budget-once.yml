@@ -43,13 +43,13 @@ jobs:
           from pathlib import Path
           data=json.loads(Path('web/site/content/07-memory-context-engineering.json').read_text())
           assert 'context-budget-prefix-cache' in data['supplements']
-          assert 'context-budget-cache-strategy' in data['zh']
-          assert 'context-budget-cache-strategy' in data['en']
+          assert 'context-budget-prefix-cache' in data['zh']
+          assert 'context-budget-prefix-cache' in data['en']
           for fid in ('fig-7-b1','fig-7-b2','fig-7-b3'):
               assert fid in data['zh'] and fid in data['en']
           assert 'Compaction' in data['en'] and 'Offloading' in data['en']
           search=json.loads(Path('web/site/content/search-index.json').read_text())
-          assert any('07-memory-context-engineering' in item.get('href','') and 'context-budget-cache-strategy' in item.get('href','') for item in search)
+          assert any('07-memory-context-engineering' in item.get('href','') and 'context-budget-prefix-cache' in item.get('href','') for item in search)
           print('PASS: bilingual diagrams + section search')
           PY
       - name: Commit generated artifacts
