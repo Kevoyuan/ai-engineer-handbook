@@ -131,6 +131,10 @@
     {
       "path": "/assets/fde-stage07-context.html",
       "id": "fde-stage07-context"
+    },
+    {
+      "path": "/assets/ch07-context-budget-prefix-cache.html",
+      "id": "context-budget-prefix-cache"
     }
   ],
   "10-serving-deployment-ai-platform": [

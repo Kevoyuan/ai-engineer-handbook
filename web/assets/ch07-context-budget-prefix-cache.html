@@ -1,0 +1,64 @@
+<section id="context-budget-prefix-cache" aria-labelledby="context-budget-cache-title">
+  <h2 class="sub" id="context-budget-cache-title"><span class="i18n-text" data-i18n-zh="Context Budget：压缩、卸载与 Prefix Cache" data-i18n-en="Context Budget: compaction, offloading, and prefix caching">Context Budget：压缩、卸载与 Prefix Cache</span> <small>§7.B</small></h2>
+  <p class="lead"><span class="i18n-text" data-i18n-zh="Context 快满时，不只是删掉 Token，还要保住决策依据与可信证据，并计算前缀复用的机会成本。比较两条不同的信息流。" data-i18n-en="When context fills up, the job is not merely deleting tokens: preserve decisions and trustworthy evidence while accounting for the opportunity cost of prefix reuse. Compare two information flows.">Context 快满时，不只是删掉 Token，还要保住决策依据与可信证据，并计算前缀复用的机会成本。比较两条不同的信息流。</span></p>
+
+  <div class="bfs-canvas rv" id="fig-7-b1">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.B1 · TWO CONTEXT STRATEGIES</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="两条路径：压缩视图，还是卸载原始证据？" data-i18n-en="Two paths: compact the view or offload the raw evidence?">两条路径：压缩视图，还是卸载原始证据？</span></h2>
+      <p class="bfs-subtitle"><span class="i18n-text" data-i18n-zh="两者并不互斥；最重要的是把 Model-visible View 与 Authoritative Record 分开。" data-i18n-en="These strategies are complementary. The critical distinction is between the model-visible view and the authoritative record.">两者并不互斥；最重要的是把 Model-visible View 与 Authoritative Record 分开。</span></p>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-flow-container" style="min-width:0">
+          <div class="bfs-card bfs-amber"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">A · COMPACTION</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="改写 Active Context View" data-i18n-en="Rewrite the active context view">改写 Active Context View</span></h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="历史中抽取阶段结论、决策理由和未完成事项。" data-i18n-en="Extract outcomes, decisions, and unresolved items from earlier turns.">历史中抽取阶段结论、决策理由和未完成事项。</span></div></div>
+          <div class="bfs-card bfs-blue" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div><h3 class="bfs-card-title">Conversation + Tool History</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="原始历史先保存到受控日志/快照。" data-i18n-en="Preserve source history in a governed log or snapshot first.">原始历史先保存到受控日志/快照。</span></div></div>
+          <div class="bfs-card bfs-purple" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div><h3 class="bfs-card-title">Summarize + Validate Invariants</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="检查精确 ID、否定条件、约束和决策依据是否保留。" data-i18n-en="Check exact IDs, negations, constraints, and decision rationale for fidelity.">检查精确 ID、否定条件、约束和决策依据是否保留。</span></div></div>
+          <div class="bfs-card bfs-emerald" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">OUTPUT</span></div><h3 class="bfs-card-title">Stable Prefix + Compact View</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Token 占用降低；旧 conversation tail 的 cache 复用可能被重置。" data-i18n-en="Fewer active tokens; cache reuse for the rewritten conversation tail may be lost.">Token 占用降低；旧 conversation tail 的 cache 复用可能被重置。</span></div></div>
+        </div>
+        <div class="bfs-flow-container" style="min-width:0">
+          <div class="bfs-card bfs-teal"><div class="bfs-strip"></div><div class="bfs-card-head"><span class="bfs-stage-pill">B · OFFLOADING</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="外置大体积原始材料" data-i18n-en="Externalize bulky original material">外置大体积原始材料</span></h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="Tool 输出、日志、文档不必每一轮都常驻 Prompt。" data-i18n-en="Tool output, logs, and documents need not remain in every prompt.">Tool 输出、日志、文档不必每一轮都常驻 Prompt。</span></div></div>
+          <div class="bfs-card bfs-blue" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">STEP 1</span></div><h3 class="bfs-card-title">Large Tool Result / Artifact</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="保存原始输出与权限、版本、来源。" data-i18n-en="Persist the raw output with permissions, versions, and provenance.">保存原始输出与权限、版本、来源。</span></div></div>
+          <div class="bfs-card bfs-purple" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">STEP 2</span></div><h3 class="bfs-card-title">Artifact ID + Relevant Excerpt</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="只把指针与当下需要的证据送进 Context。" data-i18n-en="Return the pointer and only the evidence needed now.">只把指针与当下需要的证据送进 Context。</span></div></div>
+          <div class="bfs-card bfs-emerald" style="margin-top:10px"><div class="bfs-card-head"><span class="bfs-stage-pill">OUTPUT</span></div><h3 class="bfs-card-title">Selective Re-read + Evidence</h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="保留可追溯原始证据；未来读取需要额外 I/O 与 Token。" data-i18n-en="Retain traceable evidence; future reads incur I/O and token costs.">保留可追溯原始证据；未来读取需要额外 I/O 与 Token。</span></div></div>
+        </div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:15px"><span class="co-t"><span class="i18n-text" data-i18n-zh="组合原则" data-i18n-en="Combined policy">组合原则</span></span><p class="say">Preserve decisions. Offload bulk. Stabilize prefix. Compact selectively.</p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-7-b2" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.B2 · CACHE BOUNDARY</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="摘要重写的是 Tail，不一定破坏前面的 Stable Prefix" data-i18n-en="Compaction rewrites the tail, not necessarily the stable prefix">摘要重写的是 Tail，不一定破坏前面的 Stable Prefix</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g2">
+        <div class="bfs-flow-container">
+          <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">BEFORE</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="压缩之前" data-i18n-en="Before compaction">压缩之前</span></h3><div class="bfs-card-desc">[System + Tools] → [Turn 1 … 28] → [Turn 29]</div></div>
+        </div>
+        <div class="bfs-flow-container">
+          <div class="bfs-card bfs-amber"><div class="bfs-card-head"><span class="bfs-stage-pill">AFTER</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="压缩之后" data-i18n-en="After compaction">压缩之后</span></h3><div class="bfs-card-desc">[System + Tools] → [New Summary] → [Turn 29]</div></div>
+        </div>
+      </div>
+      <div class="co note" style="margin-top:13px"><span class="co-t">LONGEST MATCHING PREFIX</span><p><span class="i18n-text" data-i18n-zh="稳定的 System / Tool Prefix 仍可能命中缓存；首次改变的位置之后，需要按新内容计算。最终是否命中取决于缓存断点、有效期、模型与服务商实现。" data-i18n-en="The unchanged system/tool prefix may remain cacheable; tokens after the first change require new computation. Actual reuse depends on breakpoints, TTL, model, and provider implementation.">稳定的 System / Tool Prefix 仍可能命中缓存；首次改变的位置之后，需要按新内容计算。最终是否命中取决于缓存断点、有效期、模型与服务商实现。</span></p></div>
+      <div class="co warn" style="margin-top:11px"><span class="co-t"><span class="i18n-text" data-i18n-zh="容易混淆" data-i18n-en="Common confusion">容易混淆</span></span><p><strong><span class="i18n-text" data-i18n-zh="缓存命中降低 Prefill 计算，不代表缓存中的 Token 不再占用 Context Window。" data-i18n-en="A cache hit lowers repeated prefill work; cached tokens still consume context-window capacity.">缓存命中降低 Prefill 计算，不代表缓存中的 Token 不再占用 Context Window。</span></strong></p></div>
+    </div>
+  </div>
+
+  <div class="bfs-canvas rv" id="fig-7-b3" style="margin-top:18px">
+    <div class="bfs-head"><div>
+      <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.7.B3 · DECISION AND MEASUREMENT</span>
+      <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="三问四招之后，检查是否真的更便宜、更可靠" data-i18n-en="After the three questions and four tactics, measure the real outcome">三问四招之后，检查是否真的更便宜、更可靠</span></h2>
+    </div></div>
+    <div class="bfs-body">
+      <div class="bfs-grid bfs-g3">
+        <div class="bfs-card bfs-blue"><div class="bfs-card-head"><span class="bfs-stage-pill">01 · REUSE</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="未来还会用吗？" data-i18n-en="Will it be reused?">未来还会用吗？</span></h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="小而关键的状态固定保存；大证据按 ID 检索。" data-i18n-en="Pin small decision-critical state; retrieve large evidence by ID.">小而关键的状态固定保存；大证据按 ID 检索。</span></div></div>
+        <div class="bfs-card bfs-purple"><div class="bfs-card-head"><span class="bfs-stage-pill">02 · EVIDENCE</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="决策依据还是流水账？" data-i18n-en="Decision basis or raw trace?">决策依据还是流水账？</span></h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="保留约束、否定条件、决策理由；卸载噪声。" data-i18n-en="Keep constraints, negations and rationale; externalize bulk.">保留约束、否定条件、决策理由；卸载噪声。</span></div></div>
+        <div class="bfs-card bfs-teal"><div class="bfs-card-head"><span class="bfs-stage-pill">03 · LAYOUT</span></div><h3 class="bfs-card-title"><span class="i18n-text" data-i18n-zh="稳定前缀还是动态尾部？" data-i18n-en="Stable prefix or dynamic tail?">稳定前缀还是动态尾部？</span></h3><div class="bfs-card-desc"><span class="i18n-text" data-i18n-zh="缓存真正稳定的部分；用户修正和授权变化必须更新。" data-i18n-en="Cache truly stable content; user corrections and permission changes must remain fresh.">缓存真正稳定的部分；用户修正和授权变化必须更新。</span></div></div>
+      </div>
+      <div class="co must interp-callout interp-engineering" style="margin-top:13px"><span class="co-t">EVALUATE</span><p class="say">Task success + evidence fidelity + cached / uncached / write tokens + TTFT + total cost per successful task</p></div>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:16px"><span class="i18n-text" data-i18n-zh="来源边界：该图解释用户视频中的工程问题，并结合 Anthropic / OpenAI 官方 Context 和 Prompt Caching 文档校正缓存失效、价格、TTL 与 Compaction 表述。示意非性能实测；读写价格需按实际模型与服务商核算。" data-i18n-en="Source boundary: these figures address the supplied interview lesson and correct caching, pricing, TTL, and compaction claims using official Anthropic/OpenAI docs. They are conceptual, not performance benchmarks; actual rates depend on provider and model.">来源边界：该图解释用户视频中的工程问题，并结合 Anthropic / OpenAI 官方 Context 和 Prompt Caching 文档校正缓存失效、价格、TTL 与 Compaction 表述。示意非性能实测；读写价格需按实际模型与服务商核算。</span></p>
+</section>
