@@ -904,3 +904,372 @@ if exhausted: omit low-value history → compact with provenance
 **Operational metrics:** overflow/refusal rate, context tokens per approved success, evidence citation retention, correction fidelity, p95 end-to-end latency and unauthorized-context rate. Large windows may lower routing complexity for small tasks, but do not fix stale document ACLs or non-relevant retrieved material.
 
 **Source/ownership:** CH01 §1.4 covers context capacity and lost-in-middle. CH07 §7.4/7.7 owns compression/memory policy. CH02 §2.8 owns index freshness. This is design synthesis to the public FDE topic, not a proprietary solution or quantitative benchmark.
+
+
+## 7.13 Agent Context Budget：Compaction、Offloading 与 Prefix Cache 的共同优化
+
+面试问题：
+
+> “Agent 跑着跑着，Context 快撑满了，你怎么办？”
+
+只回答“做 summarize”不够；只回答“把记录写到文件”也不够。Context Engineering 需要同时管理 **容量、信息保真、可恢复性、Prefix Cache 复用、延迟和总成本**。
+
+### 7.13.1 三种不同预算
+
+~~~text
+Capacity Budget
+→ 当前请求还能容纳多少 model-visible tokens？
+
+Fidelity / Evidence Budget
+→ 哪些事实、约束、决策理由必须无损保留或可恢复？
+
+Cache / Compute Budget
+→ 哪一段稳定前缀可以复用已计算的 KV？
+~~~
+
+其中：
+
+~~~text
+cached prompt tokens
+still occupy context-window capacity
+~~~
+
+Prompt Caching 降低重复 Prefill 的价格和延迟，但不会把命中缓存的 tokens 从模型 Context Window 的长度限制中扣除。
+
+> **A cache hit reduces repeated computation; it does not create extra context capacity.**
+
+### 7.13.2 Compaction vs Offloading：不是二选一
+
+| 维度 | Compaction / Summary | Offloading / Externalization |
+|---|---|---|
+| 操作 | 把较旧历史转成更短的 active context view | 原始 tool result、artifact、trace 或文档移到外部存储 |
+| 目的 | 降低下一轮实际输入 tokens，维持任务连续性 | 不让低频、大体积原始材料常驻 Context |
+| 信息保真 | 摘要可能遗漏隐性约束、否定或决策理由 | 原始证据可以保留，但未来能否召回取决于索引、权限、版本与生命周期 |
+| Prefix Cache | 改写发生位置之后的 token 前缀匹配会变化；更早的稳定段仍可能命中 | 稳定 Prompt 可不变；但重新读取外部材料也会形成新的 suffix |
+| 主要成本 | 摘要生成、后续缓存写入、摘要漂移风险 | 存储、检索、I/O、重读后的 tokens、访问控制 |
+| 适合 | 连续聊天、冗余长历史、接近窗口上限的任务 | 长日志、大文档、工具 stdout、需要核验的原始证据 |
+
+二者可以组合：
+
+~~~text
+Raw Event / Tool History (durable + access-controlled)
+               │
+     ┌─────────┴─────────┐
+     ▼                   ▼
+Structured Working State  External Artifact Store
+constraints / reasons     logs / files / tool outputs
+     │                   │
+     └─────────┬─────────┘
+               ▼
+       Context Assembler
+               ▼
+Stable Prefix + Compact View + Retrieved Evidence
+               ▼
+           Model / Agent
+~~~
+
+**压缩后的摘要不可从自身“逆向还原”完整历史。** 如果任务需要可回溯，应在摘要以外保存受权限与保留政策治理的原始记录、Artifact ID、版本与来源；这才是 operationally recoverable，而非数学意义上的可逆压缩。
+
+> **Compact the model-visible view; do not confuse that view with the authoritative execution record.**
+
+### 7.13.3 Prefix Cache：首次变化位置决定可复用区间
+
+对于相同模型/配置下兼容的 Prompt：
+
+~~~text
+Before compaction
+
+[ STABLE SYSTEM + TOOLS ][ TURN 1 … TURN 28 ][ TURN 29 ]
+├──────── reusable prefix ────────────────────┘
+
+After compaction
+
+[ STABLE SYSTEM + TOOLS ][ NEW COMPACT SUMMARY ][ TURN 29 ]
+├── still matching ──┘  └── new suffix ───────┘
+~~~
+
+若首次不同 token 出现在 Summary 开头，旧的 Conversation Tail 便不能按原前缀继续命中；**这不表示 stable system/tool prefix 自动失效**。缓存系统按模型/厂商的有效断点、最小长度、TTL 与路由策略匹配最长可复用前缀，不保证任意前缀都能被缓存。
+
+Anthropic 官方 Compaction 文档甚至明确建议：给稳定 System Prompt 单独设置 cache breakpoint，使 Compaction 重写 conversation 后，System Prefix 仍有机会独立命中。
+
+易错说法：
+
+~~~text
+"一旦 summarize，之后所有请求的 cache 都失效"
+→ too absolute
+~~~
+
+更准确：
+
+> **Compaction breaks reuse from the earliest rewritten prefix position, subject to cache breakpoints, TTL, model compatibility and provider behavior.**
+
+Prompt / Tool Schema 顺序、模型、推理配置和其他影响渲染前缀的设置也可能导致匹配变化。不应为“命中缓存”而把租户授权、会话新事实或动态安全策略固定在不可更新的缓存内容中。
+
+### 7.13.4 TTL 与价格：0.1× 不等于整体调用成本 0.1×
+
+按 2026-10-13 的官方公开说明，Anthropic 的常见 Prompt Cache 定价倍率为：
+
+~~~text
+Uncached input     1.00× base input rate
+5-minute write     1.25× base input rate
+1-hour write       2.00× base input rate
+Cache read         commonly 0.10× base input rate
+~~~
+
+某些具体模型的 read multiplier 不同。5 分钟是通常的默认 TTL，并存在一小时选项；TTL / 兼容模式和计费应以调用时的模型与供应商文档为准。
+
+**这些是对应 token 类别的价格倍率，不是完整请求价格，也不是 TTFT 保证。**
+
+可测量的近似核算：
+
+~~~text
+C_request =
+    uncached_input_tokens × input_rate
+  + cache_write_tokens   × write_rate
+  + cache_read_tokens    × read_rate
+  + output_tokens        × output_rate
+  + model / tool / storage / retrieval costs
+
+C_successful_task =
+    sum(all attempts, compaction and recovery costs)
+    / successful_task_count
+~~~
+
+比较两种候选策略时，应在同一任务与成功质量约束下计算未来多轮总成本：
+
+~~~text
+Strategy A
+→ compact immediately
+→ shorter future prompts
+→ possibly lower prefix reuse
+→ extra summary/write cost
+
+Strategy B
+→ externalize low-value bulk
+→ stable prefix reused
+→ retrieval cost when evidence is needed
+→ possibly longer retained constraints
+~~~
+
+因此不能只看：
+
+~~~text
+tokens removed
+cache hit ratio
+one-request TTFT
+~~~
+
+而应同时测：剩余任务轮数、缓存生命周期、summary 频率、re-read 次数、任务成功率和恢复重试代价。
+
+### 7.13.5 面试“三问”：信息价值与缓存位置
+
+**Q1 · 之后是否会被反复使用？**
+
+不要直接得出“反复使用就一律不压缩”。先分清：
+
+~~~text
+small, durable, decision-critical fact
+→ preserve as structured working state
+→ perhaps pin a compact exact representation
+
+large evidence repeatedly queried by reference
+→ persist externally + keep ID / index
+→ fetch exact slices when needed
+
+long redundant chat repeatedly revisited
+→ compaction can still be useful
+→ keep fidelity tests and original evidence
+~~~
+
+**Q2 · 它是决策依据还是低价值流水账？**
+
+~~~text
+decision rationale / confirmed constraints / active plan
+→ preserve exact meaning, provenance, supersession and version
+
+giant stdout / full stack trace / temporary observation
+→ offload original + short pointer / excerpt
+
+failed attempts
+→ may still matter when preventing repeated mistakes
+→ preserve concise failure signature / chosen recovery
+~~~
+
+失败记录不总是可以随意删；重要的是保留**失败教训与不可重复条件**，而非全量噪声。
+
+**Q3 · 它在 Prompt 里是稳定前缀还是动态尾部？**
+
+~~~text
+system / stable tool schemas / reusable instructions
+→ place in stable ordered prefix
+→ use supported cache breakpoints
+
+current task / user correction / retrieved evidence
+→ append in dynamic suffix
+
+tenant / policy / entitlement
+→ resolve from trusted up-to-date runtime
+→ no stale permission reuse
+~~~
+
+由此得到选择规则：
+
+> **Preserve decision-critical state, externalize bulky evidence, stabilize cacheable instructions, and compact replaceable history when the quality/cost balance justifies it.**
+
+### 7.13.6 四条落地手段
+
+**1. Tool output rightsizing**
+
+~~~text
+Shell / Search / API returns 20,000 lines
+→ write raw output to versioned artifact
+→ return artifact_id + path + bounded excerpt + status
+→ later read relevant slice when necessary
+~~~
+
+应保存来源、时间、权限、checksum/version；路径本身不代表模型有权读取，更不代表报告一定正确。输出里可能包含 secret / prompt injection，应过滤敏感信息并隔离信任级别。
+
+**2. Stable Prefix Layout**
+
+~~~text
+Stable: system instructions + consistent tool definitions
+---
+Dynamic: current task + retrieved material + new messages
+~~~
+
+固定只应固定真正稳定的部分。不要因为优化缓存而拒绝必要的工具版本、安全策略或授权更新。
+
+**3. Sub-agent Context Isolation**
+
+~~~text
+Main agent
+→ delegate bounded task + acceptance criteria
+    → subagent handles verbose scratch/tool history
+    → stores artifacts / citations
+    → returns validated result + references
+→ main agent merges result into structured state
+~~~
+
+Sub-agent 隔离不代表“免费减少 tokens”；新增的模型调用、并发、校验、失败重试和额外 cache scope 都可能增加成本。主 Agent 不应只拿一个不可验证的“已完成”。
+
+**4. Compaction with Snapshot / Provenance**
+
+~~~text
+capture raw transcript / checkpoint under retention policy
+→ extract invariants + decision rationale + open items
+→ compact active view
+→ validate constraints / exact IDs / negative conditions
+→ continue
+→ retrieve original source only when needed
+~~~
+
+Snapshot 要权限受控、具备生命周期；摘要不是事实源。服务端 Compaction 若提供专用 compaction block，应按 API 协议完整回传，不能只保留可见文字。
+
+### 7.13.7 Production State：先降噪，后压缩，必要时重新分配任务
+
+一个不依赖厂商的阈值触发器：
+
+~~~text
+if input_budget_near_limit:
+    protect current task + verified constraints
+    detect oversized tool outputs
+    externalize / trim low-value bulk
+    preserve raw evidence pointers
+    consider safe bounded subtask isolation
+    if still above threshold:
+        snapshot + compact
+        validate state invariants
+    reassemble only needed evidence
+    ensure response/output headroom
+~~~
+
+除了触发阈值，还要留出最大工具返回、下一轮输入和预计输出的 headroom，避免某个工具突然返回超大内容时再来不及压缩。
+
+缓存 TTL 不应成为牺牲任务正确性或跳过必须重新授权的理由。
+
+### 7.13.8 Eval：怎么证明“更省”且没忘东西
+
+| Dimension | Example measurement |
+|---|---|
+| Capacity | live context occupancy; overflow / refusal rate |
+| Quality | constraint retention; exact ID/negation fidelity; plan consistency |
+| Evidence | provenance recovery success; artifact retrieval precision |
+| Prefix Cache | read/write/uncached tokens; effective hit ratio; invalidation frequency |
+| Cost | summed input, cached-input, write, output, summary, retrieval and retry costs |
+| Latency | TTFT P50/P95; end-to-end success latency |
+| Reliability | recovery success; duplicate work after compaction; authorization leakage |
+
+至少做四种对照：
+
+~~~text
+A: Full transcript until overflow
+B: Rolling compaction only
+C: Offload + structured state
+D: Offload + structured state + selective compaction + stable prefix
+~~~
+
+Eval slices：
+
+~~~text
+Turn 3: "订单是 43，不是 42"
+Turn 30: confirm 43 and negative constraint still hold
+
+Large tool output
+→ check exact traceback still retrievable by artifact ID
+
+Stable prefix + compacted tail
+→ check cache-read token count before/after
+
+Long subagent run
+→ account for its tokens, latency and evidence quality
+~~~
+
+不能把缓存的 read/write tokens 误当作“Context Window 没占用”。也不能只报告输入 token 降低而忽略输出、摘要生成、重试与检索成本。
+
+### 7.13.9 面试答题版
+
+> 我不会上来就无限 Summarize，也不会全量把历史塞进外部向量库。Context Budget 要同时考虑窗口容量、信息保真和 Prefix Cache。我会先分三类：当前任务目标、精确 ID、否定条件和决策依据进入结构化 Working State；大体积日志和 Tool 输出存入受治理的 Artifact Store，只留指针、短摘要和必要 evidence；稳定 System Prompt 与 Tool Schema 放在前缀，动态检索和用户补充放在后面。窗口仍接近阈值时，再对可替代的历史做 Compaction，但保留原始证据并验证重要约束。Compaction 改写旧会话 Tail 后，旧 Tail 的 Prefix Cache 可能无法复用，但前面未变的 System / Tool Prefix 仍可能命中，所以不能说“压缩会永久打碎所有缓存”。Sub-agent 能隔离 verbose scratch，但新增调用也要计成本。最终用输入缓存 read/write、uncached tokens、TTFT、摘要/检索开销、证据保真和 cost per successful task 的 A/B Eval 决定策略。
+
+最短记忆：
+
+~~~text
+Preserve decisions.
+Offload bulk.
+Stabilize prefix.
+Compact selectively.
+Measure total successful-task cost.
+~~~
+
+> **The best context policy is not the one that removes the most tokens; it is the one that preserves decision quality at the lowest total successful-task cost.**
+
+### 7.13.10 Source boundary · Agent Context Budget
+
+Primary user-supplied material:
+- 视频文本《字节二面Agent上下文预算面试题完整解析》：Compaction vs Offloading、Prefix Cache、三问四招、面试追问。
+
+Source-derived ideas retained:
+- Context 逼近上限时 Compaction 与 Offloading 都可用；
+- Prompt Prefix 稳定性影响 KV Prefix Cache；
+- 决策依据应与大体积低价值流水账分开；
+- Tool 输出落盘、静态内容前置、Sub-agent 隔离与压缩前保留原始快照；
+- Token 节约要和 Prefill/缓存成本一起分析。
+
+Handbook corrections / synthesis:
+- 不采纳“压缩以后所有缓存全部失效”：保留变化位置之前、仍满足 provider 规则的 cacheable prefix；
+- 不采纳“频繁复用的信息永远不能摘要”：区分小而关键的状态与大量可检索原始证据；
+- 不采纳“流水账可随意删除”：错误签名、否定条件和 failure lesson 可能是 decision-critical；
+- 不把 Summary 称为可逆压缩：可恢复性来自独立保存的原始记录；
+- 不把 Offloading / Sub-agent 视为零成本；
+- 将缓存价格倍率、TTL 与 server-side Compaction 标成模型/供应商/版本依赖；
+- 明确 Cache Hit 并不增加 Model Context Window 容量；
+- 通过 cost-per-successful-task + quality regression 选策略，而不看单轮 token 数。
+
+External verification: 2026-10-13. Sources:
+- Anthropic, Effective Context Engineering for AI Agents: https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents
+- Anthropic, Compaction overview / on-demand / threshold: https://platform.claude.com/docs/en/build-with-claude/compaction
+- Anthropic, Context windows: https://platform.claude.com/docs/en/build-with-claude/context-windows
+- Anthropic, Prompt caching: https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+- Anthropic, Reducing cost and improving performance: https://claude.com/blog/reducing-cost-and-improving-performance-with-claude-platform
+- OpenAI, Prompt caching: https://developers.openai.com/api/docs/guides/prompt-caching
+
+Technical cross-reference: Chapter 10 §10.1–10.5 owns KV / Prefix Cache serving internals. Chapter 07 owns what to place in the context, what to externalize and when to compact.
