@@ -24,8 +24,7 @@ jobs:
           cache-dependency-path: preview/handbook-custom/package-lock.json
       - name: Install content generator dependency
         run: python3 -m pip install beautifulsoup4
-      - name: Rebuild chapter registry
-        run: node web/rebuild.mjs
+      # Reuse the checked-in 12-chapter registry. Legacy rebuild currently fails on Chapter 11 metadata.
       - name: Install site dependencies
         working-directory: preview/handbook-custom
         run: npm ci
