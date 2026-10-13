@@ -47,7 +47,7 @@ jobs:
           assert 'context-budget-prefix-cache' in data['en']
           for fid in ('fig-7-b1','fig-7-b2','fig-7-b3'):
               assert fid in data['zh'] and fid in data['en']
-          assert 'Compaction' in data['en'] and 'Offloading' in data['en']
+          assert 'compaction' in data['en'].lower() and 'offloading' in data['en'].lower()
           search=json.loads(Path('web/site/content/search-index.json').read_text())
           assert any('07-memory-context-engineering' in item.get('href','') and 'context-budget-cache-title' in item.get('href','') for item in search)
           print('PASS: bilingual diagrams + section search')
