@@ -275,3 +275,24 @@
 .chapter-body .trace-loop-steps li[data-state="current"] small {
   color: var(--foreground);
 }
+
+
+/* V3.4: architecture graph first, textual legacy trace in a disclosure.
+   The disclosure is supplementary inspection, not a second visual spine. */
+.chapter-body .decision-trace .trace-inspection {
+  margin:.85rem 0;
+  border:1px solid var(--border);border-radius:.48rem;
+  background:var(--card);min-width:0;
+}
+.chapter-body .decision-trace .trace-inspection > summary {
+  cursor:pointer;padding:.75rem .9rem;min-height:44px;
+  color:var(--foreground);font-size:.78rem;font-weight:610;
+}
+.chapter-body .decision-trace .trace-inspection[open] > summary {
+  border-bottom:1px solid var(--border);
+}
+.chapter-body .decision-trace .trace-inspection > :not(summary) {
+  margin-inline:.75rem;
+}
+.chapter-body .decision-trace .trace-inspection > .trace-decision {margin-bottom:.75rem;}
+.chapter-body .decision-trace .atlas-graph {margin-top:.75rem;}

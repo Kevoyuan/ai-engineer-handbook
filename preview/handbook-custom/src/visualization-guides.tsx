@@ -3,6 +3,7 @@
 import { useLayoutEffect, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import "./visualization-guides.css";
+import { PrefixServingGraph } from "./remaining-graph-models";
 
 type Copy = readonly [string, string];
 type Stage = { title: Copy; detail: Copy; state: "pass" | "hold" | "stop" };
@@ -172,6 +173,9 @@ function PrefixGuide({en}: {en:boolean}) {
         : "对比兼容、提前分叉与租户隔离的请求。这是机制教学图，不是真实推理引擎 Trace。"}</p>
     </div>
     <ScenarioButtons cases={kvCases} current={selected} onChange={setSelected} en={en}/>
+    <PrefixServingGraph scenario={selected} en={en}/>
+    <details className="v2-graph-details">
+      <summary>{en?"Inspect the token-level prefix comparison and lookup checks":"展开逐 token 前缀对比与缓存检查"}</summary>
     <div className="v2-guide-layout">
       <div className="v2-main">
         <div className="v2-diagram-label">{en ? "TWO REQUESTS · COMMON PREFIX" : "两个请求 · 前缀对齐"}</div>
@@ -188,6 +192,7 @@ function PrefixGuide({en}: {en:boolean}) {
       </div>
       <div className="v2-trace"><span className="v2-diagram-label">{en ? "LOOKUP / EXECUTION" : "查找 / 执行阶段"}</span><Stages scenario={scenario} en={en}/></div>
     </div>
+    </details>
     <p className="v2-source-note">{en ? "Based on CH10 §§10.2–10.8. Prefix reuse never means sharing mutable Agent session state or skipping Decode."
       : "对应 CH10 §10.2–10.8：Prefix 复用不代表共享可变 Agent 会话，也不意味着跳过 Decode。"}</p>
   </section>;
