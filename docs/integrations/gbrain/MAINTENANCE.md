@@ -16,6 +16,7 @@ Input (article / bug report / observed regression)
   → git commit mirror locally
   → gbrain sync --source ai-engineer-handbook --no-pull --no-embed --dry-run
   → explicit sync
+  → review local mirror for any sync-created working-tree changes
   → source-scoped keyword and provenance readback
 \`\`\`
 
