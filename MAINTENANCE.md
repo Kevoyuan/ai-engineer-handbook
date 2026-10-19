@@ -408,3 +408,17 @@ fix sync/publish generator
 ```
 
 Always fix derivation bugs at their source rather than patching generated output.
+
+## Local GBrain Source integration (optional)
+
+The opt-in keyless PGLite Source workflow is documented at [docs/integrations/gbrain/README.md](./docs/integrations/gbrain/README.md). Its [governance](./docs/integrations/gbrain/GOVERNANCE.md), [maintenance](./docs/integrations/gbrain/MAINTENANCE.md) and [installation/readback verification](./docs/integrations/gbrain/INSTALL_VERIFY.md) are subordinate to this canonical repository workflow.
+
+GBrain indexes a **separately committed local mirror of verified canonical chapters**, not the live working tree, generated site, private files or all archived interviews. After an approved canonical PR merges, an operator can export from an immutable Git revision, inspect and commit the mirror, dry-run GBrain sync, then validate source-scoped retrieval. There is no reverse sync into GitHub, no automatic installation, no scheduled job and no provider API use. This optional local Source has no impact on the published Atlas build.
+
+Run the local source safety tests explicitly when changing the exporter:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_gbrain_stage_source.py' -v
+```
+
+No GitHub Actions workflow is added for this integration, in accordance with the repository's manual-validation policy.

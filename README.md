@@ -145,6 +145,10 @@ The canonical operating procedure lives in **[MAINTENANCE.md](./MAINTENANCE.md)*
 
 The guiding principle remains: **engineering knowledge first; interview preparation is only one downstream use case.**
 
+## GBrain local Source integration (opt-in)
+
+The [GBrain integration runbook](docs/integrations/gbrain/README.md) prepares an isolated, **keyless local PGLite** Source for canonical chapters only. It includes provenance/knowledge governance, an external committed Source mirror, a read-only-by-default exporter, maintenance procedures, and opt-in installation/readback checks. GBrain is **not installed or enabled by this repository**, and no cloud provider, MCP connection, auto-capture or background daemon is configured.
+
 ## FDE curriculum integration (2026-10-08)
 
 FDEInterviews provides a 167-concept curriculum across ten original tracks. The [full source-track-to-canonical-chapter crosswalk](handbook/references/fde-2026-concept-crosswalk.md) assigns each concept to one stable knowledge owner. This is an **editorial classification**, not proof of deep coverage or access to premium course material.

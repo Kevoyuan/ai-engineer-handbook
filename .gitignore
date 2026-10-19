@@ -24,3 +24,8 @@ dist/
 preview/handbook-custom/evidence/*.png
 preview/handbook-custom/evidence/*.jpg
 preview/handbook-custom/evidence/*.jpeg
+
+# Local GBrain state (never commit databases, source marker, or secrets)
+.gbrain/
+.gbrain-source
+*.pglite/
