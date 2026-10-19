@@ -66,6 +66,12 @@ class StageSourceTests(unittest.TestCase):
         with self.assertRaises(module.StageError):
             module.stage(self.repo, self.mirror, "HEAD", True)
 
+    def test_refuses_symlinked_chapters_directory(self):
+        self.mirror.mkdir()
+        (self.mirror / "chapters").symlink_to(self.repo / "handbook/chapters", target_is_directory=True)
+        with self.assertRaises(module.StageError):
+            module.stage(self.repo, self.mirror, "HEAD", True)
+
 
 if __name__ == "__main__":
     unittest.main()
