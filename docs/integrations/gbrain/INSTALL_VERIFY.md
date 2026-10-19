@@ -95,6 +95,8 @@ gbrain sync --source ai-engineer-handbook --no-pull --no-embed --dry-run
 
 # After checking the plan and no unexpected paths:
 gbrain sync --source ai-engineer-handbook --no-pull --no-embed
+# Inspect the mirror Git worktree after sync; some GBrain modes can normalize source files.
+git -C "$MIRROR" status --short
 ~~~
 
 \`--no-federated\` and explicit \`--source\` prevent accidental **default search inclusion**, but **are not access-control enforcement**. Verify Source ID on results. Do not register a bare default brain source instead.
