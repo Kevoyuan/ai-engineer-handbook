@@ -92,10 +92,13 @@ def stage(repo: Path, dest: Path, revision: str, apply: bool) -> dict:
         raise StageError("--repo must be the Git repository root")
     documents, commit = source_docs(repo, revision)
     manifest_file = dest / "source-manifest.json"
+    chapters_dir = dest / "chapters"
+    if chapters_dir.is_symlink() or (chapters_dir.exists() and not chapters_dir.is_dir()):
+        raise StageError("Refusing symlinked or non-directory chapters path")
+    if manifest_file.is_symlink():
+        raise StageError("Refusing symlinked manifest")
     old: dict[str, str] = {}
     if manifest_file.exists():
-        if manifest_file.is_symlink():
-            raise StageError("Refusing symlinked manifest")
         previous = json.loads(manifest_file.read_text(encoding="utf-8"))
         if previous.get("source_id") != SOURCE_ID:
             raise StageError("Destination belongs to another source; refusing overwrite")
