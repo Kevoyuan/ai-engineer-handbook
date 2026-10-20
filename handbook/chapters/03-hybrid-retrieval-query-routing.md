@@ -41,6 +41,34 @@ RRF(d) = Σ 1 / (k + rank_i(d))
 
 RRF 解决的是**候选融合**，不是最终相关性证明。融合后仍可能需要 Cross-Encoder / LLM Reranker 与 Evidence Validation。
 
+### 3.1.1 Rerank：机制、分数与证据边界
+
+Reranking 是对候选重新排序的阶段，**不等于某一种模型架构**。Cross-Encoder 是常见实现，也可以使用其他学习排序模型或 LLM reranker。
+
+| 实现 | 输入与可复用计算 | 工程取舍 |
+|---|---|---|
+| Dense Bi-Encoder | Query 和文档独立编码；文档表示可离线索引 | 适合扩大候选集；独立编码不代表只能判断主题、完全不能学习相关性 |
+| Cross-Encoder reranker | 联合处理 Query–passage pair，输出匹配分数 | 能利用联合交互；常规实现不能用独立文档向量相似度替代成对前向计算 |
+| LLM reranker | 按任务提示对候选打分或排序 | 还需约束输入长度、顺序偏差、格式、成本与候选中的指令注入 |
+
+`[CLS] query [SEP] passage [SEP]` 是 BERT 类输入的示意，不能当作所有 reranker 的固定协议。Cross-Encoder 常用于有限候选的精排；具体收益仍受模型、语言、训练分布、截断和业务数据影响。小候选库可直接成对评分，是否分两阶段取决于规模与延迟预算，并非“企业 RAG 必须重排”。
+
+**Relevance score ≠ calibrated answer probability.** 模型可以输出 raw logits，应用也可能再做 sigmoid 映射到 0～1。例如 BGE reranker 的 `normalize=True` 才显式应用该映射；数值落在 0～1 不证明它是“这段内容能回答问题的真实概率”，也不能直接跨模型复用阈值。重排后的第一名仍可能缺少答案、版本错误或没有访问权限；证据充分性与拒答策略由 Chapter 04 负责。
+
+### 3.1.2 如何决定是否重排
+
+以下是本手册的工程评测建议，不是模型性能承诺：
+
+1. 在相同授权候选集上比较不重排与重排，先测 answer-bearing Recall@K，再测 MRR / NDCG、答案正确率、拒答质量及 P95 / 每次成功请求成本。候选中没有的证据，reranker 无法补回。
+2. 分别配置 `K_retrieve`、`K_rerank` 和最终 token budget；Top20～50 → Top3～5 只能作为实验配置，不能照抄为标准容量。长片段需检查 query / passage 的截断策略。
+3. 归一化加权融合需要评估归一化方法、权重与数据漂移；也可沿用上面的 RRF，不能说“混合检索只能先归一化”。
+4. 去重、来源多样性与子问题覆盖应显式实现；按相关性排序本身不保证去重、减少幻觉或解决长上下文的位置偏差。
+5. 定义精排超时/失败后的策略：返回已有候选、缩小范围或澄清/拒答，取决于业务风险；任何降级都不得跳过授权和证据校验。
+
+把动态排序后的证据放在稳定指令之后，仍可能复用此前未变的 cacheable prefix；不要为了提高缓存命中冻结错误的证据顺序。Prompt 布局与缓存边界见 Chapter 07 §7.13.3。
+
+**核对于 2026-10-20：** [Sentence Transformers: Cross-Encoder](https://www.sbert.net/examples/cross_encoder/applications/README.html)、[Retrieve & Re-Rank](https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html)、[BGE reranker model card](https://huggingface.co/BAAI/bge-reranker-v2-m3)。原始笔记未附作者、发布链接或实验记录；“二面必考”“国内最多”与毫秒级全库查询等宣传性结论未采纳。处理与来源边界见 [本轮记录](../verification/2026-10-20-inbox-rerank-context.md)。
+
 ## 3.2 Query Routing：先判断证据形状
 
 Router 的职责包括：选择数据源、选择检索方式、决定是否并行、决定是否需要工具、决定信息不足时澄清还是停止。

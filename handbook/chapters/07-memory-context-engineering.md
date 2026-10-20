@@ -1005,6 +1005,10 @@ Anthropic 官方 Compaction 文档甚至明确建议：给稳定 System Prompt �
 
 Prompt / Tool Schema 顺序、模型、推理配置和其他影响渲染前缀的设置也可能导致匹配变化。不应为“命中缓存”而把租户授权、会话新事实或动态安全策略固定在不可更新的缓存内容中。
 
+**滑动窗口并不天然保住旧历史的前缀缓存。** 从 `[System][A][B][C]` 变成 `[System][B][C][D]` 时，首次变化就在 System 后；`B/C` 的相对顺序虽未变，它们也不是旧输入从起点延伸的相同前缀。System 段是否可复用仍受服务商规则约束。这里讨论请求级 Prefix Caching，不等同于某个推理引擎内部的 sliding-window attention / KV eviction。
+
+同样，外部记忆召回或 Rerank 改变动态证据 suffix，并不必然使前面的稳定指令全部失效；应测实际 cache read、未缓存输入与任务质量，而非按“摘要/截断/检索”的名称断言命中率。
+
 ### 7.13.4 TTL 与价格：0.1× 不等于整体调用成本 0.1×
 
 按 2026-10-13 的官方公开说明，Anthropic 的常见 Prompt Cache 定价倍率为：
@@ -1185,6 +1189,20 @@ if input_budget_near_limit:
 
 除了触发阈值，还要留出最大工具返回、下一轮输入和预计输出的 headroom，避免某个工具突然返回超大内容时再来不及压缩。
 
+可用一个保守的、按具体 API 计数规则校验的请求准入预算表达这种约束：
+
+~~~text
+assembled_input_tokens + reserved_output_tokens + safety_margin
+    <= model_context_limit
+
+before next tool result / user turn:
+    reserve bounded incoming payload or truncate/offload it before assembly
+~~~
+
+`assembled_input_tokens` 包括实际会发送的 system、tools、消息、检索结果和模型可见的摘要；不要再把已经包含的工具结果重复计算。输出/思考 token、隐藏封装开销及独立输入/输出上限应按模型/API 检查；有条件时使用其 token counting 接口。原文的“75%～80% 预警、100% 再截断”不是通用安全线：应在发请求前拒绝或重组超预算输入，并为压缩操作本身预留空间。
+
+裁剪时还应保留 provider 要求的消息结构：不要留下无配对的 tool result，或删掉仍在使用的 tool call；保留当前目标、精确 ID、否定约束与证据指针。若仍无法安全装配，就暂停、缩小任务或请求用户选择，不能静默删除关键约束继续执行。这是本手册的工程建议，具体消息配对规则取决于所用协议。
+
 缓存 TTL 不应成为牺牲任务正确性或跳过必须重新授权的理由。
 
 ### 7.13.8 Eval：怎么证明“更省”且没忘东西
@@ -1273,3 +1291,5 @@ External verification: 2026-10-13. Sources:
 - OpenAI, Prompt caching: https://developers.openai.com/api/docs/guides/prompt-caching
 
 Technical cross-reference: Chapter 10 §10.1–10.5 owns KV / Prefix Cache serving internals. Chapter 07 owns what to place in the context, what to externalize and when to compact.
+
+2026-10-20 补充核对：[Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) 的相同前缀与变化 suffix 边界、[Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows) 的输入/输出容量计数。新增用户笔记与已有本节高度重合；本轮只补充滑动窗口反例、预留容量与安全裁剪规则，未采纳“外部记忆让任务无限运行”“结构化摘要必然更少幻觉”“缓存必定省显存”等无实测保证的断言。详见 [处理记录](../verification/2026-10-20-inbox-rerank-context.md)。

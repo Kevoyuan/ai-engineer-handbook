@@ -7,6 +7,10 @@
     {
       "path": "/assets/fde-stage07-query.html",
       "id": "fde-stage07-query"
+    },
+    {
+      "path": "/assets/ch03-rerank-boundaries.html",
+      "id": "rerank-boundaries"
     }
   ],
   "05-document-pdf-rag": [
@@ -135,6 +139,10 @@
     {
       "path": "/assets/ch07-context-budget-prefix-cache.html",
       "id": "context-budget-prefix-cache"
+    },
+    {
+      "path": "/assets/ch07-context-budget-guardrails.html",
+      "id": "context-budget-guardrails"
     }
   ],
   "10-serving-deployment-ai-platform": [
