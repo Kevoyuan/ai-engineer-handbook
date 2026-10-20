@@ -214,3 +214,17 @@
     scroll-behavior: auto !important;
   }
 }
+
+
+/* CH10: the cache-key graph takes priority; detailed tokens remain inspectable. */
+.chapter-body .v2-graph-details {
+  margin:.8rem 0;border:1px solid var(--border);
+  border-radius:.5rem;background:var(--card);
+}
+.chapter-body .v2-graph-details > summary {
+  cursor:pointer;min-height:44px;padding:.75rem .9rem;
+  font-weight:610;color:var(--foreground);font-size:.78rem;
+}
+.chapter-body .v2-graph-details[open] > summary {border-bottom:1px solid var(--border);}
+.chapter-body .v2-graph-details > .v2-guide-layout {margin:.7rem;}
+.chapter-body .v2-guide > .atlas-graph {margin-top:1rem;}

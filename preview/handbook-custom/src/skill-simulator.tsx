@@ -9,6 +9,7 @@ import { KnowledgeCheck, SkillContextInspector } from "./learning-interactions";
 import { ArchifyOverview } from "./archify-overview";
 import type { Lesson } from "./learning-content";
 import { usePretextLayout } from "./use-pretext-layout";
+import { SkillBoundaryGraph } from "./remaining-graph-models";
 
 /** A teaching simulation: no real files, model calls, tokens or authorization. */
 export function SkillSimulator({
@@ -340,6 +341,12 @@ export function SkillSimulator({
             ))}
           </TabsList>
         </header>
+        <div className="skill-graph-layer" aria-label={t("Skill 到工具的受信架构图","Skill-to-tool trust-boundary architecture")}>
+          <div className="skill-graph-kicker">06 / CAPABILITY → POLICY → HOST TOOL</div>
+          <SkillBoundaryGraph scenario={scenario}
+            step={phase < 0 ? -1 : phase === 0 ? 0 : phase === 1 ? 1 : phase <= 3 ? 2 : 3}
+            en={en}/>
+        </div>
         <TabsContent
           value={String(scenario)}
           className="sim-tabs-panel"

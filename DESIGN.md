@@ -289,3 +289,70 @@ Run, pause, single-step, reset and scenario switching control a bounded simulati
 Archify workflow specifications live in `preview/handbook-custom/diagrams/`. Delivered HTML owns standalone diagram layout and viewer behavior; do not hand-edit it. Inline PNGs and SVGs are native exports of that exact checked HTML. Chapter 06 places the map behind its full-context disclosure; chapter 07 keeps its overview. Archify's independent delivery, browser and image review receipts live in `evidence/archify/`. The English Memory candidate failed readability after two focused repairs and is not published; the English reader explicitly labels its Chinese diagram fallback.
 
 Before/after 390 and 1440 captures, a 1728 capture, runtime and accessibility checks, and measured spacing for the simulator live in `preview/handbook-custom/evidence/bento/`. `test:learning` covers all five lesson chapters and source-to-render canonical article preservation; `test:concepts` covers the four node diagrams. The terminal simulator additionally uses `node evidence/bento/check.cjs`.
+
+
+## Structural Visualization V3 · Evidence, diagnosis and responsibility
+
+CH05, CH09 and CH12 use three **different topologies** while retaining the same Knowledge Spine aesthetic, responsive text scale and semantic green signal.
+
+- **CH05 · Provenance lineage:** five source-grounded checks (`document → structure → evidence chunk → claim alignment → resolvable citation`). Display the earliest broken link, not a reassuring citation icon when the source cannot be reconstructed. A matching text span is not sufficient evidence for a table cell's row, unit or version.
+- **CH09 · Diagnostic trace tree plus evaluation return loop:** the root run contains observable child runs; trace storage is not the same as an offline golden dataset. Show first-fault investigation, privacy review, labeled regression, release policy and the conditional return of production evidence. A critical authorization regression blocks release regardless of average score.
+- **CH12 · Five responsibility planes plus B1–B7 review checks:** Customer / Workflow, Control, Data, Execution and Evidence / Operations. The previous markdown heading said "four" while its illustration named five. The revised chapter explicitly calls out the five names and enumerates B1–B7 as an authored capstone checklist, **not** universal interfaces.
+- Each chapter retains existing canonical figures. New teaching diagrams are optional lazy-mounted Reader elements and use the shared `#concept-demo` deep link. No second top-level app, no invented datasets or measured latency, and no live retrieval, parsing or execution.
+- Responsive geometry uses the *Reader content container*, not only viewport width. Each scenario control is a real, keyboard-accessible button with selected state, at least 44px high. Color never stands alone; reduced motion, light/dark, zh/en, static text, and readable source notes are required.
+- Keep the current Vercel policy `web/vercel.json → git.deploymentEnabled=false`. Production-facing integration must refresh `web/site` with `publish:web` after validation, as required by `MAINTENANCE.md`; hosted deployment remains manual.
+
+
+
+## Concept Atlas V3.1 · 12/12 chapter labs and dual-layer diagrams
+
+The canonical Atlas now registers **a primary Lab in every chapter**. The two remaining gaps are CH01 and CH02. CH07 and CH11 also gain separate, narrowly scoped **supplemental** visual models; these must not duplicate the original `#concept-demo` anchor.
+
+- **CH01**: A context-responsibility rail, not a fake token-percentage meter. Preserve system/developer constraints and output reserve; identify compressible history, retrieved evidence and durable working state. The Lost-in-the-Middle effect is contextual and requires measurement, not a guaranteed ranking rule.
+- **CH02**: Trust-boundary funnel `Trusted Identity → Candidate ACL → Retrieve/Rerank → Fetch ACL Recheck → Evidence`. When the indexed ACL is stale, fail at source fetch; when tenants differ, reject before the candidate set enters search. The model never grants permission.
+- **CH07**: Two distinct governance lanes, `Write / Promotion` and `Read / Context`. An explicit correction can supersede a scoped version. Inferred facts must never casually override an explicit user constraint; audit/retention policy determines event storage.
+- **CH11**: Three visually distinct rows for source logical sequence, observed arrival order, and SCD2 version intervals. The sequence domain is deliberately *not* presented as physical event time. Duplicate deliveries, out-of-order changes and tombstones each trigger different contract behavior.
+
+Use distinctive geometry for each mental model instead of reusing the generic four-stage timeline. All visual cases are illustrative, with source notes from chapter section numbers; no fabricated benchmark, real customer order or live API call. Keep existing Chapter 07 and 11 Labs untouched while adding second views at `#concept-extension` with no new global Atlas link. New CH01 and 02 Labs use `#concept-demo` and existing Reader deep-link readiness. Enforce 44px controls, labels alongside color, scoped WCAG checks, light/dark, Chinese/English, keyboard and reduced motion. Preserve `git.deploymentEnabled=false`; validate locally and generate `web/site` before a production-facing merge.
+
+
+
+## Graph-first Architecture V3.3 · node/edge readability contract
+
+User-directed upgrade from cardinal teaching panels to **architecture node-edge graphs**. Graphs should explain actual causal, authorization and evidence relationships, not paint decorative arrows between cards.
+
+- Reuse `GraphCanvas`, HTML `GraphNodeData` and directed SVG `GraphEdgeData` from `preview/handbook-custom/src/graph-primitives.tsx` with source-scoped layouts from `graph-models.tsx` and `structural-graph-models.tsx`. Keep nodes and SVG edges on the **same authored viewBox coordinate grid**; node CSS must remain `position:absolute`. Different geometry for desktop and compact Reader containers; never merely shrink wide topology.
+- Edge semantics: forward sequence, conditional branch, denied/blocked path, cross-lane identity mapping, and explicit feedback. Active states highlight **both nodes and edges**; an optional/unselected edge remains visible but subordinate. A blocked edge does not certify a call occurred. Unknown or not-highlighted nodes must not be described as “not executed” without evidence.
+- CH01: input task → context allocator → five allocation policy branches, with **one separate assembly spine**. Output reserve is not an extra prompt evidence source; removing all five fake converging “include” arrows both improves readability and prevents a wrong mental model. No quantitative token shares.
+- CH02: Trusted identity → candidate ACL gate → authorized set → retrieval → source-level recheck → evidence in context, with separate rejection branches at candidate and fetch authorization.
+- CH05: PDF version/page → structure → evidence element → claim support → resolvable citation. Broken table and uncertain OCR cases lead to explicit source repair/review, not invented citations.
+- CH07: Memory promotion and permission-filtered read are distinct connected lanes. The versioned store connects read/write; explicit correction returns to versioned memory and forces view re-evaluation.
+- CH09: A root trace with four possible diagnostic child Runs leads through trace triage, privacy-reviewed dataset curation, slice regression and a release gate. Safety regressions **block**; no failed gate may enter Shadow / Canary. “Not highlighted” does not assert an unobserved execution step was skipped.
+- CH11: Source version/sequence, observed ingestion order and SCD2 **sequence-domain** history are three independent lanes. Use identity-matched curved mapping edges for out-of-order events instead of overlaying ambiguous mid-lane elbow lines; duplicate delivery has a rejection edge, tombstone follows the documented delete contract.
+- CH12: Five canonical responsibility planes and two visible trust gates B4 (tenant-scoped read) / B6 (write approval) form a graph; seven B1–B7 review checks remain readable below it. Separate the real feedback edge from any imagined host write authorization.
+- For every diagram verify 390/768/1440/1728px and zh/en, both themes, keyboard scenario controls, 44px minimum touch targets, 0 horizontal clipping. Use actual screenshot review **in addition to** component-scoped axe checks; a passing DOM test alone does not guarantee aligned edges. Annotate invented scenarios as instructional, not live events.
+- Preserve `web/vercel.json` with `git.deploymentEnabled=false`. Follow the manual validation, generated-artifact and deployment workflow in `MAINTENANCE.md`.
+
+
+
+## Graph-first V3.4 · Remaining architecture chapters
+
+All 12 chapters retain one primary Lab; **CH03, CH04, CH06, CH08 and CH10 now expose graph-node/edge topology** on the existing primary interactive lesson, building on the earlier seven-chapter graph-first upgrade. Use the same system GraphCanvas, CSS tokens, responsive viewBox layouts and accessible HTML node labels. The graph appears first; previous high-density inspection panels are preserved **inside native details/summary disclosures**, not deleted or exposed as a redundant second main graphic.
+
+- **CH03 / Query Routing:** Query analysis → trusted ACL/tenant/version scope → route planner. Five optional paths (Exact, BM25, Dense, Graph, source documents) lead into candidate fusion, then evidence validation. Scenario selection highlights exactly two relevant branches; raw BM25 and cosine scores cannot be added, and RRF ranking does not prove any claim.
+- **CH04 / Six Evidence Gates:** G0–G5 connect to separate ANSWER, RESOLVE/ESCALATE, and RETRIEVE_MORE/ABSTAIN outcomes. With CONFLICT or INSUFFICIENT evidence, **G4 Claim Verification remains blocked**; G5 policy may still choose a safe non-answer decision. Do not depict those cases as verified claims.
+- **CH06 / Skill, Tool and MCP:** Task → Skill Registry match → trusted input/ACL Gate → on-demand SKILL.md → authorized Host tool (MCP only when applicable) → verification. Missing input goes to CLARIFY; cross-tenant attempts to REJECT before loading instructions or invoking tools. Skill matching ≠ authorization; skill method ≠ API/tool protocol.
+- **CH08 / Bounded Agent Loop:** Show Plan → Act → Observe → Check with actual controlled retry/back-edge for the scenario with a second round; graph tracks existing lesson step. STOP requires verified criteria; budget exhaustion leads to HANDOFF, not fictitious success. Retried tools always require remaining budget and authorization.
+- **CH10 / Prefix KV Serving:** Request tokens → cache namespace/key Gate → exact token prefix → cached prefix KV blocks (if present) → suffix Prefill → independent Decode. In isolated-tenant scenarios, deny cache cross-scope reuse and use independent Prefill. Prefix cache is not cross-user mutable Agent session state.
+- **Visual truth:** Nodes must align with SVG edge endpoints and remain within the stage at 390/768/1440/1728px across zh/en and light/dark. Use text alongside edge style; show blocked, pending and alternative routes distinctly. Browser audits must inspect **specific edge IDs** and selected states—not merely count card elements. Preserve source terms, correct step timing, keyboard/motion/44px controls, chapter anchors and quiz.
+- **Release:** Keep `web/vercel.json` `git.deploymentEnabled: false`. Run local checks and `publish:web` before a production-facing merge; publish Vercel only within an authorized release.
+
+
+
+## Graph-first V3.5 · density and duplication review
+
+Visual review of 390px Reader screenshots found CH03 routing's compact stage unnecessarily tall (1140px), with unused air between five route choices and fusion. The refined compact stage is **925px**; all five choices, exactly two selected routes, authorization scope, candidate fusion, and evidence verification stay readable with left/right edge corridors. CH04, CH06 and CH10 trim unused canvas tails as their authored layouts allow. This is visual density improvement, not measured runtime performance.
+
+Avoid a second large node/card diagram immediately above a GraphCanvas teaching the same stages. On CH03/CH04/CH08 the old four-stage seek cards remain usable inside native `concept-step-inspector` disclosures, closed by default. Their step/next/previous/autoplay/round-two seeking logic remains owned by the original LessonPlayer; don't duplicate that state. Claim, provenance, token, and trust-boundary **detail panels remain available** via their established disclosures. Keep CH06/CH07 optional zoomable Archify maps; those are a distinct source-backed deep-inspection experience, not disposable duplicate assets.
+
+For compact branching graphs, test the actual **selected SVG edge segments** against the bounding boxes of unrelated HTML nodes, not only horizontal overflow. A clear flow needs whitespace around boundaries, not arbitrary whitespace between every node. V3.5 evidence and chapter-by-chapter disposition: `preview/handbook-custom/evidence/graph-duplication-audit.md`. Automatic hosted deployment remains disabled; release follows `MAINTENANCE.md`.

@@ -38,7 +38,8 @@ fs.mkdirSync(out, { recursive: true });
         // Compare all canonical article text, excluding the newly inserted teaching module.
         const preserved = await page.locator(".canonical-content").evaluate((node) => {
           const clone = node.cloneNode(true);
-          clone.querySelectorAll(".concept-slot,.jev-dfc-root,[data-arch-title],[data-arch-desc],[data-arch-score]").forEach(n => n.remove());
+          // Exclude both optional portal owners; compare every original article node unchanged.
+          clone.querySelectorAll(".concept-slot,.atlas-mental-slot,.jev-dfc-root,[data-arch-title],[data-arch-desc],[data-arch-score]").forEach(n => n.remove());
           return clone.textContent.replace(/\s+/g, " ").trim();
         });
         const payload = JSON.parse(fs.readFileSync(path.join(__dirname, "../public/content", slug + ".json")));

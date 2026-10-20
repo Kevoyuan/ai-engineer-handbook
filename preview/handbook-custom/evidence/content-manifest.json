@@ -1,15 +1,15 @@
 [
   {
     "slug": "01-model-api-context-foundations",
-    "sections": 15,
-    "supplements": 2,
-    "characters": 8667
+    "sections": 16,
+    "supplements": 3,
+    "characters": 9215
   },
   {
     "slug": "02-enterprise-retrieval",
-    "sections": 4,
-    "supplements": 3,
-    "characters": 4863
+    "sections": 5,
+    "supplements": 4,
+    "characters": 5702
   },
   {
     "slug": "03-hybrid-retrieval-query-routing",
@@ -37,9 +37,9 @@
   },
   {
     "slug": "07-memory-context-engineering",
-    "sections": 7,
-    "supplements": 5,
-    "characters": 7948
+    "sections": 8,
+    "supplements": 6,
+    "characters": 8800
   },
   {
     "slug": "08-agent-orchestration",
@@ -49,9 +49,9 @@
   },
   {
     "slug": "09-reliability-evaluation-observability",
-    "sections": 30,
-    "supplements": 10,
-    "characters": 38851
+    "sections": 31,
+    "supplements": 11,
+    "characters": 39513
   },
   {
     "slug": "10-serving-deployment-ai-platform",
@@ -69,6 +69,6 @@
     "slug": "12-fde-customer-delivery",
     "sections": 21,
     "supplements": 3,
-    "characters": 16151
+    "characters": 16607
   }
 ]
