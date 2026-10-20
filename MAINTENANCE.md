@@ -260,6 +260,13 @@ npm run test:ui
 npm run test:a11y
 npm run test:concepts
 npm run test:learning
+# For the chapter graph labs:
+npm run test:atlas
+npm run test:structures
+npm run test:structure-browser
+npm run test:mental-browser
+npm run test:remaining-graphs
+npm run test:decision-traces
 ```
 
 Run the tests relevant to the changed surface at minimum; substantial UI changes should exercise the full set.
@@ -287,7 +294,7 @@ npm run dev -- --port 4180
 node evidence/surface-ui-audit.cjs
 ```
 
-This script checks Atlas, Notebook, Concept, system architecture and chapters 01–10 at 390/768/1440/1728px across two locale/theme states (112 route × viewport × state combinations), plus search and Notebook interaction flows and six representative automated accessibility surfaces. It is a **manual regression tool, not currently a mandatory CI gate**; do not treat its earlier pass as proof that a later change remains correct.
+This script checks Atlas, Notebook, Concept, system architecture and chapters 01–12 at 390/768/1440/1728px across two locale/theme states (128 route × viewport × state combinations), plus search and Notebook interaction flows and six representative automated accessibility surfaces. It is a **manual regression tool, not currently a mandatory CI gate**; do not treat its earlier pass as proof that a later change remains correct.
 
 For affected specialty components also run:
 

@@ -1,5 +1,5 @@
 // Cross-surface UI regression: inspect shipped Atlas, Notebook, Search, Concept,
-// Architecture and all ten Reader chapters. DOM geometry is measured in a real browser.
+// Architecture and all twelve Reader chapters. DOM geometry is measured in a real browser.
 const { chromium } = require("../node_modules/playwright");
 const AxeBuilder = require("../node_modules/@axe-core/playwright").default;
 const assert = require("node:assert/strict");
@@ -11,6 +11,7 @@ const routes = [
   "05-document-pdf-rag", "06-skills-routing",
   "07-memory-context-engineering", "08-agent-orchestration",
   "09-reliability-evaluation-observability", "10-serving-deployment-ai-platform",
+  "11-data-sql-engineering", "12-fde-customer-delivery",
 ].map(x => x.startsWith("#") ? x : "#read/" + x);
 const errors = [];
 const records = [];
@@ -33,7 +34,7 @@ const records = [];
         for (const route of routes) {
           await page.goto(base + route);
           await page.locator("#content").waitFor();
-          if (route.includes("#read/") && /03-|04-|06-|07-|08-/.test(route))
+          if (route.includes("#read/"))
             await page.locator("#concept-demo").waitFor({ timeout: 25000 });
           await page.evaluate(() => document.fonts.ready);
           const state = await page.evaluate(() => {
@@ -94,7 +95,7 @@ const records = [];
     await page.locator(".result").first().waitFor();
     await page.keyboard.press("Escape");
     assert.equal(await page.getByRole("dialog").count(),0);
-    await page.locator(".atlas-node-row").first().getByRole("button").click();
+    await page.locator(".atlas-node-row").first().getByRole("button", {name:/^收藏 /}).click();
     await page.goto(base + "#home/saved");
     await page.locator(".notebook-row").first().waitFor();
     assert.equal(await page.locator(".notebook-row").count(),1);
