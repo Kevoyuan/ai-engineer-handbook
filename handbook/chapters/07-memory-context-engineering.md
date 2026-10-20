@@ -850,6 +850,7 @@ Sources:
 - https://okf.md/
 - https://okf.md/spec/
 
+
 ## Canonical rules
 
 > **The transcript is not the state.**
@@ -1293,3 +1294,57 @@ External verification: 2026-10-13. Sources:
 Technical cross-reference: Chapter 10 §10.1–10.5 owns KV / Prefix Cache serving internals. Chapter 07 owns what to place in the context, what to externalize and when to compact.
 
 2026-10-20 补充核对：[Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) 的相同前缀与变化 suffix 边界、[Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows) 的输入/输出容量计数。新增用户笔记与已有本节高度重合；本轮只补充滑动窗口反例、预留容量与安全裁剪规则，未采纳“外部记忆让任务无限运行”“结构化摘要必然更少幻觉”“缓存必定省显存”等无实测保证的断言。详见 [处理记录](../verification/2026-10-20-inbox-rerank-context.md)。
+
+### 7.13.11 按内容类型压缩与 Compaction Receipt
+
+本节补充 §7.13.6 的输出裁剪与快照契约；上游 evidence selection 归 CH02/03，端到端对照实验归 §9.25。检索、压缩与精确前缀缓存仍是三个独立杠杆。
+
+来源：[Headroom 新闻介绍](https://aiengineering.beehiiv.com/p/reduce-ai-agent-token-costs-by-95) 提供产品线索；实现限制以 [官方 README](https://github.com/headroomlabs-ai/headroom) 与 LIMITATIONS 为准。[Agentic Context Management 预印本](https://arxiv.org/abs/2607.21503) 提出管理上下文生命周期的思路，其自报 benchmark 不作为本手册的生产保证。
+
+#### Headroom：按内容类型做有损压缩，保留原件恢复通道
+
+~~~text
+Tool outputs (JSON rows, logs, source code, prose)
+           ↓
+Guardrails: protected messages / active debugging context
+           ↓
+ContentRouter
+  ├─ structured arrays → sampling + anomalies + dedup
+  ├─ plain text        → content-dependent semantic compaction
+  └─ code              → AST-aware only when safe; often passthrough
+           ↓
+Small evidence view + pointer to original (CCR / retrieval)
+           ↓
+LLM may request original when summary is insufficient
+~~~
+
+**实现版本修正（2026-10-08 核对项目 README / LIMITATIONS）**：新闻稿提到的 IntelligentContext 已在上游项目后续版本退役；当前 README 明确将 CacheAligner → ContentRouter → compressors 作为流水线，并指出 CacheAligner 标记易变内容以保护精确 prefix，不应写成“自动修改任何 Prompt 就会提高 cache hit”。配置、压缩器与保护逻辑会随项目版本变化，部署时必须固定版本验证。
+
+[Headroom 官方限制文档](https://github.com/headroomlabs-ai/headroom/blob/main/wiki/LIMITATIONS.md) 给出的示例范围体现巨大类型差异：JSON 对象数组 86–100%、结构化日志 82–95%、纯文本文档约 43–46%，而某些代码及 RAG 文档上下文默认 passthrough；这些是**项目自报的分场景指标**，不是随机企业 Agent 的保证。该项目还保护近期代码和调试相关内容，以免删除正在排查的行与错误。
+
+推荐的生产 Compaction Receipt：
+
+~~~yaml
+compaction:
+  source_event_range: [start_event_id, end_event_id]
+  input_context_hash: source_digest
+  compact_view_version: v3
+  preserved:
+    - active_goal
+    - confirmed_entities_with_source_ids
+    - nonnegotiable_constraints
+    - permission_and_scope_refs
+    - unresolved_questions
+    - critical_errors_and_tool_results
+  recoverable_sources: [event_log_pointer, artifact_pointer]
+  validation:
+    constraint_recall: pass
+    entity_and_number_checks: pass
+    source_pointer_integrity: pass
+    permission_scope_check: pass
+  on_failure: retry_with_more_context_or_reopen_raw
+~~~
+
+Receipt 是**本手册建议的实现契约**，并非文章或 Headroom 固定 API。原则是关键事实和 provenance 仍可从受控原文重建；摘要既不是授权来源，也不能覆盖最新的可信系统状态。
+
+**失败处理**：关键事实校验失败或原始指针不可恢复时，按当前权限重新打开原件或扩大上下文；不得以压缩率代替正确性与授权检查。
