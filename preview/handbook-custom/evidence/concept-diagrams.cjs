@@ -47,15 +47,10 @@ fs.mkdirSync(out, { recursive: true });
                 e.scrollIntoView({ block: "start", behavior: "instant" }),
               );
               assert.equal(await page.locator("#concept-demo").count(), 1);
-              assert.equal(
-                await page
-                  .getByRole("button", {
-                    name: en ? "Interactive diagram" : "交互图解",
-                    exact: true,
-                  })
-                  .isEnabled(),
-                true,
-              );
+              assert.equal(await demo.locator("#concept-title").isVisible(),true,
+                "The current Reader routes directly to the chapter's interactive Lab");
+              assert.equal(await demo.locator(".concept-examples #concept-example").count(),1,
+                "Scenario selection is available in the actual Reader, not a legacy nav button");
               for (const example of ["0", "1", "2"]) {
                 await demo.locator("select").selectOption(example);
                 assert.match(
@@ -93,11 +88,21 @@ fs.mkdirSync(out, { recursive: true });
                   await demo.locator(".concept-position").innerText(),
                   new RegExp("^" + (count - 1) + " /"),
                 );
+                const stageMap=demo.locator(".concept-step-inspector");
+                if(await stageMap.count()){
+                  if(example==="0")assert.equal(await stageMap.getAttribute("open"),null,
+                    "Duplicate 4-card topology is initially collapsed");
+                  if((await stageMap.getAttribute("open"))===null)
+                    await stageMap.locator("summary").click();
+                }
                 await demo.locator(".concept-node").first().click();
-                assert.match(
-                  await demo.locator(".concept-position").innerText(),
-                  /^1 \/ /,
-                );
+                const jumpPosition=await demo.locator(".concept-position").innerText();
+                // CH08 remains in the second round after a retry; Plan is
+                // round-aware and must seek to step 5/8, never silently 1/8.
+                if(slug.startsWith("08")&&example==="1")
+                  assert.match(jumpPosition,/^5 \/ 8/,
+                    "Retry scenario stage seeks must stay in round two");
+                else assert.match(jumpPosition,/^1 \/ /);
               }
               await demo.locator("select").selectOption("0");
               await page.waitForTimeout(250);
@@ -131,6 +136,11 @@ fs.mkdirSync(out, { recursive: true });
                 .include("#concept-demo")
                 .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
                 .analyze();
+              if(axe.violations.length)
+                console.error("CONCEPT AXE DETAIL",slug,width,{en,dark,reduce},
+                  JSON.stringify(axe.violations.map(v=>({
+                    id:v.id,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))
+                  }))));
               assert.deepEqual(
                 axe.violations.map((v) => ({
                   id: v.id,
@@ -193,15 +203,11 @@ fs.mkdirSync(out, { recursive: true });
       await r.continue();
     });
     await page.goto(base + "#read/" + routes[0]);
-    const shortcut = page.getByRole("button", {
-      name: "交互图解",
-      exact: true,
-    });
-    await shortcut.waitFor();
-    if (!(await page.locator("#concept-demo").count()))
-      assert.equal(await shortcut.isDisabled(), true);
+    // The current Reader mounts its optional Lab automatically at the
+    // canonical section: the former "Interactive diagram" nav shortcut
+    // no longer exists. Delayed chunks must still become interactive.
     await page.locator("#concept-demo").waitFor();
-    await shortcut.click();
+    assert.equal(await page.locator("#concept-title").isVisible(),true);
     const demo = page.locator("#concept-demo");
     await demo.getByRole("button", { name: "播放", exact: true }).click();
     await assert.doesNotReject(() =>
@@ -242,16 +248,22 @@ fs.mkdirSync(out, { recursive: true });
     assert.deepEqual(errors, []);
     // A failed optional module must not take down the chapter.
     const failurePage = await browser.newPage();
+    // Vite dev requests /src/concept-diagrams.tsx, whereas production
+    // bundles request concept-diagrams-<hash>.js. Exercise the same
+    // optional-chunk error boundary in either environment.
+    const conceptChunk = target => { const url = String(target); return url.includes("/concept-diagrams.tsx") || (url.includes("/concept-diagrams-") && url.split("?")[0].endsWith(".js")); };
     const blockModule = r => r.abort("failed");
-    await failurePage.route("**/concept-diagrams-*.js", blockModule);
+    await failurePage.route(conceptChunk, blockModule);
     await failurePage.goto(base + "#read/" + routes[0]);
     await failurePage.getByRole("alert").waitFor();
     assert.equal(await failurePage.locator(".canonical-content").isVisible(), true);
-    assert.equal(await failurePage.getByRole("button", { name: "交互图解", exact: true }).isDisabled(), true);
-    await failurePage.unroute("**/concept-diagrams-*.js", blockModule);
+    assert.equal(await failurePage.locator("#concept-demo").count(),0,
+      "Failed optional Lab must not create an invalid interactive shell");
+    await failurePage.unroute(conceptChunk, blockModule);
     await failurePage.getByRole("button", { name: "重新加载", exact: true }).click();
     await failurePage.locator("#concept-demo").waitFor();
-    assert.equal(await failurePage.getByRole("button", { name: "交互图解", exact: true }).isEnabled(), true);
+    assert.equal(await failurePage.locator("#concept-title").isVisible(),true,
+      "Recovery should restore the Lab in the current Reader");
     await failurePage.close();
     fs.writeFileSync(
       out + "/results.json",

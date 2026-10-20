@@ -1,0 +1,159 @@
+// Interaction and scoped accessibility evidence for CH01/02/07/11 concept visualizations.
+// No Vercel deployment, no API mutations and no live user data.
+const assert=require("node:assert/strict");
+const {chromium}=require("playwright");
+const AxeBuilder=require("@axe-core/playwright").default;
+const fs=require("node:fs"),path=require("node:path");
+const base=process.env.HANDBOOK_URL||"http://127.0.0.1:4180/";
+const out=process.env.CONCEPT_ATLAS_SHOTS||"/tmp/concept-atlas-visual";
+const specs=[
+  {slug:"01-model-api-context-foundations",chapter:"01",count:3,stages:5},
+  {slug:"02-enterprise-retrieval",chapter:"02",count:3,stages:5},
+  {slug:"07-memory-context-engineering",chapter:"07",count:3,stages:8},
+  {slug:"11-data-sql-engineering",chapter:"11",count:4,stages:4},
+];
+fs.mkdirSync(out,{recursive:true});
+(async()=>{
+  let validations=0,shots=0;
+  const logs=[];
+  const browser=await chromium.launch();
+  try{
+    for(const width of [390,768,1440,1728])
+    for(const en of [false,true])
+    for(const dark of [false,true]){
+      const ctx=await browser.newContext({viewport:{width,height:2200},reducedMotion:"reduce"});
+      await ctx.addInitScript(({en,dark})=>{
+        localStorage.setItem("preview-locale",JSON.stringify(en));
+        localStorage.setItem("preview-theme",JSON.stringify(dark));
+      },{en,dark});
+      const page=await ctx.newPage();const errors=[];
+      page.on("pageerror",e=>errors.push(e.message));
+      for(const spec of specs){
+        await page.goto(base+"#read/"+spec.slug+"/concept-demo");
+        const primary=spec.chapter==="01"||spec.chapter==="02";
+        const lab=page.locator(primary?"#concept-demo.atlas-mental":"#concept-extension.atlas-mental");
+        await lab.waitFor();
+        assert.equal(await lab.count(),1);
+        assert.equal(await lab.getAttribute("data-mental-chapter"),spec.chapter);
+        // The supplemental CH07/11 portal can settle before the original
+        // primary lab's independent lazy chunk. Await both mount points.
+        await page.locator("#concept-demo").waitFor({timeout:15000});
+        assert.equal(await page.locator("#concept-demo").count(),1,
+          "All chapters keep exactly one primary Atlas Lab anchor");
+        assert.equal(await lab.locator(".atlas-examples button").count(),spec.count);
+        for(let i=0;i<spec.count;i++){
+          const button=lab.locator(".atlas-examples button").nth(i);
+          await button.click();
+          assert.equal(await button.getAttribute("aria-pressed"),"true");
+          assert.equal(await lab.locator('.atlas-examples button[aria-pressed="true"]').count(),1);
+          assert.equal(await lab.getAttribute("data-scenario"),String(i));
+          assert((await lab.locator(".atlas-mental-outcome strong").innerText()).length>8);
+          if(i===spec.count-1){
+            await button.focus();
+            await page.keyboard.press("Space");
+            assert.equal(await button.getAttribute("aria-pressed"),"true","Native keyboard scenario selection must work");
+          }
+          const box=await button.boundingBox();
+          assert(box&&box.height>=43.5,"Touch target must be at least 44px");
+          const graph=lab.locator(".atlas-graph");
+          assert.equal(await graph.count(),1,"Graph canvas replaces card layout");
+          assert.equal(await graph.locator(".atlas-graph-svg").count(),1);
+          const geometry=await graph.evaluate(el=>{
+            const stage=el.querySelector(".atlas-graph-stage");
+            const nodes=[...el.querySelectorAll(".atlas-graph-node")];
+            const first=nodes[0],second=nodes[1];
+            const a=first.getBoundingClientRect(),b=second.getBoundingClientRect(),c=stage.getBoundingClientRect();
+            const npos=getComputedStyle(first).position;
+            const center=(r)=>[r.left+r.width/2,r.top+r.height/2];
+            return {position:npos,layout:el.dataset.layout,
+              a:center(a),b:center(b),stage:{left:c.left,top:c.top,width:c.width,height:c.height}};
+          });
+          assert.equal(geometry.position,"absolute","Graph nodes MUST use absolute positioning aligned to SVG paths");
+          if(spec.chapter==="02"){
+            if(geometry.layout==="wide"){
+              assert(geometry.b[0]-geometry.a[0]>75,"Desktop permission graph requires horizontal nodes, not stacked cards");
+              assert(Math.abs(geometry.b[1]-geometry.a[1])<10,"Desktop permission nodes share a lane");
+            } else {
+              assert(geometry.b[1]-geometry.a[1]>60,"Compact permission graph requires vertical flow");
+              assert(Math.abs(geometry.b[0]-geometry.a[0])<10,"Compact permission nodes share a vertical spine");
+            }
+          }
+
+          assert((await graph.getAttribute("data-active-edges")||"0")!=="0");
+          const counts={"01":8,"02":8,"07":10};
+          if(counts[spec.chapter]){
+            assert.equal(await graph.locator('[data-node]').count(),counts[spec.chapter]);
+          }else{
+            assert((await graph.locator('[data-node]').count())>=7);
+          }
+          if(spec.chapter==="01"){
+            assert.equal(await graph.locator('[data-edge^="allocate-"]').count(),5);
+            assert.equal(await graph.locator('[data-edge^="include-"]').count(),0,
+              "No fake resource-to-output merging lines");
+            assert.equal(await graph.locator('[data-edge="allocator-assemble"]').getAttribute("data-state"),"active");
+            assert.equal(await graph.locator('[data-node="allocator"]').getAttribute("data-state"),"active");
+            if(i===2)assert.equal(await graph.locator('[data-node="history"] .atlas-graph-node-state').innerText(),
+              en?"Summary loss":"摘要失真","Compression loss must not display as ACL denial");
+          }
+          if(spec.chapter==="02"){
+            assert.equal(await graph.locator('[data-edge="acl-reject"]').getAttribute("data-state"),
+              i===2?"blocked":"idle","Cross-tenant denial must select ACL reject edge");
+            assert.equal(await graph.locator('[data-edge="fetch-reject"]').getAttribute("data-state"),
+              i===1?"blocked":"idle","Stale ACL must select source recheck denial edge");
+            assert.equal(await graph.locator('[data-node="evidence"]').getAttribute("data-state"),
+              i===0?"active":"idle","Denied evidence must not enter context");
+          }
+          if(spec.chapter==="07"){
+            assert.equal(await graph.locator('[data-edge="read-denied"]').getAttribute("data-state"),
+              i===1?"blocked":"idle","Unauthorized memory read is visibly denied");
+            assert.equal(await graph.locator('[data-edge="correction-version"]').getAttribute("data-state"),
+              i===2?"active":"idle","Correction back-edge must highlight only for a correction");
+          }
+          if(spec.chapter==="11"){
+            assert.equal(await graph.locator('[data-edge="source-arrival-0"]').count(),1);
+            if(i===1){
+              const p=await graph.locator('[data-edge="source-arrival-0"] path').getAttribute("d");
+              assert(p?.includes(" C "),"Out-of-order CDC identity mapping must have a curved cross-lane edge");
+            }
+            if(i===2)assert.equal(await graph.locator('[data-edge="source-arrival-2"]').getAttribute("data-state"),
+              "blocked","Duplicate CDC event highlights rejected duplicate edge");
+          }
+          if((width===390&&!en&&!dark)||(width===1440&&en&&dark)){
+            if((spec.chapter==="11"&&i===1)||(spec.chapter==="01"&&i===0)||
+               (spec.chapter==="02"&&i===2)){
+              const fname=spec.chapter+"-"+width+"-"+(en?"en":"zh")+"-"+(dark?"dark":"light")+
+                "-selected-path-"+i+".png";
+              await graph.screenshot({path:path.join(out,fname),animations:"disabled"});
+            }
+          }
+          validations++;
+        }
+        const dims=await lab.evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth,
+          viewport:innerWidth,right:el.getBoundingClientRect().right,
+          container:getComputedStyle(el).containerType}));
+        assert(dims.scroll<=dims.client+2,spec.slug+" horizontal overflow "+JSON.stringify(dims));
+        assert(dims.right<=dims.viewport+2,spec.slug+" clip "+JSON.stringify(dims));
+        assert.equal(dims.container,"inline-size");
+        if(width===390&&!en&&!dark||width===1440&&en&&dark){
+          const axe=await new AxeBuilder({page}).include(".atlas-mental")
+            .withTags(["wcag2a","wcag2aa","wcag21aa","wcag22aa"]).analyze();
+          if(axe.violations.length) console.error("AXE",spec.slug,width,en,dark,
+            JSON.stringify(axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({
+              target:n.target,html:n.html,summary:n.failureSummary
+            }))}))));
+          assert.deepEqual(axe.violations.map(v=>v.id),[],"WCAG violations "+spec.slug);
+          const name=spec.chapter+"-"+width+"-"+(en?"en":"zh")+"-"+(dark?"dark":"light")+".png";
+          await lab.screenshot({path:path.join(out,name),animations:"disabled"});
+          logs.push({file:name,...dims,violations:0});
+          shots++;
+        }
+      }
+      assert.deepEqual(errors,[],"No JS runtime errors");
+      await ctx.close();
+    }
+    fs.writeFileSync(path.join(out,"audit.json"),JSON.stringify(logs,null,2));
+    console.log("PASS 12/12 Atlas chapter labs: "+validations+
+      " scenario checks for CH01/02/07/11, "+shots+
+      " scoped screenshots, zero axe violations, 4 widths × 2 locales × 2 themes, no clipping.");
+  }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1;});

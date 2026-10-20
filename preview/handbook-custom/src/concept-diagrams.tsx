@@ -621,43 +621,10 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
     setPlaying(false);
     setStep(next);
   };
-  if (lesson.anchor === "capability-architecture-title") return <SkillSimulator lesson={lesson} en={en} rootRef={root} />;
-  return (
-    <section
-      ref={root}
-      id="concept-demo"
-      className="concept-demo"
-      aria-labelledby="concept-title"
-      data-bd-group="concept-demo"
-    >
-      <header className="concept-heading">
-        <h3 id="concept-title">{t(lesson.title)}</h3>
-        <p>{t(lesson.intro)}</p>
-      </header>
-      <ArchifyOverview anchor={lesson.anchor} en={en} />
-      <div className="concept-examples">
-        <label htmlFor="concept-example">
-          {en ? "Choose an example" : "选择示例"}
-        </label>
-        <select
-          id="concept-example"
-          value={example}
-          onChange={(e) => {
-            setExample(Number(e.target.value));
-            seek(0);
-          }}
-        >
-          {lesson.examples.map((e, i) => (
-            <option key={i} value={i}>
-              {t(e.label)}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="concept-input">
-        <span>{en ? "Example" : "示例"}</span>
-        <p>{t(scenario.input)}</p>
-      </div>
+  const graphFirst = ["dg2-query-routing","fig-4-1","fig-8-loop-vs-graph"].includes(lesson.anchor);
+  // The directed graph is the primary visual. This four-step seek map stays
+  // accessible on demand rather than repeating the architecture above it.
+  const flowMap = (
       <div
         className="concept-flow"
         role="group"
@@ -722,6 +689,50 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
           </div>
         ))}
       </div>
+  );
+  if (lesson.anchor === "capability-architecture-title") return <SkillSimulator lesson={lesson} en={en} rootRef={root} />;
+  return (
+    <section
+      ref={root}
+      id="concept-demo"
+      className="concept-demo"
+      aria-labelledby="concept-title"
+      data-bd-group="concept-demo"
+    >
+      <header className="concept-heading">
+        <h3 id="concept-title">{t(lesson.title)}</h3>
+        <p>{t(lesson.intro)}</p>
+      </header>
+      <ArchifyOverview anchor={lesson.anchor} en={en} />
+      <div className="concept-examples">
+        <label htmlFor="concept-example">
+          {en ? "Choose an example" : "选择示例"}
+        </label>
+        <select
+          id="concept-example"
+          value={example}
+          onChange={(e) => {
+            setExample(Number(e.target.value));
+            seek(0);
+          }}
+        >
+          {lesson.examples.map((e, i) => (
+            <option key={i} value={i}>
+              {t(e.label)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="concept-input">
+        <span>{en ? "Example" : "示例"}</span>
+        <p>{t(scenario.input)}</p>
+      </div>
+      {graphFirst ? (
+        <details className="concept-step-inspector">
+          <summary>{en ? "Inspect 4-step navigation / jump to a stage" : "展开四阶段导航 / 跳转到指定步骤"}</summary>
+          {flowMap}
+        </details>
+      ) : flowMap}
       {lesson.anchor === "fig-8-loop-vs-graph" && (
         <div className="concept-loop" data-return={step >= 4}>
           <span aria-hidden="true">↶</span>
