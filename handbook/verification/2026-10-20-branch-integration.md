@@ -38,7 +38,7 @@ All four new section numbers are unique. The manifest preserves existing main re
 - `surface-ui-audit`: 128 route/viewport/locale/theme layouts, Search/Notebook flows and six accessibility surfaces.
 - Published artifact served locally: 20 chapter/locale/width cases across CH01/02/07/09/12, English text without CJK leakage in changed content, unique anchors, twelve labs and two search navigation cases.
 - `web/validate.mjs`: 13 canonical semantic modules, 12 web chapters, 54 fragments, 73 HTML files; no duplicate IDs or broken local links.
-- Syntax checks of legacy app/search/interactions/rebuild scripts and changed test files; `git diff --check`: passed.
+- Syntax checks of legacy app/search/interactions/rebuild scripts and changed test files: passed. Source diff whitespace checks pass. Vite-generated JavaScript retains five whitespace-only template-literal lines, also present in the original main bundle; a whole-artifact `git diff --check` reports those lines. The generated bundle was not hand-edited.
 - Two native review passes of the repaired content/runtime: no remaining actionable findings. Test-gate changes were inspected separately; no assertion of original article preservation was removed.
 
 ## Limits and delivery boundary
