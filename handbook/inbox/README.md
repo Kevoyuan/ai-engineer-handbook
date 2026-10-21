@@ -6,6 +6,11 @@
 
 已处理的原文保留在 `processed/`，顶部记录状态、日期、原文 SHA-256、正式章节和处理报告。`processed` 表示已完成阅读与提炼，不表示原文全部正确或已经发布。
 
+## 已处理 · 2026-10-21
+
+- [Agent 记忆机制面试稿](processed/怎么设计Agent记忆机制？.md) → [第 7 章](../chapters/07-memory-context-engineering.md) §7.14（Retention 与 Forgetting）。分层与生命周期部分与 §7.1、§7.10 重合，未新增语义；面试口述版移入 [archive/interview](../../archive/interview/agent-memory-layering-interview.md)。
+- [纠错与验证记录](../verification/2026-10-21-inbox-agent-memory.md)。
+
 ## 已处理 · 2026-10-20
 
 - [Agent 上下文预算](processed/Agent%20上下文快要撑满了，该怎么办？.md) → [第 7 章](../chapters/07-memory-context-engineering.md) §7.13。

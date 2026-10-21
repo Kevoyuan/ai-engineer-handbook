@@ -151,6 +151,10 @@
     {
       "path": "/assets/ch07-validated-context-optimization.html",
       "id": "validated-context-optimization"
+    },
+    {
+      "path": "/assets/ch07-memory-retention.html",
+      "id": "memory-retention"
     }
   ],
   "10-serving-deployment-ai-platform": [

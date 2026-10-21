@@ -867,6 +867,12 @@ Sources:
 
 > **Correction should supersede a memory with lineage; newer does not automatically mean more authoritative.**
 
+> **Expiry, decay and eviction change recall priority or storage tier; they are not deletion.**
+
+> **Authoritative constraints and permissions do not decay from disuse; they end by validity or explicit correction.**
+
+> **Deletion is a compliance action that must reach derived views, indexes and caches, not just the primary record.**
+
 
 ## Verification boundary · 2026-09-28
 
@@ -1348,3 +1354,122 @@ compaction:
 Receipt 是**本手册建议的实现契约**，并非文章或 Headroom 固定 API。原则是关键事实和 provenance 仍可从受控原文重建；摘要既不是授权来源，也不能覆盖最新的可信系统状态。
 
 **失败处理**：关键事实校验失败或原始指针不可恢复时，按当前权限重新打开原件或扩大上下文；不得以压缩率代替正确性与授权检查。
+
+## 7.14 Retention 与 Forgetting：过期、衰减、淘汰、删除不是一回事
+
+只有写入和召回、没有保留策略的 Memory，会在几个月内变成噪声库：过时事实仍被召回、低价值片段挤占 Top-K、合规要求删除的内容还留在索引与摘要里。所以遗忘不是“定期清理脚本”，而是一组必须显式定义的保留策略。
+
+### 7.14.1 四种“遗忘”要先分开
+
+| 机制 | 改变什么 | 事实是否仍成立 | 典型实现 |
+|---|---|---|---|
+| Retention expiry | `valid_to` 到期，默认退出召回 | 否，时间上已不成立 | 有效期字段 + 召回前过滤 |
+| Salience decay | 排序权重下降 | 是 | 打分函数中的时间/使用因子 |
+| Capacity eviction | 存储层级迁移，不改变有效性 | 是 | hot → warm → cold → tombstone |
+| Deletion | 记录本体被移除 | — | 合规删除，并失效派生视图、索引与缓存 |
+
+前三者都是“降低默认召回优先级或迁移存储层”，不是删除；第四者受法规、合同或用户请求约束，必须真正覆盖原始记录、向量索引、摘要、缓存以及备份策略所声明的范围。
+
+> **Forgetting is a retention policy. Deletion is a compliance action. Do not implement one and call it the other.**
+
+### 7.14.2 有些记忆不该按“久未使用”衰减
+
+把“长期没被召回就降权”套到全部记忆上，会先忘掉最贵的东西：
+
+~~~text
+user_explicit constraints      → 只按 valid_to 或显式更正结束
+permissions / authorization    → 不进入记忆打分，按请求向授权系统重新校验
+safety / compliance rules      → 版本化替换，不按使用频率淘汰
+financial / legal definitions  → 随来源口径更新，不随闲置衰减
+~~~
+
+这些内容的生命周期由来源权威与有效期决定，而不是由“最近有没有被用到”决定。它们只有两种合法的“遗忘”：显式更正（新版本 supersede 旧版本并保留 lineage，见 §7.10.7），或有效期到期。
+
+### 7.14.3 重要度不能只由模型自己打
+
+如果 importance 由写下这条记忆的模型自评，模型会系统性高估自己刚产生的推断。更可用的信号：
+
+~~~text
+source_kind        user_explicit > tool_observed > model_inferred
+scope              tenant / project > thread > turn
+decision impact    cited by a decision, constraint check or repair
+reuse evidence     retrieved and confirmed useful, not merely retrieved
+freshness          inside the declared validity window
+~~~
+
+这些信号只影响排序，不能提升 authority：一条被反复召回的高分推断仍然是推断，不能覆盖用户显式声明（§7.10.4）。
+
+### 7.14.4 先过滤，再打分
+
+召回顺序应是硬过滤在前、排序在后：
+
+~~~text
+Query
+→ scope / tenant / ACL filter
+→ validity filter (valid_from ≤ now < valid_to)
+→ status filter (active / superseded / archived)
+→ rank: relevance · authority · recency · salience
+→ assemble with provenance
+~~~
+
+过期或已被 supersede 的记录默认不进入候选，只在“查历史”这类显式意图下按时间线返回。把新旧记忆一起交给模型“自己判断”，等于把冲突解决成本转移到推理阶段，而且不可审计。
+
+时间衰减只是排序信号之一，权重必须用召回质量与任务成功率评测，不能从文章里抄一个系数。
+
+### 7.14.5 淘汰要留指针，不要留空位
+
+分层淘汰的终点是 tombstone，而不是黑洞：
+
+~~~text
+hot     working state / profile view            ← 每次请求可用
+warm    recent episodic, bounded window         ← 按任务召回
+cold    archived events, searchable on demand   ← 默认不召回
+tomb    deleted per policy, id + reason kept    ← 可审计，不可读内容
+~~~
+
+被淘汰的记忆应保留 ID、来源事件、失效原因和时间，使“当时为什么这样答”仍可复盘；但 tombstone 不能保留已被要求删除的内容本体。
+
+### 7.14.6 怎么证明“忘得对”
+
+遗忘策略的评测要同时包含两个方向，只测一边都会得出错误结论：
+
+| 方向 | 构造 | 观测 |
+|---|---|---|
+| 应该忘记 | 已过期、已被更正、明确低价值的记忆 | 是否仍出现在召回结果里（stale-fact rate） |
+| 不应该忘记 | 仍有效的显式约束、跨会话关键事实 | 经过压缩、衰减与淘汰后是否仍可召回（retention recall） |
+
+再加两个成本侧指标：候选规模与噪声占比，以及归档后重新取回的成功率。只看“库变小了”不能说明策略正确。
+
+### 7.14.7 面试答题版
+
+> 我不会把记忆当成只增不减的日志。设计上先分四种动作：过期（`valid_to` 到期）、衰减（只降排序权重）、淘汰（迁移到冷层并留指针）、删除（合规动作，要覆盖索引、摘要、缓存）。再明确哪些内容不参与衰减：用户显式约束、权限、安全与合规规则、财务法律口径，它们只按有效期或显式更正结束。召回时先做权限与有效期过滤再排序；重要度用来源类型、scope、是否被决策引用等信号，而不是让模型给自己打分。最后用两组评测证明忘得对：该忘的没被召回，不该忘的仍能召回。
+
+最短记忆：
+
+~~~text
+Expire by validity.
+Decay by salience, not by authority.
+Evict to a tier, keep the pointer.
+Delete only as compliance, and delete everywhere.
+~~~
+
+### 7.14.8 Source boundary · Retention 与 Forgetting
+
+Primary user-supplied material：面试稿《怎么设计Agent记忆机制？》，2026-10-21 收入 `handbook/inbox/`；未提供作者、平台链接与发布日期，文中“面试高频”“90% 候选人不讲”等说法未独立验证。
+
+Source-derived ideas retained：
+- 只增不减的长期记忆库会推高召回噪声，需要显式遗忘机制；
+- 时间、重要性、容量是三种不同的淘汰触发条件；
+- 召回应服务“当下最相关、仍然有效”，而不是单纯向量相似度排序。
+
+Handbook corrections / synthesis：
+- 不采纳“新记忆时间戳更新就优先”：§7.10.7 已说明 newer-wins 不足以仲裁，来源权威与 scope specificity 优先；
+- 不采纳“冲突时直接改写原记录”：应新版本 supersede 并保留 lineage，不覆盖历史事实；
+- 不采纳“遗忘＝删除”：过期、衰减、淘汰、删除是四件事，前三个都不是删除；
+- 不采纳“重要度由模型打分决定淘汰”：importance 只影响排序，不能提升 authority；
+- 不采纳把“权限”写进语义记忆：权限必须来自授权系统，不能由模型写入的记忆授予（§7.1）；
+- 不把“三层记忆（工作/中期/长期）”当标准：§7.10.2 已将其映射到六层结构，本节只补生命周期缺口；
+- 不把 Redis、向量库等具体选型当架构要求：它们是实现示例；
+- 未采纳“结构化存储＋向量索引即完整长期记忆”：§7.2 的 Ledger + Views + Policy 仍是写入与审计边界。
+
+本节为手册工程综合，未新增供应商特定断言，也未做外部一手核对；面试口述版与追问整理见 [archive/interview/agent-memory-layering-interview.md](../../archive/interview/agent-memory-layering-interview.md)。处理记录见 [2026-10-21](../verification/2026-10-21-inbox-agent-memory.md)。
