@@ -149,7 +149,7 @@ export function SkillSimulator({
   useEffect(() => {
     for (const ref of [terminal, stream])
       ref.current?.scrollTo({
-        top: ref.current.scrollHeight,
+        top: phase < 0 ? 0 : ref.current.scrollHeight,
         behavior: reduced ? "instant" : "smooth",
       });
   }, [phase, reduced]);
@@ -185,7 +185,8 @@ export function SkillSimulator({
         --border:var(--sim-border); --ring:#e9ad91; --ring-inverted:#e9ad91; --secondary:var(--sim-raised);
         --secondary-foreground:var(--sim-ink); --accent:#30231e; --accent-foreground:#f1b69c;
         --input:var(--sim-raised); --muted:var(--sim-raised); --success:#a0cbb0; --destructive:#edafa5;
-        padding:1.25rem; border:.0625rem solid var(--sim-border); border-radius:1rem;
+        --sim-stream-height:clamp(6rem, calc(100dvh - 43rem), 14rem);
+        padding:.75rem; border:.0625rem solid var(--sim-border); border-radius:1rem;
         color:var(--sim-ink); background:var(--sim-canvas);
         box-shadow:inset 0 .0625rem 0 #ffffff08, 0 .75rem 2rem #0000000d;
       }
@@ -206,19 +207,20 @@ export function SkillSimulator({
       .dark .skill-terminal .sim-run:hover { background:#e6af94; }
       .chapter-body .skill-terminal p { margin:0; }
       .chapter-body .skill-terminal h3 { margin:0; color:var(--sim-ink); font-family:Georgia,"Noto Serif SC",serif; font-size:1.5rem; font-weight:500; line-height:1.35; letter-spacing:-.02em; }
-      .skill-terminal .sim-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:.875rem; margin-bottom:1rem; border-bottom:.0625rem solid var(--sim-border); }
-      .skill-terminal .sim-header p { margin-top:.375rem; max-width:34rem; color:var(--sim-muted); font-size:.875rem; line-height:1.7; text-wrap:pretty; }
+      .skill-terminal .sim-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding-bottom:.75rem; margin-bottom:.75rem; border-bottom:.0625rem solid var(--sim-border); }
+      .skill-terminal .sim-header p { margin-top:.375rem; max-width:28rem; color:var(--sim-muted); font-size:.875rem; line-height:1.7; text-wrap:pretty; }
       .skill-terminal .sim-scenarios { height:auto; display:flex; flex-wrap:wrap; gap:.25rem; padding:.25rem; border:.0625rem solid var(--sim-border); border-radius:.625rem; background:var(--sim-terminal); box-shadow:inset 0 .0625rem .25rem #00000040; }
       .skill-terminal .sim-scenarios button { height:auto; min-height:2.75rem; border:.0625rem solid transparent; background:transparent; color:var(--sim-muted); border-radius:.375rem; padding:.5rem .75rem; box-shadow:none; font-size:.8125rem; font-weight:500; }
       .skill-terminal .sim-scenarios button[data-state=active] { background:var(--accent); border-color:#745344; color:var(--accent-foreground); box-shadow:inset 0 .0625rem 0 #ffffff0a; }
-      .skill-terminal .sim-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.9fr); gap:.875rem; }
-      .skill-terminal .sim-panel { display:flex; flex-direction:column; border:.0625rem solid var(--sim-border); border-radius:.75rem; overflow:hidden; background:var(--sim-panel); }
-      .skill-terminal .sim-titlebar { display:flex; align-items:center; justify-content:space-between; gap:1rem; min-height:3.5rem; padding:.75rem 1rem; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-panel); }
+      .skill-terminal .sim-grid { margin:0; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.9fr); gap:1.25rem; }
+      .skill-terminal .sim-panel { display:grid; height:calc(var(--sim-stream-height) + 14.5rem); grid-template-rows:4.5rem minmax(0,1fr) 4rem; border:.0625rem solid var(--sim-border); border-radius:.75rem; overflow:hidden; background:var(--sim-panel); }
+      .skill-terminal .sim-panel + .sim-panel { grid-template-rows:4.5rem 3rem minmax(0,1fr) 7rem; }
+      .skill-terminal .sim-titlebar { display:flex; align-items:center; justify-content:space-between; gap:1rem; min-height:3.25rem; padding:.5rem .75rem; flex-shrink:0; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-panel); }
       .skill-terminal .sim-window-title { display:flex; align-items:center; gap:.5rem; color:var(--sim-ink); font-family:var(--font-mono); font-size:.75rem; font-weight:500; letter-spacing:.04em; }
       .skill-terminal .sim-window-prefix { color:var(--sim-accent); font-size:1rem; line-height:1; }
       .skill-terminal .sim-window-caption { display:block; margin-top:.375rem; color:var(--sim-muted); font-size:.6875rem; line-height:1.5; }
-      .skill-terminal .sim-terminal { flex:1; height:16rem; min-height:14rem; max-height:18rem; overflow:auto; scrollbar-gutter:stable; padding:1rem; background:var(--sim-terminal); font-family:var(--font-mono); font-size:.8125rem; line-height:1.9; overflow-wrap:anywhere; }
-      .skill-terminal .sim-pending { padding-bottom:1rem; margin-bottom:1rem; border-bottom:.0625rem solid var(--sim-border); }
+      .skill-terminal .sim-terminal { height:100%; min-height:0; overflow:auto; scrollbar-gutter:stable; padding:.75rem; background:var(--sim-terminal); font-family:var(--font-mono); font-size:.8125rem; line-height:1.9; overflow-wrap:anywhere; }
+      .skill-terminal .sim-pending { padding-bottom:.75rem; margin-bottom:.75rem; border-bottom:.0625rem solid var(--sim-border); }
       .skill-terminal .sim-pending-label { display:block; color:var(--sim-muted); font-size:.6875rem; margin-bottom:1rem; }
       .skill-terminal .sim-request { display:grid; grid-template-columns:auto 1fr; gap:.75rem; align-items:baseline; color:var(--sim-ink); }
       .chapter-body .skill-terminal .sim-request p { font-size:.9375rem; line-height:1.9; }
@@ -232,18 +234,18 @@ export function SkillSimulator({
       .skill-terminal .sim-log.process { color:#b8bfc4; }
       .skill-terminal .sim-log.result { color:var(--success); }
       .skill-terminal .sim-log.blocked { color:var(--destructive); }
-      .skill-terminal .sim-controls { padding:.75rem; display:grid; grid-template-columns:1fr auto; gap:.5rem; border-top:.0625rem solid var(--sim-border); background:var(--sim-panel); }
-      .skill-terminal .sim-controls button { border-radius:.5rem; font-size:.8125rem; min-height:2.75rem; min-width:4rem; cursor:pointer; }
-      .skill-terminal .sim-controls .sim-run { grid-column:1/-1; min-height:3rem; color:var(--primary-foreground); background:var(--sim-accent); box-shadow:inset 0 .0625rem 0 #ffffff24, 0 .125rem .25rem #00000030; font-weight:600; }
+      .skill-terminal .sim-controls { padding:.5rem; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); flex-shrink:0; gap:.5rem; border-top:.0625rem solid var(--sim-border); background:var(--sim-panel); }
+      .skill-terminal .sim-controls button { border-radius:.5rem; font-size:.8125rem; min-height:2.75rem; min-width:0; padding-inline:.5rem; white-space:normal; overflow-wrap:anywhere; cursor:pointer; }
+      .skill-terminal .sim-controls .sim-run { grid-column:auto; min-height:2.75rem; color:var(--primary-foreground); background:var(--sim-accent); box-shadow:inset 0 .0625rem 0 #ffffff24, 0 .125rem .25rem #00000030; font-weight:600; }
       .skill-terminal .sim-run svg { width:1rem; height:1rem; flex:none; }
       .skill-terminal .sim-controls button:not(.sim-run) { background:var(--sim-raised); color:var(--sim-ink); border-color:var(--sim-border); box-shadow:inset 0 .0625rem 0 #ffffff06; }
       .skill-terminal button:disabled { cursor:default; opacity:.45; }
-      .skill-terminal .sim-progress { padding:0 1.25rem; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-terminal); }
+      .skill-terminal .sim-progress { min-height:0; overflow:auto; padding:0 1.25rem; border-bottom:.0625rem solid var(--sim-border); background:var(--sim-terminal); }
       .skill-terminal .sim-progress [data-progress-style] { min-height:2.75rem; gap:.5rem; align-items:center; }
       .skill-terminal .sim-progress span { font-family:var(--font-mono); font-size:.6875rem; }
       .skill-terminal .sim-progress [data-step-state] { padding:.75rem 0; }
       .skill-terminal .sim-progress [data-step-state=current] { color:var(--accent-foreground); }
-      .skill-terminal .sim-stream { height:15rem; overflow:auto; scrollbar-gutter:stable; padding:1rem; display:flex; flex-direction:column; gap:.75rem; }
+      .skill-terminal .sim-stream { height:100%; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; padding:.75rem; display:flex; flex-direction:column; gap:.75rem; }
       .skill-terminal .sim-message { --message-color:var(--sim-blue); padding:.75rem; border:.0625rem solid color-mix(in srgb,var(--message-color) 18%,var(--sim-border)); border-radius:.5rem; background:color-mix(in srgb,var(--message-color) 5%,var(--sim-panel)); flex:none; }
       .skill-terminal .sim-message strong { display:flex; align-items:center; justify-content:space-between; gap:.5rem; color:var(--message-color); font-family:var(--font-mono); font-size:.6875rem; font-weight:500; letter-spacing:.04em; margin-bottom:.5rem; }
       .skill-terminal .sim-message-index { color:var(--sim-muted); font-variant-numeric:tabular-nums; letter-spacing:0; }
@@ -254,24 +256,27 @@ export function SkillSimulator({
       .skill-terminal .sim-message.result { --message-color:var(--success); }
       .skill-terminal .sim-message.blocked { --message-color:var(--destructive); }
       .skill-terminal .sim-message[data-current=true] { border-color:color-mix(in srgb,var(--message-color) 45%,var(--sim-border)); box-shadow:inset 0 .0625rem 0 #ffffff06; }
-      .skill-terminal .sim-assets { display:grid; grid-template-columns:1fr 1fr; margin-top:auto; background:var(--sim-terminal); border-top:.0625rem solid var(--sim-border); min-height:6rem; }
-      .skill-terminal .sim-assets > div { padding:.875rem; }
+      .skill-terminal .sim-assets { display:grid; grid-template-columns:1fr 1fr; margin:0; overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; background:var(--sim-terminal); border-top:.0625rem solid var(--sim-border); min-height:0; flex-shrink:0; }
+      .skill-terminal .sim-assets > div { align-self:start; padding:.625rem .75rem; }
       .skill-terminal .sim-assets > div+div { border-left:.0625rem solid var(--sim-border); }
-      .chapter-body .skill-terminal .sim-assets h4 { font-family:var(--font-sans); font-size:.75rem; line-height:1.5; color:var(--sim-muted); margin:0 0 .75rem; font-weight:500; }
-      .skill-terminal .sim-assets p { font-family:var(--font-mono); font-size:.6875rem; line-height:1.8; color:var(--sim-muted); overflow-wrap:anywhere; }
-      .skill-terminal .sim-scope { display:inline-block; border:.0625rem solid var(--sim-border); padding:.25rem .5rem; border-radius:.25rem; font-family:var(--font-mono); font-size:.6875rem; margin-right:.5rem; margin-bottom:.5rem; color:var(--sim-ink); background:var(--sim-raised); }
+      .chapter-body .skill-terminal .sim-assets h4 { font-family:var(--font-sans); font-size:.75rem; line-height:1.5; color:var(--sim-muted); margin:0 0 .375rem; font-weight:500; }
+      .skill-terminal .sim-assets p { font-family:var(--font-mono); font-size:.6875rem; line-height:1.5; color:var(--sim-muted); overflow-wrap:anywhere; }
+      .skill-terminal .sim-scope { display:inline-block; border:.0625rem solid var(--sim-border); padding:.25rem .5rem; border-radius:.25rem; font-family:var(--font-mono); font-size:.6875rem; margin-right:.5rem; margin-bottom:.25rem; color:var(--sim-ink); background:var(--sim-raised); }
       .skill-terminal .sim-asset-row { display:flex; gap:.5rem; align-items:baseline; margin-bottom:.25rem; }
       .skill-terminal .sim-asset-row::before { content:"+"; color:var(--success); }
-      .skill-terminal .sim-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; border-top:.0625rem solid var(--sim-border); padding:.875rem 0 0; margin-top:1rem; }
+      .skill-terminal .sim-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; border-top:.0625rem solid var(--sim-border); padding:.625rem 0 0; margin:.75rem 0 0; }
       .skill-terminal .sim-metrics > div+div { border-left:.0625rem solid var(--sim-border); padding-left:1rem; }
       .skill-terminal .sim-metrics dt { font-family:var(--font-sans); font-size:.6875rem; color:var(--sim-muted); }
-      .skill-terminal .sim-metrics dd { margin:.5rem 0 0; font-family:var(--font-mono); font-size:.875rem; color:var(--sim-ink); font-variant-numeric:tabular-nums; }
+      .skill-terminal .sim-metrics dd { margin:.25rem 0 0; font-family:var(--font-mono); font-size:.875rem; color:var(--sim-ink); font-variant-numeric:tabular-nums; }
       .skill-terminal .sim-metrics > div:first-child dd { font-size:1.25rem; line-height:1.3; }
-      .skill-terminal .sim-status { min-height:1.75rem; padding:.25rem .5rem; gap:.5rem; font-size:.6875rem; border-radius:.375rem; flex:none; font-variant-numeric:tabular-nums; }
+      .skill-terminal .sim-status { min-height:1.75rem; padding:.25rem .5rem; gap:.5rem; font-size:.6875rem; border-radius:.375rem; flex:none; font-variant-numeric:tabular-nums; white-space:nowrap; }
       .skill-terminal .sim-status::before { content:""; width:.3125rem; height:.3125rem; border-radius:50%; background:currentColor; }
       .skill-terminal[data-run-state=needs-input] .sim-status { color:var(--sim-gold); }
       .skill-terminal .sim-status-count { opacity:.85; }
-      .skill-terminal details { border-top:.0625rem solid var(--sim-border); padding-top:1rem; margin-top:1rem; }
+      .skill-terminal .sim-extras { display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:.75rem; margin-top:.75rem; border-top:.0625rem solid var(--sim-border); padding-top:.5rem; }
+      .skill-terminal .sim-extras:has(details[open]), .skill-terminal .sim-extras:has(.knowledge-check[data-state=open]) { grid-template-columns:1fr; }
+      .skill-terminal .knowledge-check { margin:0; padding:0; border:0; }
+      .skill-terminal details { border:0; padding:0; margin:0; }
       .skill-terminal summary { cursor:pointer; color:var(--sim-muted); font-size:.8125rem; min-height:2.75rem; display:flex; align-items:center; gap:.75rem; }
       .skill-terminal summary::before { content:"+"; color:var(--sim-accent); font-family:var(--font-mono); font-size:1rem; }
       .skill-terminal details[open] > summary::before { content:"−"; }
@@ -289,22 +294,26 @@ export function SkillSimulator({
       }
       @media (prefers-reduced-motion:no-preference) { .skill-terminal .sim-message[data-current=true] { animation:sim-arrive 180ms ease-out; } @keyframes sim-arrive { from {opacity:.5;transform:translateY(.25rem)} to {opacity:1;transform:translateY(0)} } }
       @media (prefers-reduced-motion:reduce) { .skill-terminal button { transition:none; transform:none; } }
-      @container (max-width:1050px) { .skill-terminal .sim-header { align-items:flex-start; flex-direction:column; gap:.75rem; } }
-      @container (max-width:760px) {
-        .chapter-body .skill-terminal { padding:1rem; }
+      @container (max-width:1050px) { .skill-terminal .sim-run svg { display:none; } }
+      @container (max-width:600px) { .skill-terminal .sim-header { align-items:flex-start; flex-direction:column; gap:.75rem; } }
+      @container (max-width:600px) {
+        .chapter-body .skill-terminal { padding:1.25rem; }
+        .skill-terminal .sim-extras { grid-template-columns:1fr; }
         .skill-terminal .sim-grid { grid-template-columns:1fr; gap:1rem; }
-        .skill-terminal .sim-terminal { height:11rem; min-height:11rem; max-height:11rem; flex:auto; }
-        .skill-terminal .sim-stream { height:13rem; }
-        .skill-terminal .sim-metrics { grid-template-columns:1fr 1fr; gap:.875rem; }
+        .skill-terminal .sim-panel { height:16.5rem; }
+        .skill-terminal .sim-panel + .sim-panel { height:30rem; grid-template-rows:4.5rem 5.5rem minmax(0,1fr) 8rem; }
+        .skill-terminal .sim-terminal { height:100%; min-height:0; }
+        .skill-terminal .sim-stream { --sim-stream-height:12rem; }
+        .skill-terminal .sim-metrics { grid-template-columns:1fr 1fr; gap:1.25rem; }
         .skill-terminal .sim-metrics > div:nth-child(3) { border-left:0; padding-left:0; }
         .skill-terminal .sim-scenarios { width:100%; }
         .skill-terminal .sim-scenarios button { flex:1; padding:.5rem; white-space:normal; }
-        .skill-terminal .sim-titlebar { padding:1rem; }
+        .skill-terminal .sim-titlebar { padding:.5rem .75rem; }
         .skill-terminal .sim-stream,.skill-terminal .sim-terminal { padding:1rem; }
         .skill-terminal .sim-progress { padding:0 1rem; }
         .skill-terminal .sim-progress [data-progress-style] { flex-wrap:wrap; justify-content:flex-start; gap:0 1rem; padding:.5rem 0; }
         .skill-terminal .sim-progress [data-step-state] { padding:.5rem 0; }
-        .skill-terminal .sim-assets > div { padding:1rem; }
+        .skill-terminal .sim-assets > div { align-self:start; padding:.625rem .75rem; }
       }
       @container (max-width:400px) { .chapter-body .skill-terminal { padding:1rem; } .chapter-body .skill-terminal h3 { font-size:1.625rem; } .skill-terminal .sim-scenarios button { font-size:.75rem; } .skill-terminal .sim-titlebar { gap:.5rem; } .skill-terminal .sim-window-title { font-size:.6875rem; } }
     `}</style>
@@ -479,7 +488,7 @@ export function SkillSimulator({
                   <span className="sim-status-count">{phase + 1} / 5</span>
                 </Badge>
               </div>
-              <div className="sim-progress">
+              <div className="sim-progress" role="region" aria-label={t("生命周期阶段", "Lifecycle stages")} tabIndex={0}>
                 <OnboardingUnderlineIndicator
                   steps={steps}
                   index={phase < 0 ? -1 : phase}
@@ -545,7 +554,7 @@ export function SkillSimulator({
                   </div>
                 ))}
               </div>
-              <div className="sim-assets">
+              <div className="sim-assets" role="region" aria-label={t("工具权限与已加载资料", "Tool permissions and loaded assets")} tabIndex={0}>
                 <div>
                   <h4>{t("工具权限 / PERMISSIONS", "PERMISSIONS / SCOPES")}</h4>
                   <span className="sim-scope">Read</span>
@@ -606,25 +615,27 @@ export function SkillSimulator({
           </dl>
         </TabsContent>
       </Tabs>
-      <KnowledgeCheck key={scenario} anchor={lesson.anchor} en={en} />
-      <details>
-        <summary>
-          {t(
-            "查看完整上下文与架构全景",
-            "Inspect context layers and architecture map",
-          )}
-        </summary>
-        <div className="sim-detail">
-          <SkillContextInspector
-            key={scenario}
-            example={scenario}
-            step={phase < 0 ? 0 : phase}
-            en={en}
-          />
-          <p>{lesson.takeaway[en ? 1 : 0]}</p>
-          <ArchifyOverview anchor={lesson.anchor} en={en} />
-        </div>
-      </details>
+      <div className="sim-extras">
+        <KnowledgeCheck key={scenario} anchor={lesson.anchor} en={en} />
+        <details>
+          <summary>
+            {t(
+              "查看完整上下文与架构全景",
+              "Inspect context layers and architecture map",
+            )}
+          </summary>
+          <div className="sim-detail">
+            <SkillContextInspector
+              key={scenario}
+              example={scenario}
+              step={phase < 0 ? 0 : phase}
+              en={en}
+            />
+            <p>{lesson.takeaway[en ? 1 : 0]}</p>
+            <ArchifyOverview anchor={lesson.anchor} en={en} />
+          </div>
+        </details>
+      </div>
     </section>
   );
 }

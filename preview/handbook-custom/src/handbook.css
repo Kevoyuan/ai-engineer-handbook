@@ -1,10 +1,12 @@
 /* Preview theme adapter: custom evergreen identity. Layers: navigation 10, dialogs 50. */
 :root {
-  --background: #f4f6f3;
+  --background: #edf0ea;
+  --page: #fcfdfb;
+  --plate: #f7f9f5;
   --foreground: #18211d;
-  --card: #fcfdfc;
+  --card: #eef2ec;
   --card-foreground: var(--foreground);
-  --popover: var(--card);
+  --popover: #ffffff;
   --popover-foreground: var(--foreground);
   --overlay: color-mix(in srgb, var(--foreground) 20%, transparent);
   --primary: #2f6850;
@@ -12,11 +14,11 @@
   --secondary: #e3e9e5;
   --secondary-foreground: #25332c;
   --muted: #eef2ef;
-  --muted-foreground: #68736d;
+  --muted-foreground: #5f6a64;
   --accent: #dde9e2;
   --accent-foreground: #25332c;
   --border: #d7dfda;
-  --input: #f8faf8;
+  --input: #f1f4ee;
   --ring: #2f6850;
   --ring-inverted: #98c7ac;
   --sidebar: var(--background);
@@ -33,14 +35,40 @@
   --shadow-thumb: 0 1px 2px #24413222;
   --shadow-float-modal: 0 24px 72px #152e3430;
   --radius: 0.625rem;
+  --font-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --destructive: oklch(0.5563 0.1632 32);
+  --destructive-foreground: oklch(1 0 0);
+  --success: oklch(0.5262 0.0942 151.04);
+  --warning: oklch(0.6658 0.1574 58.32);
+  --chart-1: oklch(0.5832 0.227 268.34);
+  --chart-2: oklch(0.5262 0.0942 151.04);
+  --chart-3: oklch(0.6658 0.1574 58.32);
+  --chart-4: oklch(0.5563 0.1632 32);
+  --chart-5: oklch(0.5534 0.0116 58.07);
+  --shadow-lift: 0 0.0625rem 0.125rem oklch(0.2161 0.0061 56.04 / 0.06), 0 0.25rem 0.625rem -0.5rem oklch(0.2161 0.0061 56.04 / 0.45);
+  --shadow-well: inset 0 0.0625rem 0.125rem oklch(0.2161 0.0061 56.04 / 0.07);
+  --shadow-cap: 0 0.0938rem 0 oklch(0.2161 0.0061 56.04 / 0.09), inset 0 0 0 0.0625rem oklch(0.2161 0.0061 56.04 / 0.11);
+  --shadow-row: inset 0 0 0 0.0625rem oklch(0.2161 0.0061 56.04 / 0.07), 0 0.0625rem 0.125rem oklch(0.2161 0.0061 56.04 / 0.05);
+  --shadow-float-dropdown: 0 1rem 2.25rem -1.125rem oklch(0.2161 0.0061 56.04 / 0.5);
+  --shadow-float-popover: 0 1.125rem 2.5rem -1.5rem oklch(0.2161 0.0061 56.04 / 0.5);
+  --shadow-xs: 0 0.0625rem 0.125rem oklch(0.2161 0.0061 56.04 / 0.06);
+  --shadow-sm: var(--shadow-lift);
+  --shadow-md: var(--shadow-float-dropdown);
+  --shadow-lg: var(--shadow-float-popover);
+  --shadow-xl: var(--shadow-float-modal);
+  --shadow-s: var(--shadow-sm);
+  --shadow-m: var(--shadow-md);
+  --shadow-l: var(--shadow-lg);
 }
 .dark {
   color-scheme: dark;
-  --background: #141718;
+  --background: #0f1211;
+  --page: #181c1a;
+  --plate: #131715;
   --foreground: #e7ebe8;
-  --card: #1b1f20;
+  --card: #1e2320;
   --card-foreground: var(--foreground);
-  --popover: #222728;
+  --popover: #262b28;
   --popover-foreground: var(--foreground);
   --overlay: rgb(5 8 10 / 64%);
   --primary: #b8d0c0;
@@ -52,7 +80,7 @@
   --accent: #2a3430;
   --accent-foreground: #c6d9cd;
   --border: #333a37;
-  --input: #181c1d;
+  --input: #141716;
   --ring: #b8d0c0;
   --ring-inverted: #7ba78e;
   --success: #a9c5b5;
@@ -73,11 +101,24 @@
   --shadow-float-modal: 0 24px 72px rgb(10 10 12 / 48%);
   --shadow-cap: inset 0 0 0 1px var(--border);
   --shadow-row: inset 0 0 0 1px var(--border);
-  --shadow-lift: inset 0 .0625rem 0 rgb(255 255 255 / 4%), 0 .125rem .3125rem rgb(0 0 0 / 12%);
+  --shadow-lift: 0 .125rem .3125rem rgb(0 0 0 / 14%);
   --shadow-well: inset 0 .0625rem .1875rem rgb(0 0 0 / 20%);
-  --shadow-float-dropdown: inset 0 .0625rem 0 rgb(255 255 255 / 6%), 0 .75rem 2rem rgb(0 0 0 / 32%);
+  --shadow-float-dropdown: 0 .75rem 2rem rgb(0 0 0 / 34%);
   --shadow-float-popover: var(--shadow-float-dropdown);
-  --shadow-float-modal: inset 0 .0625rem 0 rgb(255 255 255 / 6%), 0 1.5rem 4.5rem rgb(0 0 0 / 48%);
+  --shadow-float-modal: 0 1.5rem 4.5rem rgb(0 0 0 / 50%);
+  --chart-1: #b8d0c0;
+  --chart-2: #8fb3a1;
+  --chart-3: #d9ba86;
+  --chart-4: #e1a19b;
+  --chart-5: #a8b0ac;
+  --shadow-xs: 0 .0625rem .125rem rgb(0 0 0 / 24%);
+  --shadow-sm: var(--shadow-lift);
+  --shadow-md: var(--shadow-float-dropdown);
+  --shadow-lg: var(--shadow-float-popover);
+  --shadow-xl: var(--shadow-float-modal);
+  --shadow-s: var(--shadow-sm);
+  --shadow-m: var(--shadow-md);
+  --shadow-l: var(--shadow-lg);
 }
 * {
   box-sizing: border-box;
@@ -340,7 +381,7 @@ kbd {
   bottom: 13px;
   right: 15px;
   font-family: var(--font-mono);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   color: var(--muted-foreground);
 }
 .entry-search {
@@ -855,7 +896,7 @@ kbd {
   }
   .group-heading > span {
     margin: 0;
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
   }
   .chapter-link {
     gap: 14px;
@@ -1034,7 +1075,7 @@ kbd {
   color: var(--muted-foreground);
 }
 .dark .topbar {
-  background: var(--input);
+  background: var(--page);
 }
 .dark .modal-search input:focus-visible {
   outline: none;
@@ -1157,7 +1198,7 @@ body,
   margin-top: 0.5rem;
 }
 .chapter-body {
-  padding: 1.5rem 1rem 1.5rem 0;
+  padding: 1.5rem 1rem 3rem;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
@@ -1298,7 +1339,7 @@ body,
 
 /* Complete handbook: semantic typography, preserved diagram topology. */
 .chapter-body {
-  --bg: var(--background);
+  --bg: var(--plate);
   --paper: var(--card);
   --paper2: var(--secondary);
   --ink: var(--foreground);
@@ -1307,7 +1348,7 @@ body,
   --line2: var(--border);
   --blu: var(--primary);
   --org: #8b4d20;
-  --grn: #367657;
+  --grn: #336f51;
   --pur: #725aa1;
   --red: #a33e3e;
   --tea: #2d6b6b;
@@ -1318,9 +1359,33 @@ body,
   --code-string: #326e53;
   --code-number: #8b5226;
   --acc: var(--primary);
-  line-height: 1.9;
-  overflow-wrap: anywhere;
+  --measure: 38rem;
+  --measure-wide: 42rem;
+  line-height: 1.85;
+  overflow-wrap: break-word;
+  text-spacing-trim: trim-start;
+  text-autospace: normal;
   text-wrap: pretty;
+}
+.chapter-body > * {
+  max-inline-size: var(--measure);
+  margin-inline: auto;
+}
+.chapter-body {
+  container-type: inline-size;
+}
+.chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *) {
+  max-inline-size: 100%;
+}
+@container (min-width: 60rem) {
+  .chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *) {
+    width: calc(100cqw - 2rem);
+    max-inline-size: none;
+    margin-inline: calc((var(--measure) - (100cqw - 2rem)) / 2);
+  }
+}
+.chapter-body :is(pre, code, kbd, .tw) {
+  overflow-wrap: anywhere;
 }
 .dark .chapter-body {
   --org: #d8b487;
@@ -1356,9 +1421,10 @@ body,
 .chapter-body .sub small {
   font-size: 0.6em;
   color: var(--muted-foreground);
+  white-space: nowrap;
 }
 .chapter-body p {
-  line-height: 1.9;
+  line-height: 1.85;
 }
 .chapter-body strong {
   font-weight: 600;
@@ -1377,7 +1443,7 @@ body,
   margin: 1.5rem 0;
   padding: 1.5rem;
   border: 1px solid var(--border);
-  background: var(--background);
+  background: var(--plate);
   border-radius: var(--radius);
   box-shadow: none;
 }
@@ -1433,7 +1499,7 @@ body,
 .chapter-body .bfs-card,
 .chapter-body .cd {
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 0.5rem;
   box-shadow: none;
   padding: 1rem;
@@ -1512,7 +1578,7 @@ body,
 .chapter-body pre {
   max-width: 100%;
   overflow-x: auto;
-  background: var(--background);
+  background: var(--plate);
   border: 1px solid var(--border);
   padding: 1rem;
   border-radius: 0.5rem;
@@ -1545,7 +1611,7 @@ body,
   height: auto;
 }
 .chapter-body .lab-shell {
-  background: var(--background);
+  background: var(--plate);
   border: 1px solid var(--border);
   box-shadow: none;
 }
@@ -1873,7 +1939,7 @@ button[data-variant="default"] {
   container-type: inline-size;
 }
 .chapter-body .lab {
-  background: var(--background);
+  background: var(--plate);
   box-shadow: none;
   padding: 1rem;
 }
@@ -1904,7 +1970,7 @@ button[data-variant="default"] {
     margin-inline: auto;
   }
   .chapter-body .wheel .wn {
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     width: 4.5rem;
   }
 }
@@ -1956,7 +2022,7 @@ button[data-variant="default"] {
 
 .chapter-num {
   opacity: 1;
-  color: var(--muted-foreground);
+  color: var(--secondary-foreground);
 }
 .search-more {
   display: flex;
@@ -2122,7 +2188,7 @@ button[data-variant="default"] {
 
 /* Concept teaching: motion communicates the selected stage, never delays reading. */
 .concept-slot { margin: 1.25rem 0; }
-.chapter-body .concept-demo { padding: 1.125rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card); color: var(--foreground); scroll-margin-top: 1rem; font-size: 1rem; }
+.chapter-body .concept-demo { padding: 1.125rem; border: 0; border-radius: 1rem; background: var(--card); color: var(--foreground); scroll-margin-top: 1rem; font-size: 1rem; }
 .chapter-body .concept-heading h3 { margin: 0; font-size: 1.25rem; line-height: 1.5; font-weight: 650; color: var(--foreground); }
 .chapter-body .concept-heading p { margin: .375rem 0 .875rem; color: var(--muted-foreground); font-size: .875rem; line-height: 1.65; }
 .concept-examples { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
@@ -2175,7 +2241,7 @@ button[data-variant="default"] {
 .concept-examples select:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
 .concept-transport button { min-width: 44px; padding: .5rem 1rem; }
 .learning-caption { color: var(--muted-foreground); font-size: .8125rem; line-height: 1.6; }
-.chapter-body .archify-overview { margin: 0 0 1.25rem; padding: 0; border: 1px solid var(--border); border-radius: .75rem; background: var(--background); }
+.chapter-body .archify-overview { margin: 0 0 1.25rem; padding: 0; border: 1px solid var(--border); border-radius: .75rem; background: var(--plate); }
 .archify-overview-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 1rem; }
 .archify-kicker { font: 500 .6875rem/1.5 var(--font-mono); letter-spacing: .12em; color: var(--muted-foreground); }
 .chapter-body .archify-overview-heading h4 { font-size: 1.125rem; line-height: 1.5; color: var(--foreground); margin: .5rem 0 0; }
@@ -2235,7 +2301,7 @@ button[data-variant="default"] {
 
 /* 2026-10-07 Atlas redesign — engineering workbench × technical manual × system topology. */
 body {
-  background: var(--background);
+  background: var(--page);
 }
 
 .brand-mark {
@@ -2264,8 +2330,8 @@ body {
 }
 
 .topbar {
-  background: color-mix(in srgb, var(--background) 94%, transparent);
-  backdrop-filter: blur(10px);
+  background: var(--page);
+  border-bottom: 1px solid var(--border);
 }
 
 .atlas-page,
@@ -2725,7 +2791,7 @@ body {
 }
 
 .dark .topbar {
-  background: color-mix(in srgb, var(--background) 94%, transparent);
+  background: var(--page);
 }
 
 @media (max-width: 1180px) {
@@ -3606,7 +3672,7 @@ body {
   .reader-top-identity { gap: 0.4rem; }
   .reader-top-title { max-width: none; font-size: 0.8125rem; }
   .reader-top-identity .top-reading-percent {
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
   }
   .reader-workspace .reader-header-search,
   .reader-top-actions > button {
@@ -3686,3 +3752,8 @@ body {
 .chapter-body .concept-node[data-current="true"] > span:not(.concept-node-status):not(.concept-node-marker) {
   color:var(--foreground);
 }
+
+/* Keep visual previews compact on laptop screens. */
+.archify-overview-heading { padding: .75rem 1rem; }
+.archify-poster img { height: auto; max-height: clamp(9rem, 30dvh, 18rem); object-fit: contain; }
+.chapter-body .archify-overview figcaption { padding: .75rem 1rem; }

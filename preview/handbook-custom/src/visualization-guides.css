@@ -172,7 +172,7 @@
 }
 .chapter-body .v2-stage > div > span {
   color: var(--v2-muted);
-  font-size: 0.71875rem;
+  font-size: 0.75rem;
   line-height: 1.65;
 }
 .chapter-body .v2-stage-symbol {
@@ -192,7 +192,7 @@
   border-top: 1px solid var(--v2-line);
   margin: 1.3rem 0 0;
   padding: 0.9rem 0 0;
-  font-size: 0.71875rem;
+  font-size: 0.75rem;
   line-height: 1.7;
   color: var(--v2-muted);
 }
