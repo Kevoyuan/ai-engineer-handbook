@@ -45,7 +45,8 @@ Do not silently enable \`autopilot --install\`, \`sync --watch\`, cloud embeddin
 | GBrain result contradicts current main | Mark stale; source of truth remains main |
 | A chapter is renamed/deleted | Export reports \`stale_manual_review\`; manually review \`git rm\` and verify tombstone after sync |
 | Staged file has local edits | Exporter refuses overwrite; compare source and preserve provenance |
-| GBrain DB is locked | Wait/serialize; never remove live lock |
+| GBrain DB is locked | List every stdio server with `pgrep -fl 'cli.ts serve'`; the lock moves to another live server as soon as one stops, so stop all of them before CLI work. Never remove a live lock. Stopping a server disconnects that agent session; reopen the session to respawn it |
+| `--apply` run against an existing mirror | Expected: the exporter is idempotent, reports `unchanged`, and only creates `chapters/` when it is missing. A second run must not be treated as a failure |
 | Keyless doctor reports missing embedding provider | Expected capability limitation; do not create API key |
 | Sync skips/holds/blocks a file | Inspect source status and diagnostics; no \`--skip-failed\` shortcut without documented exception |
 | Tool/retrieval seems too permissive | Disable or narrow MCP surface; confirm Source routing and host permissions |
@@ -63,6 +64,7 @@ Run against disposable local test data, **not** on the authoritative brain:
 7. Keyless state produces keyword hits without sending content to an embedding provider.
 8. A wrong or missing \`--source\` does not count as a successful isolated Source verification.
 9. A second process does not corrupt the brain via unsafe lock workarounds.
+10. Re-running `--apply` against an unchanged mirror reports `unchanged` and writes nothing.
 
 Run local pure-Python safety tests:
 
@@ -85,6 +87,10 @@ canonical Git SHA
 ~~~
 
 Never interpret a stale index as permission to synthesize an answer or alter the source of truth. Do not force schema migration, broad re-embedding or re-init to chase a green score. For PGLite WAL issues, inspect documented recovery and take a stopped-state backup before an approved repair.
+
+Readback caution: keyword mode scores many pages at the same value, so a newly indexed section may not appear in the top rows of a broad query. Confirm indexing with a unique token (`--match keyword`) or by reading the page, not by absence from a ranked list.
+
+Destination refusal is not one condition. An existing mirror whose pages hash identically is `unchanged` and needs no action; a symlinked or non-directory `chapters/` is a hard refusal that must not be worked around by writing through it or by staging elsewhere and copying in.
 
 ## 6. Record template (local only; do not commit machine-specific metadata)
 
