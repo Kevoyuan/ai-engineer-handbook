@@ -136,7 +136,13 @@ def stage(repo: Path, dest: Path, revision: str, apply: bool) -> dict:
     # No automatic deletions: old pages require review, git rm, commit and sync.
     if apply:
         dest.mkdir(parents=True, exist_ok=True)
-        (dest / "chapters").mkdir(exist_ok=True)
+        chapters_dir = dest / "chapters"
+        if chapters_dir.is_symlink():
+            raise StageError("Refusing symlinked chapters directory")
+        if chapters_dir.exists() and not chapters_dir.is_dir():
+            raise StageError("Chapters path exists but is not a directory")
+        if not chapters_dir.exists():
+            chapters_dir.mkdir()
         for name, body in documents:
             if next(x for x in updates if x["path"] == name)["status"] != "unchanged":
                 (dest / name).write_bytes(body)

@@ -15,7 +15,8 @@ class StageSourceTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        root = Path(self.tmp.name)
+        # Resolve macOS /var -> /private/var; the exporter rejects symlinked destinations on purpose.
+        root = Path(self.tmp.name).resolve()
         self.repo = root / "checkout"
         self.mirror = root / "mirror"
         self.repo.mkdir()
@@ -47,6 +48,12 @@ class StageSourceTests(unittest.TestCase):
         self.assertIn("/blob/", staged)
         self.assertTrue((self.mirror / "source-manifest.json").is_file())
         self.assertEqual(module.stage(self.repo, self.mirror, "HEAD", False)["operations"][0]["status"], "unchanged")
+
+    def test_apply_into_existing_mirror_is_idempotent(self):
+        module.stage(self.repo, self.mirror, "HEAD", True)
+        plan = module.stage(self.repo, self.mirror, "HEAD", True)
+        self.assertEqual(plan["operations"][0]["status"], "unchanged")
+        self.assertIn("Committed chapter", (self.mirror / "chapters/07-context.md").read_text())
 
     def test_rejects_destination_inside_checkout(self):
         with self.assertRaises(module.StageError):
