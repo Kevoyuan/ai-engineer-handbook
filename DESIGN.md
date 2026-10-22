@@ -5,25 +5,29 @@ last_updated: "2026-10-08"
 status: "active"
 colors:
   primary: "#2f6850"
-  light-background: "#f4f6f3"
+  light-background: "#edf0ea"
+  light-page: "#fcfdfb"
+  light-plate: "#f7f9f5"
   light-foreground: "#18211d"
-  light-card: "#fcfdfc"
+  light-card: "#eef2ec"
   light-primary: "#2f6850"
   light-primary-foreground: "#f7faf8"
   light-secondary: "#e3e9e5"
   light-secondary-foreground: "#25332c"
   light-muted: "#eef2ef"
-  light-muted-foreground: "#68736d"
+  light-muted-foreground: "#5f6a64"
   light-accent: "#dde9e2"
   light-accent-foreground: "#25332c"
   light-border: "#d7dfda"
-  light-input: "#f8faf8"
+  light-input: "#f1f4ee"
   light-ring: "#2f6850"
   light-ring-inverted: "#98c7ac"
-  dark-background: "#141718"
+  dark-background: "#0f1211"
+  dark-page: "#181c1a"
+  dark-plate: "#131715"
   dark-foreground: "#e7ebe8"
-  dark-card: "#1b1f20"
-  dark-popover: "#222728"
+  dark-card: "#1e2320"
+  dark-popover: "#262b28"
   dark-success: "#a9c5b5"
   dark-warning: "#d9ba86"
   dark-destructive: "#e1a19b"
@@ -37,7 +41,7 @@ colors:
   dark-accent: "#2a3430"
   dark-accent-foreground: "#c6d9cd"
   dark-border: "#333a37"
-  dark-input: "#181c1d"
+  dark-input: "#141716"
   dark-ring: "#b8d0c0"
   dark-ring-inverted: "#7ba78e"
 typography:
@@ -100,15 +104,27 @@ Runtime tokens live in `preview/handbook-custom/src/handbook.css`; the published
 The first cohesive Atlas system now covers all four primary surfaces plus the connective Concept Layer: Atlas establishes the Knowledge Spine, Reader exposes current-section trace and reading progress in the existing shell, Search behaves as a ranked local Knowledge Command, Notebook presents saved chapters as a return surface, and Concept routes connect canonical sources across chapters. Future work may extend concept coverage or add section/concept-level saves, but it must extend this system rather than introduce a second visual language.
 
 ## Colors
-Light mode uses a pale mineral canvas (`#f4f6f3`), near-white reading surfaces (`#fcfdfc`), dark green-black ink (`#18211d`), and restrained gray-green secondary text. The primary `#2f6850` is a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state.
+Surfaces come from one lightness ladder. Every step must be wide enough to perceive (ΔL\* ≈ 3–5); below 3 the eye reads two planes as one, which is why an earlier three-value ladder looked flat even though three surfaces existed.
 
-Dark mode is a laboratory graphite system: canvas `#141718`, reading surface `#1b1f20`, raised/popover surface `#222728`, gray-white text, and muted sage signals. Never tint an entire reading surface green. Borders stay neutral; diagrams communicate hierarchy with structure and labels before color.
+| Role | Token | Light | Dark |
+| --- | --- | --- | --- |
+| Rail / canvas | `--background` | `#edf0ea` | `#0f1211` |
+| Page | `--page` | `#fcfdfb` | `#181c1a` |
+| Plate (figure well) | `--plate` | `#f7f9f5` | `#131715` |
+| Raised block | `--card` | `#eef2ec` | `#1e2320` |
+| Floating | `--popover` | `#ffffff` | `#262b28` |
+
+The rail and the page are never the same value: the rail is the navigation canvas, the page is the reading surface. A plate is always one step from the page toward the rail — a well in dark mode, a faint tint in light mode. Raised blocks sit above the page, never below it. In light mode raised blocks are tinted rather than outlined, so a border is not the only thing making a card visible.
+
+Light mode uses a pale mineral rail (`#edf0ea`), a near-white page (`#fcfdfb`), tinted blocks (`#eef2ec`), dark green-black ink (`#18211d`), and restrained gray-green secondary text. The primary `#2f6850` is a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state.
+
+Dark mode is a laboratory graphite system: rail `#0f1211`, page `#181c1a`, raised `#1e2320`, popover `#262b28`, gray-white text, and muted sage signals. Never tint an entire reading surface green. Borders stay neutral; diagrams communicate hierarchy with structure and labels before color.
 
 Semantic colors are allowed when they encode engineering meaning such as evidence, warnings, failures, or destructive actions, but they must not become decorative category colors. Meaning can never depend on color alone.
 
 ## Whole-site dark refinement
 
-The whole-site dark refinement applies to Atlas, Notebook, Search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry the Atlas graphite surfaces: navigation/canvas #141718, header/input #181c1d, reading #1b1f20, secondary #262c2a and popover #222728. Soft gray-green text and muted sage actions retain the existing identity. Elevation uses neutral dark shadows and a restrained top rim. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
+The whole-site dark refinement applies to Atlas, Notebook, Search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry the Atlas graphite surfaces: navigation/canvas `#0f1211`, page and header `#181c1a`, figure plate `#131715`, raised blocks `#1e2320`, secondary `#262c2a` and popover `#262b28`. Soft gray-green text and muted sage actions retain the existing identity. Elevation uses neutral dark shadows only — no inset top rim, since a light rim on a low-lightness surface reads as a plastic edge. The topbar is a solid page-coloured surface with a hairline rule; it must not use backdrop blur or a translucent wash, because scrolling text bleeding through makes the chrome look unfinished. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
 
 Gain: clearer reading and consistent surface hierarchy across routes. Cost: lighter charcoal surfaces reduce the former deep-black appearance. Light-theme tokens and content are preserved. The terminal has a named dark variant that follows the same graphite material with a quiet peach primary action. Pretext prepare/layout reserve simulator explanation heights after fonts load; native wrapping stays visible and widths are remeasured on resize. No new permission or billing behavior is introduced.
 

@@ -18,7 +18,8 @@
     "test:structures": "node scripts/validate-structures.mjs",
     "test:structure-browser": "node evidence/structural-guides-browser.cjs",
     "test:mental-browser": "node evidence/concept-atlas-browser.cjs",
-    "test:remaining-graphs": "node evidence/remaining-graphs-browser.cjs"
+    "test:remaining-graphs": "node evidence/remaining-graphs-browser.cjs",
+    "test:simulator-layout": "node evidence/simulator-stable-height.cjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.9",

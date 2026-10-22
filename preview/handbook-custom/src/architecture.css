@@ -1,7 +1,7 @@
 /* Shared visual vocabulary for the system and Agent reference diagrams. */
 .architecture-overview {
   --diagram-evidence: #416b98;
-  --diagram-state: #906932;
+  --diagram-state: #85602c;
   --diagram-action: #7d629a;
   --diagram-control: #487766;
   --diagram-rule: color-mix(in srgb, var(--foreground) 24%, var(--background));

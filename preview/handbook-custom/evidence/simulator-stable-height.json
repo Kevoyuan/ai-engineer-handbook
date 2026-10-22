@@ -1,0 +1,130 @@
+[
+  {
+    "width": 390,
+    "en": false,
+    "baseline": {
+      "height": 1240.66,
+      "grid": 760,
+      "panels": [
+        264,
+        480
+      ],
+      "assets": 128,
+      "stream": 190,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 1154,
+    "en": false,
+    "baseline": {
+      "height": 580.67,
+      "grid": 328,
+      "panels": [
+        328,
+        328
+      ],
+      "assets": 112,
+      "stream": 94,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 1440,
+    "en": false,
+    "baseline": {
+      "height": 696.67,
+      "grid": 444,
+      "panels": [
+        444,
+        444
+      ],
+      "assets": 112,
+      "stream": 210,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 1728,
+    "en": false,
+    "baseline": {
+      "height": 708.67,
+      "grid": 456,
+      "panels": [
+        456,
+        456
+      ],
+      "assets": 112,
+      "stream": 222,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 390,
+    "en": true,
+    "baseline": {
+      "height": 1293.84,
+      "grid": 760,
+      "panels": [
+        264,
+        480
+      ],
+      "assets": 128,
+      "stream": 190,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 1154,
+    "en": true,
+    "baseline": {
+      "height": 604.47,
+      "grid": 328,
+      "panels": [
+        328,
+        328
+      ],
+      "assets": 112,
+      "stream": 94,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 1440,
+    "en": true,
+    "baseline": {
+      "height": 720.47,
+      "grid": 444,
+      "panels": [
+        444,
+        444
+      ],
+      "assets": 112,
+      "stream": 210,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  },
+  {
+    "width": 1728,
+    "en": true,
+    "baseline": {
+      "height": 732.47,
+      "grid": 456,
+      "panels": [
+        456,
+        456
+      ],
+      "assets": 112,
+      "stream": 222,
+      "controls": 64
+    },
+    "verifiedSteps": 9
+  }
+]

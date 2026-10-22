@@ -10,6 +10,11 @@
     "violations": []
   },
   {
+    "route": "#read/01-model-api-context-foundations",
+    "dark": true,
+    "violations": []
+  },
+  {
     "route": "#read/02-enterprise-retrieval",
     "dark": true,
     "violations": []
@@ -51,6 +56,16 @@
   },
   {
     "route": "#read/10-serving-deployment-ai-platform",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/11-data-sql-engineering",
+    "dark": true,
+    "violations": []
+  },
+  {
+    "route": "#read/12-fde-customer-delivery",
     "dark": true,
     "violations": []
   },
@@ -65,6 +80,11 @@
     "violations": []
   },
   {
+    "route": "#read/01-model-api-context-foundations",
+    "dark": false,
+    "violations": []
+  },
+  {
     "route": "#read/02-enterprise-retrieval",
     "dark": false,
     "violations": []
@@ -106,6 +126,16 @@
   },
   {
     "route": "#read/10-serving-deployment-ai-platform",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/11-data-sql-engineering",
+    "dark": false,
+    "violations": []
+  },
+  {
+    "route": "#read/12-fde-customer-delivery",
     "dark": false,
     "violations": []
   }

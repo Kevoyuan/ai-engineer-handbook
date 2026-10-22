@@ -6,7 +6,7 @@
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   padding: clamp(1rem, 2vw, 1.4rem);
-  margin: 0.4rem 0 1.2rem;
+  margin: 0.4rem 0 1.25rem;
   font-size: 0.8125rem;
   line-height: 1.6;
   min-width: 0;
@@ -90,7 +90,7 @@
 .chapter-body .trace-route-top strong { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 640; overflow-wrap: anywhere; }
 .chapter-body .trace-route-top span { font-size: 0.6875rem; color: var(--muted-foreground); }
 .chapter-body .trace-route[data-state="selected"] .trace-route-top span { color: var(--primary); }
-.chapter-body .trace-route p { font-size: 0.71875rem; line-height: 1.5; margin-top: 0.4rem; }
+.chapter-body .trace-route p { font-size: 0.75rem; line-height: 1.5; margin-top: 0.4rem; }
 .chapter-body .trace-decision {
   display: grid; gap: 0.35rem;
   padding: 0.85rem 0;
@@ -126,7 +126,7 @@
 .chapter-body .trace-gate-id { color: var(--muted-foreground); }
 .chapter-body .trace-gate-content { min-width: 0; }
 .chapter-body .trace-gate-content strong { font-size: 0.75rem; font-weight: 610; line-height: 1.45; }
-.chapter-body .trace-gate-content p { color: var(--muted-foreground); font-size: 0.7rem; line-height: 1.55; margin-top: 0.22rem; }
+.chapter-body .trace-gate-content p { color: var(--muted-foreground); font-size: 0.6875rem; line-height: 1.55; margin-top: 0.22rem; }
 .chapter-body .trace-gate-status {
   grid-column: 2; justify-self: start; font-size: 0.6875rem;
   font-family: var(--font-mono); overflow-wrap: anywhere;
@@ -134,12 +134,12 @@
 }
 .chapter-body .trace-evidence-signal {
   display: grid; gap: 0.23rem;
-  margin-bottom: 0.7rem; padding: 0.7rem 0.85rem;
+  margin-bottom: 0.6875rem; padding: 0.6875rem 0.85rem;
   border-inline-start: 3px solid var(--border); background: var(--card);
 }
 .chapter-body .trace-evidence-signal[data-state="selected"] { border-color: var(--primary); }
 .chapter-body .trace-evidence-signal[data-state="issue"] { border-color: var(--foreground); }
-.chapter-body .trace-evidence-signal strong { font-family: var(--font-mono); font-weight: 650; font-size: 0.9rem; }
+.chapter-body .trace-evidence-signal strong { font-family: var(--font-mono); font-weight: 650; font-size: 0.875rem; }
 .chapter-body .trace-evidence-signal small { font-size: 0.75rem; color: var(--muted-foreground); }
 .chapter-body .trace-policy-options, .chapter-body .trace-loop-exits {
   display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0.4rem;
@@ -148,7 +148,7 @@
 .chapter-body .trace-policy-options > div,
 .chapter-body .trace-loop-exits > div {
   min-width: 0; display: grid; gap: 0.25rem;
-  padding: 0.7rem 0.55rem; background: var(--card);
+  padding: 0.6875rem 0.55rem; background: var(--card);
   border: 1px solid var(--border); border-radius: 0.4rem;
 }
 .chapter-body .trace-policy-options > div[data-state="selected"],
@@ -157,14 +157,14 @@
 }
 .chapter-body .trace-policy-options > div span,
 .chapter-body .trace-loop-exits > div strong {
-  font-family: var(--font-mono); font-size: 0.69rem;
+  font-family: var(--font-mono); font-size: 0.6875rem;
   overflow-wrap: anywhere;
 }
 .chapter-body .trace-policy-options > div strong,
 .chapter-body .trace-loop-exits > div span {
-  color: var(--muted-foreground); font-size: 0.68rem; font-weight: 450;
+  color: var(--muted-foreground); font-size: 0.6875rem; font-weight: 450;
 }
-.chapter-body .trace-loop-rounds { display: grid; gap: 0.7rem; }
+.chapter-body .trace-loop-rounds { display: grid; gap: 0.6875rem; }
 .chapter-body .trace-loop-round {
   border: 1px solid var(--border); border-radius: 0.55rem;
   background: var(--card); padding: 0.75rem;
@@ -195,8 +195,8 @@
   font-size: 0.75rem; color: var(--muted-foreground);
 }
 .chapter-body .trace-return-edge[data-state="selected"] { color: var(--primary); border-color: var(--primary); }
-.chapter-body .trace-return-edge > span { font-size: 1.2rem; line-height: 1; }
-.chapter-body .trace-return-edge small { color: var(--muted-foreground); font-size: 0.7rem; }
+.chapter-body .trace-return-edge > span { font-size: 1.25rem; line-height: 1; }
+.chapter-body .trace-return-edge small { color: var(--muted-foreground); font-size: 0.6875rem; }
 @container (max-width: 760px) {
   .chapter-body .trace-route-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .chapter-body .trace-gates { grid-template-columns: minmax(0,1fr); }

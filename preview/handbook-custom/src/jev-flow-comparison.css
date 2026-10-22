@@ -344,6 +344,6 @@
 }
 .dark .jev-dfc-handoff-label { color: #c6d5ca; }
 @container (max-width: 430px) {
-  .jev-dfc-handoff-label { font-size: 9px; }
+  .jev-dfc-handoff-label { font-size: 11px; }
   .jev-dfc-handoff { grid-template-columns: .65fr auto 1fr; }
 }
