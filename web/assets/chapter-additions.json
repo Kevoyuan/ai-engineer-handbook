@@ -125,6 +125,10 @@
     {
       "path": "/assets/ch09-context-cost-benchmark.html",
       "id": "context-cost-benchmark"
+    },
+    {
+      "path": "/assets/ch09-agent-eval-role-map.html",
+      "id": "agent-eval-role-map"
     }
   ],
   "07-memory-context-engineering": [
