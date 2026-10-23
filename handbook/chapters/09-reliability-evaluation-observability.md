@@ -1731,3 +1731,87 @@ cost_per_successful_task
 **发布门禁建议（Handbook 综合，非 Headroom 默认阈值）**：critical fact / identifier / error-line recall 不能回退；任一跨 tenant/ACL 泄漏、关键约束丢失、不可恢复原件均阻止发布。保留可审计的源数据，避免仅凭 LLM 对压缩摘要的主观评分认定“语义没丢”。
 
 交叉归属：CH02 的索引能优化候选证据、CH07 的压缩能缩短 Context、CH10 的 cache 能复用 prefill；评测需证明三个杠杆合用后 **Cost / Verified Success** 真正改善。
+
+## 9.26 Agent Evaluation 岗位图谱：同名职位，四种不同的工程责任
+
+> **Source boundary · 2026-10-23.** 本节“四类工作”来自用户提供的抖音图文整理（[野生鲸鱼：解密最近热招的 Agent 评测在做什么](https://v.douyin.com/01bAcFGyiNs/)），属于**内容来源的归纳**，不是正式招聘职级标准，也未独立核对视频逐字原文。岗位职责的交叉性由 [美团《大模型/Agent 评测工程师（AI 研发方向）》官方 JD（2026-08-31 更新）](https://zhaopin.meituan.com/web/position/detail?highlightType=social&jobUnionId=4736527116) 交叉印证；该 JD 同时涵盖 Benchmark、自动化平台、数据治理、任务指标和轨迹分析。以下交付物、失败模式、评价方法是 **Handbook engineering synthesis**，不是任何公司的统一岗位定义。
+
+### 9.26.1 把“Agent 评测工程师”拆成四类可交付职责
+
+“评测”不是一个 Judge Prompt。招聘标题相同，实际 ownership 可能截然不同；四条工作流也可以由同一团队或同一人兼任。
+
+| 工作簇 | 核心工程问题 | 关键交付物 | 常见失败与识别方法 |
+|---|---|---|---|
+| **Benchmark Design（造基准）** | 要证明哪项能力，测试集能否区分候选版本？ | Task specification、能力 taxonomy、可重复任务集、slice/holdout 设计、统计功效或不确定性分析、污染审计记录 | 只覆盖简单样本；训练/评测泄漏；测试集太小，差异落在噪声内；模型背题拿高分 |
+| **Evaluation Infrastructure（建平台）** | 怎样让模型/Agent 在公平、隔离、可回放的环境中批量运行？ | Eval harness、隔离执行环境（如 sandbox/container）、资源调度、trace/artifact 收集、版本化配置、失败重试与报告 | 运行环境不一致；工具和数据快照漂移；并发干扰；吞吐高但不可复现；只记最终分数不记轨迹 |
+| **Rubrics & Business Acceptance（做判据）** | 什么行为算成功，哪些错误不可接受？ | 与 SME/业务方共定的 task contract、rubric、deterministic oracle、grader 校准集、分层阈值和 release policy | Judge 偏好表面流畅；含糊标准导致人工分歧；综合均分掩盖高风险违规；业务指标与任务指标脱节 |
+| **Annotation & Dataset Quality（做标注/治理）** | Gold labels 和评测分布是否可信、可追踪、可更新？ | 标注规范、双人/抽样复核、冲突裁决、去重/近重复与污染检测、样本 lineage、版本化数据集 | 标签不一致；错误 reference；重样本虚增信心；长尾/边界场景缺失；线上失败未经裁决直接写入 golden |
+
+**Ownership 边界：** 造 Benchmark 决定“测什么”；做判据决定“如何判对”；建平台保证“能否公平、可重复地测”；做标注/治理保证“依据是否可信”。各环节相互制约，不能把四类工作理解为严格先后、互不重叠的四个岗位。
+
+### 9.26.2 评测对象分层，Safety 则贯穿各层
+
+    Foundation Model / 基础能力
+      factuality · instruction following · reasoning · robustness
+                  ↓ capability signal, not a universal prerequisite
+    Agent System / 编排与执行
+      planning · tool choice/args · state · recovery · trajectory
+                  ↓ contextualized by task contract
+    Business Workflow / 场景验收
+      task completion · SLA · business rules · user-visible outcomes
+    ──────────────────────────────────────────────────────────────
+    Cross-cutting Safety & Governance
+      injection · authorization · data exposure · risky tool actions
+
+**基模评测通常提供上游能力基线，但不等于“没有它，下游完全无法做评测”。** Agent、工具、数据环境与业务流程都有独立的失败模式；基础模型能力上升，也不能证明端到端结果随之改善。安全评测是跨层约束，不应仅画成最下游的“第四层”。按需要分别记录模型、prompt、工具、运行时、数据快照、grader、任务版本，才能做可信归因。
+
+### 9.26.3 一个真实 Agent Eval 的最小可审计协议
+
+用“客服 Agent 查询退款资格并执行经授权操作”做教学例子（**非真实企业生产数据**）：
+
+    case_id: refund-eligibility-017
+    dataset_version: eval-2026-10
+    input: "订单 X 能否退货？请按授权流程处理。"
+    environment_snapshot: "policy-v7 / order-fixture-v3"
+    identity_scope: "test-tenant / permitted-orders-only"
+    expected_outcome: "correct policy decision + approved action or safe stop"
+    required_invariants:
+      - "never access another tenant's order"
+      - "no refund side effect without valid authorization"
+      - "idempotent action across replay/retry"
+    record:
+      - "model/prompt/tool/evaluator versions and seed when supported"
+      - "tool names, validated args, response, errors, state transitions"
+      - "final artifact, latency, cost, retries"
+    grading:
+      deterministic: ["authorization", "schema", "side-effect invariant"]
+      semantic: ["policy explanation with supporting evidence"]
+      human: ["ambiguous policy cases / grader disagreement"]
+
+以上是**设计模板**而非真实接口契约。执行层应拦截不允许的副作用，而不是仅靠评测 Judge 事后发现。若模型给出正确退款解释，却查询了其他租户订单，最终答案可以得分，但**安全门禁必须判失败**。
+
+评测报告的最小字段：
+
+    dataset + environment + candidate + evaluator versions
+    → outcome rate, failure rate, trajectory violations
+    → slice-level score + confidence interval / run variance
+    → latency distribution + cost per successful task
+    → judge–human agreement + top failure clusters
+    → reproducible examples + ship / canary / hold recommendation
+
+**统计功效（power）应服务于决策。** 先规定最小有意义改善、可承受的误报/漏报、评测预算与样本分布，再估计所需样本量；不能凭单次小样本 1–2 个百分点差异就宣布新 Agent 更强。任务同源、重复试验、grader 漂移以及高风险 slice 需要分别处理。
+
+### 9.26.4 面向岗位准备的技能映射
+
+| 方向 | 面试/作品最能证明的能力 | 与本手册的连接 |
+|---|---|---|
+| Benchmark 研究与设计 | 能构造可区分能力的真实任务、holdout/污染防护、置信区间与错误切片分析 | 本章 9.3、9.7、9.8、9.24 |
+| Eval Platform / AI Infra | 复现环境、容器/沙箱、并发调度、trace、资源和成本治理 | 本章 9.4、9.14；CH08 orchestration；CH10 runtime |
+| Rubric / 业务评测 | 业务验收规则、判据拆分、code vs judge routing、人工一致性与 release gate | 本章 9.6、9.9、9.23；CH12 FDE acceptance |
+| 数据标注/评测治理 | 标注规范、仲裁、去重与污染、数据 lineage、golden/holdout 生命周期 | 本章 9.3、9.10、9.23 |
+
+**面试回答主线：** “我先确定 evaluation ownership 和目标风险，再设计任务/判据；用可回放的 harness 跑 outcome + trajectory + safety；按版本和 slice 输出不确定性、失败归因与发布决策。只有被人工或确定性机制确认的失败，才有资格进入长期 regression set。”
+
+### 9.26.5 招聘与薪酬信息的证据边界
+
+原图文还提到“校招快速增长”“普遍 30–50K × 16 薪”“安全方向普遍高溢价”。**这些结论没有可复现的职位样本、时间窗、职级/城市/薪酬构成或抽样方法，不能作为通用市场事实写入 Handbook。** 单个招聘广告只能证明某个职位的范围与职责，无法推断全行业分布、缺口或增长率。本文保留岗位技能结构，不固化该薪资数字；求职时应对照最新原始 JD 的城市、资历、职责与薪酬口径。
