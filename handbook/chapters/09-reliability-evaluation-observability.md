@@ -1353,8 +1353,9 @@ keep adopted harness + evidence + when it helped
 因此“多 refine 一点”不是免费调参，而是显式的成本换收益决策，必须和单次任务预算、并发上限一起设，并用 §9.14 的口径衡量：
 
 ~~~text
-cost per successful task
-= (base run + k × candidate probes + judging) / successful tasks
+cost per verified successful task
+= (base-run cost + all candidate-probe costs + judging/reflection cost)
+  / verified successful tasks
 ~~~
 
 #### 三个必须显式声明的评估边界
@@ -1382,7 +1383,7 @@ Agent 可以提出编辑、可以执行探测，但不应该拥有“放宽自�
 
 #### 面试回答
 
-> 我不把自我改进理解成“失败就重试”或“跑完就 fine-tune”。更外层的改进对象是 Harness：system prompt、guardrail、memory、skills、tool guidance、scripts、subagents、plugins。比较成熟的做法是把编辑变成实验——提出候选编辑，在同一任务上探测，用执行 trace 与交付物的差异决定保留哪些。这不需要标准答案，但代价是它只能证明“编辑改变了行为”，不能证明“答案正确”，所以候选必须走 Candidate → Validated → Shadow → Active 的晋升。经验层面要保留的是被采纳的 Harness 加上证据和适用条件，而不是把上次的最终配置直接搬到下一个任务。成本上，递归预算 k 与任务执行次数线性相关，要用 cost per successful task 衡量。权限上，Agent 可以提议编辑和执行探测，但不应该有权修改自己的 guardrail 与权限边界。
+> 我不把自我改进理解成“失败就重试”或“跑完就 fine-tune”。更外层的改进对象是 Harness：system prompt、guardrail、memory、skills、tool guidance、scripts、subagents、plugins。比较成熟的做法是把编辑变成实验——提出候选编辑，在同一任务上探测，用执行 trace 与交付物的差异决定保留哪些。这不需要标准答案，但代价是它只能证明“编辑改变了行为”，不能证明“答案正确”，所以候选必须走 Candidate → Validated → Shadow → Active 的晋升。经验层面要保留的是被采纳的 Harness 加上证据和适用条件，而不是把上次的最终配置直接搬到下一个任务。成本上，递归预算 k 会增加候选探测与真实任务执行次数，要用 cost per successful task 衡量。权限上，Agent 可以提议编辑和执行探测，但不应该有权修改自己的 guardrail 与权限边界。
 
 ### 9.21.22 Source boundary
 

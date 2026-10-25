@@ -5,7 +5,7 @@ Date: 2026-10-25. Three user-supplied raw notes were reviewed against current ca
 | Raw note | Original SHA-256 | Disposition |
 |---|---|---|
 | `Agent 的 Todo List 有什么用？.md` | `7aa1b4753ea34ad309e7ec146c73d5700e84841e11094b90e383cc70fc66618a` | Integrated into Chapter 08 §8.14.20 with vendor-specific claims checked against DeepSeek's own code and package README. |
-| `Agent评测岗位.md` | `9b544ad3205ccd4610ef4793ba21353027ecf8c173dea595531920ce548a28e8` | Reviewed, no canonical addition. Benchmark design, platform operations, business criteria and annotation already occur throughout Chapter 09. Employer examples, salary, scarcity and hiring trend were not verified and were not promoted. |
+| `Agent评测岗位.md` | `9b544ad3205ccd4610ef4793ba21353027ecf8c173dea595531920ce548a28e8` | Reviewed, no canonical addition. The latest main already owns the role map in Chapter 09 §9.26 (PR #84); the release reuses it. Employer examples, salary, scarcity and hiring trend were not verified and were not promoted. |
 | `如何从根源上保障RAG系统的知识时效性.md` | `b47b3c233a60c067fc7eec595ffe360d61774c89f8645cf7f4eba2f432f99c5b` | Integrated the missing distinction between index freshness and business validity into Chapter 02 §2.11. Interview rhetoric and vendor-independent implementation claims were not promoted. |
 
 ## Source and correction boundaries
@@ -21,4 +21,4 @@ After the initial review, the user authorized stopping the lock-owning GBrain se
 
 GBrain indexes committed `main` only. Therefore this pass's new local edits to Chapters 02 and 08 are intentionally not in the snapshot; they can be indexed after review and merge. The raw inbox and verification records remain excluded. GBrain reported existing chapter-size warnings and a 100-fence parsing cap on some large chapters; the sync succeeded, but those limits may affect completeness of individual chunk excerpts.
 
-The canonical worktree changes have not been published to the Reader; content derivation, build, PR and deployment remain separate release work.
+Publication follow-through is recorded in `2026-10-25-inbox-release.md`, including the bilingual Reader mapping, validation and delivery status.

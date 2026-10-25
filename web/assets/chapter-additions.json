@@ -78,6 +78,10 @@
     {
       "path": "/assets/ch08-fde-agent-coding.html",
       "id": "fde-agent-coding-06"
+    },
+    {
+      "path": "/assets/ch08-task-list-state.html",
+      "id": "task-list-state"
     }
   ],
   "09-reliability-evaluation-observability": [
@@ -129,6 +133,10 @@
     {
       "path": "/assets/ch09-agent-eval-role-map.html",
       "id": "agent-eval-role-map"
+    },
+    {
+      "path": "/assets/ch09-harness-self-improvement.html",
+      "id": "harness-self-improvement"
     }
   ],
   "07-memory-context-engineering": [
@@ -203,6 +211,10 @@
     {
       "path": "/assets/ch02-enterprise-indexing-context.html",
       "id": "enterprise-indexing-before-tokens"
+    },
+    {
+      "path": "/assets/ch02-rag-temporal-validity.html",
+      "id": "rag-temporal-validity"
     }
   ],
   "12-fde-customer-delivery": [

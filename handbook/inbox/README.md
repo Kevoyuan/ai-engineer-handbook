@@ -10,7 +10,7 @@
 
 - [Agent Todo List](processed/Agent%20的%20Todo%20List%20有什么用？.md) → [第 8 章 §8.14.20](../chapters/08-agent-orchestration.md)。核对 DeepSeek 源码与 Manus 原文后，保留单会话清单与共享任务板的所有权边界。
 - [RAG 知识时效](processed/如何从根源上保障RAG系统的知识时效性.md) → [第 2 章 §2.11](../chapters/02-enterprise-retrieval.md)。补充索引新鲜度与业务有效期的区别；无原始出处的“工业基线”说法未采纳。
-- [Agent 评测岗位](processed/Agent评测岗位.md) → 已审阅，技术内容与[第 9 章](../chapters/09-reliability-evaluation-observability.md)重合；薪酬、招聘趋势和雇主案例未核验，未写入正式章节。
+- [Agent 评测岗位](processed/Agent评测岗位.md) → 已审阅；最新 `main` 已在[第 9 章 §9.26](../chapters/09-reliability-evaluation-observability.md)收录岗位图谱，本轮沿用，不再重复。薪酬与招聘趋势仍未核验，未作为正式事实采纳。
 - [本轮核验记录](../verification/2026-10-25-inbox-todo-eval-freshness.md)。正式章节经审核合入 `main` 后，才可按 GBrain runbook 更新外部索引。
 
 ## 已处理 · 2026-10-22

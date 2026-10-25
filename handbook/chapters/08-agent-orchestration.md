@@ -4024,7 +4024,7 @@ universal formal equation
 
 长任务中的清单同时服务于两件事：让 Agent 重新看见当前目标和未完成步骤，让用户看到可纠正的进度。它是执行状态的一个视图，不能代替 §8.4 的 Workflow State、§8.15 的持久交接或实际完成验证。Manus 把反复更新 `todo.md` 描述为将目标带回近期上下文的做法；这是其团队经验，不是所有模型都能因此避免目标漂移的保证。
 
-DeepSeek Harness 的 `todo_write` 是一个具体实现例：每次提交完整清单，每项只有 `content` 和 `pending / in_progress / completed` 状态；工具校验空白、重复项目，并按部署时必选的 `allowParallelInProgress` 设置限制并行活动项。一次成功调用把完整清单写入拥有该会话的 `todo/write` 事件，前端用 `todos` projection 读取；新一轮 `turn/start` 清空当前投影。工具返回给模型的是状态计数，完整清单仍存在工具调用参数与事件日志中。这个设计减少单会话内逐项 ID 管理，但全量覆写带来最后写入覆盖先前更新的语义。
+DeepSeek Harness 的 `todo_write` 是一个具体实现例：每次提交完整清单，每项只有 `content` 和 `pending / in_progress / completed` 状态；工具拒绝空白、重复项目和未知字段，并按部署时必选的 `allowParallelInProgress` 设置限制并行活动项。这个设置只约束进度声明，不调度或证明真实并发。一次成功调用把完整清单写入拥有该会话的 `todo/write` 事件，前端用 `todos` projection 读取；新一轮 `turn/start` 清空当前投影。工具返回给模型的是状态计数，完整清单仍存在工具调用参数与事件日志中。这个设计减少单会话内逐项 ID 管理，但全量覆写带来最后写入覆盖先前更新的语义。
 
 设计选择要看所有权：单个 Agent 拥有清单时，全量替换足够简单；多个 Worker 共同修改任务板时，需要稳定任务 ID、owner、依赖关系和并发提交规则（§8.13、§8.15）。清单状态是 Agent 的进度声明，`completed` 仍需由交付物和验证结果支持。上下文压缩或恢复时，应从持久状态重建未完成任务，不能仅依赖最近一条自然语言摘要。
 
