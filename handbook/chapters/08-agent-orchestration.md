@@ -3711,6 +3711,8 @@ Governance / Runtime Harness
 
 > **As model capability rises, the harness shifts from correcting weak cognition to governing powerful action.**
 
+Harness 自身也可以成为被系统化编辑与搜索的对象——候选编辑如何产生、对比证据能证明什么、以及为什么编辑 guardrail 的权限不能交给被约束的 Agent，见 [第 9 章 §9.21.21](./09-reliability-evaluation-observability.md)。
+
 ### 8.14.14 Harness 不是 Prompt Loop，而是 Model ↔ Real World Runtime Boundary
 
 把 Harness 理解成：
@@ -4018,7 +4020,17 @@ universal formal equation
 
 > **Model capability and Harness guarantees are complementary system dimensions, not substitutes.**
 
-### 8.14.20 Source boundary · Effective Agent Harness / ACI
+### 8.14.20 Task List：执行进度的会话状态
+
+长任务中的清单同时服务于两件事：让 Agent 重新看见当前目标和未完成步骤，让用户看到可纠正的进度。它是执行状态的一个视图，不能代替 §8.4 的 Workflow State、§8.15 的持久交接或实际完成验证。Manus 把反复更新 `todo.md` 描述为将目标带回近期上下文的做法；这是其团队经验，不是所有模型都能因此避免目标漂移的保证。
+
+DeepSeek Harness 的 `todo_write` 是一个具体实现例：每次提交完整清单，每项只有 `content` 和 `pending / in_progress / completed` 状态；工具校验空白、重复项目，并按部署时必选的 `allowParallelInProgress` 设置限制并行活动项。一次成功调用把完整清单写入拥有该会话的 `todo/write` 事件，前端用 `todos` projection 读取；新一轮 `turn/start` 清空当前投影。工具返回给模型的是状态计数，完整清单仍存在工具调用参数与事件日志中。这个设计减少单会话内逐项 ID 管理，但全量覆写带来最后写入覆盖先前更新的语义。
+
+设计选择要看所有权：单个 Agent 拥有清单时，全量替换足够简单；多个 Worker 共同修改任务板时，需要稳定任务 ID、owner、依赖关系和并发提交规则（§8.13、§8.15）。清单状态是 Agent 的进度声明，`completed` 仍需由交付物和验证结果支持。上下文压缩或恢复时，应从持久状态重建未完成任务，不能仅依赖最近一条自然语言摘要。
+
+**来源边界：** [DeepSeek Harness 工具实现](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/todo/tool-todo/src/index.ts)与[包说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/todo/tool-todo/README.md)支持上述具体机制；[Manus 的上下文工程文章](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus)支持反复更新清单的团队实践。共享任务板与验证边界是本手册综合建议，不是这些工具的内建保证。
+
+### 8.14.21 Source boundary · Effective Agent Harness / ACI
 
 Primary inputs:
 
