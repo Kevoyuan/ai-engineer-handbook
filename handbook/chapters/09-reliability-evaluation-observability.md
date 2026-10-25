@@ -1266,11 +1266,131 @@ Efficiency
 
 > Agent 的经验积累我会分成快慢两条路径。生产 Trace 先作为原始证据保存，通过 Eval 和 Root Cause 抽取 Candidate Experience；经验经过去重、适用条件、scope、版本和证据验证后，由 Promotion Router 决定进入 Case Memory、Skill、Deterministic Policy 还是 Regression Dataset。新任务只检索当前 task / environment 真正适用的经验，不做全局相似度乱召回。只有长期稳定、重复出现、且有明确 Eval Contract 的行为缺口才进入训练数据，再根据数据形式选择 SFT、preference optimization 或 RL，并经过完整 Regression 和 Release Gate。Fine-tuning 不是不能用，而是不应该成为每条生产轨迹的实时第一落点。核心是让经验可追溯、可验证、可失效、可回滚，并且只有成熟经验才晋升到参数层。
 
-### 9.21.21 Source boundary
+### 9.21.21 Harness 层面的自我改进：编辑执行设置，而不是重试任务
 
-Primary source:
+§9.21 讨论的是“经验应该晋升到哪里”。还有一类自我改进作用在更外层：直接编辑 Harness 本身。
+
+动机不是模型不会做，而是：
+
+~~~text
+retry with the same instructions
+→ new sample
+→ same failure cause
+~~~
+
+重试改变的是采样，不是导致失败的结构。因此更合理的方向是：在重跑之前先改执行设置。
+
+Harness²（Google Research 开源研究框架，arXiv 2610.14224，2026）把这件事做成了可检验的实验流程，同时保持模型权重不变：
+
+~~~text
+Propose
+  inspect a reference run → identify weakness → propose candidate edits
+
+Probe
+  execute candidates on the same task under matched conditions
+
+Compose
+  retain / combine edits supported by behavioral contrast
+~~~
+
+它的可编辑对象是八个组件，按运行时角色分四组：
+
+~~~text
+context construction
+  system prompt · guardrails · memory · skills
+
+tool interface
+  tool guidance · scripts
+
+delegation
+  subagents
+
+middleware
+  plugins
+~~~
+
+关键设计取舍是**不需要标准答案**：比较对象是同一任务下的执行 trace 与交付物，判断依据是“这个编辑是否改变了行为”，而不是“这个答案是否正确”。
+
+> **Behavioral contrast is evidence about change, not proof of correctness.**
+
+这条边界要写进系统设计，而不是当成实现细节。两次运行可以共享同一个错误假设：编辑让 Agent 多查了一个来源并发现了矛盾，只能说明检查程序起作用了；如果两次运行建立在同一个错误前提上，对比结果依然“看起来变好了”。这是 §9.21.10 的 self-reinforcing error 在 Harness 层的版本——错误被固化进 prompt 和工具，而不是 case。
+
+所以这类改进的输出只能进 Candidate，走 §9.21.18 的状态机：
+
+~~~text
+OBSERVED → CANDIDATE → VALIDATED → SHADOW → ACTIVE
+~~~
+
+#### 两层递归：任务级与 Harnessing 级
+
+~~~text
+Task-level recursion
+  refine the execution harness for the current task
+  (Propose–Probe–Compose, no ground-truth feedback)
+
+Harnessing-level recursion
+  update a persistent improvement harness
+  with adopted harnesses + evidence-supported lessons
+  (experience reflector)
+~~~
+
+第二层才是“学习”发生的地方，做法与 §9.21 一致：不把上一个任务的最终 Harness 原样搬到下一个任务，而是把**被采纳的 Harness 连同证据**存进库；新任务从公共 base Harness 起步，按适用条件复用或改造。
+
+~~~text
+keep the final config only
+→ you inherit a result you cannot justify
+
+keep adopted harness + evidence + when it helped
+→ you can re-evaluate applicability per task
+~~~
+
+> **Promote the evidence behind a revision, not just the revision.**
+
+#### 预算即成本
+
+任务级递归预算是显式参数：一次 Propose–Probe–Compose 是 k=1；并行模式探测 k 个 general 与 k 个 domain-specific 候选再产出 k 个组合；串行模式连续迭代 k 步。官方表述是并行探索更宽、串行收敛更深，增加预算仍有收益——但每一步都要真实执行任务。
+
+因此“多 refine 一点”不是免费调参，而是显式的成本换收益决策，必须和单次任务预算、并发上限一起设，并用 §9.14 的口径衡量：
+
+~~~text
+cost per verified successful task
+= (base-run cost + all candidate-probe costs + judging/reflection cost)
+  / verified successful tasks
+~~~
+
+#### 三个必须显式声明的评估边界
+
+1. **对比不等于正确**：无 ground truth 的对比只能证明行为改变，不能证明答案正确；
+2. **基准污染**：README 明确说明 executor 网络访问不受限、Codex 关闭 sandbox，公开 benchmark 的 rubric 可能在线可获取，要求在评测前配置网络限制，避免访问答案与评分标准。任何“涨分”结论都要先确认这一条；
+3. **作者自报**：三个分数（WorkBuddy-Bench 最高 +11.5、JobBench +4.5、LAB partial pass rate +11.8pp，GLM-5 与 Gemini 3.5 Flash，四种 model–harness 配置）来自论文与 README 自述，没有独立复现。
+
+复现性还有一条工程约束：judge 与 report 必须使用与 refinement 相同的 benchmark、executor、subset、k、mode 与 seed，否则比较的不是同一个东西。
+
+#### 自我修改的权限问题
+
+可编辑组件里包含 **guardrails** 与 **system prompt**。让 Agent 自己改自己的 guardrail，等于把 §8.14.16 的 Capability / Authority 边界交给被约束方自己划。
+
+工程上要拆开：
+
+~~~text
+Agent proposes harness edits
+→ external evaluator runs candidates
+→ human / policy owner approves promotion
+→ runtime loads the new harness
+~~~
+
+Agent 可以提出编辑、可以执行探测，但不应该拥有“放宽自己约束”的写权限。这与 §9.13 的 Production Harness 一致：权限、验证、恢复、预算留在 Host / Workflow，而不是交给模型自律。
+
+#### 面试回答
+
+> 我不把自我改进理解成“失败就重试”或“跑完就 fine-tune”。更外层的改进对象是 Harness：system prompt、guardrail、memory、skills、tool guidance、scripts、subagents、plugins。比较成熟的做法是把编辑变成实验——提出候选编辑，在同一任务上探测，用执行 trace 与交付物的差异决定保留哪些。这不需要标准答案，但代价是它只能证明“编辑改变了行为”，不能证明“答案正确”，所以候选必须走 Candidate → Validated → Shadow → Active 的晋升。经验层面要保留的是被采纳的 Harness 加上证据和适用条件，而不是把上次的最终配置直接搬到下一个任务。成本上，递归预算 k 会增加候选探测与真实任务执行次数，要用 cost per successful task 衡量。权限上，Agent 可以提议编辑和执行探测，但不应该有权修改自己的 guardrail 与权限边界。
+
+### 9.21.22 Source boundary
+
+Primary sources:
 
 - 用户提供的视频提取：《王二讲Agent｜Agent怎么做经验积累和自我学习？》
+- Harness² README 与论文摘要（arXiv 2610.14224，2026）：recursive agent harnessing，保持模型权重固定
 
 Source-derived ideas retained:
 
@@ -1308,6 +1428,32 @@ Sources:
 - https://developers.openai.com/api/docs/guides/model-optimization
 - https://developers.openai.com/api/docs/guides/supervised-fine-tuning
 - https://developers.openai.com/api/docs/guides/reinforcement-fine-tuning
+
+#### Harness² · verified facts（2026-10-22）
+
+- 仓库 `google-research/harness2`，Apache 2.0，自述为研究发布并明确 “not an officially supported Google product”；
+- 八个可编辑组件：system prompt、guardrails、memory、tool guidance、subagents、skills、scripts、plugins，按 context construction / tool interface / delegation / middleware 四组运行时角色划分；
+- 任务级递归 = Propose–Probe–Compose，对比执行行为，不使用 ground-truth 反馈；
+- Harnessing 级递归 = 用被采纳的 Harness 与有证据支撑的 lessons 更新 persistent improvement harness，由 experience reflector 完成；
+- 结果目录保存 task summaries、deliverables、adopted harnesses、reflection notes；
+- 三种 benchmark（JobBench / LAB / WorkBuddy-Bench）、两种 executor（OpenCode / Codex）、并行与串行递归；
+- README 要求评测前配置网络限制：executor 网络访问不受限、Codex 关闭 sandbox、公开 rubric 可能在线可获取。
+
+#### Harness² · 未确认项（不得当作事实）
+
+- 通讯稿提到的 `EXPERIENCE.md` 在 README 中不存在；对应机制应表述为 persistent improvement harness + reflection notes；
+- +11.5 / +4.5 / +11.8pp 为作者自报，无独立复现；
+- “每个 model–harness 配置都有提升”只覆盖 README 声明的四种配置，不能推广为通用结论。
+
+Handbook corrections / synthesis:
+
+- 把“自我改进”限定为“对 Harness 的候选编辑 + 受控晋升”，不写成模型自主修改自身约束；
+- 明确无 ground-truth 对比的证据强度边界：改变行为 ≠ 答案正确；
+- 把 Harness 编辑纳入既有 Promotion State Machine 与 Production Harness 权限边界，而不是新增一套自我修改机制；
+- 将 refinement 预算显式折算为 cost per successful task；
+- 保留“晋升证据而非仅晋升配置”这一设计取舍；
+- 通讯稿的四个编辑方向被还原为 README 的八个组件，避免把分类压缩误当成组件清单。
+
 ## 9.22 Guardrail Evidence Gate + Behavior Observability
 
 《AI Native 研发范式实践手册》提出两个值得并入 Reliability Control Plane 的设计：**行为可观测** 与 **独立 Guardrail Evidence Gate**。
@@ -1515,6 +1661,12 @@ Representative sources:
 > **Not every experience should become memory, and not every memory should become training data.**
 
 > **Learning is incomplete until the lesson becomes testable.**
+
+> **A harness edit is a candidate experiment, not a self-certified improvement.**
+
+> **Behavioral contrast proves that an edit changed behavior, not that the answer became correct.**
+
+> **An agent may propose edits to its own constraints; it must not authorize them.**
 
 
 ## Verification boundary · 2026-09-28

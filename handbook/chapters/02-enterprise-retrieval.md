@@ -450,3 +450,24 @@ Good indexing → narrower, source-complete and permissioned evidence
 | 端到端 | task success / latency / cost per success | token 下降但错误决策上升 |
 
 **本手册综合**：先提高被授权的 Evidence Supply 质量，再调 Context Packing；二者是互补杠杆，不应互相替代。CH03 负责查询路由与 Retrieval Budget，CH04 负责 Evidence Sufficiency，CH07 负责压缩，CH09 负责端到端评估。
+
+## 2.11 RAG 时效治理：索引新鲜不等于事实仍有效
+
+§2.8 的 source-to-query freshness 衡量**更新何时可查**；业务有效期回答**在查询所问时间点，哪条事实生效**。新近写入的历史公告可能早已失效，旧文件里的长期规则也可能仍有效。仅按 `indexed_at` 或文档发布时间降序排列，会把这两种情况混淆。
+
+一个可执行的证据记录至少区分 `source_record_id`、`document_version`、`source_updated_at`、`indexed_at`、`effective_from`、`effective_to`、`supersedes`、业务 scope 与权威来源。字段是否存在、由谁确认、时间区间如何解释，必须由业务源定义；缺少版本或有效期时不能凭检索分数推断“当前有效”。价格、库存、权限和实时状态还应优先查询权威实时系统，索引只能在约定的新鲜度窗口内充当读模型。
+
+~~~text
+query intent + as_of time + authorized scope
+→ choose authoritative source and required snapshot
+→ filter invalid / superseded evidence before ranking
+→ retrieve and resolve same-fact version conflicts
+→ answer with evidence ID, version and effective interval
+→ recheck critical evidence at fetch / answer boundary
+~~~
+
+默认“当前”与显式“历史回溯”要走不同的 `as_of` 时间。新版本的生效时间可能在未来，不能一概用最高版本号覆盖当前版本。发布、撤回和改正也可能不按时间戳顺序到达；变更处理要有稳定 ID、版本/序列、可重放的增量更新、索引可见性与缓存失效检查。若无法确认最新权威事实，尤其在高风险决策中，应标明未知或拒绝确定性结论，而不是让 Prompt 在新旧片段之间猜。
+
+验证应覆盖四类坏例：新版已生效但旧切片仍命中；新版尚未生效却被提前引用；源记录已撤回但索引或缓存仍可见；用户明确查历史却只收到当前版。分别测 source-to-query lag、过期证据引用率、同一事实的版本冲突率和带正确 `as_of` 的答案支持率。检索后过滤是受限底层的一种补救，但候选窗口不足时会漏掉合法证据；它不能替代权限边界或源端核验。
+
+**来源边界：**本节是对本章 §2.5、§2.8、§2.10 和第 4 章证据充分性规则的工程综合，起点是收件箱中无原始出处的面试稿。稿中的“时态向量库隔离”“每次更新都在同一事务中写入向量和元数据”“工业基线”等不是通用能力或已验证标准；实现必须按所用存储系统与业务源的一致性契约确定。
