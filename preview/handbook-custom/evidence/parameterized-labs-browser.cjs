@@ -73,6 +73,10 @@ async function assertFit(page, root, width) {
       assert.equal((await values(page, "#route-budget-lab"))[1].trim(), "1 / 2");
       await range.press("ArrowRight");
       assert.equal((await values(page, "#route-budget-lab"))[1].trim(), "2 / 2");
+      await route.locator("#route-case-select").selectOption("aggregate");
+      await range.press("Home");
+      assert.equal((await values(page, "#route-budget-lab"))[1].trim(), "1 / 1");
+      assert.equal(await route.locator('li[data-state="planned"]').count(), 1);
       await route.locator("#route-case-select").selectOption("clarify");
       assert.equal((await values(page, "#route-budget-lab"))[0].trim(), "0 / 5");
       assert.equal(await route.locator('li[data-state="planned"]').count(), 0);
