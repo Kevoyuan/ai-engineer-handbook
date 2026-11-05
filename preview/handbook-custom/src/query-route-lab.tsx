@@ -51,6 +51,14 @@ const ROUTE_CASES: readonly RouteCase[] = [
     required: ["Exact", "BM25"],
   },
   {
+    id: "aggregate",
+    label: ["数值聚合", "Numeric aggregation"],
+    query: ["统计本季度故障工单数量", "Count incident tickets this quarter"],
+    need: ["授权的结构化聚合结果", "An authorized structured aggregate"],
+    priority: ["SQL", "Exact"],
+    required: ["SQL"],
+  },
+  {
     id: "clarify",
     label: ["指代不明", "Missing referent"],
     query: ["帮我查一下那个。", "Can you check that one?"],
