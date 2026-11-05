@@ -186,6 +186,23 @@ The existing CH04 `#concept-demo` remains one mounted Reader destination. Its or
 
 QA acceptance before merging: `npm run build`, `npm run test:concepts`, manual keyboard/locale/theme/reduced-motion checks at 390/768/1440/1728px, source and published asset parity via `npm run publish:web`, then Vercel Preview smoke test. Do not merge to `main` with an unrefreshed `web/site` build.
 
+## CH03 + CH08 parameterized chapter experiments
+
+The CH03 and CH08 lessons retain their one `#concept-demo`, original chapter and graph, step playback, per-example decision trace, two-question check, and source semantic boundaries. Their extra interactive teaching subsection appears after the takeaway and before the quiz. Neither introduces an Atlas route, new scroll owner, network call or new authority for handbook content.
+
+**CH03 Route Budget / `#route-budget-lab`:**
+- `#route-case-select` selects an authored query/evidence scenario; `#route-budget-range` sets at most 1–5 *planned* routes, not parallel execution. Five explicit retriever rows always appear (Exact, BM25, Dense, Graph, SQL) with human-readable selected/skipped/clarify state.
+- The chosen route list is the deterministic top-N of the scenario's suitable routes; fixture-required evidence paths produce the covered/required count. Display unmet paths as unresolved; do not suggest they were retrieved or that a source is actually absent. Extra paths may increase planning breadth without adding necessary evidence.
+- Missing referent always yields Clarify and zero planned routes. Every case displays authorization-first filtering and a conditional next action; selecting more paths never bypasses ACL, version, source recheck, RRF/rerank or CH04 evidence validation.
+- No fabricated speed, cost, accuracy, recall or model confidence. Both the selected route list and evidence-requirement mapping are synthetic pedagogical cases.
+
+**CH08 Agent Budget / `#agent-budget-lab`:**
+- `#agent-case-select` selects first-pass success, targeted-retry recovery, persistent failure or blocked human approval. `#agent-attempt-limit` accepts 1–4 attempts; `#agent-work-budget` accepts 0–12 invented units. Each permitted attempt uses three artificial units; both remaining units and maximum attempts must allow the next complete attempt.
+- The outcome shows verified STOP, incomplete HANDOFF or permission BLOCKED. The four-step ledger identifies failed, verified and never-executed attempts, with textual states. A success stops further attempts. Approval cannot be overridden by increasing either budget.
+- Reset restores the recoverable scenario, three maximum attempts and nine units. Work units are not time, tokens or money; no tool call or external side effect is performed. Evidence, checkpoint reconciliation, authorization, bounded retries and external idempotency remain distinct.
+
+**Acceptance:** native, visible label for each control; keyboard Home/End/Arrow and reset; polite live outcome; full bilingual copy; 44px control height and visible focus; no color-only status; no unbounded scrolling or mobile horizontal clipping. Regression: `evidence/parameterized-labs-browser.cjs` visits both routes at 390 / 768 / 1440 / 1728px with zh/en, light/dark, reduced motion; checks default and edge cases including Clarify, missing evidence, attempted/verified/unused retries, zero budget, approval block and reset. Preserve existing `test:concepts` coverage and verify the published `web/site` artifact before merging.
+
 ## V3.5 collapsed stage navigation
 
 On the graph-first CH03, CH04 and CH08 Labs, the original `.concept-flow` four-stage button map is wrapped in `<details class="concept-step-inspector">` and **closed by default**. Readers may expand it to jump to a named stage; step highlights, round-two seek behavior, Next/Previous, reduced motion and quiz must remain unaffected. Native disclosure semantics give keyboard and screen reader access. The GraphCanvas is the only default visual topology; the old detailed evidence pane remains another intentionally optional inspection layer.
