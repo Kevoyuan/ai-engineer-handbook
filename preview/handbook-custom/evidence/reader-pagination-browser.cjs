@@ -26,12 +26,19 @@ async function dimensions(page, selector) {
   }));
 }
 
-async function scrollToFooter(page, width) {
-  await page.locator(".reader-bottom").scrollIntoViewIfNeeded();
-  const scrollOwner = width <= 767 ? ".workspace.reader-workspace" : ".chapter-body";
-  await page.locator(scrollOwner).evaluate((node) => {
-    node.scrollTop = node.scrollHeight;
+async function scrollToFooter(page) {
+  // CSS smooth scrolling can leave the screenshot in the *middle* of a long
+  // chapter. Force the actual article footer into the visible viewport before
+  // asserting or capturing it, for both workspace and nested pane owners.
+  await page.locator(".reader-bottom").evaluate((node) => {
+    node.scrollIntoView({ block: "end", inline: "nearest", behavior: "instant" });
   });
+  await page.waitForFunction(() => {
+    const nav = document.querySelector(".reader-bottom");
+    if (!nav) return false;
+    const rect = nav.getBoundingClientRect();
+    return rect.top >= 48 && rect.bottom <= window.innerHeight + 2;
+  }, null, { timeout: 10000 });
   await page.evaluate(() => new Promise((resolve) =>
     requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
@@ -85,7 +92,7 @@ async function scrollToFooter(page, width) {
         }).isVisible(), true);
       }
 
-      await scrollToFooter(page, cfg.width);
+      await scrollToFooter(page);
       const after = await dimensions(page, ".workspace.reader-workspace .topbar");
       assert.ok(Math.abs(after.y - initial.y) <= 1.5,
         "Topbar moved/disappeared after deep reading: " + JSON.stringify([initial,after]));
