@@ -13,6 +13,7 @@ on:
       - "preview/handbook-custom/src/parameterized-labs.css"
       - "preview/handbook-custom/evidence/risk-coverage-browser.cjs"
       - "preview/handbook-custom/evidence/parameterized-labs-browser.cjs"
+      - "preview/handbook-custom/evidence/capture-parameter-lab.cjs"
       - ".github/workflows/ch04-risk-coverage.yml"
   workflow_dispatch:
 
@@ -53,6 +54,12 @@ jobs:
         run: npm run build --prefix preview/handbook-custom
       - name: Generate production static site for review
         run: npm run publish:web --prefix preview/handbook-custom
+      - name: Install Chinese glyph support for visual review
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends fonts-noto-cjk
+          fc-match "Noto Sans CJK SC"
       - name: Install Chromium
         timeout-minutes: 6
         run: cd preview/handbook-custom && npx playwright install chromium
