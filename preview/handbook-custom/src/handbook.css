@@ -202,7 +202,6 @@
 }
 html {
   scroll-padding-top: 100px;
-  scrollbar-color: var(--muted-foreground) var(--background);
 }
 body {
   margin: 0;
@@ -243,23 +242,6 @@ p {
 ::selection {
   background: var(--accent);
   color: var(--accent-foreground);
-}
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-*::-webkit-scrollbar-track {
-  background: var(--background);
-}
-*::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-}
-*::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
-}
-*::-webkit-scrollbar-thumb:active {
-  background: var(--primary);
 }
 .desktop-nav {
   position: fixed;
@@ -1930,28 +1912,6 @@ body,
 .focus-reading .reader-toc-button {
   display: inline-flex;
 }
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--muted-foreground) var(--background);
-}
-*::-webkit-scrollbar {
-  width: 0.5rem;
-  height: 0.5rem;
-}
-*::-webkit-scrollbar-thumb {
-  background: var(--muted-foreground);
-  border: 2px solid var(--background);
-  border-radius: 1rem;
-}
-*::-webkit-scrollbar-thumb:hover {
-  background: var(--foreground);
-}
-*::-webkit-scrollbar-thumb:active {
-  background: var(--primary);
-}
-*::-webkit-scrollbar-track {
-  background: var(--background);
-}
 button:active {
   filter: brightness(0.95);
 }
@@ -2208,44 +2168,64 @@ button[data-variant="default"] {
   }
 }
 
-/* Auto-hidden scrollbar chrome retains its gutter to avoid layout shifts. */
+/* One scrollbar contract for the Atlas: quiet, theme-aware, never a rail.
+   Consolidated from three conflicting blanket rules. Scroll owners and
+   nested code/matrix panes retain their native scrolling and stable gutters.
+   Only the actual active thumb gets stronger contrast; hovering an ancestor
+   does NOT light up every nested scrollbar. */
+:root {
+  --scroll-thumb-idle: color-mix(in srgb, var(--foreground) 22%, transparent);
+  --scroll-thumb-engaged: color-mix(in srgb, var(--foreground) 45%, transparent);
+  --scroll-thumb-dragging: color-mix(in srgb, var(--foreground) 64%, transparent);
+}
 * {
-  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb-idle) transparent;
 }
-*::-webkit-scrollbar-track {
-  background: transparent;
+*::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner { background: transparent; }
 *::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-color: transparent;
+  min-height: 32px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--scroll-thumb-idle);
+  background-clip: padding-box;
 }
 *[data-scrolling="true"],
 *:focus-visible {
-  scrollbar-color: var(--muted-foreground) transparent;
+  scrollbar-color: var(--scroll-thumb-engaged) transparent;
 }
 *[data-scrolling="true"]::-webkit-scrollbar-thumb,
-*:focus-visible::-webkit-scrollbar-thumb {
-  background: var(--muted-foreground);
-  border-color: transparent;
+*:focus-visible::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-thumb-engaged);
+  background-clip: padding-box;
 }
-@media (hover: hover) and (pointer: fine) {
-  *:hover {
-    scrollbar-color: var(--muted-foreground) transparent;
-  }
-  *:hover::-webkit-scrollbar-thumb {
-    background: var(--muted-foreground);
-    border-color: transparent;
-  }
-  *::-webkit-scrollbar-thumb:hover {
-    background: var(--foreground);
-  }
+*::-webkit-scrollbar-thumb:active {
+  background: var(--scroll-thumb-dragging);
+  background-clip: padding-box;
 }
+/* Touch surfaces keep a minimal indicator without reserving a thick rail.
+   Do not disable wheel/touch/keyboard scrolling or hide horizontal table
+   affordances. */
+@media (pointer: coarse) {
+  *::-webkit-scrollbar { width: 5px; height: 5px; }
+  *::-webkit-scrollbar-thumb { border-width: 1px; }
+}
+/* Platform high-contrast scrollbars are a usability control, not decoration. */
 @media (forced-colors: active) {
   * {
     scrollbar-color: auto;
+    scrollbar-width: auto;
   }
+  *::-webkit-scrollbar { width: auto; height: auto; }
   *::-webkit-scrollbar-thumb {
-    background: CanvasText;
+    border: 0;
+    background: ButtonText;
   }
 }
 .desktop-sidebar-toggle {
