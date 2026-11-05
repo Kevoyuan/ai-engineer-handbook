@@ -1,0 +1,70 @@
+name: CH04 Risk-Coverage Lab verification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "DESIGN.md"
+      - "preview/handbook-custom/UX-CONTRACT.md"
+      - "preview/handbook-custom/src/concept-diagrams.tsx"
+      - "preview/handbook-custom/src/reliability-lab.*"
+      - "preview/handbook-custom/evidence/risk-coverage-browser.cjs"
+      - ".github/workflows/ch04-risk-coverage.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-exercise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: preview/handbook-custom/package-lock.json
+      - name: Install Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r preview/handbook-custom/scripts/requirements.txt
+          npm ci --prefix preview/handbook-custom
+      - name: Regenerate semantic reader content
+        run: npm run sync-content --prefix preview/handbook-custom
+      - name: Typecheck and build
+        run: npm run build --prefix preview/handbook-custom
+      - name: Generate production static site for review
+        run: npm run publish:web --prefix preview/handbook-custom
+      - name: Install Chromium
+        run: cd preview/handbook-custom && npx playwright install --with-deps chromium
+      - name: Exercise threshold and accessibility contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd preview/handbook-custom
+          npm run dev -- --port 4180 >/tmp/risk-lab-vite.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4180/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4180/ >/dev/null
+          HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
+      - name: Save generated site for visual and publication review
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ch04-risk-coverage-web-site
+          path: web/site/
+          if-no-files-found: error
+          retention-days: 7
