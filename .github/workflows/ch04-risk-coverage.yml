@@ -1,4 +1,4 @@
-name: Parameterized Atlas Teaching Labs verification
+name: Atlas Reader and Scrollbar verification
 
 on:
   pull_request:
@@ -17,6 +17,7 @@ on:
       - "preview/handbook-custom/evidence/risk-coverage-browser.cjs"
       - "preview/handbook-custom/evidence/parameterized-labs-browser.cjs"
       - "preview/handbook-custom/evidence/reader-pagination-browser.cjs"
+      - "preview/handbook-custom/evidence/scrollbar-browser.cjs"
       - "preview/handbook-custom/evidence/capture-parameter-lab.cjs"
       - ".github/workflows/ch04-risk-coverage.yml"
   workflow_dispatch:
@@ -67,7 +68,7 @@ jobs:
       - name: Install Chromium
         timeout-minutes: 6
         run: cd preview/handbook-custom && npx playwright install chromium
-      - name: Exercise all three parameterized labs and accessibility contracts
+      - name: Exercise teaching labs, Reader navigation and scrollbar accessibility
         shell: bash
         run: |
           set -euo pipefail
@@ -83,6 +84,15 @@ jobs:
           PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
           PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/parameterized-labs-browser.cjs
           PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/reader-pagination-browser.cjs
+          SCROLLBAR_VISUAL_DIR="$PWD/evidence/scrollbar-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/scrollbar-browser.cjs
+      - name: Save scrollbar light/dark/touch screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-scrollbar-review
+          path: preview/handbook-custom/evidence/scrollbar-review/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Save lab screenshots for review
         if: always()
         uses: actions/upload-artifact@v4
@@ -103,11 +113,11 @@ jobs:
   # Avoid giving untrusted build/source steps write credentials. The only write
   # happens in a separate, shell-only job after the published artifact passed
   # TypeScript, Vite and real-browser tests. This is intentionally limited to
-  # the same-repo #86 review branch, never main or third-party pull requests.
+  # the same-repo scrollbar review branch, never main or third-party PRs.
   sync-published-site:
     name: Commit verified web/site artifact to PR branch
     needs: build-and-exercise
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 86 && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'web/scrollbar-editorial-refinement-20261106' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -147,5 +157,5 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build(web): sync verified Atlas teaching lab assets"
+          git commit -m "build(web): sync verified Atlas scrollbar assets"
           git push origin "HEAD:refs/heads/$HEAD_BRANCH"

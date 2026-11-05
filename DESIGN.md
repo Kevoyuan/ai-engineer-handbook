@@ -168,6 +168,14 @@ Controls and topology nodes use restrained radii. The base radius remains `0.625
 
 The Knowledge Spine uses circles, fine connector rules, chapter indices, and aligned text rather than decorative badges. Avoid pill-shaped labels except where a true compact control or status requires them. Spacing continues to use the established 4/8/12/16/24/32/40/48/64/96/128px rhythm.
 
+## Scrollbars · quiet editorial interaction
+
+Scrollbar styling is part of the reading surface, not a colored UI component. Use **one global rule** for Reader, Atlas, Notebook, chapter rail, search/dialog contents, and scrollable code or wide matrices. The thumb is a thin rounded neutral trace (7px desktop, 5px pointer-coarse for browsers honoring WebKit width; native `scrollbar-width: thin` otherwise), on a fully transparent track. Derive thumb values from `--foreground` using `color-mix` so light, graphite, ink and forest surfaces preserve one visual grammar; the thumb is low-opacity at rest (22%), more visible when the **actual** scroll owner is actively scrolling or focused (45%), and stronger when dragged (64%). Never use the primary-green action color for a scrollbar.
+
+**No blanket ancestor `:hover` reveal.** Hovering an article must not light up the chapter scroller plus every code block and matrix at once. Only hovering the thumb, direct scroll activity (`data-scrolling`) or keyboard focus of a scroll container changes the thumb. Preserve `scrollbar-gutter: stable` on desktop scroll owners so document widths do not jump, and retain the mobile single-page scroll geometry and horizontal overflow capability of technical content. Scrollbar styling may not hide a necessary control, block touch/wheel/keyboard navigation, or change deep-link placement. Forced-colors mode restores the platform's native-width, system-color scrollbar; a11y overrides take priority over appearance.
+
+Change scrollbars only in `preview/handbook-custom/src/handbook.css` and document the interaction contract in `preview/handbook-custom/UX-CONTRACT.md`. Validate Reader / Atlas / nested scroll panes at 320, 390, 768 and 1440px, light/dark/forest and forced-colors. Screenshots should show the actual scroller without inventing a themed dashboard.
+
 ## Components
 The complete edition covers Atlas, Notebook, the system framework and Agent reference architecture, every chapter and registered supplement, ranked section search, bookmarks, and local reading preferences. Desktop uses one bounded content scroller per route. On phones, the toolbar and route content scroll together. The architecture overview preserves the original execution core, domain connections, control plane, feedback loop and platform foundation; module links open the corresponding chapters. Wide comparison tables and code own their horizontal scrolling.
 
