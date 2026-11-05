@@ -2,8 +2,7 @@
  * Run with a Vite server available at HANDBOOK_URL and Playwright Chromium installed.
  */
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
+const { captureLabReview } = require("./capture-parameter-lab.cjs");
 const visualDir = process.env.PARAMETER_VISUAL_DIR;
 const { chromium } = require("playwright");
 
@@ -69,8 +68,7 @@ async function verify(page, threshold) {
       );
       assert.ok(overflow <= 2, "Lab content overflows horizontally at " + width + "px: " + overflow);
       if (visualDir && (width === 390 || width === 1440)) {
-        fs.mkdirSync(visualDir, { recursive: true });
-        await page.locator("#risk-coverage-lab").screenshot({ path: path.join(visualDir, `ch04-${width}-${language ? "en" : "zh"}.png`) });
+        await captureLabReview(page, "#risk-coverage-lab", visualDir, `ch04-${width}-${language ? "en" : "zh"}`);
       }
       console.log("CH04 lab verified", width, language ? "EN" : "ZH", theme ? "dark" : "light");
       await context.close();
