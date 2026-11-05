@@ -82,6 +82,10 @@
     {
       "path": "/assets/ch08-task-list-state.html",
       "id": "task-list-state"
+    },
+    {
+      "path": "/assets/ch08-subagent-boundaries.html",
+      "id": "subagent-boundaries"
     }
   ],
   "09-reliability-evaluation-observability": [
@@ -137,6 +141,10 @@
     {
       "path": "/assets/ch09-harness-self-improvement.html",
       "id": "harness-self-improvement"
+    },
+    {
+      "path": "/assets/ch09-eval-state-reconciliation.html",
+      "id": "eval-state-reconciliation"
     }
   ],
   "07-memory-context-engineering": [

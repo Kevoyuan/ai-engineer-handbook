@@ -1942,6 +1942,8 @@ cost_per_successful_task
 
 以上是**设计模板**而非真实接口契约。执行层应拦截不允许的副作用，而不是仅靠评测 Judge 事后发现。若模型给出正确退款解释，却查询了其他租户订单，最终答案可以得分，但**安全门禁必须判失败**。
 
+**把过程证据与权威结果分开检查。** 对有标注必要证据的任务，分别检查必要证据召回、回答是否由证据支持、工具轨迹和后端权威状态，并独立检查权限门禁、延迟、成本与多次运行成功率。合理答案可以有不同措辞，稳定性不等于逐字一致。超时需区分动作尚未发生、动作完成但响应丢失、结果未知；结果未知时先对账再决定是否重试，避免重复副作用。轨迹记录不等于最终环境状态；参见 [Anthropic Agent evals](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)。
+
 评测报告的最小字段：
 
     dataset + environment + candidate + evaluator versions

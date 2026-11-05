@@ -6,6 +6,10 @@
 
 已处理的原文保留在 `processed/`，顶部记录状态、日期、原文 SHA-256、正式章节和处理报告。`processed` 表示已完成阅读与提炼，不表示原文全部正确或已经发布。
 
+## 已处理 · 2026-10-29
+
+- 六篇 Agent、面试和评测材料已审阅归档；新增内容归入第 8、9 章，其余沿用已有覆盖。详见 [核验记录](../verification/2026-10-29-inbox-agent-evals.md)。
+
 ## 已处理 · 2026-10-25
 
 - [Agent Todo List](processed/Agent%20的%20Todo%20List%20有什么用？.md) → [第 8 章 §8.14.20](../chapters/08-agent-orchestration.md)。核对 DeepSeek 源码与 Manus 原文后，保留单会话清单与共享任务板的所有权边界。

@@ -1933,6 +1933,8 @@ more evaluation surface
 
 > **Multi-Agent is a coordination pattern, not a cure for an overloaded single Agent.**
 
+**按上下文边界拆分，也可以把子代理合并回主循环。** 独立研究、接口清晰的任务和黑盒验证适合隔离；若计划、实现和测试反复交接同一批状态，分工可能增加交接损失。先以单循环、按需加载技能和工具为对照，再保留经实测有价值的并行、上下文或权限边界。迁移时逐个合并高度耦合的步骤，比较完整真实调用链的任务结果、权限不变量、重复运行的成功率、延迟和成本；工具执行层仍须独立实施授权与硬约束。以上为工程取舍，不存在适用于所有任务的工具数量或 token 倍数阈值。来源：[Anthropic：多 Agent 何时使用](https://claude.com/resources/articles/building-multi-agent-systems-when-and-how-to-use-them)、[何时合并子代理](https://claude.com/resources/articles/building-agents-when-to-fold-subagents-into-your-main-agent-loop)。
+
 ### 8.12.6 Pattern 5 · Router + Skill
 
 结构：
