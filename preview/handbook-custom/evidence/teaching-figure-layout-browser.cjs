@@ -61,12 +61,14 @@ async function assertContained(page, rootSelector, children, label) {
 async function capture(page, selector, name) {
   if (!visualDir) return;
   fs.mkdirSync(visualDir, { recursive: true });
-  await page.locator(selector).first().evaluate((el) => {
-    el.scrollIntoView({ block: "start", inline: "nearest", behavior: "instant" });
+  const target = page.locator(selector).first();
+  await target.scrollIntoViewIfNeeded({ timeout: 15000 });
+  await page.evaluate(() => document.fonts.ready);
+  await target.screenshot({
+    path: path.join(visualDir, name + ".png"),
+    animations: "disabled",
+    timeout: 15000,
   });
-  await page.evaluate(() => new Promise(resolve =>
-    requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  await page.screenshot({ path: path.join(visualDir, name + ".png"), fullPage: false, animations: "disabled" });
 }
 
 (async () => {
@@ -104,7 +106,8 @@ async function capture(page, selector, name) {
         [".lab-grid", ".lab-controls", ".lab-result", ".lab-topology", ".lab-seq", ".lab-graph-grid", ".lab-node"],
         "CH08 " + cfg.width + " initial");
       if (cfg.width === 390 || cfg.width === 1440) {
-        await capture(page, ".lab-result", "ch08-result-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
+        await capture(page, root + " .lab-topology-loop", "ch08-loop-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
+        await capture(page, root + " .lab-topology-graph", "ch08-graph-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
       }
 
       const choice = lab.locator("input[data-arch-signal]");
@@ -120,7 +123,7 @@ async function capture(page, selector, name) {
       assert.equal(await lab.getAttribute("data-mode"), "loop");
       assert.equal(await lab.locator("input[data-arch-signal]:checked").count(), 0);
       if (cfg.width === 390 || cfg.width === 1440) {
-        await capture(page, ".lab-controls", "ch08-controls-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
+        await capture(page, root + " .lab-controls", "ch08-controls-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
       }
 
       // CH09 reuses the original .lab/.lab-grid/.lab-result composition.
@@ -130,6 +133,9 @@ async function capture(page, selector, name) {
       await assertContained(page, costRoot,
         [".lab-grid", ".lab-controls", ".lab-result", ".lab-equation", ".lab-metrics", ".lab-node"],
         "CH09 cost " + cfg.width);
+      if (cfg.width === 390 || cfg.width === 1440) {
+        await capture(page, costRoot + " .lab-equation", "ch09-cost-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
+      }
       const initialCost = await page.locator("[data-cost-per-success]").innerText();
       const price = page.locator("[data-cost-price]");
       await price.focus();
