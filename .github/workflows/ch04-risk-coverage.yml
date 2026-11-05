@@ -1,4 +1,4 @@
-name: CH04 Risk-Coverage Lab verification
+name: Parameterized Atlas Teaching Labs verification
 
 on:
   pull_request:
@@ -8,7 +8,11 @@ on:
       - "preview/handbook-custom/UX-CONTRACT.md"
       - "preview/handbook-custom/src/concept-diagrams.tsx"
       - "preview/handbook-custom/src/reliability-lab.*"
+      - "preview/handbook-custom/src/query-route-lab.tsx"
+      - "preview/handbook-custom/src/agent-retry-lab.tsx"
+      - "preview/handbook-custom/src/parameterized-labs.css"
       - "preview/handbook-custom/evidence/risk-coverage-browser.cjs"
+      - "preview/handbook-custom/evidence/parameterized-labs-browser.cjs"
       - ".github/workflows/ch04-risk-coverage.yml"
   workflow_dispatch:
 
@@ -46,7 +50,7 @@ jobs:
         run: npm run publish:web --prefix preview/handbook-custom
       - name: Install Chromium
         run: cd preview/handbook-custom && npx playwright install --with-deps chromium
-      - name: Exercise threshold and accessibility contracts
+      - name: Exercise all three parameterized labs and accessibility contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -60,11 +64,12 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4180/ >/dev/null
           HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
+          HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/parameterized-labs-browser.cjs
       - name: Save generated site for visual and publication review
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: ch04-risk-coverage-web-site
+          name: atlas-parameterized-labs-web-site
           path: web/site/
           if-no-files-found: error
           retention-days: 7
