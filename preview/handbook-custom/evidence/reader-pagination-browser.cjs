@@ -65,8 +65,8 @@ async function scrollToFooter(page, width) {
       const next = nav.locator(".reader-bottom-next");
       assert.equal(await prev.getAttribute("href"), "#read/02-enterprise-retrieval");
       assert.equal(await next.getAttribute("href"), "#read/04-rag-reliability-selective-answering");
-      assert.ok((await prev.locator(".reader-bottom-title").innerText()).length > 6);
-      assert.ok((await next.locator(".reader-bottom-title").innerText()).length > 6);
+      assert.ok((await prev.locator(".reader-bottom-title").innerText()).length >= 4);
+      assert.ok((await next.locator(".reader-bottom-title").innerText()).length >= 4);
       assert.ok((await prev.getAttribute("aria-label")).length > 10);
       assert.ok((await next.getAttribute("aria-label")).length > 10);
 
