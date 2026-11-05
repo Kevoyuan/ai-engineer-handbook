@@ -1,0 +1,346 @@
+/* CH04 decision experiment. Extends the existing editorial Atlas language;
+   never creates an independent dashboard, scroll context, or palette. */
+.reliability-lab {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--hairline);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.reliability-lab :is(h4, h5, p, ol, figure) {
+  margin: 0;
+}
+
+.risk-lab-header {
+  max-width: 62ch;
+}
+
+.risk-lab-header h4 {
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  font-weight: 560;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.risk-lab-header p {
+  margin-top: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.risk-lab-controls {
+  margin-top: 1.5rem;
+  max-width: 42rem;
+}
+
+.risk-lab-control-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.risk-lab-control-heading label {
+  font-size: 0.875rem;
+  font-weight: 560;
+}
+
+.risk-lab-control-heading output {
+  font: 500 1.25rem/1.2 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-lab-range {
+  display: block;
+  width: 100%;
+  height: 44px;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.risk-lab-range::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border);
+}
+
+.risk-lab-range::-moz-range-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border);
+}
+
+.risk-lab-range::-webkit-slider-thumb {
+  width: 21px;
+  height: 21px;
+  margin-top: -8px;
+  border: 4px solid var(--page);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--primary);
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--primary);
+}
+
+.risk-lab-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 4px solid var(--page);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--primary);
+  background: var(--primary);
+}
+
+.risk-lab-range:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.risk-lab-limits {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.risk-lab-limits > span:last-child {
+  text-align: right;
+}
+
+.risk-lab-limits button {
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  background: var(--page);
+  color: var(--foreground);
+  font: 500 0.75rem var(--font-sans);
+  cursor: pointer;
+}
+
+.risk-lab-limits button:hover {
+  border-color: var(--primary);
+}
+
+.risk-lab-limits button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.risk-lab-measures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 1.5rem;
+  border-block: 1px solid var(--hairline);
+}
+
+.risk-lab-measures > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1rem 1rem 1rem 0;
+}
+
+.risk-lab-measures > div + div {
+  padding-left: 1rem;
+  border-left: 1px solid var(--hairline);
+}
+
+.risk-lab-measures span {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.risk-lab-measures strong {
+  color: var(--foreground);
+  font: 550 clamp(1.25rem, 2.5vw, 1.75rem)/1.3 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-lab-measures small {
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+}
+
+.risk-lab-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+.risk-lab-figure {
+  min-width: 0;
+  padding: 1rem 0.75rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--plate);
+}
+
+.risk-lab-figure figcaption {
+  color: var(--foreground);
+  font-weight: 560;
+  font-size: 0.8125rem;
+}
+
+.risk-lab-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+  overflow: visible;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.risk-lab-grid line {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+
+.risk-lab-grid text,
+.risk-lab-axis {
+  fill: var(--muted-foreground);
+}
+
+.risk-lab-curve {
+  fill: none;
+  stroke: var(--foreground);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.risk-lab-curve-node {
+  fill: var(--page);
+  stroke: var(--foreground);
+  stroke-width: 1.5;
+}
+
+.risk-lab-selected circle:first-child {
+  fill: var(--page);
+  stroke: var(--signal-ink);
+  stroke-width: 3;
+}
+
+.risk-lab-selected circle:last-child {
+  fill: var(--signal-ink);
+}
+
+.risk-lab-figure-note {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.risk-lab-ledger {
+  min-width: 0;
+}
+
+.risk-lab-ledger h5 {
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 560;
+}
+
+.risk-lab-ledger ol {
+  display: grid;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+
+.risk-lab-ledger li {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr) 2.5rem minmax(5.25rem, auto);
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--hairline);
+  line-height: 1.4;
+  font-size: 0.75rem;
+}
+
+.risk-lab-case-id,
+.risk-lab-case-score {
+  color: var(--muted-foreground);
+  font: 0.6875rem/1.4 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.risk-lab-case-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.risk-lab-ledger li strong {
+  justify-self: end;
+  font-weight: 560;
+  text-align: right;
+  color: var(--foreground);
+}
+
+.risk-lab-ledger li[data-state="correct"] strong {
+  color: var(--signal-ink);
+}
+
+.risk-lab-ledger li[data-state="abstained"] strong {
+  color: var(--muted-foreground);
+}
+
+.risk-lab-boundary {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.risk-lab-boundary strong {
+  font-size: 0.8125rem;
+  font-weight: 560;
+}
+
+.risk-lab-boundary p {
+  margin-top: 0.35rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+@container (max-width: 700px) {
+  .risk-lab-content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .reliability-lab { margin-top: 2rem; padding-top: 1.5rem; }
+  .risk-lab-controls { margin-top: 1.25rem; }
+  .risk-lab-measures > div { padding: 0.75rem 0.45rem 0.75rem 0; }
+  .risk-lab-measures > div + div { padding-left: 0.65rem; }
+  .risk-lab-measures span { font-size: 0.6875rem; }
+  .risk-lab-measures small { font-size: 0.625rem; }
+  .risk-lab-content { grid-template-columns: minmax(0, 1fr); }
+  .risk-lab-limits { grid-template-columns: 1fr auto; }
+  .risk-lab-limits > span:last-child { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .risk-lab-range,
+  .risk-lab-limits button { scroll-behavior: auto; transition: none; }
+}
