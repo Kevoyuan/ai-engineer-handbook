@@ -618,7 +618,7 @@ const selectedAtlas =
 
 ### 13.7 交接状态
 
-源码改动、构建、回归、文档、生产同步均已完成；端口 4180 / 4183 仍在运行（本地静态服务）。**已于 2026-11-05 20:18 提交 `aec1bba`（只暂存本轮相关文件、保留工作区既有改动），未 push、未部署**。
+源码改动、构建、回归、文档、生产同步均已完成；端口 4180 / 4183 仍在运行（本地静态服务）。**已于 2026-11-05 20:18 提交 `aec1bba`（只暂存本轮相关文件、保留工作区既有改动），并于 21:20 随本次 release 推送上线，详见第 15 节**。
 
 
 ## 14. 新增网站 favicon（用户「add icon to website」）
@@ -666,5 +666,73 @@ const selectedAtlas =
 
 ### 14.6 范围边界与状态
 
-未新增 ICO、apple-touch-icon、web manifest 或 `theme-color` meta；不支持 SVG 图标的 UA 会回退到默认标签字形，属已记录的既定限制。旧 `web/favicon.svg` 未改动，也不由部署根提供。**本轮改动尚未 commit、未部署**；4180 / 4183 本地静态服务仍在运行。
+未新增 ICO、apple-touch-icon、web manifest 或 `theme-color` meta；不支持 SVG 图标的 UA 会回退到默认标签字形，属已记录的既定限制。旧 `web/favicon.svg` 未改动，也不由部署根提供。**已随本次 release 提交 `b4a234b`、推送并上线，详见第 15 节**；4180 / 4183 本地静态服务仍在运行。
+
+
+## 15. 生产发布记录（用户「release」，2026-11-05 21:20）
+
+### 15.1 发布决策与通道
+
+用户选择「入库 + 推送 + 生产部署」，明确不创建 GitHub Release / tag（仓库 0 个 tag、无 CHANGELOG、无发版脚本）。
+
+`web/vercel.json` 的 `"git": { "deploymentEnabled": false }` 禁用了 Git 自动部署，因此 `git push` **不会**触发上线；发布必须走 Vercel CLI。项目 Root Directory = `web`，所以 CLI 必须从**仓库根目录**运行：在 `web/` 内运行会把路径拼成不存在的 `web/web` 并报 "The provided path … does not exist"。正确命令是在仓库根执行 `vercel deploy --prod --yes`，CLI 上传 15.5MB（只取 `web/` 子树）。
+
+### 15.2 入库与推送
+
+| 提交 | 内容 |
+|---|---|
+| `aec1bba` | 11-05 reader 布局链 + CH02 可读性修复（上一轮已提交，本次一并推送） |
+| `22747b5` | CH08 / CH09 新章节内容工作流（20 files，+907 / −7） |
+| `b4a234b` | 原创 Knowledge Spine favicon（11 files，+163 / −3） |
+
+`git push origin main` → `d6be18a..b4a234b`，作者保持 `Kevoyuan <kevinsyuan@gmail.com>`，未强推、未跳 hooks、未覆盖身份。推送后 `main` 与 `origin/main` 一致。
+
+### 15.3 Vercel 部署
+
+- Deployment ID：`2EB4r6w8onvz4teuoLjgyxkmiXBH`
+- Deployment URL：`https://ai-engineer-handbook-dk425rl2s-kevoyuans-projects.vercel.app`
+- 生产 alias：`https://kevoyuan-ai-handbook.vercel.app`
+- 上传 15.5MB，`Ready in 20s`，无构建错误（静态输出，`buildCommand: ""` / `outputDirectory: "site"`）。
+
+### 15.4 上线前后对比
+
+| 项目 | 上线前 | 上线后 |
+|---|---|---|
+| 入口 bundle | `index-C2WETa-M.js` / `index-D9ywmkuz.css`（11 天前） | `index-B30BLWRa.js` / `index-Dh1xlw27.css` |
+| `<link rel="icon">` | 无 | `/favicon.svg` |
+| `GET /favicon.svg` | 404 | `200 image/svg+xml`，1780 bytes |
+| favicon SHA-256 | — | `aa94dc17…351`（与 public / dist / web/site 三份一致） |
+| CH08 / CH09 新章节 | 无 | `#subagent-boundaries` / `#eval-state-reconciliation` 可见 |
+
+### 15.5 生产冒烟结果（明暗两版）
+
+| 检查 | 结果 |
+|---|---|
+| 首页 / CH02 / CH08 / CH09 路由 | 明暗两版全部加载，`pageOver 0`、`pageerror 0` |
+| favicon link + 浏览器内 fetch | `href=/favicon.svg`、`200 image/svg+xml`、1770 字符、含 scoped CSS 与 `prefers-color-scheme` 规则 |
+| CH02 1440 | `.g5` 5 个有效列、最小卡宽 196.19px；`#comparison` 为正常表格且首格 `data-label=能力` |
+| CH02 768 | `#comparison` `display:block` / `thead:none` → `stacked=true`，`pageOver 0` |
+| CH08 / CH09 新章节 | `子代理的上下文边界 · §8.12.5` 与 `Agent 评测：轨迹与真实状态 · §9.26.3` 元素可见 |
+| content / search index | `content/08…json` 含 `subagent-boundaries`、`content/09…json` 含 `eval-state-reconciliation`；`search-index.json` 含「子代理的上下文边界 / Subagent context boundaries」 |
+| 响应头 | `Content-Security-Policy`、`X-Content-Type-Options: nosniff`、`Referrer-Policy: strict-origin-when-cross-origin` 均按 `vercel.json` 生效；`x-vercel-cache: HIT` |
+
+### 15.6 既有结构说明（非本次引入）
+
+`outputDirectory: "site"` 只发布 `web/site/`，因此 `/assets/*`、`robots.txt`、`sitemap.xml`、`chapters.json` 在线上均为 404 —— 旧 `assets/app.js` 与旧片段 `ch08-task-list-state.html` 同样如此，是既有部署结构而非本次漏发。`web/assets/chapter-additions.json` 是内容生成 / `web/validate.mjs` 校验用的注册表，运行时 bundle 不加载它；新章节正文已编进 `web/site/content/*.json`，并已在生产浏览器中实测渲染，所以不影响本次发布内容。`/assets/*.html` 的 308 是 `cleanUrls` + `trailingSlash` 的通用重定向，不代表文件存在。
+
+### 15.7 推送扫描告警（已核实误报）
+
+`gstack-redact` pre-push 输出 MEDIUM 提示但未阻断推送，逐条核实：
+
+- `internal.url_private` @ `verification.md:525` → `http://localhost:4180/`，本地开发服务地址。
+- `pii.phone.e164` @ CH09 content JSON / bundle → `jobUnionId=4736527116`，美团招聘 JD 链接里的岗位 ID，不是 E.164 电话号码。
+
+### 15.8 截图与状态
+
+| 文件 | 内容 |
+|---|---|
+| `prod-home-1440-dark.jpg` | 生产首页 1440px 深色 |
+| `prod-ch02-768.jpg` | 生产 CH02 768px 堆叠对比表 |
+
+`main` 与 `origin/main` 一致，生产 alias 已切到本次部署。工作区仍保留 GBrain 配置、被否决的原型 HTML、10 月会话日志与未处理的 inbox 文章等**与本次发布无关**的改动，未暂存、未清理。4180 / 4183 本地静态服务仍在运行。
 

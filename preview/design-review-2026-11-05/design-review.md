@@ -291,7 +291,7 @@ screenshots/preset-*.jpg            三档深色底色的首页 / 阅读页，�
 
 **结果**：CH02 四个宽度 `1440 / 1024 / 768 / 390` 全部 `pageOver 0`、`crushed []`、`pageerror 0`；1440 下 5 个有效列 × 196px（≥150px），768 / 390 下对比表 `stacked=true`；1440 表格 `Metadata` 完整成行。六套回归全绿（ui 17 / a11y 28 route 0 violation / learning 60 / concepts 96 / structure-browser 144 断言 / simulator-layout 8 基线 × 9 步 0 漂移），`web/validate.mjs` PASS，`FINAL_FAIL=0`；144 状态横滚 `10`、`pageOver 0`、同类-bug 矩阵仍 `bad 6`，均无回退。最终 hash `index-Dh1xlw27.css` / `index-B30BLWRa.js`。
 
-前后对照截图见 `screenshots/readable-{g5,table}-{before,after}-{1440,768}.jpg` 共 8 张；完整数据见 `verification.md` 第 13 节。生产产物做第七次非破坏性同步（备份 `web-site-backup-20261105-i`），`diff -rq dist web/site` = `IDENTICAL`、`content/*.json` 原样保留。**已于 20:18 提交 `aec1bba`，未部署**。
+前后对照截图见 `screenshots/readable-{g5,table}-{before,after}-{1440,768}.jpg` 共 8 张；完整数据见 `verification.md` 第 13 节。生产产物做第七次非破坏性同步（备份 `web-site-backup-20261105-i`），`diff -rq dist web/site` = `IDENTICAL`、`content/*.json` 原样保留。**已于 20:18 提交 `aec1bba`，并于 21:20 随本次 release 推送并上线（见第 15 节）**。
 
 
 ## 追加新增 · 网站 favicon（用户「add icon to website」）
@@ -306,4 +306,23 @@ screenshots/preset-*.jpg            三档深色底色的首页 / 阅读页，�
 
 **结果**：明暗两版 × 16/32/64px × inline SVG / `<img>` 两条加载路径逐张目视通过；`prefers-color-scheme` 在两种加载方式下都生效，绿点唯一，spine 可见。`npm run build` 通过且 JS/CSS 哈希未变（只新增静态资源 + 一行 head link）；`test:ui` 17、`test:a11y` 28 route / 0 violation、`web/validate.mjs` PASS；专门的明暗冒烟脚本确认浏览器实际请求 `/favicon.svg` 返回 `200 image/svg+xml`、`pageOver 0`、`pageerror 0`，`FAVICON_PASS=0`。因 bundle 字节未变，未重跑上一轮已 `FINAL_FAIL=0` 的六套全量矩阵。生产同步后 `diff -rq dist web/site` = `IDENTICAL`、`content/*.json` 未变。
 
-截图见 `screenshots/favicon-preview-{light,dark}.png`；完整数据见 `verification.md` 第 14 节。**本轮改动尚未 commit、未部署**。
+截图见 `screenshots/favicon-preview-{light,dark}.png`；完整数据见 `verification.md` 第 14 节。**已随本次 release 提交 `b4a234b`、推送并上线（见第 15 节）**。
+
+
+## 发布记录 · 2026-11-05 21:20（用户「release」）
+
+用户选择「入库 + 推送 + 生产部署」，不创建 GitHub Release / tag（仓库本来 0 个 tag、无 CHANGELOG、无发版脚本）。
+
+**发布通道**：`web/vercel.json` 里 `"git": { "deploymentEnabled": false }` —— Git 自动部署被禁用，`git push` 不会触发上线；必须用 Vercel CLI 从**仓库根目录**运行（项目 Root Directory = `web`，从 `web/` 里运行会被拼成不存在的 `web/web`）。部署上传 15.5MB、20s Ready，alias 到 `https://kevoyuan-ai-handbook.vercel.app`。
+
+**入库**：三个提交依次推送 `d6be18a..b4a234b` —— `aec1bba`（11-05 reader 布局与 CH02 可读性）、`22747b5`（CH08 / CH09 新章节内容工作流）、`b4a234b`（原创 favicon）。此前各节写的「未 commit / 未部署」均为当时快照，本次一次性全部落地。
+
+**上线前状态**：生产仍是 11 天前的旧构建 `index-C2WETa-M.js`，`/favicon.svg` 为 404。
+
+**上线后冒烟**（明暗两版）：生产入口指向 `index-B30BLWRa.js` / `index-Dh1xlw27.css` 且带 `<link rel="icon">`；`/favicon.svg` 返回 `200 image/svg+xml`、SHA-256 与本地三份产物一致；浏览器内显式 fetch 拿到 1770 字符的 SVG（含 scoped CSS 与 dark rule）；CH02 1440 下 `.g5` 仍为 5 列 ×196px、768 下 `#comparison` `stacked=true`；CH08 `#subagent-boundaries`（§8.12.5）与 CH09 `#eval-state-reconciliation`（§9.26.3）在浏览器中可见；`content/*.json` 含新 section、`search-index.json` 含「子代理的上下文边界 / Subagent context boundaries」；全部路由 `pageOver 0`、`pageerror 0`。CSP / `nosniff` / `Referrer-Policy` 头正常。
+
+**既有结构说明（非本次引入）**：`outputDirectory: "site"` 只发布 `web/site/`，所以 `/assets/*`、`robots.txt`、`sitemap.xml`、`chapters.json` 在线上均为 404（旧 `assets/app.js` 同样如此）。`chapter-additions.json` 是内容生成/校验用的注册表，运行时 bundle 不加载它；新章节正文已编进 `web/site/content/*.json` 并实测在浏览器渲染，因此不影响本次发布内容。
+
+**pre-push 扫描**：`gstack-redact` 报了 MEDIUM 提示但未阻断，已逐条核实为误报 —— `verification.md:525` 的 `http://localhost:4180` 是本地开发地址；`4736527116` 是美团招聘 JD 链接里的 `jobUnionId`，不是 E.164 电话号码。
+
+生产截图见 `screenshots/prod-home-1440-dark.jpg` 与 `screenshots/prod-ch02-768.jpg`；完整数据见 `verification.md` 第 15 节。
