@@ -17,6 +17,7 @@ import { KnowledgeCheck, SkillContextInspector } from "./learning-interactions";
 import { ArchifyOverview } from "./archify-overview";
 import { DecisionTrace } from "./decision-traces";
 import { SkillSimulator } from "./skill-simulator";
+import { ReliabilityLab } from "./reliability-lab";
 const f = (node: number, title: Copy, text: Copy): Frame => ({
   node,
   title,
@@ -811,6 +812,7 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
         <strong>{t(scenario.route)}</strong>
       </div>
       <p className="concept-takeaway">{t(lesson.takeaway)}</p>
+      {lesson.anchor === "fig-4-1" && <ReliabilityLab en={en} />}
       <KnowledgeCheck key={"quiz-" + example} anchor={lesson.anchor} en={en} />
     </section>
   );
