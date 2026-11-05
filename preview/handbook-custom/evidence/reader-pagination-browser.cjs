@@ -27,22 +27,14 @@ async function dimensions(page, selector) {
 }
 
 async function scrollToFooter(page) {
-  // CSS smooth scrolling can leave the screenshot in the *middle* of a long
-  // chapter. Force the actual article footer into the visible viewport before
-  // asserting or capturing it, for both workspace and nested pane owners.
-  await page.locator(".reader-bottom").evaluate((node) => {
-    node.scrollIntoView({ block: "end", inline: "nearest", behavior: "instant" });
-  });
-  await page.waitForFunction(() => {
-    const nav = document.querySelector(".reader-bottom");
-    if (!nav) return false;
-    const rect = nav.getBoundingClientRect();
-    return rect.top >= 48 && rect.bottom <= window.innerHeight + 2;
-  }, null, { timeout: 10000 });
+  // The Reader has mobile/workspace and desktop/chapter-body scroll owners.
+  // Use Playwright's locator scroller and a real rendered component snapshot;
+  // a full viewport screenshot is not proof the footer has been reached.
+  const nav = page.locator(".reader-bottom");
+  await nav.scrollIntoViewIfNeeded({ timeout: 15000 });
   await page.evaluate(() => new Promise((resolve) =>
     requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
-
 (async () => {
   const browser = await chromium.launch({ headless: true });
   try {
@@ -108,10 +100,14 @@ async function scrollToFooter(page) {
       if (visualDir && (cfg.width === 390 || cfg.width === 1440)) {
         fs.mkdirSync(visualDir, { recursive: true });
         await page.evaluate(() => document.fonts.ready);
-        await page.screenshot({
+        await nav.screenshot({
           path: path.join(visualDir,
             `reader-footer-${cfg.width}-${cfg.en ? "en" : "zh"}.png`),
-          fullPage: false,
+          animations: "disabled",
+        });
+        await header.screenshot({
+          path: path.join(visualDir,
+            `reader-topbar-${cfg.width}-${cfg.en ? "en" : "zh"}.png`),
           animations: "disabled",
         });
       }
