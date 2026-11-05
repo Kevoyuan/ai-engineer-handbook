@@ -256,6 +256,28 @@ The CH04 Evidence Gates lesson adds a **secondary, genuinely parameterized teach
 
 **Extraction policy:** this is the first parameterized pattern, not a license to refactor every existing lesson. Extract a shared `InteractiveFigure` shell only after at least three teaching experiments prove the same control/outcome/explanation grammar. Preserve each diagram's topology, domain-specific metric semantics, case provenance and failure boundaries.
 
+## Parameterized teaching experiments · CH03 routing and CH08 bounded execution
+
+After the first CH04 Risk–Coverage experiment, CH03 and CH08 extend the **same instructional grammar** without replacing their canonical graph-first diagrams, decision traces, article content, accessible playback, or knowledge checks. Both are mounted after the lesson takeaway inside the existing chapter-local `#concept-demo`. The experiments remain optional **authored deterministic fixtures**, never inferred execution traces or silent claims about a particular vendor/system.
+
+**CH03 · Query routing / evidence-path budget** (`src/query-route-lab.tsx`):
+
+- One native query-shape selector and a 1–5 maximum **planned retrieval route** control. Examples cover exact identifier, semantic process question, relation traversal, mixed identifier + explanation, and unresolved conversation referent.
+- Explicitly show query, required evidence, the authorization-first boundary, per-route SELECTED / SKIPPED decision, fixed fixture evidence coverage, and the conditional recovery path. Selected planned routes do not imply parallel execution, server calls, retrieval results or correct answers. The synthetic “required” route set demonstrates planning, not true ground-truth retrievability.
+- A missing referent must yield CLARIFY / no route, regardless of route allowance. More route budget cannot bypass tenant/role/ACL, fix an omitted authorized source, establish document authority, or skip CH04 evidence verification. Missing coverage is an *unresolved teaching case*, not proof of a live retrieval failure.
+- Deliberately **do not** chart unmeasured accuracy, P95 latency or cost. The meaningful quantitative relationship is selected paths versus fixture-required paths, not invented production metrics.
+
+**CH08 · Bounded agent loop / work budget** (`src/agent-retry-lab.tsx`):
+
+- One fixed feedback/authorization scenario, one 1–4 maximum-attempt control, and one 0–12 abstract **work-unit** budget control. Each illustrative attempt consumes exactly three invented work units. The current outcome, trace of attempted/unused rounds, work consumed and remaining, and reset action must update deterministically.
+- Scenarios include first-attempt verification success, success only after a targeted retry, persistent failure, and missing human approval. Approval blocks *all* execution independently of work/attempt limits. An attempt may be executed only if permission, per-attempt capacity and attempt ceiling all allow it.
+- Verified STOP occurs only after the fixture's acceptance condition passes. If work/attempt limits bind before success, show **HANDOFF / incomplete**, never success. STOP must prevent needless additional calls even if capacity remains. Failed attempts and unexecuted attempts must be distinguished in text, not color.
+- Work units are not real API cost, time, tokens, or model success probabilities. No tool side effects are performed. Production retries require authorization, checkpoint/ledger reconciliation, idempotency and human approval where appropriate; a state checkpoint alone cannot make external actions transactional.
+
+**Common presentation contract:** `src/parameterized-labs.css` owns the two new experiments' neutral paper/hairline layout and only reuses existing `--page`, `--plate`, `--foreground`, `--hairline`, `--primary`, `--signal-ink` and monospace numeric roles. CH04 retains its already-reviewed independent chart implementation and CSS while the three experiments are assessed for future extraction of a shared `InteractiveFigure` / control-output shell; avoid an early sweeping refactor of preexisting labs. Focus the reader on question → input → computed outcome → per-case evidence / trace → recovery/engineering boundary. Use native select, range and reset controls with 44px target height, visible labels/focus, bilingual copy, live outcome text, reduced-motion compatibility, and responsive vertical flow at compact reading widths; no invented dashboard cards, autoplay or independent scroll context.
+
+The source of truth is always the relevant canonical chapter (`handbook/chapters/03-*.md`, `04-*.md`, `08-*.md`). These demonstrations augment the semantics; they must never overwrite source-authored technical meanings or claim that toy planning evidence is empirical evidence. Each change must pass real-browser regression checks under the inherited Reader shell and article anchors, then verify generated `web/site` publication parity before merge.
+
 ## Decision-trace extensions · CH03 / CH04 / CH08
 
 The existing canonical four-node lessons remain the primary reading and playback interaction. Chapters 03, 04 and 08 may add a secondary, step-synchronized **Decision Trace** directly after the explanation and playback controls. It is a technical diagnosis layer, not another autonomous simulator. Use the same example and current-frame state; do not create duplicate selectors, timers, independent scroll views, invented percentages, or a separate content authority.
