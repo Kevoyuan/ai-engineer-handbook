@@ -618,5 +618,53 @@ const selectedAtlas =
 
 ### 13.7 交接状态
 
-源码改动、构建、回归、文档、生产同步均已完成；端口 4180 / 4183 仍在运行（本地静态服务）。**提交与部署仍需用户明确指示**，且按仓库约定只暂存本轮相关文件、保留工作区既有改动。
+源码改动、构建、回归、文档、生产同步均已完成；端口 4180 / 4183 仍在运行（本地静态服务）。**已于 2026-11-05 20:18 提交 `aec1bba`（只暂存本轮相关文件、保留工作区既有改动），未 push、未部署**。
+
+
+## 14. 新增网站 favicon（用户「add icon to website」）
+
+### 14.1 输入与缺口
+
+用户要求「add icon to website」。确认两点：① 用户选择「补浏览器 favicon」+「按当前设计语言重新设计」，不做 ICO / apple-touch-icon / manifest 完整套装；② 部署根为 `web/site/`（`web/vercel.json` 的 `outputDirectory: "site"`），该目录无图标资源、入口也无 `<link rel="icon">`。旧静态站 `web/favicon.svg`（绿底白 A）不在部署根内且配色与现行规范冲突，保留不动。
+
+### 14.2 约束与造型
+
+`DESIGN.md` 的「No borrowed branding」条款要求「any future brand mark must be original and documented here first」，因此**先追加 `Original favicon · Knowledge Spine mark` 文档条款，再创建资产**。
+
+造型为 Knowledge Spine：一条横向 hairline 脊柱串 4 个节点（Model / Retrieval / Agent / Production），恰好 1 个为点状绿 signal（序列起点），其余 3 个中性 ink；中性圆角底板 + hairline 边框。无字母造型、无第三方标识。色值全部取自 frontmatter 令牌：浅色 `#ffffff / #deded8 / #0c0c09 / #00a544`，深色 `#212121 / #ececec / #3ddc84`；绿色只作一个点，不铺底。
+
+### 14.3 两轮几何迭代
+
+| 版本 | 节点 | spine | 16px 目视结果 |
+|---|---|---|---|
+| v1 | r=4.5（直径 9.5），间距 13.3 | `#6b6f63`，宽 2.5 | 四点几乎相切、连线不可见，退化成「四颗珠子」，Spine 语义丢失 |
+| v2（采用） | r=4（直径 8），可见线段 5.3 | `foreground @ 50%`，宽 3 | 四节点与连线均可辨，绿点唯一，明暗两版一致 |
+
+另外 v2 把深色底板边框从 `#3a3a3a` 改为 `foreground @ 18%`（原色在深色标签条上消失），给根元素显式 `width="64" height="64"`（intrinsic size 从 150 修正为 64），并把 SVG 内 CSS 全部限定为 `svg.favicon-mark .xxx`、删除会命中 HTML 根元素的 `:root { color-scheme }` 规则，避免内联污染宿主样式。
+
+### 14.4 验证结果
+
+| 检查 | 结果 |
+|---|---|
+| `npm run build` | PASS；JS/CSS 哈希未变（`index-B30BLWRa.js` / `index-Dh1xlw27.css`），仅新增静态资源 + 一行 head link |
+| 渲染目视 | 明暗 × 16/32/64px × inline SVG / `<img>` 两路径逐张通过；`prefers-color-scheme` 两种加载方式均生效 |
+| favicon 冒烟（light + dark） | `iconHref=/favicon.svg`、`type=image/svg+xml`、浏览器实际请求 `200 image/svg+xml`、`fetch 200`、SVG 内容含 scoped CSS / dark rule / `<title>`、`pageOver 0`、`pageerror 0` → **`FAVICON_PASS=0`** |
+| `test:ui` | PASS 17 interaction and recovery groups |
+| `test:a11y` | PASS 28 routes / 0 violations（4180 仍服务 `dist`） |
+| `node web/validate.mjs` | PASS 13 modules / 12 chapters / 61 fragments / 80 HTML |
+| 全量六套矩阵 | 未重跑：bundle 字节与上一轮 `FINAL_FAIL=0` 时完全相同，改动只在 `<head>` 与静态资源 |
+| 产物一致性 | `diff -rq preview/handbook-custom/dist web/site` → `IDENTICAL`；`content/*.json` 未变 |
+
+同步方式：因 asset 哈希未变，仅 `cp dist/favicon.svg` + `cp dist/index.html` 到 `web/site`，无删除、无移动、未跑 `publish:web`；回滚点为已提交的 `aec1bba`。
+
+### 14.5 截图
+
+| 文件 | 内容 |
+|---|---|
+| `favicon-preview-light.png` | 浅色标签条：inline SVG 与 `<img>` 两行 × 16/32/64px，含加载状态 |
+| `favicon-preview-dark.png` | 深色标签条：同尺寸对照，验证 `prefers-color-scheme` 生效 |
+
+### 14.6 范围边界与状态
+
+未新增 ICO、apple-touch-icon、web manifest 或 `theme-color` meta；不支持 SVG 图标的 UA 会回退到默认标签字形，属已记录的既定限制。旧 `web/favicon.svg` 未改动，也不由部署根提供。**本轮改动尚未 commit、未部署**；4180 / 4183 本地静态服务仍在运行。
 

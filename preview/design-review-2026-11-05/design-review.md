@@ -291,4 +291,19 @@ screenshots/preset-*.jpg            三档深色底色的首页 / 阅读页，�
 
 **结果**：CH02 四个宽度 `1440 / 1024 / 768 / 390` 全部 `pageOver 0`、`crushed []`、`pageerror 0`；1440 下 5 个有效列 × 196px（≥150px），768 / 390 下对比表 `stacked=true`；1440 表格 `Metadata` 完整成行。六套回归全绿（ui 17 / a11y 28 route 0 violation / learning 60 / concepts 96 / structure-browser 144 断言 / simulator-layout 8 基线 × 9 步 0 漂移），`web/validate.mjs` PASS，`FINAL_FAIL=0`；144 状态横滚 `10`、`pageOver 0`、同类-bug 矩阵仍 `bad 6`，均无回退。最终 hash `index-Dh1xlw27.css` / `index-B30BLWRa.js`。
 
-前后对照截图见 `screenshots/readable-{g5,table}-{before,after}-{1440,768}.jpg` 共 8 张；完整数据见 `verification.md` 第 13 节。生产产物做第七次非破坏性同步（备份 `web-site-backup-20261105-i`），`diff -rq dist web/site` = `IDENTICAL`、`content/*.json` 原样保留。**仍未 commit、未部署**。
+前后对照截图见 `screenshots/readable-{g5,table}-{before,after}-{1440,768}.jpg` 共 8 张；完整数据见 `verification.md` 第 13 节。生产产物做第七次非破坏性同步（备份 `web-site-backup-20261105-i`），`diff -rq dist web/site` = `IDENTICAL`、`content/*.json` 原样保留。**已于 20:18 提交 `aec1bba`，未部署**。
+
+
+## 追加新增 · 网站 favicon（用户「add icon to website」）
+
+用户说「add icon to website」。核查发现线上部署根是 `web/site/`（`web/vercel.json` 的 `outputDirectory: "site"`），该目录**既无图标资源、入口 `index.html` 也无 `<link rel="icon">`**；旧静态站的 `web/favicon.svg`（深绿底 + 白色 A 字）在部署根之外，且整片绿底与当前「一个平面 + 一个点状绿色 signal」的规范相冲突。经确认，用户选择「补浏览器 favicon」+「按当前设计语言重新设计」（不做 ICO / apple-touch / manifest 完整套装）。
+
+**约束前置**：`DESIGN.md` 明确「任何未来品牌标记必须原创且先写进文档」，因此先在 `DESIGN.md` 追加 `Original favicon · Knowledge Spine mark` 条款，再创建资产。
+
+**造型**：Knowledge Spine —— 项目的自有 signature「Model → Retrieval → Agent → Production 的可见轨迹」。一条横向 hairline 脊柱串 4 个节点，**恰好一个**是点状绿 signal（序列起点），其余 3 个为中性 ink；中性圆角底板 + 一条 hairline 边框。不用任何字母造型（与旧版 A 明确区分）、不借用任何第三方标识。颜色全部取自 `DESIGN.md` frontmatter 令牌：浅色 `plate #ffffff / border #deded8 / foreground #0c0c09 / signal #00a544`，深色 `page #212121 / foreground #ececec / signal #3ddc84`；绿色只是一个点，绝不铺底。
+
+**两轮迭代**：第一版节点 r=4.5、spine 用 `muted-foreground`，渲染后发现 16px 下四个点几乎相切、连线不可见，退化成「四颗珠子」，丢失 Spine 语义。改为节点 r=4（间距 13.3、可见线段 5.3）、spine 用 `foreground @ 50%` 且加粗到 3、深色底板边框改 `foreground @ 18%`（原 `#3a3a3a` 在深色标签条上消失），并显式写 `width/height=64` 让 intrinsic size 固定。同时把 SVG 内 CSS 全部限定到 `svg.favicon-mark` 作用域、去掉会命中 HTML 根元素的 `:root` 规则，避免内联时污染宿主样式。
+
+**结果**：明暗两版 × 16/32/64px × inline SVG / `<img>` 两条加载路径逐张目视通过；`prefers-color-scheme` 在两种加载方式下都生效，绿点唯一，spine 可见。`npm run build` 通过且 JS/CSS 哈希未变（只新增静态资源 + 一行 head link）；`test:ui` 17、`test:a11y` 28 route / 0 violation、`web/validate.mjs` PASS；专门的明暗冒烟脚本确认浏览器实际请求 `/favicon.svg` 返回 `200 image/svg+xml`、`pageOver 0`、`pageerror 0`，`FAVICON_PASS=0`。因 bundle 字节未变，未重跑上一轮已 `FINAL_FAIL=0` 的六套全量矩阵。生产同步后 `diff -rq dist web/site` = `IDENTICAL`、`content/*.json` 未变。
+
+截图见 `screenshots/favicon-preview-{light,dark}.png`；完整数据见 `verification.md` 第 14 节。**本轮改动尚未 commit、未部署**。

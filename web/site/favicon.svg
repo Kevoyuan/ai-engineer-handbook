@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="favicon-mark" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="favicon-title">
+  <title id="favicon-title">AI 工程手册 · Knowledge Spine</title>
+  <!--
+    Original mark for the deployed React site (web/site). Documented in
+    DESIGN.md, "Original favicon · Knowledge Spine mark", before this asset
+    was created. Four nodes = Model / Retrieval / Agent / Production on one
+    hairline spine; exactly one point-sized green signal, the rest neutral
+    ink. Colors are the DESIGN.md frontmatter tokens, never borrowed marks.
+    All CSS is scoped to svg.favicon-mark so inlining cannot leak styles.
+  -->
+  <style>
+    svg.favicon-mark .plate  { fill: #ffffff; }
+    svg.favicon-mark .edge   { fill: none; stroke: #deded8; stroke-width: 1; }
+    svg.favicon-mark .spine  { stroke: #0c0c09; stroke-opacity: .5; stroke-width: 3; stroke-linecap: round; }
+    svg.favicon-mark .node   { fill: #0c0c09; }
+    svg.favicon-mark .signal { fill: #00a544; }
+    @media (prefers-color-scheme: dark) {
+      svg.favicon-mark .plate  { fill: #212121; }
+      svg.favicon-mark .edge   { stroke: #ececec; stroke-opacity: .18; }
+      svg.favicon-mark .spine  { stroke: #ececec; stroke-opacity: .55; }
+      svg.favicon-mark .node   { fill: #ececec; }
+      svg.favicon-mark .signal { fill: #3ddc84; }
+    }
+  </style>
+  <rect class="plate" x="2" y="2" width="60" height="60" rx="14" />
+  <rect class="edge" x="2.5" y="2.5" width="59" height="59" rx="13.5" />
+  <path class="spine" d="M12 32 H52" fill="none" />
+  <circle class="signal" cx="12" cy="32" r="4" />
+  <circle class="node" cx="25.33" cy="32" r="4" />
+  <circle class="node" cx="38.67" cy="32" r="4" />
+  <circle class="node" cx="52" cy="32" r="4" />
+</svg>
