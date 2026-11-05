@@ -16,6 +16,10 @@ on:
       - ".github/workflows/ch04-risk-coverage.yml"
   workflow_dispatch:
 
+concurrency:
+  group: atlas-param-labs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -50,7 +54,8 @@ jobs:
       - name: Generate production static site for review
         run: npm run publish:web --prefix preview/handbook-custom
       - name: Install Chromium
-        run: cd preview/handbook-custom && npx playwright install --with-deps chromium
+        timeout-minutes: 6
+        run: cd preview/handbook-custom && npx playwright install chromium
       - name: Exercise all three parameterized labs and accessibility contracts
         shell: bash
         run: |
