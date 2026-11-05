@@ -7,12 +7,16 @@ on:
       - "DESIGN.md"
       - "preview/handbook-custom/UX-CONTRACT.md"
       - "preview/handbook-custom/src/concept-diagrams.tsx"
+      - "preview/handbook-custom/src/reader.tsx"
+      - "preview/handbook-custom/src/main.tsx"
+      - "preview/handbook-custom/src/handbook.css"
       - "preview/handbook-custom/src/reliability-lab.*"
       - "preview/handbook-custom/src/query-route-lab.tsx"
       - "preview/handbook-custom/src/agent-retry-lab.tsx"
       - "preview/handbook-custom/src/parameterized-labs.css"
       - "preview/handbook-custom/evidence/risk-coverage-browser.cjs"
       - "preview/handbook-custom/evidence/parameterized-labs-browser.cjs"
+      - "preview/handbook-custom/evidence/reader-pagination-browser.cjs"
       - "preview/handbook-custom/evidence/capture-parameter-lab.cjs"
       - ".github/workflows/ch04-risk-coverage.yml"
   workflow_dispatch:
@@ -78,6 +82,7 @@ jobs:
           curl -fsS http://127.0.0.1:4180/ >/dev/null
           PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
           PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/parameterized-labs-browser.cjs
+          PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/reader-pagination-browser.cjs
       - name: Save lab screenshots for review
         if: always()
         uses: actions/upload-artifact@v4
