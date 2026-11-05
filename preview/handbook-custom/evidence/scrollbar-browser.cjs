@@ -10,7 +10,7 @@ const base = (process.env.HANDBOOK_URL || "http://127.0.0.1:4180").replace(/\/$/
 const visualDir = process.env.SCROLLBAR_VISUAL_DIR;
 
 function appearance(page, selector) {
-  return page.locator(selector).evaluate((el) => {
+  return page.locator(selector).first().evaluate((el) => {
     const css = getComputedStyle(el);
     return {
       scrollbarWidth: css.scrollbarWidth,
