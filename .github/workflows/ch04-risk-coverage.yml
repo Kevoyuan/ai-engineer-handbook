@@ -63,8 +63,16 @@ jobs:
             sleep 1
           done
           curl -fsS http://127.0.0.1:4180/ >/dev/null
-          HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
-          HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/parameterized-labs-browser.cjs
+          PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
+          PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/parameterized-labs-browser.cjs
+      - name: Save lab screenshots for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-parameterized-labs-screenshots
+          path: preview/handbook-custom/evidence/parameterized-labs-review/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Save generated site for visual and publication review
         if: success()
         uses: actions/upload-artifact@v4
