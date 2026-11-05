@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { BookIcon, BookmarkIcon, ArrowRightIcon } from "@/components/icons";
+import { BookIcon, BookmarkIcon } from "@/components/icons";
 import chapters from "./chapters.json";
 import {
   advanceScrollChrome,
