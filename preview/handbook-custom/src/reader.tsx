@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { BookIcon, BookmarkIcon, ArrowRightIcon } from "@/components/icons";
+import { BookIcon } from "@/components/icons";
 import chapters from "./chapters.json";
 import {
   advanceScrollChrome,
@@ -144,6 +144,8 @@ export function Reader({
   chromeVisible,
   onToggleTheme,
   dark,
+  darkPreset,
+  onSetDarkPreset,
 }: {
   index: number;
   en: boolean;
@@ -156,6 +158,8 @@ export function Reader({
   chromeVisible: boolean;
   onToggleTheme: () => void;
   dark: boolean;
+  darkPreset: "graphite" | "ink" | "forest";
+  onSetDarkPreset: (preset: "graphite" | "ink" | "forest") => void;
 }) {
   const t = (zh: string, e: string) => (en ? e : zh);
   const chapter = chapters[index];
@@ -446,6 +450,28 @@ export function Reader({
                 <DropdownMenuItem onSelect={onToggleTheme}>
                   {dark ? t("浅色模式", "Light theme") : t("深色模式", "Dark theme")}
                 </DropdownMenuItem>
+                {mobile && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>{t("深色底色", "Dark surface")}</DropdownMenuLabel>
+                    {([
+                      ["graphite", "深灰", "Graphite"],
+                      ["ink", "纯黑", "Ink black"],
+                      ["forest", "墨绿", "Evergreen"],
+                    ] as const).map(([preset, zh, english]) => (
+                      <DropdownMenuItem key={preset} onSelect={() => onSetDarkPreset(preset)}>
+                        {t(zh, english)}{dark && darkPreset === preset ? " ✓" : ""}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <a href="https://github.com/kevoyuan/ai-engineer-handbook"
+                         target="_blank" rel="noopener noreferrer">
+                        {t("在 GitHub 上查看", "View on GitHub")}
+                      </a>
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </>,
@@ -546,40 +572,58 @@ export function Reader({
             </DiagramBoundary>
           )}
           {data && !error && (
-            <nav
-              className="reader-bottom"
-              aria-label={t("章节翻页", "Chapter pagination")}
-            >
-              {index > 0 ? (
-                <Button asChild variant="outline">
-                  <a href={chapterHref(index - 1)}>
-                    <span aria-hidden="true">←</span>
-                    {t("上一章", "Previous")}
-                  </a>
-                </Button>
-              ) : (
-                <Button asChild variant="outline">
-                  <a href="#home">{t("返回目录", "Contents")}</a>
-                </Button>
-              )}
-              <span className="chapter-page-count">
-                {index + 1} / {chapters.length}
-              </span>
-              {index < chapters.length - 1 ? (
-                <Button asChild>
-                  <a href={chapterHref(index + 1)}>
-                    {t("下一章", "Next")}
-                    <ArrowRightIcon />
-                  </a>
-                </Button>
-              ) : (
-                <Button asChild>
-                  <a href="#home">
-                    {t("返回目录", "Contents")}
-                    <BookIcon />
-                  </a>
-                </Button>
-              )}
+            <nav className="reader-bottom" aria-label={t("章节翻页", "Chapter pagination")}>
+              <div className="reader-bottom-caption">
+                <span>{t("阅读路径 / 章节导航", "READING PATH / CHAPTERS")}</span>
+                <span className="chapter-page-count" aria-label={t(
+                  `第 ${index + 1} 章，共 ${chapters.length} 章`,
+                  `Chapter ${index + 1} of ${chapters.length}`,
+                )}>
+                  {String(index + 1).padStart(2, "0")}
+                  <span aria-hidden="true"> / </span>
+                  {String(chapters.length).padStart(2, "0")}
+                </span>
+              </div>
+              <div className="reader-bottom-links">
+                <a
+                  className="reader-bottom-link reader-bottom-prev"
+                  href={index > 0 ? chapterHref(index - 1) : "#home/all"}
+                  aria-label={index > 0
+                    ? t(`上一章：${chapters[index - 1].zh}`, `Previous chapter: ${chapters[index - 1].en}`)
+                    : t("返回知识图谱", "Back to Atlas")}
+                >
+                  <span className="reader-bottom-arrow" aria-hidden="true">←</span>
+                  <span className="reader-bottom-copy">
+                    <span className="reader-bottom-direction">
+                      {index > 0 ? t("上一章", "Previous chapter") : t("返回目录", "Back to contents")}
+                    </span>
+                    <strong className="reader-bottom-title">
+                      {index > 0
+                        ? en ? chapters[index - 1].en : chapters[index - 1].zh
+                        : "Atlas"}
+                    </strong>
+                  </span>
+                </a>
+                <a
+                  className="reader-bottom-link reader-bottom-next"
+                  href={index < chapters.length - 1 ? chapterHref(index + 1) : "#home/all"}
+                  aria-label={index < chapters.length - 1
+                    ? t(`下一章：${chapters[index + 1].zh}`, `Next chapter: ${chapters[index + 1].en}`)
+                    : t("返回知识图谱", "Back to Atlas")}
+                >
+                  <span className="reader-bottom-copy">
+                    <span className="reader-bottom-direction">
+                      {index < chapters.length - 1 ? t("下一章", "Next chapter") : t("返回目录", "Back to contents")}
+                    </span>
+                    <strong className="reader-bottom-title">
+                      {index < chapters.length - 1
+                        ? en ? chapters[index + 1].en : chapters[index + 1].zh
+                        : "Atlas"}
+                    </strong>
+                  </span>
+                  <span className="reader-bottom-arrow" aria-hidden="true">→</span>
+                </a>
+              </div>
             </nav>
           )}
         </div>

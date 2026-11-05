@@ -17,6 +17,9 @@ import { KnowledgeCheck, SkillContextInspector } from "./learning-interactions";
 import { ArchifyOverview } from "./archify-overview";
 import { DecisionTrace } from "./decision-traces";
 import { SkillSimulator } from "./skill-simulator";
+import { ReliabilityLab } from "./reliability-lab";
+import { QueryRouteBudgetLab } from "./query-route-lab";
+import { AgentRetryBudgetLab } from "./agent-retry-lab";
 const f = (node: number, title: Copy, text: Copy): Frame => ({
   node,
   title,
@@ -811,6 +814,9 @@ function LessonPlayer({ lesson, en }: { lesson: Lesson; en: boolean }) {
         <strong>{t(scenario.route)}</strong>
       </div>
       <p className="concept-takeaway">{t(lesson.takeaway)}</p>
+      {lesson.anchor === "dg2-query-routing" && <QueryRouteBudgetLab en={en} />}
+      {lesson.anchor === "fig-4-1" && <ReliabilityLab en={en} />}
+      {lesson.anchor === "fig-8-loop-vs-graph" && <AgentRetryBudgetLab en={en} />}
       <KnowledgeCheck key={"quiz-" + example} anchor={lesson.anchor} en={en} />
     </section>
   );

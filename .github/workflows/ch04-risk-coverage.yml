@@ -1,0 +1,151 @@
+name: Parameterized Atlas Teaching Labs verification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "DESIGN.md"
+      - "preview/handbook-custom/UX-CONTRACT.md"
+      - "preview/handbook-custom/src/concept-diagrams.tsx"
+      - "preview/handbook-custom/src/reader.tsx"
+      - "preview/handbook-custom/src/main.tsx"
+      - "preview/handbook-custom/src/handbook.css"
+      - "preview/handbook-custom/src/reliability-lab.*"
+      - "preview/handbook-custom/src/query-route-lab.tsx"
+      - "preview/handbook-custom/src/agent-retry-lab.tsx"
+      - "preview/handbook-custom/src/parameterized-labs.css"
+      - "preview/handbook-custom/evidence/risk-coverage-browser.cjs"
+      - "preview/handbook-custom/evidence/parameterized-labs-browser.cjs"
+      - "preview/handbook-custom/evidence/reader-pagination-browser.cjs"
+      - "preview/handbook-custom/evidence/capture-parameter-lab.cjs"
+      - ".github/workflows/ch04-risk-coverage.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: atlas-param-labs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-exercise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: preview/handbook-custom/package-lock.json
+      - name: Install Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r preview/handbook-custom/scripts/requirements.txt
+          npm ci --prefix preview/handbook-custom
+      - name: Regenerate semantic reader content
+        run: npm run sync-content --prefix preview/handbook-custom
+      - name: Typecheck and build
+        run: npm run build --prefix preview/handbook-custom
+      - name: Generate production static site for review
+        run: npm run publish:web --prefix preview/handbook-custom
+      - name: Install Chinese glyph support for visual review
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends fonts-noto-cjk
+          fc-match "Noto Sans CJK SC"
+      - name: Install Chromium
+        timeout-minutes: 6
+        run: cd preview/handbook-custom && npx playwright install chromium
+      - name: Exercise all three parameterized labs and accessibility contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd preview/handbook-custom
+          npm run dev -- --port 4180 >/tmp/risk-lab-vite.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4180/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:4180/ >/dev/null
+          PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/risk-coverage-browser.cjs
+          PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/parameterized-labs-browser.cjs
+          PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/reader-pagination-browser.cjs
+      - name: Save lab screenshots for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-parameterized-labs-screenshots
+          path: preview/handbook-custom/evidence/parameterized-labs-review/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Save generated site for visual and publication review
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-parameterized-labs-web-site
+          path: web/site/
+          if-no-files-found: error
+          retention-days: 7
+
+  # Avoid giving untrusted build/source steps write credentials. The only write
+  # happens in a separate, shell-only job after the published artifact passed
+  # TypeScript, Vite and real-browser tests. This is intentionally limited to
+  # the same-repo #86 review branch, never main or third-party pull requests.
+  sync-published-site:
+    name: Commit verified web/site artifact to PR branch
+    needs: build-and-exercise
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 86 && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out exact tested head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: true
+      - name: Download verified static output
+        uses: actions/download-artifact@v4
+        with:
+          name: atlas-parameterized-labs-web-site
+          path: ${{ runner.temp }}/atlas-verified-web-site
+      - name: Commit generated output only when PR head is unchanged
+        shell: bash
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
+          VERIFIED_OUTPUT: ${{ runner.temp }}/atlas-verified-web-site
+        run: |
+          set -euo pipefail
+          current_sha="$(git ls-remote origin "refs/heads/$HEAD_BRANCH" | cut -f1)"
+          if [ "$current_sha" != "$TESTED_SHA" ]; then
+            echo "PR branch moved since this build; skip stale publication."
+            exit 0
+          fi
+          test -f "$VERIFIED_OUTPUT/index.html"
+          rm -rf web/site
+          mkdir -p web/site
+          cp -a "$VERIFIED_OUTPUT/." web/site/
+          git add -A -- web/site
+          if git diff --cached --quiet; then
+            echo "Committed site already matches verified build."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(web): sync verified Atlas teaching lab assets"
+          git push origin "HEAD:refs/heads/$HEAD_BRANCH"

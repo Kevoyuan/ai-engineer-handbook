@@ -555,9 +555,7 @@ function App() {
         {nav}
       </div>
       <div className={
-        page === "reader"
-          ? "workspace reader-workspace" + (chromeVisible ? "" : " reader-chrome-hidden")
-          : "workspace"
+        page === "reader" ? "workspace reader-workspace" : "workspace"
       }>
         <header className="topbar" onFocusCapture={() => setChromeVisible(true)}>
           <div className="top-location">
@@ -1130,6 +1128,8 @@ function App() {
             chromeVisible={chromeVisible}
             onToggleTheme={() => setDark((value) => !value)}
             dark={dark}
+            darkPreset={darkPreset}
+            onSetDarkPreset={(preset) => { setDarkPreset(preset); setDark(true); }}
           />
         )}
       </div>
