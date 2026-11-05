@@ -27,6 +27,7 @@ jobs:
       - name: Check out
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - name: Install Node 22
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -81,3 +82,53 @@ jobs:
           path: web/site/
           if-no-files-found: error
           retention-days: 7
+
+  # Avoid giving untrusted build/source steps write credentials. The only write
+  # happens in a separate, shell-only job after the published artifact passed
+  # TypeScript, Vite and real-browser tests. This is intentionally limited to
+  # the same-repo #86 review branch, never main or third-party pull requests.
+  sync-published-site:
+    name: Commit verified web/site artifact to PR branch
+    needs: build-and-exercise
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 86 && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out exact tested head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: true
+      - name: Download verified static output
+        uses: actions/download-artifact@v4
+        with:
+          name: atlas-parameterized-labs-web-site
+          path: ${{ runner.temp }}/atlas-verified-web-site
+      - name: Commit generated output only when PR head is unchanged
+        shell: bash
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          TESTED_SHA: ${{ github.event.pull_request.head.sha }}
+          VERIFIED_OUTPUT: ${{ runner.temp }}/atlas-verified-web-site
+        run: |
+          set -euo pipefail
+          current_sha="$(git ls-remote origin "refs/heads/$HEAD_BRANCH" | cut -f1)"
+          if [ "$current_sha" != "$TESTED_SHA" ]; then
+            echo "PR branch moved since this build; skip stale publication."
+            exit 0
+          fi
+          test -f "$VERIFIED_OUTPUT/index.html"
+          rm -rf web/site
+          mkdir -p web/site
+          cp -a "$VERIFIED_OUTPUT/." web/site/
+          git add -A -- web/site
+          if git diff --cached --quiet; then
+            echo "Committed site already matches verified build."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(web): sync verified Atlas teaching lab assets"
+          git push origin "HEAD:refs/heads/$HEAD_BRANCH"
