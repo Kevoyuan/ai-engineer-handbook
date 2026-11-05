@@ -94,8 +94,8 @@ async function loadReader(page) {
       // after scroll activity has ended.
       await page.locator(scroller).evaluate((el) => {
         delete el.dataset.scrolling;
-        el.focus();
       });
+      await page.locator(".chapter-body").focus();
       const focused = await appearance(page, scroller);
       assert.equal(focused.scrollbarColor, engaged.scrollbarColor);
 
