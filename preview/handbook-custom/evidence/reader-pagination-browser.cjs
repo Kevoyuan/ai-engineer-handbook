@@ -67,8 +67,10 @@ async function scrollToFooter(page, width) {
       assert.equal(await next.getAttribute("href"), "#read/04-rag-reliability-selective-answering");
       assert.ok((await prev.locator(".reader-bottom-title").innerText()).length >= 4);
       assert.ok((await next.locator(".reader-bottom-title").innerText()).length >= 4);
-      assert.ok((await prev.getAttribute("aria-label")).length > 10);
-      assert.ok((await next.getAttribute("aria-label")).length > 10);
+      assert.ok((await prev.getAttribute("aria-label")).includes(
+        await prev.locator(".reader-bottom-title").innerText()));
+      assert.ok((await next.getAttribute("aria-label")).includes(
+        await next.locator(".reader-bottom-title").innerText()));
 
       const header = page.locator(".workspace.reader-workspace .topbar");
       const initial = await dimensions(page, ".workspace.reader-workspace .topbar");
