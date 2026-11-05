@@ -173,6 +173,19 @@ The original `LessonPlayer` owns scenario/step/seek/autoplay/quiz for CH03, CH04
 
 
 
+## CH04 parameterized selective-answering Lab · first implementation
+
+The existing CH04 `#concept-demo` remains one mounted Reader destination. Its original evidence-gates graph, synchronized trace, selectable teaching examples, stage controls, decision outcomes, and two-question quiz remain available. After the takeaway, a secondary `#risk-coverage-lab` subsection exposes a controlled threshold experiment without creating another route or altering the canonical semantic chapter.
+
+- The native range control moves in 0.01 increments from 0.00 through 1.00 and starts at 0.70; Reset restores 0.70. Changing it recomputes accepted cases, Coverage, Selective Risk and the current plot point immediately. It does not call a model, fetch, or change the canonical evidence gate.
+- The fixed fixture has 8 authored illustrative records with a score and reference correctness label. The case ledger shows every record's current answer/abstain decision; wrong answers remain explicitly wrong rather than becoming corrected on abstention. The same filtered set drives all visual and text summaries.
+- Coverage is accepted / 8. Selective Risk is incorrect among accepted / accepted. With no accepted cases, display an em dash and explicit “undefined” copy; never show 0%. The selected plot point is absent when risk is undefined. The historical operating-point curve is deterministic and is not a production ROC or calibrated guarantee.
+- The copy is bilingual and explicitly separates invented values from calibrated confidence and observed production results. A separate boundary note preserves the other mandatory evidence/authorization/version/conflict/risk gates. Higher thresholds do not imply monotonically better risk.
+- All status meanings are text-visible without color; SVG has a descriptive accessible label; input has a visible label, `aria-valuetext` and 44px hit area; Reset supports keyboard and visible focus; the metrics announce updates politely. The figure and case ledger stack on compact widths, with no page-level horizontal overflow. Reduced-motion users receive the same static-first teaching outcome.
+- Module failure must be contained by the existing Reader `DiagramBoundary` without suppressing the canonical article. Direct Atlas `#concept-demo` navigation and original layout/scroll/reader-language contracts remain unchanged.
+
+QA acceptance before merging: `npm run build`, `npm run test:concepts`, manual keyboard/locale/theme/reduced-motion checks at 390/768/1440/1728px, source and published asset parity via `npm run publish:web`, then Vercel Preview smoke test. Do not merge to `main` with an unrefreshed `web/site` build.
+
 ## V3.5 collapsed stage navigation
 
 On the graph-first CH03, CH04 and CH08 Labs, the original `.concept-flow` four-stage button map is wrapped in `<details class="concept-step-inspector">` and **closed by default**. Readers may expand it to jump to a named stage; step highlights, round-two seek behavior, Next/Previous, reduced motion and quiz must remain unaffected. Native disclosure semantics give keyboard and screen reader access. The GraphCanvas is the only default visual topology; the old detailed evidence pane remains another intentionally optional inspection layer.
