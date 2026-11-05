@@ -2,8 +2,7 @@
  * Run with Vite at HANDBOOK_URL and installed Playwright Chromium.
  */
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
+const { captureLabReview } = require("./capture-parameter-lab.cjs");
 const visualDir = process.env.PARAMETER_VISUAL_DIR;
 const { chromium } = require("playwright");
 
@@ -85,11 +84,10 @@ async function assertFit(page, root, width) {
       assert.equal(await route.locator('li[data-state="planned"]').count(), 0);
       await assertFit(page, "#route-budget-lab", config.width);
       if (visualDir && (config.width === 390 || config.width === 1440)) {
-        fs.mkdirSync(visualDir, { recursive: true });
         await route.locator("#route-case-select").selectOption("semantic");
         await range.press("Home");
         await range.press("ArrowRight");
-        await route.screenshot({ path: path.join(visualDir, `ch03-${config.width}-${config.en ? "en" : "zh"}.png`) });
+        await captureLabReview(page, "#route-budget-lab", visualDir, `ch03-${config.width}-${config.en ? "en" : "zh"}`);
       }
 
       // CH08: two verified attempts when both permission and work budget permit.
@@ -125,7 +123,7 @@ async function assertFit(page, root, width) {
       assert.equal(await budget.inputValue(), "9");
       await assertFit(page, "#agent-budget-lab", config.width);
       if (visualDir && (config.width === 390 || config.width === 1440)) {
-        await agent.screenshot({ path: path.join(visualDir, `ch08-${config.width}-${config.en ? "en" : "zh"}.png`) });
+        await captureLabReview(page, "#agent-budget-lab", visualDir, `ch08-${config.width}-${config.en ? "en" : "zh"}`);
       }
 
       console.log("CH03 + CH08 parameterized labs PASS", config.width, config.en ? "EN" : "ZH", config.dark ? "dark" : "light");
