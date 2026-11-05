@@ -2199,6 +2199,20 @@ button[data-variant="default"] {
 *:focus-visible {
   scrollbar-color: var(--scroll-thumb-engaged) transparent;
 }
+/* Keyboard focus inside the mobile workspace belongs to its one page scroll
+   owner; desktop Reader and nested panels keep their own focus ring/scroll
+   indicator. This is focused scope, not a blanket parent:hover reveal. */
+:is(.workspace.reader-workspace, .chapter-body, .atlas-page, .notebook-page,
+    .concept-page, .catalog-scroll, .knowledge-map, .search-results,
+    .toc, .tw, .table-scroll):focus-within {
+  scrollbar-color: var(--scroll-thumb-engaged) transparent;
+}
+:is(.workspace.reader-workspace, .chapter-body, .atlas-page, .notebook-page,
+    .concept-page, .catalog-scroll, .knowledge-map, .search-results,
+    .toc, .tw, .table-scroll):focus-within::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb-engaged);
+  background-clip: padding-box;
+}
 *[data-scrolling="true"]::-webkit-scrollbar-thumb,
 *:focus-visible::-webkit-scrollbar-thumb,
 *::-webkit-scrollbar-thumb:hover {
