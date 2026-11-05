@@ -225,6 +225,38 @@ export function Reader({
     return () => controller.abort();
   }, [chapter.slug, attempt]);
   const html = useMemo(() => data?.[en ? "en" : "zh"] || "", [data, en]);
+  // Concept-card grids and comparison tables are authored at fixed column
+  // counts that crush each cell inside the reading measure. Without touching
+  // the chapter JSON we annotate plain header-row tables so the stylesheet can
+  // stack them into labeled semantic records on narrow containers, and let
+  // card grids wrap. Only real diagram matrices are excluded: .interp-matrix
+  // is a scrollable comparison-table wrapper (CH02/CH03), not a diagram, so it
+  // must be stacked too. This is presentation-only: no new storage key, route,
+  // or content change. Header text is read from the locale-correct DOM.
+  useEffect(() => {
+    const root = pane.current?.querySelector<HTMLElement>(".canonical-content");
+    if (!root) return;
+    root.querySelectorAll<HTMLTableElement>("table").forEach((table) => {
+      if (table.closest(".dg2-matrix, .dg2-pyramid, .bfs-g3, .bfs-g4, .bfs-g5, .bfs-g6, .cv-stats"))
+        return;
+      const thead = table.querySelector("thead");
+      const headers = thead
+        ? Array.from(thead.querySelectorAll<HTMLTableCellElement>("th"))
+        : [];
+      if (!headers.length) return;
+      table.classList.add("stack-table");
+      const body = table.querySelector("tbody") ?? table;
+      body.querySelectorAll<HTMLTableRowElement>("tr").forEach((tr) => {
+        const cells = Array.from(tr.querySelectorAll<HTMLTableCellElement>("td"));
+        cells.forEach((cell, i) => {
+          const label = (headers[Math.min(i, headers.length - 1)]?.textContent || "")
+            .replace(/\s+/g, " ")
+            .trim();
+          if (label && !cell.getAttribute("data-label")) cell.setAttribute("data-label", label);
+        });
+      });
+    });
+  }, [html, data, en, chapter.slug]);
   function jump(id: string) {
     const target = pane.current?.querySelector<HTMLElement>(
       '[id="' + CSS.escape(id) + '"]',

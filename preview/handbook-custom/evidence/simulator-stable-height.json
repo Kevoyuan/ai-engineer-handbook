@@ -3,7 +3,7 @@
     "width": 390,
     "en": false,
     "baseline": {
-      "height": 1240.66,
+      "height": 2292.77,
       "grid": 760,
       "panels": [
         264,
@@ -19,14 +19,14 @@
     "width": 1154,
     "en": false,
     "baseline": {
-      "height": 580.67,
-      "grid": 328,
+      "height": 2254.27,
+      "grid": 760,
       "panels": [
-        328,
-        328
+        264,
+        480
       ],
-      "assets": 112,
-      "stream": 94,
+      "assets": 128,
+      "stream": 190,
       "controls": 64
     },
     "verifiedSteps": 9
@@ -35,7 +35,7 @@
     "width": 1440,
     "en": false,
     "baseline": {
-      "height": 696.67,
+      "height": 1298.56,
       "grid": 444,
       "panels": [
         444,
@@ -51,7 +51,7 @@
     "width": 1728,
     "en": false,
     "baseline": {
-      "height": 708.67,
+      "height": 1310.56,
       "grid": 456,
       "panels": [
         456,
@@ -67,7 +67,7 @@
     "width": 390,
     "en": true,
     "baseline": {
-      "height": 1293.84,
+      "height": 2376.44,
       "grid": 760,
       "panels": [
         264,
@@ -83,14 +83,14 @@
     "width": 1154,
     "en": true,
     "baseline": {
-      "height": 604.47,
-      "grid": 328,
+      "height": 2278.06,
+      "grid": 760,
       "panels": [
-        328,
-        328
+        264,
+        480
       ],
-      "assets": 112,
-      "stream": 94,
+      "assets": 128,
+      "stream": 190,
       "controls": 64
     },
     "verifiedSteps": 9
@@ -99,7 +99,7 @@
     "width": 1440,
     "en": true,
     "baseline": {
-      "height": 720.47,
+      "height": 1322.36,
       "grid": 444,
       "panels": [
         444,
@@ -115,7 +115,7 @@
     "width": 1728,
     "en": true,
     "baseline": {
-      "height": 732.47,
+      "height": 1334.36,
       "grid": 456,
       "panels": [
         456,

@@ -136,6 +136,13 @@ const groups = [
     descriptionEn: "Move systems into production with evaluation, observability, and platform controls.",
   },
 ];
+const DARK_PRESETS = [
+  { id: "graphite", zh: "深灰", en: "Graphite" },
+  { id: "ink", zh: "纯黑", en: "Ink black" },
+  { id: "forest", zh: "墨绿", en: "Evergreen" },
+] as const;
+type DarkPreset = (typeof DARK_PRESETS)[number]["id"];
+
 function read<T>(key: string, fallback: T): T {
   try {
     return JSON.parse(localStorage.getItem(key) || "null") ?? fallback;
@@ -155,7 +162,13 @@ function App() {
   const [en, setEn] = useState(() => read("preview-locale", false)),
     [dark, setDark] = useState(() =>
       read("preview-theme", matchMedia("(prefers-color-scheme: dark)").matches),
-    );
+    ),
+    [darkPreset, setDarkPreset] = useState<DarkPreset>(() => {
+      const stored = read<string>("preview-dark-preset", "graphite");
+      return DARK_PRESETS.some((preset) => preset.id === stored)
+        ? (stored as DarkPreset)
+        : "graphite";
+    });
   const [page, setPage] = useState(() =>
     location.hash.startsWith("#read")
       ? "reader"
@@ -271,11 +284,19 @@ function App() {
   const [saved, setSaved] = useState<string[]>(() =>
     read("preview-bookmarks", []),
   );
-  const [selectedAtlasSlug, setSelectedAtlasSlug] = useState<string>(
-    () => chapters.find((chapter) => chapter.number === "03")?.slug || chapters[0].slug,
-  );
+  /* The inspector needs a chapter to describe on first paint, but that is a
+     preview, not a user selection. An empty selectedAtlasSlug means no node
+     is highlighted and no Inspect button claims aria-pressed; the inspector
+     still shows the same representative chapter (03) it has always shown.
+     A real selection is created only by focusing a node or clicking Inspect,
+     which is when the green signal dot should appear. */
+  const defaultInspectSlug =
+    chapters.find((chapter) => chapter.number === "03")?.slug || chapters[0].slug;
+  const [selectedAtlasSlug, setSelectedAtlasSlug] = useState<string>("");
   const selectedAtlas =
-    chapters.find((chapter) => chapter.slug === selectedAtlasSlug) || chapters[0];
+    chapters.find((chapter) => chapter.slug === selectedAtlasSlug) ||
+    chapters.find((chapter) => chapter.slug === defaultInspectSlug) ||
+    chapters[0];
   const inspectAtlas = (slug: string) => {
     setSelectedAtlasSlug(slug);
     // On stacked layouts, the inspector follows the full spine.
@@ -291,11 +312,16 @@ function App() {
   const [notice, setNotice] = useState("");
   const [noticeError, setNoticeError] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const appearanceRef = useRef<HTMLDetailsElement>(null);
   const t = (zh: string, enText: string) => (en ? enText : zh);
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     save("preview-theme", dark);
   }, [dark]);
+  useEffect(() => {
+    document.documentElement.dataset.darkPreset = darkPreset;
+    save("preview-dark-preset", darkPreset);
+  }, [darkPreset]);
   useEffect(() => {
     document.documentElement.lang = en ? "en" : "zh-CN";
     document.documentElement.dataset.lang = en ? "en" : "zh";
@@ -636,6 +662,60 @@ function App() {
                 {dark ? <SunLightIcon /> : <HalfMoonIcon />}
               </Button>
             )}
+            <details
+              className="appearance-picker"
+              ref={appearanceRef}
+              onKeyDown={(event) => {
+                if (event.key === "Escape" && appearanceRef.current) {
+                  appearanceRef.current.open = false;
+                }
+              }}
+            >
+              <summary
+                aria-label={t("选择深色底色", "Choose dark surface")}
+                title={t("深色底色预设", "Dark surface presets")}
+              >
+                <span
+                  className="appearance-swatch"
+                  data-preset={darkPreset}
+                  aria-hidden="true"
+                />
+              </summary>
+              <div
+                className="appearance-menu"
+                role="group"
+                aria-label={t("深色底色", "Dark surface")}
+              >
+                <p className="appearance-menu-label">
+                  {t("深色底色 · DARK SURFACE", "DARK SURFACE")}
+                </p>
+                {DARK_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    aria-pressed={darkPreset === preset.id}
+                    onClick={() => {
+                      setDarkPreset(preset.id);
+                      setDark(true);
+                      if (appearanceRef.current)
+                        appearanceRef.current.open = false;
+                    }}
+                  >
+                    <span
+                      className="appearance-swatch"
+                      data-preset={preset.id}
+                      aria-hidden="true"
+                    />
+                    <span>{t(preset.zh, preset.en)}</span>
+                    {darkPreset === preset.id && (
+                      <span className="appearance-check" aria-hidden="true">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </details>
             <Button
               variant="ghost"
               className={page === "reader" ? "reader-direct-language" : undefined}
@@ -759,6 +839,10 @@ function App() {
                       "Do not just read chapters in order. See why models, retrieval, agents, and production systems connect.",
                     )}
                   </p>
+                  <a className="atlas-start-link" href={chapterHref(0)}>
+                    {t("从第 01 章开始读", "Start with chapter 01")}
+                    <ArrowRightIcon />
+                  </a>
                   <div className="atlas-search">
                     <div className="search-button">
                       <SearchIcon />

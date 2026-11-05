@@ -234,6 +234,12 @@ export function SkillSimulator({
       .skill-terminal .sim-log.process { color:#b8bfc4; }
       .skill-terminal .sim-log.result { color:var(--success); }
       .skill-terminal .sim-log.blocked { color:var(--destructive); }
+      /* The global search-result stylesheet uses the bare .result class. Here
+         .result is a state modifier for logs and stream messages; without this
+         override its 2.25rem / 1fr / 1rem grid leaks in, drops the log text
+         into the middle track and squeezes .sim-json into the 1rem third
+         track, producing a one-glyph-per-line column at every viewport. */
+      .chapter-body .skill-terminal :is(.sim-log, .sim-message) { display:block; }
       .skill-terminal .sim-controls { padding:.5rem; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); flex-shrink:0; gap:.5rem; border-top:.0625rem solid var(--sim-border); background:var(--sim-panel); }
       .skill-terminal .sim-controls button { border-radius:.5rem; font-size:.8125rem; min-height:2.75rem; min-width:0; padding-inline:.5rem; white-space:normal; overflow-wrap:anywhere; cursor:pointer; }
       .skill-terminal .sim-controls .sim-run { grid-column:auto; min-height:2.75rem; color:var(--primary-foreground); background:var(--sim-accent); box-shadow:inset 0 .0625rem 0 #ffffff24, 0 .125rem .25rem #00000030; font-weight:600; }
@@ -295,8 +301,13 @@ export function SkillSimulator({
       @media (prefers-reduced-motion:no-preference) { .skill-terminal .sim-message[data-current=true] { animation:sim-arrive 180ms ease-out; } @keyframes sim-arrive { from {opacity:.5;transform:translateY(.25rem)} to {opacity:1;transform:translateY(0)} } }
       @media (prefers-reduced-motion:reduce) { .skill-terminal button { transition:none; transform:none; } }
       @container (max-width:1050px) { .skill-terminal .sim-run svg { display:none; } }
-      @container (max-width:600px) { .skill-terminal .sim-header { align-items:flex-start; flex-direction:column; gap:.75rem; } }
-      @container (max-width:600px) {
+      /* The simulator only becomes a wide plate at .chapter-body >= 60rem.
+         Below that it stays at the 38rem reading measure, where a 1fr / 1.9fr
+         split leaves the USER TERMINAL around 194px and stacks CJK logs one
+         glyph per line. Use the compact layout whenever the wide plate is
+         inactive, not only below 600px. */
+      @container (max-width:59.99rem) { .skill-terminal .sim-header { align-items:flex-start; flex-direction:column; gap:.75rem; } }
+      @container (max-width:59.99rem) {
         .chapter-body .skill-terminal { padding:1.25rem; }
         .skill-terminal .sim-extras { grid-template-columns:1fr; }
         .skill-terminal .sim-grid { grid-template-columns:1fr; gap:1rem; }
@@ -316,6 +327,18 @@ export function SkillSimulator({
         .skill-terminal .sim-assets > div { align-self:start; padding:.625rem .75rem; }
       }
       @container (max-width:400px) { .chapter-body .skill-terminal { padding:1rem; } .chapter-body .skill-terminal h3 { font-size:1.625rem; } .skill-terminal .sim-scenarios button { font-size:.75rem; } .skill-terminal .sim-titlebar { gap:.5rem; } .skill-terminal .sim-window-title { font-size:.6875rem; } }
+      /* The graph caption describes the active scenario, so its length changes
+         with the tab. In the compact layout it wraps to 2–5 lines and the whole
+         demo grows 19.53px at 390 and 28.08px at 1024–1280 when switching
+         scenarios, shifting the reading position and breaking the stable-height
+         contract. Reserve the measured maximum caption height while the wide
+         plate is inactive: 72.61px at 768–1280, 92.14px (Chinese) and 124.22px
+         (English) at 390 (split with :lang() so Chinese does not carry the
+         English reservation). At >=60rem every caption fits one line, so no
+         reservation is needed. */
+      @container (max-width:59.99rem) { .skill-terminal .atlas-graph-caption { min-height:4.75rem; } }
+      @container (max-width:25rem) { .skill-terminal .atlas-graph-caption { min-height:6rem; } }
+      @container (max-width:25rem) { html:lang(en) .skill-terminal .atlas-graph-caption { min-height:8rem; } }
     `}</style>
       <Tabs
         value={String(scenario)}

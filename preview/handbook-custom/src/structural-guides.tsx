@@ -224,7 +224,20 @@ export function StructuralGuide({slug,en,pane,onReady}:{
     const slot=document.createElement("div");
     slot.className="structural-guide-slot";
     const insertion=chapter==="12"&&anchor.nextElementSibling?.tagName==="P" ? anchor.nextElementSibling : anchor;
-    insertion.after(slot);
+    // A structural guide is a full-width reading block. Some canonical anchors
+    // (CH05 #fig-5-2) live inside an authored two-column grid; mounting the slot
+    // as their sibling makes it a grid item in a collapsed 0px track, stacking
+    // every CJK glyph into a narrow vertical column. Hoist it past any grid
+    // ancestor so it sits in .ch at the same measure as CH09 / CH12.
+    let mountAfter: Element = insertion;
+    for (
+      let parent = insertion.parentElement;
+      parent && parent !== pane.current && !parent.classList.contains("canonical-content");
+      parent = parent.parentElement
+    ) {
+      if (getComputedStyle(parent).display.includes("grid")) mountAfter = parent;
+    }
+    mountAfter.after(slot);
     setHost(slot);
     return ()=>slot.remove();
   },[chapter,en,pane]);

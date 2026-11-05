@@ -1,26 +1,33 @@
 /* Preview theme adapter: custom evergreen identity. Layers: navigation 10, dialogs 50. */
 :root {
-  --background: #edf0ea;
-  --page: #fcfdfb;
-  --plate: #f7f9f5;
-  --foreground: #18211d;
-  --card: #eef2ec;
+  /* Editorial clarity refinement (scope B): one flat white plane, one hairline,
+     one secondary well, one point-sized green signal. */
+  --background: #ffffff;
+  --page: #ffffff;
+  --plate: #f8f8f5;
+  --foreground: #0c0c09;
+  --card: #f8f8f5;
   --card-foreground: var(--foreground);
   --popover: #ffffff;
   --popover-foreground: var(--foreground);
   --overlay: color-mix(in srgb, var(--foreground) 20%, transparent);
-  --primary: #2f6850;
-  --primary-foreground: #f7faf8;
-  --secondary: #e3e9e5;
-  --secondary-foreground: #25332c;
-  --muted: #eef2ef;
-  --muted-foreground: #5f6a64;
-  --accent: #dde9e2;
-  --accent-foreground: #25332c;
-  --border: #d7dfda;
-  --input: #f1f4ee;
-  --ring: #2f6850;
+  --primary: #007a35;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f0;
+  --secondary-foreground: #0c0c09;
+  --muted: #f4f4f0;
+  --muted-foreground: #6b6f63;
+  --accent: #edf4ee;
+  --accent-foreground: #0c0c09;
+  --border: #deded8;
+  --input: #f8f8f5;
+  --ring: #007a35;
   --ring-inverted: #98c7ac;
+  /* New editorial tokens. --signal is non-text only (3.25:1 on white). */
+  --hairline: #deded8;
+  --signal: #00a544;
+  --signal-ink: #087a37;
+  --editorial-measure: 43rem;
   --sidebar: var(--background);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
@@ -35,7 +42,8 @@
   --shadow-thumb: 0 1px 2px #24413222;
   --shadow-float-modal: 0 24px 72px #152e3430;
   --radius: 0.625rem;
-  --font-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  /* Local-only Chinese-capable editorial serif; no remote font request. */
+  --font-serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --destructive: oklch(0.5563 0.1632 32);
   --destructive-foreground: oklch(1 0 0);
   --success: oklch(0.5262 0.0942 151.04);
@@ -62,27 +70,53 @@
 }
 .dark {
   color-scheme: dark;
-  --background: #0f1211;
-  --page: #181c1a;
-  --plate: #131715;
-  --foreground: #e7ebe8;
-  --card: #1e2320;
+  /* Dark surface presets. graphite is the default: a Codex-like neutral gray
+     ladder with no green cast. ink is near-black; forest keeps the old
+     evergreen surfaces. Only the --ds-* ladder changes between presets. */
+  --ds-background: #171717;
+  --ds-page: #212121;
+  --ds-plate: #1c1c1c;
+  --ds-foreground: #ececec;
+  --ds-card: #2b2b2b;
+  --ds-popover: #303030;
+  --ds-overlay: rgb(0 0 0 / 64%);
+  --ds-primary: #ebebeb;
+  --ds-primary-foreground: #1a1a1a;
+  --ds-secondary: #2b2b2b;
+  --ds-secondary-foreground: #e9e9e9;
+  --ds-muted: #262626;
+  --ds-muted-foreground: #a9a9a9;
+  --ds-accent: #333333;
+  --ds-accent-foreground: #e2e2e2;
+  --ds-border: #3a3a3a;
+  --ds-input: #1c1c1c;
+  --ds-ring: #ebebeb;
+  --ds-ring-inverted: #8a8a8a;
+  --background: var(--ds-background);
+  --page: var(--ds-page);
+  --plate: var(--ds-plate);
+  --foreground: var(--ds-foreground);
+  --card: var(--ds-card);
   --card-foreground: var(--foreground);
-  --popover: #262b28;
+  --popover: var(--ds-popover);
   --popover-foreground: var(--foreground);
-  --overlay: rgb(5 8 10 / 64%);
-  --primary: #b8d0c0;
-  --primary-foreground: #19241e;
-  --secondary: #262c2a;
-  --secondary-foreground: #e0e4e2;
-  --muted: #222725;
-  --muted-foreground: #a8b0ac;
-  --accent: #2a3430;
-  --accent-foreground: #c6d9cd;
-  --border: #333a37;
-  --input: #141716;
-  --ring: #b8d0c0;
-  --ring-inverted: #7ba78e;
+  --overlay: var(--ds-overlay);
+  --primary: var(--ds-primary);
+  --primary-foreground: var(--ds-primary-foreground);
+  --secondary: var(--ds-secondary);
+  --secondary-foreground: var(--ds-secondary-foreground);
+  --muted: var(--ds-muted);
+  --muted-foreground: var(--ds-muted-foreground);
+  --accent: var(--ds-accent);
+  --accent-foreground: var(--ds-accent-foreground);
+  --border: var(--ds-border);
+  --input: var(--ds-input);
+  --ring: var(--ds-ring);
+  --ring-inverted: var(--ds-ring-inverted);
+  /* Same editorial discipline in every dark preset. */
+  --hairline: rgba(255, 255, 255, 0.14);
+  --signal: #3ddc84;
+  --signal-ink: #5de29c;
   --success: #a9c5b5;
   --warning: #d9ba86;
   --destructive: #e1a19b;
@@ -119,6 +153,49 @@
   --shadow-s: var(--shadow-sm);
   --shadow-m: var(--shadow-md);
   --shadow-l: var(--shadow-lg);
+}
+/* User-selectable dark surfaces. The light theme is unaffected. */
+.dark[data-dark-preset="ink"] {
+  --ds-background: #0b0b0b;
+  --ds-page: #101010;
+  --ds-plate: #0e0e0e;
+  --ds-foreground: #f4f4f4;
+  --ds-card: #191919;
+  --ds-popover: #202020;
+  --ds-overlay: rgb(0 0 0 / 72%);
+  --ds-primary: #f2f2f2;
+  --ds-primary-foreground: #101010;
+  --ds-secondary: #1c1c1c;
+  --ds-secondary-foreground: #ededed;
+  --ds-muted: #171717;
+  --ds-muted-foreground: #a6a6a6;
+  --ds-accent: #242424;
+  --ds-accent-foreground: #e4e4e4;
+  --ds-border: #303030;
+  --ds-input: #0e0e0e;
+  --ds-ring: #f2f2f2;
+  --ds-ring-inverted: #7d7d7d;
+}
+.dark[data-dark-preset="forest"] {
+  --ds-background: #0f1211;
+  --ds-page: #181c1a;
+  --ds-plate: #131715;
+  --ds-foreground: #e7ebe8;
+  --ds-card: #1e2320;
+  --ds-popover: #262b28;
+  --ds-overlay: rgb(5 8 10 / 64%);
+  --ds-primary: #b8d0c0;
+  --ds-primary-foreground: #19241e;
+  --ds-secondary: #262c2a;
+  --ds-secondary-foreground: #e0e4e2;
+  --ds-muted: #222725;
+  --ds-muted-foreground: #a8b0ac;
+  --ds-accent: #2a3430;
+  --ds-accent-foreground: #c6d9cd;
+  --ds-border: #333a37;
+  --ds-input: #141716;
+  --ds-ring: #b8d0c0;
+  --ds-ring-inverted: #7ba78e;
 }
 * {
   box-sizing: border-box;
@@ -1374,14 +1451,38 @@ body,
 .chapter-body {
   container-type: inline-size;
 }
-.chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *) {
+/* Authored multi-column grids are not wide-plate containers. Excluding their
+   descendants (not just direct children) keeps nested CH09 .tw / pre plates
+   inside their 297px column instead of spilling to 1037px. Plate descendants
+   of plates and of the React concept demos are excluded for the same reason.
+   A .tsc / .table-scroll / .fig wrapper is itself the wide plate; its inner
+   .tw is excluded here so the wrapper can grow without being scrolled by a
+   1037px child at 608px (the CH05 / CH09 clipped-table screenshots). */
+.chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview, .tsc, .table-scroll, .fig, .g3, .g4, .g5, .lane3):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *, .two *, .g2 *, .g3 *, .g4 *, .g5 *, .qa-grid *, .qwall *, .wheel-wrap *, .lane3 *, .cover *, .cap-stack *, .harness-wrap *) {
   max-inline-size: 100%;
 }
 @container (min-width: 60rem) {
-  .chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *) {
+  .chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview, .tsc, .table-scroll, .fig, .g3, .g4, .g5, .lane3):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *, .two *, .g2 *, .g3 *, .g4 *, .g5 *, .qa-grid *, .qwall *, .wheel-wrap *, .lane3 *, .cover *, .cap-stack *, .harness-wrap *) {
     width: calc(100cqw - 2rem);
     max-inline-size: none;
     margin-inline: calc((var(--measure) - (100cqw - 2rem)) / 2);
+  }
+}
+/* Wide plates are for top-level content only. An authored multi-column grid
+   that contains a plate must keep the grid's geometry: widening one grid item
+   collapses a sibling track to 0px (CH05 .bfs-canvas, CH06 / CH03 / CH09
+   pre.code), or overflows a 293px track by 744px (CH04 / CH09). Stack those
+   grids and keep the plates inside the reading measure at the same breakpoint
+   where wide plates are enabled. Grids authored inside another wide plate are
+   excluded: their topology is diagram content, not a reading column. */
+@container (min-width: 60rem) {
+  .chapter-body .canonical-content :is(.two, .g2, .g3, .g4, .g5, .qa-grid, .qwall, .wheel-wrap, .lane3, .cover, .cap-stack, .harness-wrap):not(.bfs-canvas *, .concept-demo *, .archify-overview *, figure *, .tw *):has(> :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chapter-body .canonical-content :is(.two, .g2, .g3, .g4, .g5, .qa-grid, .qwall, .wheel-wrap, .lane3, .cover, .cap-stack, .harness-wrap):not(.bfs-canvas *, .concept-demo *, .archify-overview *, figure *, .tw *):has(> :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview)) > :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview) {
+    width: auto;
+    max-inline-size: 100%;
+    margin-inline: 0;
   }
 }
 .chapter-body :is(pre, code, kbd, .tw) {
@@ -2095,7 +2196,13 @@ button[data-variant="default"] {
   min-height: 2.75rem;
   min-width: 2.75rem;
 }
-@media (max-width: 640px) {
+/* The authored .document-grid has three min-content-sized tracks that need
+   ~586px. This media query used the viewport, but the reading column is only
+   453px at a 768px viewport and 585px at 900px, so CH06 / CH07 / CH09 pushed
+   the whole .chapter-body into horizontal scrolling between 641px and ~968px.
+   Key the stack to the .chapter-body container, the same geometry the wide
+   plates use, instead of the viewport. */
+@container (max-width: 40rem) {
   .chapter-body .document-grid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -3757,3 +3864,590 @@ body {
 .archify-overview-heading { padding: .75rem 1rem; }
 .archify-poster img { height: auto; max-height: clamp(9rem, 30dvh, 18rem); object-fit: contain; }
 .chapter-body .archify-overview figcaption { padding: .75rem 1rem; }
+
+
+/* ==================================================================
+   Editorial clarity refinement · scope B · 2026-11-05
+   No book cover. One flat plane, one hairline, one point signal,
+   a serif prose layer and one 64rem reading column.
+   Presentation only: routes, selectors, counts and behavior unchanged.
+   See DESIGN.md "Editorial clarity refinement · scope B".
+   ================================================================== */
+
+/* ---- chrome: the rail and the page are now the same white plane ---- */
+.desktop-nav {
+  border-right: 1px solid var(--hairline);
+}
+:root.sidebar-collapsed .desktop-nav {
+  border-right: 0;
+}
+.chapter-sidebar {
+  background: var(--page);
+}
+
+/* A slim 64px hairline topbar with the one sanctioned translucent wash.
+   The Reader keeps its solid, direction-aware chrome (never blurred). */
+.workspace:not(.reader-workspace) > .topbar {
+  flex-basis: 4rem;
+  height: 4rem;
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* The English wordmark is wider than the 264px rail. Let the mono subtitle
+   wrap instead of being clipped by the fixed-width sidebar header. Chinese
+   stays on one line; the 44px brand target is preserved. */
+.brand {
+  white-space: normal;
+  min-width: 0;
+}
+.brand > span:last-child {
+  min-width: 0;
+}
+.brand-en {
+  white-space: normal;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+}
+
+/* ---- Atlas home: one calm editorial column, no cover, no hero ---- */
+.atlas-shell,
+.notebook-shell {
+  width: min(100%, 64rem);
+  padding: 3.5rem 1.75rem 5rem;
+}
+.atlas-intro {
+  max-width: var(--editorial-measure);
+  padding-bottom: 3rem;
+}
+.atlas-eyebrow,
+.atlas-group-index,
+.atlas-node-number {
+  color: var(--muted-foreground);
+  letter-spacing: 0.09em;
+}
+.atlas-intro h1 {
+  max-width: 22ch;
+  margin-top: 1.25rem;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.atlas-lede {
+  margin-top: 1.25rem;
+  max-width: var(--editorial-measure);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+/* The single primary action. Ink-on-paper, not a filled green block. */
+.atlas-start-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  margin-top: 1.75rem;
+  padding: 0 1.125rem;
+  border-radius: 8px;
+  background: var(--foreground);
+  color: var(--page);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.atlas-start-link:hover {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.atlas-start-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.atlas-start-link svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+.atlas-search {
+  margin-top: 2.25rem;
+  max-width: 36rem;
+}
+.atlas-search .search-button {
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+.atlas-search .search-button:hover,
+.atlas-search .search-button:focus-within {
+  border-color: var(--signal);
+}
+.atlas-meta {
+  margin-top: 1.25rem;
+  color: var(--muted-foreground);
+}
+.atlas-meta strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* ---- one column: the inspector flows below the spine ---- */
+.atlas-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--hairline);
+}
+.atlas-group {
+  grid-template-columns: minmax(8rem, 10rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.atlas-group-heading h2 {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.atlas-node-row + .atlas-node-row {
+  border-top: 1px solid var(--hairline);
+}
+.atlas-nodes::before {
+  background: var(--hairline);
+}
+.atlas-node-copy strong {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.atlas-node-marker {
+  border-color: var(--hairline);
+  background: var(--page);
+}
+.atlas-node-row.is-selected .atlas-node-marker,
+.atlas-node:hover .atlas-node-marker,
+.atlas-node:focus-visible .atlas-node-marker {
+  border-color: var(--signal);
+  background: var(--signal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 18%, transparent);
+}
+
+.atlas-inspector {
+  position: static;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin-top: 3.5rem;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+}
+.atlas-inspector-block {
+  padding: 1.75rem 0;
+}
+.atlas-inspector-block + .atlas-inspector-block {
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--hairline);
+}
+.atlas-inspector h2 {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+.atlas-inspector-related a {
+  border-bottom: 1px solid var(--hairline);
+  min-height: 44px;
+}
+.atlas-text-link {
+  color: var(--signal-ink);
+}
+.atlas-text-link:hover {
+  color: var(--primary);
+}
+@media (min-width: 900px) {
+  .atlas-inspector {
+    grid-template-columns: 1.15fr 1fr 1fr;
+    column-gap: 2.5rem;
+    align-items: start;
+  }
+  .atlas-inspector-block + .atlas-inspector-block {
+    border-top: 0;
+    border-left: 1px solid var(--hairline);
+    padding-left: 2.5rem;
+  }
+}
+
+/* ---- Reader: serif prose, hairline callouts, unchanged metrics ----
+   The generated chapter payload is flat: section.ch > p / h2.sub are prose,
+   while every technical surface is a div child. Direct-child scoping keeps
+   tables, code, figures, labs, graph canvases and simulators on the exact
+   sans/mono metrics their geometry audits were written against. */
+.chapter-body .canonical-content .ch > :is(
+  p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote, figcaption
+) {
+  font-family: var(--font-serif);
+}
+.chapter-body .canonical-content .ch > :is(h1, h2, h3, h4, h5, h6, .sub) {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.chapter-body .canonical-content .ch > p {
+  line-height: 1.85;
+}
+.chapter-body .canonical-content .ch > pre,
+.chapter-body .canonical-content .ch > :is(pre, code, kbd, samp) {
+  font-family: var(--font-mono);
+}
+/* Hairline, not a filled box, for editorial callouts. */
+.chapter-body .co {
+  background: transparent;
+  border: 0;
+  border-block: 1px solid var(--hairline);
+  border-radius: 0;
+  box-shadow: none;
+}
+/* The generated BFS meta plate is tinted with 6% --blu. With the new, more
+   saturated --primary that tint drops 11px --mut labels to 4.43:1, below the
+   WCAG AA 4.5 floor. Flatten it to the chapter well + one hairline instead of
+   darkening the global muted ink. Keeps geometry and DOM untouched. */
+.chapter-body .bfs-meta {
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+/* ---- compact widths ---- */
+@media (max-width: 767px) {
+  .atlas-shell,
+  .notebook-shell {
+    padding: 2.25rem 1.25rem 4rem;
+  }
+  .atlas-intro {
+    padding-bottom: 2.25rem;
+  }
+  .atlas-group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 1.5rem 0;
+  }
+  .atlas-group-heading {
+    padding-top: 0;
+  }
+  .atlas-inspector {
+    margin-top: 2.5rem;
+  }
+  .atlas-inspector-block + .atlas-inspector-block {
+    border-top: 1px solid var(--hairline);
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-start-link,
+  .atlas-node-marker {
+    transition: none;
+  }
+}
+
+/* ==================================================================
+   Dark surface picker · 2026-11-05
+   The evergreen dark ladder is no longer the default. graphite (neutral
+   Codex-like gray) is; ink and forest remain one click away. Presentation
+   only: the light/dark toggle, routes and selectors are unchanged.
+   ================================================================== */
+.appearance-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.appearance-picker > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted-foreground);
+}
+.appearance-picker > summary::-webkit-details-marker {
+  display: none;
+}
+.appearance-picker > summary::marker {
+  content: "";
+}
+.appearance-picker > summary:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.appearance-picker > summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.appearance-swatch {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  /* A visible ring keeps the picker discoverable on dark surfaces. */
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: #212121;
+}
+.appearance-menu .appearance-swatch {
+  border-color: var(--muted-foreground);
+}
+.appearance-swatch[data-preset="ink"] {
+  background: #101010;
+}
+.appearance-swatch[data-preset="forest"] {
+  background: #181c1a;
+}
+.appearance-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  min-width: 188px;
+  padding: 8px;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+}
+.appearance-menu-label {
+  margin: 2px 10px 6px;
+  font: 500 10px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.appearance-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: 500 13px/1.4 var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+}
+.appearance-menu button:hover,
+.appearance-menu button[aria-pressed="true"] {
+  background: var(--secondary);
+}
+.appearance-menu button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+.appearance-check {
+  margin-left: auto;
+  color: var(--signal-ink);
+}
+
+/* ==================================================================
+   Readable tables and code · 2026-11-05
+   The generated chapter stylesheet makes every table and every code
+   example an overflow-x:auto surface with a 560/720/640px min-width.
+   Inside the 38rem reading measure that turns ordinary 2-4 column
+   tables and JSON examples into clipped, sideways-scrolling panes.
+   Everything below is presentation-only: no chapter HTML, no generated
+   CSS, no DOM or behavior change.
+   ================================================================== */
+
+/* An authored multi-column grid that contains a table gives the table the
+   whole reading measure. A three-column table in a 293px grid item is
+   technically scrollable but effectively unreadable. Grids authored
+   inside diagrams keep their own topology. */
+.chapter-body .canonical-content :is(.two, .g2, .g3, .g4, .g5, .qa-grid, .qwall, .wheel-wrap, .lane3, .cover, .cap-stack, .harness-wrap):not(.bfs-canvas *, .concept-demo *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *):has(> .tsc table, > .tw table, > .table-scroll table, > .fig table) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Tables with at most four columns become fluid and wrap. The generated
+   min-widths, nowrap headers and 8rem cell minimums all use zero-
+   specificity :where() selectors, so these win without !important.
+   Five-plus column matrices (mostly .bfs-canvas diagrams) keep their
+   authored horizontal scroll: shrinking them destroys the matrix. */
+.chapter-body .canonical-content table:not(:has(tr:first-child > :nth-child(5))) {
+  width: 100%;
+  min-width: 0;
+  table-layout: auto;
+}
+.chapter-body .canonical-content table:not(:has(tr:first-child > :nth-child(5))) :is(th, td) {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Code examples wrap instead of opening a second scrollbar. Diagram and
+   simulator <pre> keep their authored geometry: those are figures with a
+   deliberately fixed line structure, not prose examples. */
+.chapter-body .canonical-content pre:not(.concept-demo *, .skill-terminal *, .bfs-canvas *) {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Below the wide-plate breakpoint the reading column is 29rem or less.
+   Slightly smaller table type keeps identifiers such as document_id on
+   one line instead of breaking every field name into two. */
+@container (max-width: 40rem) {
+  .chapter-body .canonical-content table:not(:has(tr:first-child > :nth-child(5))) :is(th, td) {
+    font-size: 0.78rem;
+  }
+  .chapter-body .canonical-content table:not(:has(tr:first-child > :nth-child(5))) :is(code, kbd, samp) {
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Once the reading column is wide enough, field names and identifiers in
+   the first column stay on one line (document_id, parser_provenance).
+   Below 40rem they must be allowed to wrap instead, otherwise a 297px
+   three-column table devotes half its width to the key column and the two
+   prose columns collapse. 144-state sweep: 14 remaining scroll surfaces
+   before and after, all of them .bfs-canvas diagram internals. */
+@container (min-width: 40rem) {
+  .chapter-body .canonical-content table:not(:has(tr:first-child > :nth-child(5))) :is(th:first-child, td:first-child) code {
+    white-space: nowrap;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Concept-card grids · wrapping instead of crushing
+   A fixed five-up grid packs each card into ~120px inside the 38rem
+   reading measure, and .cd small's overflow-wrap:anywhere then splits
+   identifiers such as BM25 / DENSE mid-token. Reference editors present
+   parallel concepts as a wrapping card row. Inside the measure the grid
+   wraps to as many 9.5rem+ columns as fit; at the wide-plate breakpoint
+   (above) it spans the full plate and keeps its authored column count.
+   ------------------------------------------------------------------ */
+.chapter-body .canonical-content :is(.g3, .g4, .g5, .lane3):has(> .cd) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: 14px;
+}
+/* Above the wide-plate breakpoint the card grid spans the full plate and keeps
+   its authored column count instead of auto-fitting extra collapsed tracks.
+   This block must stay after the auto-fit rule: both selectors have the same
+   specificity, so source order decides the winner. :has(> .cd) keeps diagram
+   grids out of both rules. */
+@container (min-width: 60rem) {
+  .chapter-body .canonical-content .g5:has(> .cd) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .chapter-body .canonical-content .g4:has(> .cd) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .chapter-body .canonical-content .g3:has(> .cd) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .chapter-body .canonical-content .lane3:has(> .cd) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.chapter-body .canonical-content .cd {
+  min-width: 0;
+}
+.chapter-body .canonical-content .cd small {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* ------------------------------------------------------------------
+   Plain comparison tables · stacked semantic records on narrow columns
+   The old fluid-table + overflow-wrap:anywhere combo turned "Exact" into
+   "Ex/act" at ~110px columns. reader.tsx marks header-row tables outside
+   the diagram matrices with .stack-table and copies each column header
+   into the body cells' data-label. Below the reading measure each row
+   becomes a hairline-separated record: the first cell is the title, the
+   rest are labeled fields. No token is broken mid-word.
+   ------------------------------------------------------------------ */
+@container (max-width: 38rem) {
+  .chapter-body .canonical-content table.stack-table {
+    display: block;
+    border: 0;
+    min-width: 0 !important;
+    background: transparent;
+    font-size: 13px;
+  }
+  .chapter-body .canonical-content table.stack-table thead {
+    display: none;
+  }
+  .chapter-body .canonical-content table.stack-table tbody,
+  .chapter-body .canonical-content table.stack-table tr,
+  .chapter-body .canonical-content table.stack-table td {
+    display: block;
+    width: 100%;
+  }
+  .chapter-body .canonical-content table.stack-table tbody {
+    border: 0;
+  }
+  .chapter-body .canonical-content table.stack-table tr {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin: 12px 0;
+    padding: 12px 15px;
+    background: var(--paper);
+  }
+  .chapter-body .canonical-content table.stack-table td {
+    border: 0;
+    padding: 7px 0;
+    vertical-align: top;
+    overflow-wrap: normal;
+    word-break: normal;
+    white-space: normal;
+  }
+  .chapter-body .canonical-content table.stack-table td:not(:first-child)::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--mut);
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .chapter-body .canonical-content table.stack-table td:first-child {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: var(--ink);
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .chapter-body .canonical-content table.stack-table td:first-child::before {
+    content: none;
+  }
+}
+
+/* Wide mode: the generic fluid-table rule sets overflow-wrap:anywhere so a
+   generated min-width never opens a second scrollbar. For the plain comparison
+   tables (.tsc.interp-matrix, CH02/CH03) the narrow KEY column then splits
+   short identifiers ("Metadata" -> "Metad/ata", "Exact" -> "Ex/act"). Let
+   only that column grow a few pixels and keep tokens intact. Scoping to the
+   key column and to the comparison wrapper is essential: applying normal
+   wrapping to every .stack-table cell also reaches CH09 / CH10 diagram tables
+   with fixed min-widths and reopens four horizontal scroll surfaces. */
+@container (min-width: 38rem) {
+  .chapter-body .canonical-content .tsc.interp-matrix .tw > table.stack-table :is(th:first-child, td:first-child) {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+}

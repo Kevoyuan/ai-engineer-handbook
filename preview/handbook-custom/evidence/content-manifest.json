@@ -43,15 +43,15 @@
   },
   {
     "slug": "08-agent-orchestration",
-    "sections": 16,
-    "supplements": 11,
-    "characters": 29045
+    "sections": 17,
+    "supplements": 12,
+    "characters": 29177
   },
   {
     "slug": "09-reliability-evaluation-observability",
-    "sections": 33,
-    "supplements": 13,
-    "characters": 42204
+    "sections": 34,
+    "supplements": 14,
+    "characters": 42329
   },
   {
     "slug": "10-serving-deployment-ai-platform",

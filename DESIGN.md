@@ -1,53 +1,63 @@
 ---
 name: AI Engineering Atlas
 description: An engineering knowledge atlas for exploring systems, learning deeply, and returning to evidence
-last_updated: "2026-10-08"
+last_updated: "2026-11-05"
 status: "active"
 colors:
-  primary: "#2f6850"
-  light-background: "#edf0ea"
-  light-page: "#fcfdfb"
-  light-plate: "#f7f9f5"
-  light-foreground: "#18211d"
-  light-card: "#eef2ec"
-  light-primary: "#2f6850"
-  light-primary-foreground: "#f7faf8"
-  light-secondary: "#e3e9e5"
-  light-secondary-foreground: "#25332c"
-  light-muted: "#eef2ef"
-  light-muted-foreground: "#5f6a64"
-  light-accent: "#dde9e2"
-  light-accent-foreground: "#25332c"
-  light-border: "#d7dfda"
-  light-input: "#f1f4ee"
-  light-ring: "#2f6850"
+  primary: "#007a35"
+  signal: "#00a544"
+  signal-ink: "#087a37"
+  light-background: "#ffffff"
+  light-page: "#ffffff"
+  light-plate: "#f8f8f5"
+  light-foreground: "#0c0c09"
+  light-card: "#f8f8f5"
+  light-primary: "#007a35"
+  light-primary-foreground: "#ffffff"
+  light-secondary: "#f4f4f0"
+  light-secondary-foreground: "#0c0c09"
+  light-muted: "#f4f4f0"
+  light-muted-foreground: "#6b6f63"
+  light-accent: "#edf4ee"
+  light-accent-foreground: "#0c0c09"
+  light-border: "#deded8"
+  light-input: "#f8f8f5"
+  light-ring: "#007a35"
   light-ring-inverted: "#98c7ac"
-  dark-background: "#0f1211"
-  dark-page: "#181c1a"
-  dark-plate: "#131715"
-  dark-foreground: "#e7ebe8"
-  dark-card: "#1e2320"
-  dark-popover: "#262b28"
+  dark-background: "#171717"
+  dark-page: "#212121"
+  dark-plate: "#1c1c1c"
+  dark-foreground: "#ececec"
+  dark-card: "#2b2b2b"
+  dark-popover: "#303030"
   dark-success: "#a9c5b5"
   dark-warning: "#d9ba86"
   dark-destructive: "#e1a19b"
   dark-destructive-foreground: "#291b1a"
-  dark-primary: "#b8d0c0"
-  dark-primary-foreground: "#19241e"
-  dark-secondary: "#262c2a"
-  dark-secondary-foreground: "#e0e4e2"
-  dark-muted: "#222725"
-  dark-muted-foreground: "#a8b0ac"
-  dark-accent: "#2a3430"
-  dark-accent-foreground: "#c6d9cd"
-  dark-border: "#333a37"
-  dark-input: "#141716"
-  dark-ring: "#b8d0c0"
-  dark-ring-inverted: "#7ba78e"
+  dark-primary: "#ebebeb"
+  dark-primary-foreground: "#1a1a1a"
+  dark-secondary: "#2b2b2b"
+  dark-secondary-foreground: "#e9e9e9"
+  dark-muted: "#262626"
+  dark-muted-foreground: "#a9a9a9"
+  dark-accent: "#333333"
+  dark-accent-foreground: "#e2e2e2"
+  dark-border: "#3a3a3a"
+  dark-input: "#1c1c1c"
+  dark-ring: "#ebebeb"
+  dark-ring-inverted: "#8a8a8a"
+  dark-signal: "#3ddc84"
+  dark-signal-ink: "#5de29c"
+  dark-surface-presets: "graphite (default) | ink | forest"
+  dark-surface-storage: "preview-dark-preset"
 typography:
   body:
     fontFamily: "Geist Variable, PingFang SC, Microsoft YaHei, sans-serif"
     fontSize: "1rem"
+  editorial:
+    fontFamily: "Songti SC, Noto Serif CJK SC, Source Han Serif SC, Iowan Old Style, Georgia, serif"
+    roles: "Atlas introduction heading and lede; Reader chapter/section headings and prose"
+    chapterBody: "1rem / 1.85 (38rem measure; geometry-stable)"
   observed-0:
     fontSize: "0.625rem"
   observed-1:
@@ -95,9 +105,9 @@ spacing:
 ## Overview
 This is the active visual contract for the AI Engineering Atlas. The product is no longer framed as a conventional online handbook. It is an engineering knowledge instrument: readers should be able to see the system, locate a concept, understand its dependencies, inspect evidence, and then enter deep reading without losing orientation.
 
-The visual North Star is **engineering workbench × technical manual × system topology**. The memorable signature is the Knowledge Spine: a visible trace from Model → Retrieval → Agent → Production that reappears as chapter nodes, section traces, and diagram connections. Everything around that signature stays restrained.
+The visual North Star is **engineering workbench × technical manual × system topology**, delivered with an **editorial reading clarity**: a single calm column, one hairline rule, one point-sized green signal, and a serif layer reserved for prose. The memorable signature is the Knowledge Spine: a visible trace from Model → Retrieval → Agent → Production that reappears as chapter nodes, section traces, and diagram connections. Everything around that signature stays restrained.
 
-Avoid generic documentation-site patterns, SaaS dashboard cards, glassmorphism, gradient hero sections, decorative analytics, and scroll-reveal marketing motion. Dense technical content is the product. Visual structure must reveal relationships rather than decorate them.
+Avoid generic documentation-site patterns, SaaS dashboard cards, glassmorphism, gradient hero sections, decorative analytics, and scroll-reveal marketing motion. Avoid a book-cover hero: the product is a knowledge atlas, not a mock physical book. Dense technical content is the product. Visual structure must reveal relationships rather than decorate them.
 
 Runtime tokens live in `preview/handbook-custom/src/handbook.css`; the published build lives in `web/site`. Routes, deep section anchors, bilingual content, technical meaning, diagrams, search, bookmarks, and accessibility behavior remain durable product contracts unless explicitly revised together with `UX-CONTRACT.md`.
 
@@ -106,41 +116,47 @@ The first cohesive Atlas system now covers all four primary surfaces plus the co
 ## Colors
 Surfaces come from one lightness ladder. Every step must be wide enough to perceive (ΔL\* ≈ 3–5); below 3 the eye reads two planes as one, which is why an earlier three-value ladder looked flat even though three surfaces existed.
 
-| Role | Token | Light | Dark |
+| Role | Token | Light | Dark (default `graphite` preset) |
 | --- | --- | --- | --- |
-| Rail / canvas | `--background` | `#edf0ea` | `#0f1211` |
-| Page | `--page` | `#fcfdfb` | `#181c1a` |
-| Plate (figure well) | `--plate` | `#f7f9f5` | `#131715` |
-| Raised block | `--card` | `#eef2ec` | `#1e2320` |
-| Floating | `--popover` | `#ffffff` | `#262b28` |
+| Rail / canvas | `--background` | `#ffffff` | `#171717` |
+| Page | `--page` | `#ffffff` | `#212121` |
+| Plate (figure well) | `--plate` | `#f8f8f5` | `#1c1c1c` |
+| Raised block | `--card` | `#f8f8f5` | `#2b2b2b` |
+| Floating | `--popover` | `#ffffff` | `#303030` |
+
+The Dark column is the default. The `ink` and `forest` presets substitute only this surface ladder; every other dark token (signals, semantic colors, typography, hairline) is shared.
 
 The rail and the page are never the same value: the rail is the navigation canvas, the page is the reading surface. A plate is always one step from the page toward the rail — a well in dark mode, a faint tint in light mode. Raised blocks sit above the page, never below it. In light mode raised blocks are tinted rather than outlined, so a border is not the only thing making a card visible.
 
-Light mode uses a pale mineral rail (`#edf0ea`), a near-white page (`#fcfdfb`), tinted blocks (`#eef2ec`), dark green-black ink (`#18211d`), and restrained gray-green secondary text. The primary `#2f6850` is a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state.
+Light mode now uses **one flat white plane** (`#ffffff` for both rail and page), a single near-white secondary surface (`#f8f8f5`) for wells and transient controls, neutral ink (`#0c0c09`), and restrained gray-olive secondary text (`#6b6f63`, 5.15:1 on white). The rail is separated by a hairline, not by a second color plane; the earlier mineral rail / tinted card ladder was retired because it read as a dashboard rather than a clear page. The primary `#007a35` remains a **signal**, not a wash: use it for current nodes, selected controls, links, focus, meaningful connectors, and system state. The brighter `--signal` `#00a544` is reserved for non-text point signals (dots, current-node markers, progress ticks); it is 3.25:1 on white and must never carry body text. Text-bearing green uses `--signal-ink` `#087a37` (5.46:1). Dark mode now defaults to a neutral gray lightness ladder (graphite) and keeps the same hairline, signal and editorial-typography refinements; two alternate dark surfaces are available as user presets.
 
-Dark mode is a laboratory graphite system: rail `#0f1211`, page `#181c1a`, raised `#1e2320`, popover `#262b28`, gray-white text, and muted sage signals. Never tint an entire reading surface green. Borders stay neutral; diagrams communicate hierarchy with structure and labels before color.
+Dark mode is a **neutral graphite** system by default: rail `#171717`, page `#212121`, raised `#2b2b2b`, popover `#303030`, near-white text and neutral gray muted ink. The formerly evergreen (green-tinted) surfaces are no longer the default. Users may choose `ink` (near-black) or `forest` (the old evergreen ladder) from the topbar appearance picker; all three presets share the same hairline, signal, typography and contrast rules. Never tint an entire reading surface green. Borders stay neutral; diagrams communicate hierarchy with structure and labels before color.
 
 Semantic colors are allowed when they encode engineering meaning such as evidence, warnings, failures, or destructive actions, but they must not become decorative category colors. Meaning can never depend on color alone.
 
 ## Whole-site dark refinement
 
-The whole-site dark refinement applies to Atlas, Notebook, Search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry the Atlas graphite surfaces: navigation/canvas `#0f1211`, page and header `#181c1a`, figure plate `#131715`, raised blocks `#1e2320`, secondary `#262c2a` and popover `#262b28`. Soft gray-green text and muted sage actions retain the existing identity. Elevation uses neutral dark shadows only — no inset top rim, since a light rim on a low-lightness surface reads as a plastic edge. The topbar is a solid page-coloured surface with a hairline rule; it must not use backdrop blur or a translucent wash, because scrolling text bleeding through makes the chrome look unfinished. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
+The whole-site dark refinement applies to Atlas, Notebook, Search, navigation dialogs, article tables/code/callouts, concept modules and architecture diagrams. Shared runtime tokens carry the Atlas dark surfaces. The default graphite ladder is navigation/canvas `#171717`, page and header `#212121`, figure plate `#1c1c1c`, raised blocks `#2b2b2b`, secondary `#2b2b2b` and popover `#303030`; the `ink` and `forest` presets substitute the same ladder with different values. Text and actions are neutral in every preset — no sage-green wash. Elevation uses neutral dark shadows only — no inset top rim, since a light rim on a low-lightness surface reads as a plastic edge. The **Reader** topbar stays a solid page-coloured surface with a hairline rule; it must not use backdrop blur or a translucent wash, because article text bleeding through the direction-aware chrome looks unfinished. On the non-Reader surfaces (Atlas, Notebook, Concept, Architecture) the topbar may use a light 12px backdrop blur over an 88% page wash with a 1px hairline — that is the one sanctioned translucent surface and it never applies while `reader-workspace` is active. Dark dialog scrims use black at 64% opacity instead of compositing a pale foreground wash over the page; the installed Dialog retains its behavior and reads semantic overlay/popover tokens. Focused search inputs retain their two-pixel component border without a duplicate outer outline.
 
 Gain: clearer reading and consistent surface hierarchy across routes. Cost: lighter charcoal surfaces reduce the former deep-black appearance. Light-theme tokens and content are preserved. The terminal has a named dark variant that follows the same graphite material with a quiet peach primary action. Pretext prepare/layout reserve simulator explanation heights after fonts load; native wrapping stays visible and widths are remeasured on resize. No new permission or billing behavior is introduced.
 
 ## Typography
-Use Geist Variable with Chinese system fallbacks for the current production implementation and Geist Mono Variable for code, metadata, chapter indices, system labels, and diagram annotations. The Atlas redesign deliberately increases the role of mono typography for structural metadata such as `03 / RETRIEVAL`, but prose remains sans-serif and calm.
+Three font roles, each with one job. **Geist Variable** (with Chinese system fallbacks) owns UI: controls, tables, diagrams, labs, toolbar and navigation. **Geist Mono Variable** owns code, metadata, chapter indices, system labels, and diagram annotations. A third **editorial serif** role owns prose and headings only: the Atlas introduction heading and lede, and Reader chapter titles, section headings and running text. Its stack is local-only — `Songti SC`, `Noto Serif CJK SC`, `Source Han Serif SC`, `Iowan Old Style`, `Georgia`, `serif` — so no remote font is fetched and Chinese copy actually renders as serif.
+
+The serif layer is **inherited, then reset**: apply it to the reading container and explicitly restore sans/mono on every technical surface (tables, code, callouts, figures, labs, graph canvases, simulators, and all descendants of those). This keeps the geometry-sensitive teaching diagrams on the same metrics they were tested with. Editor-facing UI labels, buttons and numeric readouts never become serif.
 
 A future IBM Plex Sans / IBM Plex Mono migration is acceptable only when the fonts are bundled locally and the runtime tokens, dependency manifest, and this file change together. Do not load remote web fonts just to match a mockup.
 
-Article headings remain neutral. Do not create “AI-looking” display typography. Hierarchy should come from scale, weight, spacing, and system labels rather than ornamental type.
+Article headings remain neutral in weight and color. Do not create “AI-looking” display typography: no extreme tracking, no gradient text, no oversized hero numerals. Hierarchy comes from scale, whitespace, hairlines, and quiet system labels rather than ornamental type. The Atlas heading is deliberately modest (about 2–2.75rem, serif, normal weight), never the earlier 4.75rem sans display.
 
 ## Layout
 The product has four primary mental surfaces: **Atlas** for system orientation, **Reader** for deep learning, **Search** for immediate retrieval, and **Notebook** for returning to saved knowledge. **Concept** is a connective entity layer between Atlas and Reader rather than a fifth top-level destination. Existing hash routes may continue to back these surfaces during migration.
 
-The Atlas home begins with the system itself, not a marketing hero. Its dominant composition is a Knowledge Spine grouped into Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production. Chapters render as nodes on a trace, with descriptions and optional interactive-lab affordances. A secondary contextual inspector may surface a selected chapter's engineering decision, failure boundary and canonical related-chapter links. It must remain flat, subordinate to the spine, and never present editorial relationships as guaranteed prerequisites. Separate, labeled lab links may open the Reader at the existing interactive lesson anchor; the canonical chapter link remains distinct.
+The Atlas home opens with a **calm editorial introduction**, then the system itself. The introduction is a single column inside a `min(100%, 64rem)` measure: one mono eyebrow, one modest serif heading, one short lede, one primary text CTA into chapter 01, a quiet search affordance, and a compact metadata line. There is **no book cover, no cover column, no hero illustration, no stat-card row, and no decorative demo widget**. The Knowledge Spine remains the dominant composition below it, grouped into Model, Retrieval & RAG, Agent Engineering, and Evaluation & Production; chapters still render as nodes on a trace with descriptions and optional interactive-lab affordances.
 
-Desktop chapter navigation may collapse. Mobile uses an overlay navigation dialog. The Reader must never gain a permanent right-column table of contents; on-page navigation opens on demand. Long-form content owns a single clear scroll context per viewport mode.
+The composition is **one column**, not a persistent three-column workbench. The contextual inspector is no longer a right-hand rail: it flows below the spine as a flat, hairline-separated section holding the selected chapter's decision/failure boundary, the architecture entry, and the eight-link Concept Index. It stays subordinate to the spine and never presents editorial relationships as guaranteed prerequisites. Separate, labeled lab links may open the Reader at the existing interactive lesson anchor; the canonical chapter link remains distinct. All existing `.atlas-group`, `.atlas-node-row`, `.atlas-lab-link` and `.atlas-concept-index a` selectors and their counts are preserved — the redesign is presentation-only.
+
+Desktop chapter navigation may collapse. Mobile uses an overlay navigation dialog. The Reader must never gain a permanent right-column table of contents; on-page navigation opens on demand. Long-form content owns a single clear scroll context per viewport mode. Review widths remain 390, 768, 1440, and 1728px with zero page-level horizontal overflow.
 
 Previous/next navigation remains at the end of chapters in normal flow. Do not add fixed bottom bars, persistent mobile control bars, scroll hijacking, or decorative parallax. Wide tables and code scroll internally. Review widths remain 390, 768, 1440, and 1728px.
 
@@ -189,6 +205,10 @@ This rule applies to both `preview/handbook-custom/public/content/` and the publ
 - Don't introduce viewport-specific palettes or low-contrast text.
 - Don't make static article content wait for entrance animations or hide it until scrolling.
 - Don't restore the old fixed reading controls or permanent page-contents column.
+- Don't add a book cover, cover column, or any mock physical-book hero on Atlas or Reader.
+- Don't copy or trace a third party's logo, logomark, or icon arrangement; use the typographic wordmark.
+- Don't put `--signal` green behind text; use `--signal-ink` or `--primary` for text-bearing green.
+- Don't make a green-tinted (evergreen) dark surface the default; dark backgrounds stay neutral, with `graphite` as the default and `ink` / `forest` only when the user chooses them.
 
 ## Article color compatibility
 
@@ -372,3 +392,90 @@ Visual review of 390px Reader screenshots found CH03 routing's compact stage unn
 Avoid a second large node/card diagram immediately above a GraphCanvas teaching the same stages. On CH03/CH04/CH08 the old four-stage seek cards remain usable inside native `concept-step-inspector` disclosures, closed by default. Their step/next/previous/autoplay/round-two seeking logic remains owned by the original LessonPlayer; don't duplicate that state. Claim, provenance, token, and trust-boundary **detail panels remain available** via their established disclosures. Keep CH06/CH07 optional zoomable Archify maps; those are a distinct source-backed deep-inspection experience, not disposable duplicate assets.
 
 For compact branching graphs, test the actual **selected SVG edge segments** against the bounding boxes of unrelated HTML nodes, not only horizontal overflow. A clear flow needs whitespace around boundaries, not arbitrary whitespace between every node. V3.5 evidence and chapter-by-chapter disposition: `preview/handbook-custom/evidence/graph-duplication-audit.md`. Automatic hosted deployment remains disabled; release follows `MAINTENANCE.md`.
+
+
+## Editorial clarity refinement · scope B (no book cover)
+
+User-directed change following the 2026-11-05 `/design-review` against `learn-inference.com`. The goal is the reference's **quiet, clear, fluid reading feel**, not its content and not its book-cover hero. The user explicitly rejected the cover as "太刻意" (too contrived). Scope is **Atlas home + Reader presentation only**; routes, content, labs, diagrams, search ranking, Notebook, Concept pages and all interaction contracts are unchanged.
+
+- **No book cover.** Neither the prototype nor the product may render a cover image, cover column, spine shadow, or fake physical-book affordance. The one shadow in the reference existed only on its cover; with the cover removed, static content carries **no shadow at all**.
+- **No borrowed branding.** Do not copy, trace, or approximate a third party's logo, logomark, wordmark, or icon arrangement. The reference site's mark is evidence only, never an asset. Our home surfaces use a **pure typographic wordmark** (serif name plus an optional mono tag); the existing product sidebar keeps its licensed Iconoir `BookIcon`, which is a generic library glyph, not a reproduction of any site's identity. Any future brand mark must be original and documented here first.
+- **One plane, one hairline.** Light mode collapses the rail/page pair to a single `#ffffff` plane; separation comes from a `#deded8` 1px rule. Secondary wells use one `#f8f8f5` surface. Dark mode defaults to the neutral graphite ladder (`ink` / `forest` remain selectable presets) and adopts the same hairline and signal discipline.
+- **One point signal.** `--signal` `#00a544` (dark `#3ddc84`) appears only on dots, current-node markers, progress ticks and hover accents; `--primary` `#007a35` remains the accessible text/button green; `--signal-ink` `#087a37` is the only bright green allowed on text (5.46:1).
+- **Three font roles.** Sans UI / serif editorial prose / mono numerals. `--font-serif` is now the local Chinese-capable stack above. Serif is inherited into `.canonical-content` and explicitly reset on all technical surfaces so diagram geometry stays on tested metrics.
+- **Contrast guard for generated plates.** Generated chapter CSS tints some surfaces with `color-mix(..., var(--blu) 6%)`. With the more saturated `--primary`, an 11px `--mut` label on that tint drops to 4.43:1, below WCAG AA. Flatten tinted plates to the well + one hairline rather than darkening the global muted ink; re-run `test:a11y` after any `--primary` or `--muted-foreground` change.
+- **Wordmark in the fixed rail.** The 264px sidebar must not clip the English wordmark. Allow the mono subtitle to wrap; keep the 44px brand hit area. Chinese stays on one line.
+- **Atlas home.** `64rem` single column; modest serif heading (~2.25–2.75rem, weight 400–500); one lede; one calm primary CTA; hairline-separated chapter rows; inspector demoted to a flat full-width section below the spine; 64–65px sticky topbar with a 1px hairline and a 12px blur on non-Reader routes only.
+- **Reader.** Chapter/section headings and prose move to the editorial serif (`1.85` line-height on direct-child paragraphs); filled callouts and tinted step plates lose their extra fills in favor of hairlines. **The reading measure stays `38rem` and the body size stays `16px`**: generated diagram containers compute their wide-surface offsets from `var(--measure)`, so widening it would move every GraphCanvas relative to the prose. The screen-reader-only `h1`, slim topbar, direction-aware chrome hiding, progress trace, focus reading, font sizing, section dialog, previous/next footer and all lab deep links remain exactly as specified above.
+- **Preserved by construction.** `.atlas-group` = 4, `.atlas-node-row` = 12, `.atlas-lab-link` = 12, `.atlas-concept-index a` = 8; `.header-search`, `.reader-top-title`, `.reader-top-section`, `.workspace.reader-chrome-hidden`, `.reader-bottom`, `.chapter-body` scroll owner and its 17px enlarged font size; bilingual and dual-theme behavior; 44px touch targets; `prefers-reduced-motion`.
+- **Validation.** `npm run build`, `test:ui`, `test:a11y`, `test:learning`, `test:concepts`, `node web/validate.mjs`; browser review at 390/768/1440/1728px in zh/en and light/dark for overflow, page errors, contrast and alignment. Production artifacts refresh with `npm run publish:web`; hosted deployment stays manual.
+
+## Dark surface presets · user-directed (2026-11-05)
+
+User feedback: "我不是很喜欢背景的墨绿色 要不改成codex的深灰色，或者允许用户选择几个预设的颜色，黑色，墨绿，深灰等". Both halves are implemented: the default dark background is now a Codex-like neutral gray, **and** the user can pick among three dark surfaces.
+
+- **Default.** `graphite` — neutral, no green cast: `--background #171717`, `--page #212121`, `--plate #1c1c1c`, `--card #2b2b2b`, `--popover #303030`, `--foreground #ececec`, `--muted-foreground #a9a9a9`, `--border #3a3a3a`, `--primary #ebebeb`.
+- **Presets.** `ink` (near-black, `#101010` page) and `forest` (the former evergreen ladder, `#181c1a` page) remain available. Only the `--ds-*` surface ladder changes between presets; semantic colors, signals, typography, geometry and all DOM contracts stay identical. `.dark` itself carries the neutral default, so the page is neutral even if JavaScript never runs.
+- **Persistence.** `preview-dark-preset` in localStorage. `public/theme-init.js` applies `data-dark-preset` before first paint to avoid a flash of the wrong surface; `main.tsx` re-applies it on state changes.
+- **Control.** One 44px topbar `details/summary` picker on every route (Atlas, Notebook, Concept, Search, Reader): a visible ring swatch, three labelled options, `aria-pressed`, ESC to close, 44px option targets, and a popover that uses the current preset's own surface colors. Choosing a preset while in light mode switches to dark so the choice is immediately visible. The existing light/dark toggle keeps its exact behavior.
+- **Light mode is unaffected** — `--page` stays `#ffffff` in every preset.
+- **Contrast floor.** Body / muted / action ratios: graphite `11.99 / 6.02 / 14.6`, ink `15.99 / 7.22 / 17`, forest `13.25 / 7.19 / 9.77` — all above 4.5:1. `test:a11y` stays at 28 routes / 0 violations.
+- **Prototype parity.** `preview/design-review-2026-11-05/prototype.html` offers the same three presets from its topbar and persists the choice, so the sample and the product can be compared surface-for-surface.
+- **Verification.** `npm run build`, `test:ui`, `test:a11y`, `test:learning`, `test:concepts`, the 32-state browser sweep, a 3-preset × 4-width sweep (0 overflow / 0 page errors), and `node web/validate.mjs`. See `preview/design-review-2026-11-05/verification.md`.
+
+
+## Canonical grid guard · screenshot-driven fix (2026-11-05)
+
+A user screenshot of CH05 showed the Reader's main column mostly blank while the CH05 provenance Lab collapsed into a ~50px strip, with every CJK glyph stacked vertically. Root cause: the wide-plate rule (top-level figures get `width: calc(100cqw - 2rem)` plus negative `margin-inline`) also matched `.bfs-canvas` figures authored **inside** canonical `.two` grids. The oversized first item made `1fr 1fr` resolve to `608px 0px` (CH05) or `1037px 1037px` (CH07), and `StructuralGuide` mounted its `.structural-guide-slot` as a sibling of `#fig-5-2`, making the Lab a grid item in that zero-width track.
+
+- **Wide plates stay top-level only.** A `.bfs-canvas` that is a direct child of a canonical `.two` grid keeps `width: auto`, `max-inline-size: 100%` and `margin-inline: 0`; that grid resolves to a single `1fr` column at the wide-plate container breakpoint. Figures then sit inside the `38rem` measure instead of escaping it. This is a geometry guard in `handbook.css`, not a change to generated `content-base.css` or chapter HTML.
+- **Structural guides are full-width blocks.** `.structural-guide-slot` is mounted after the outermost grid ancestor of its anchor, so CH05 matches CH09 / CH12 (`section.ch` as parent, `38rem` wide). The Lab's `#concept-demo` id, headings, scenario buttons, graph, captions and deep link are unchanged.
+- **No new visual language.** No new surfaces, colors, shadows, fonts or tokens; no book cover and no borrowed branding. The `.two` figure and its explanatory bullets stay together in reading order, with the Lab following them.
+- **No page-level overflow.** At 1440px both CH05 and CH07 keep `.chapter-body` `scrollWidth === clientWidth` (`1101px`), and no element taller than 300px is narrower than 120px in the CH05 article. Re-run `test:a11y`, `full-sweep.cjs` and a CH05/CH07 browser check after any change to the wide-plate rule or guide mounting.
+
+
+## Authored-grid and simulator guards · screenshot-driven sweep (2026-11-05)
+
+Two further user screenshots ("fix similar bugs") showed the same failure shape beyond CH05: a CH06 YAML `.two` whose right-hand callouts wrapped one glyph per line, and the dark Skill Simulator with `TOOL RESULT` / JSON squeezed into a ~16px column. A 12-chapter × 2-locale sweep found four independent root causes, all presentation geometry. No content, route, state, token or branding change.
+
+- **Wide plates never apply inside authored grids.** The `@container (min-width: 60rem)` plate rule now excludes *any descendant* of `.two/.g2/.g3/.g4/.g5/.qa-grid/.qwall/.wheel-wrap/.lane3/.cover/.cap-stack/.harness-wrap`, not just direct children: CH09 nests `.tw` / `pre` one level deeper (`.grid.g2 > .tsc > .tw`). An authored grid directly containing a plate stacks to one `minmax(0, 1fr)` column at that breakpoint, and those plates keep `width:auto`, `max-inline-size:100%`, `margin-inline:0`. This stops `1fr 1fr` from resolving to `608px 0px` (CH06) and stops 1037px plates from spilling out of 297px tracks (CH03 / CH04 / CH09).
+- **Simulator state classes are isolated.** The global search-results stylesheet owns the bare `.result` class (`display:grid; 2.25rem / 1fr / 1rem`). The simulator uses `.result` as a state modifier on `.sim-log` / `.sim-message`, so `.chapter-body .skill-terminal :is(.sim-log, .sim-message) { display:block; }` keeps log text and `pre.sim-json` out of that grid. The 16px × 756px JSON column is gone at every viewport.
+- **Breakpoints follow the container, not the viewport.** Reader plates are keyed to `.chapter-body` (`container-type:inline-size`), but two legacy rules used viewport media queries. The simulator compact layout now starts at `@container (max-width: 59.99rem)` — the exact point where its wide plate deactivates — instead of `600px`; `.document-grid` stacks at `@container (max-width: 40rem)` instead of `@media (max-width: 640px)`. At a 768px viewport the reading column is only 453px, so the old three-track grid (~586px of min-content) pushed `.chapter-body` 184px into horizontal scrolling in English; it is now a single 347px column with `bodyOver 0`.
+- **Reserved caption geometry.** Scenario captions differ in length, so switching tabs rewrapped `.atlas-graph-caption` and shifted the whole simulator 19.53px (390px) / 28.08px (1024–1280px). Reserve the measured maximum while the compact layout is active (`4.75rem`; `6rem` Chinese / `8rem` English at `<=25rem`, split with `:lang()`). The wide layout fits every caption on one line and needs no reservation. No text is clamped, truncated or hidden.
+- **No new visual language or branding.** No book cover, no copied logo / logomark / wordmark, no new tokens, surfaces, fonts or controls. Generated `content-base.css`, chapter HTML / JSON, DOM counts, routes, storage keys and dark presets are untouched.
+- **Verification.** `npm run build`, all six evidence suites, a 144-state (12 chapters × 5 widths × 2 locales × 2 themes) DOM/CSS matrix, `node web/validate.mjs`, `node web/sync-diagram-csp.mjs`, and a non-destructive production sync. See `preview/design-review-2026-11-05/verification.md` §10.
+
+
+## Readable tables and code · screenshot-driven refinement (2026-11-05)
+
+User feedback: two more CH05 screenshots with "尽量减少类似的横向滚动 提高可读性" — the "信息类型 / 索引路径" table clipped inside a narrow grid column, and the `EvidenceChunk` three-column table cut off with a visible horizontal scrollbar. The cause is generated: `content-base.css` gives every table `min-width:560px` (720px / 640px inside `.tsc` at smaller viewports), `th`/`td` `white-space:nowrap` and wide cell minimums, and every `pre` / `.tw` `overflow-x:auto`. Inside the `38rem` reading measure that turns ordinary 2–4 column tables and short JSON examples into sideways-scrolling panes by default. A 144-state sweep (12 chapters × 6 widths × 2 locales, dark) counted **792 internal scroll surfaces** before the change.
+
+- **The wrapper is the plate, not its inner scroller.** `.tsc` / `.table-scroll` / `.fig` join the top-level wide-plate selector at `@container (min-width: 60rem)`; their inner `.tw` is excluded. Previously the inner `.tw` was widened to `calc(100cqw - 2rem)` while its `.tsc` parent stayed at `608px` — exactly the clipped-table screenshot. Top-level tables now get the same full-bleed measure as figures; tables inside authored grids stay in the reading measure.
+- **Authored grids with a table give the table the whole measure.** `.two/.g2/.g3/…` that directly contain a `.tsc/.tw/.table-scroll/.fig` table stack to one `minmax(0, 1fr)` column at every width. A three-column table in a `293px` grid item is scrollable but not readable. Grids authored inside `.bfs-canvas` / React concept demos keep their diagram topology.
+- **Tables with at most four columns are fluid.** `width:100%`, `min-width:0`, `table-layout:auto`, `white-space:normal`, `overflow-wrap:anywhere` on `th`/`td`. All generated table rules use zero-specificity `:where()` selectors, so no `!important` is needed. Five-plus-column matrices — mostly inside `.bfs-canvas` diagrams — keep their authored horizontal scroll; shrinking them destroys the matrix.
+- **Code examples wrap.** Prose `pre` uses `white-space:pre-wrap` + `overflow-wrap:anywhere`; `pre` inside `.bfs-canvas`, `.concept-demo` and `.skill-terminal` keeps its fixed line geometry.
+- **Compact type, then intact field names.** At `@container (max-width: 40rem)` table cells use `0.78rem` and inline `code` `0.75rem`. At `@container (min-width: 40rem)` first-column `code` uses `white-space:nowrap`, so `document_id` / `parser_provenance` stay on one line once the reading column can afford it; below that breakpoint they wrap so the two prose columns do not collapse. Both are container queries, not viewport media queries.
+- **No new visual language or branding.** No book cover, no copied logo / logomark / wordmark, no new tokens, surfaces, fonts or controls. Generated `content-base.css`, chapter HTML / JSON, DOM counts, routes, storage keys, dark presets and the wide-plate geometry guards are untouched. `role="region"` / `aria-label` / `tabindex="0"` wrappers remain in the DOM and keyboard-focusable; they simply no longer need to scroll for 2–4 column tables. No text is clamped, truncated or hidden.
+- **Verification.** `npm run build`, all six evidence suites, `node web/validate.mjs`, the 144-state horizontal-scroll matrix (`792 → 14`; the 14 remaining are all `.bfs-canvas` diagram internals), the 144-state similar-bug matrix (still `bad 6`, all pre-existing `.bfs-card-desc` narrow cards), `pageOver 0` in every state, and a non-destructive production sync. See `preview/design-review-2026-11-05/verification.md` §11.
+
+
+## Atlas default-selection semantics · user-directed (2026-11-05)
+
+A user asked why chapter 03's Knowledge Spine marker glowed green on a fresh dark home page. It was not reading progress, a bookmark or a completed state: `selectedAtlasSlug` was hard-seeded to chapter 03 so the Inspector would have content on first paint. That single state also drove `.atlas-node-row.is-selected`, `aria-pressed="true"` on the Inspect control, and the `var(--signal)` point marker (`#3ddc84` in dark). A visitor who had interacted with nothing was therefore shown a selection that did not exist. The user chose option 1: keep the Inspector's default chapter, remove the implied selection.
+
+- **A preview is not a selection.** `selectedAtlasSlug` now starts empty; `defaultInspectSlug` keeps the Inspector's representative chapter at 03 only as a preview fallback. First paint is visually unchanged in the flat Inspector section, but no node is highlighted, no Inspect button claims `aria-pressed`, and no marker is green. Focusing a node link or clicking Inspect creates the real selection.
+- **The point signal is reserved for real state.** Hover and `:focus-visible` keep the existing one-point green affordance as a transient pointer/keyboard hint; they do not set `selected`, do not set `aria-pressed`, and do not change the Inspector. An explicit Inspect sets all three and updates the Inspector to that chapter. `--signal` / `--signal-ink`, the three dark surface presets and the B-scheme "one point-sized green signal" rule are untouched.
+- **No new visual language or branding.** No new tokens, surfaces, fonts, controls, storage keys, routes or DOM. No book cover, no copied logo / logomark / wordmark. The typographic wordmark, hairlines, `38rem` measure and the 12 / 4 / 12 / 8 Atlas DOM counts are unchanged.
+- **Accessibility.** `aria-pressed` now reflects actual state on all twelve Inspect controls (all `false` on first paint), so assistive technology is no longer told a chapter is pressed without user action. Keyboard focus still creates a selection and updates the Inspector. 4.5:1 ordinary text, 44px targets and visible focus are unchanged; the green remains a non-text point signal.
+- **Verification.** `npm run build`, all six evidence suites, `scripts/validate-atlas.mjs`, `node web/validate.mjs`, the 144-state horizontal-scroll matrix (still `14`) and similar-bug matrix (still `bad 6`), plus a fresh / hover / Inspect three-state check on both the dev build and the production preview. See `preview/design-review-2026-11-05/verification.md` §12.
+
+
+## Readable cards & stacked tables · screenshot-driven fix (2026-11-05)
+
+Two CH02 "企业检索基础" screenshots showed one readability failure in two forms: the `.grid.g5` capability row (EXACT / BM25 / DENSE / GRAPH / META) was crushed to about 120px per card inside the 38rem measure and `overflow-wrap:anywhere` split `BM25` into `BM/25`; the `#comparison` four-column table was crushed to ~110px columns at 768px, splitting `Exact` into `Ex/act` and stacking its header vertically. The reference editor uses a wider plate plus vertical semantic blocks with hairlines — never more columns than the measure can actually hold.
+
+- **Card grids wrap inside the measure, keep their authored count on the wide plate.** `:is(.g3, .g4, .g5, .lane3):has(> .cd)` uses `repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr))` so five capabilities wrap into 2–3 comfortable columns instead of five crushed ones; `.cd { min-width: 0 }` and `.cd small { overflow-wrap: normal; word-break: normal }` stop mid-token breaks. At `@container (min-width: 60rem)` the card plate spans the full width and restores the authored 5 / 4 / 3 tracks. **This container block must stay after the auto-fit rule**: the two selectors have identical specificity, so source order decides the winner. Placed earlier it was a dead rule and left a collapsed `0px` track in the computed grid.
+- **Plain comparison tables become labeled records on narrow containers.** `reader.tsx` marks header-row tables outside the genuine diagram matrices with `.stack-table` and copies each `th` text into the matching `td[data-label]`. At `@container (max-width: 38rem)` the table becomes `display:block`, `thead` is hidden, each `tr` is a hairline card, the first `td` is the title and the rest render `::before { content: attr(data-label) }`. `.interp-matrix` is **not** a diagram matrix: it is the `.tsc` wrapper of the CH02 / CH03 scrollable comparison tables (four occurrences in total), so it must be stacked too. Excluding it was the reason `#comparison` stayed crushed.
+- **Intact identifiers without reopening scroll surfaces.** The generic fluid-table rule sets `overflow-wrap:anywhere` on every cell; at 1440px that still split `Metadata` into `Metad/ata`. A narrowly scoped `@container (min-width: 38rem)` rule restores `overflow-wrap:normal` on **only the first column of `.tsc.interp-matrix > .tw > table.stack-table`**. Applying it to every `.stack-table` cell also reached CH09 / CH10 diagram tables with fixed `min-width` and reopened four horizontal scroll surfaces (matrix `14 → 18`); the scoped rule brought the count to `10`.
+- **No new visual language or behavior.** No new tokens, surfaces, fonts, controls, storage keys, routes, dialogs or DOM contracts; no chapter HTML, JSON or generated `content-base.css` edits. Header labels are read from the already-locale-correct DOM, so Chinese and English stacked records stay correct in both locales. The `role="region"` / `aria-label` / `tabindex="0"` scroll wrappers remain in the DOM and keyboard-focusable; they simply no longer need to scroll for stacked records.
+- **Verification.** `npm run build`, all six evidence suites (`test:ui` 17, `test:a11y` 28 routes / 0 violations, `test:learning` 60, `test:concepts` 96, `test:structure-browser` 144 assertions, `test:simulator-layout` 8 baselines × 9 steps), `node web/validate.mjs`, CH02 geometry at 1440 / 1024 / 768 / 390px (5 active columns × 196px; `stacked=true` at 768 / 390; `pageOver 0`; no crushed elements; 0 page errors), the 144-state horizontal-scroll matrix (`10`, down from baseline `14`) and similar-bug matrix (`bad 6`, unchanged), and a non-destructive production sync. See `preview/design-review-2026-11-05/verification.md` §13.

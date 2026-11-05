@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-view="home" data-theme="light" data-surface="graphite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 工程图谱 · 单列编辑式样张（无书封）</title>
+<meta name="description" content="以 learn-inference.com 的编辑式阅读语言重绘 AI Engineering Atlas 首页与阅读页；按用户反馈去掉书本封面，改为单列编辑式首页。">
+<style>
+/* ================================================================
+   AI Engineering Atlas — "清新的书" 风格样张 · scope B（无书封）
+   参照 https://learn-inference.com/ 的信息结构，不是像素复制。
+   单列阅读上下文 · 三种字体角色 · 一层 hairline · 一个信号色
+   纯本地字体，无远程 font 请求（遵循 DESIGN.md）
+   2026-11-05 修订：用户明确否决书封（"太刻意"），首页改为
+   无封面的单列编辑式开场：安静衬线标题 + 一句说明 + 单一主 CTA。
+   2026-11-05 二次修订：深色默认改为中性深灰（Codex 风格，无绿味），
+   并提供 深灰 / 纯黑 / 墨绿 三档底色预设。
+   ================================================================ */
+
+:root{
+  --paper:#ffffff;
+  --surface:#f8f8f5;
+  --surface-2:#fbfbf8;
+  --ink:#0c0c09;
+  --muted:#767a6b;
+  --muted-2:#9a9d90;
+  --hairline:#deded8;
+  --line-soft:#eaeae4;
+  --signal:#00a544;
+  --signal-ink:#087a37;
+  --primary:#0c0c09;
+  --primary-ink:#ffffff;
+  --radius-sm:8px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"Inter","PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  --serif:"Songti SC","Noto Serif CJK SC","Source Han Serif SC","Iowan Old Style",Georgia,serif;
+  --mono:ui-monospace,"SF Mono","Geist Mono","JetBrains Mono",Menlo,Consolas,monospace;
+}
+/* Dark surface presets. Default = graphite (neutral Codex-like gray, no green cast). */
+html[data-theme="dark"]{
+  --paper:#212121;
+  --surface:#2b2b2b;
+  --surface-2:#1c1c1c;
+  --ink:#ececec;
+  --muted:#a9a9a9;
+  --muted-2:#8a8a8a;
+  --hairline:rgba(255,255,255,.14);
+  --line-soft:rgba(255,255,255,.08);
+  --signal:#3ddc84;
+  --signal-ink:#5de29c;
+  --primary:#ebebeb;
+  --primary-ink:#1a1a1a;
+}
+html[data-theme="dark"][data-surface="ink"]{
+  --paper:#101010;--surface:#191919;--surface-2:#0b0b0b;
+  --ink:#f4f4f4;--muted:#a6a6a6;--muted-2:#828282;
+  --primary:#f2f2f2;--primary-ink:#101010;
+}
+html[data-theme="dark"][data-surface="forest"]{
+  --paper:#181c1a;--surface:#222725;--surface-2:#131715;
+  --ink:#e7ebe8;--muted:#a8b0ac;--muted-2:#7e8a82;
+  --primary:#b8d0c0;--primary-ink:#19241e;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font:400 16px/1.5 var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+::selection{background:color-mix(in srgb,var(--signal) 24%,transparent)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.serif{font-family:var(--serif)}
+
+/* ---------- chrome ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;height:64px;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--hairline);
+}
+.topbar-in{
+  max-width:110rem;margin:0 auto;height:100%;padding:0 20px;
+  display:flex;align-items:center;gap:16px;
+}
+/* Wordmark only. No borrowed logo, no traced third-party glyph, no icon. */
+.brand{display:inline-flex;align-items:baseline;gap:10px;min-height:44px;padding:0 4px}
+.brand-name{font:500 19px/1 var(--serif);letter-spacing:-.02em}
+.brand-tag{font:500 10px/1 var(--mono);letter-spacing:.12em;color:var(--muted-2)}
+.brand:hover .brand-name{color:var(--signal-ink)}
+.topbar-spacer{flex:1}
+.top-links{display:flex;align-items:center;gap:4px}
+.tlink{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:40px;padding:0 10px;border:0;background:transparent;border-radius:var(--radius-sm);
+  font-size:14px;font-weight:500;color:var(--muted);
+  transition:color .15s ease-out,background-color .15s ease-out;
+}
+.tlink:hover{color:var(--ink);background:var(--surface)}
+.tlink[aria-pressed="true"]{color:var(--ink);background:var(--surface)}
+.seg{
+  display:inline-flex;padding:3px;gap:2px;border:1px solid var(--hairline);
+  border-radius:var(--radius-sm);background:var(--surface-2);
+}
+.seg button{
+  min-height:34px;padding:0 12px;border:0;border-radius:6px;
+  font-size:13px;font-weight:500;color:var(--muted);background:transparent;
+  transition:color .15s ease-out,background-color .15s ease-out;
+}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+html[data-theme="dark"] .seg button[aria-pressed="true"]{box-shadow:none;background:var(--surface)}
+.theme-sm{display:none}
+.surface-seg button{display:inline-flex;align-items:center;gap:6px;padding:0 9px;font-size:12px}
+.swatch{width:11px;height:11px;flex:0 0 11px;border-radius:50%;border:1px solid var(--hairline);background:#212121}
+.swatch[data-swatch="ink"]{background:#101010}
+.swatch[data-swatch="forest"]{background:#181c1a}
+
+/* ---------- shared canvas ---------- */
+main{max-width:64rem;margin:0 auto;padding:48px 20px 96px}
+.view{display:none}
+html[data-view="home"] #view-home{display:block}
+html[data-view="reader"] #view-reader{display:block}
+.eyebrow{
+  font:500 11px/1.4 var(--mono);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted-2);
+}
+h2,h3{margin:0;font-family:var(--serif);font-weight:500;letter-spacing:-.01em}
+.section-title{font-size:20px;line-height:1.3}
+p{margin:0}
+.prose{font-size:16px;line-height:1.65;color:var(--muted)}
+.prose + .prose{margin-top:12px}
+
+/* ---------- home: single editorial column, NO book cover ---------- */
+.home-intro{max-width:44rem;padding-bottom:40px;border-bottom:1px solid var(--hairline)}
+.home-title{
+  margin:14px 0 0;
+  font:400 clamp(2rem,3.4vw,2.75rem)/1.25 var(--serif);
+  letter-spacing:-.01em;text-wrap:balance;
+}
+.home-lede{margin-top:16px;max-width:40rem;font:400 17px/1.8 var(--serif);color:var(--muted)}
+.home-lede + .home-lede{margin-top:10px}
+.home-actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:26px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:40px;padding:0 14px;border-radius:var(--radius-md);
+  border:1px solid var(--hairline);font-size:14px;font-weight:500;
+  background:transparent;color:var(--ink);
+  transition:background-color .15s ease-out,border-color .15s ease-out,color .15s ease-out,transform .15s ease-out;
+}
+.btn svg{width:15px;height:15px;flex:none}
+.btn:hover{background:var(--surface)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:var(--primary-ink);border-color:transparent}
+.btn-primary:hover{background:color-mix(in srgb,var(--primary) 86%,transparent);color:var(--primary-ink)}
+.quiet-links{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
+.quiet-links a{font-size:13px;color:var(--muted);border-bottom:1px solid transparent;transition:color .15s ease-out,border-color .15s ease-out}
+.quiet-links a:hover{color:var(--ink);border-bottom-color:var(--hairline)}
+.try{max-width:44rem;margin-top:56px}
+.try .section-title{margin:10px 0 12px}
+
+/* interactive "try one" card */
+.demo{
+  margin-top:20px;border-radius:var(--radius-lg);
+  border:1px solid var(--hairline);background:var(--surface);overflow:hidden;
+}
+.demo-body{padding:16px}
+.stream{
+  min-height:76px;padding:14px 16px;border:1px solid var(--hairline);
+  border-radius:var(--radius-sm);background:var(--surface-2);
+  font:400 17px/1.55 var(--serif);color:var(--muted);
+}
+.stream.is-live{color:var(--ink);font-style:normal}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.metric{border-left:2px solid var(--hairline);padding-left:12px}
+.metric-label{font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2)}
+.metric-num{margin-top:4px;font:500 20px/1 var(--mono);font-variant-numeric:tabular-nums}
+.metric-num small{font-size:11px;color:var(--muted);font-weight:400}
+.metric-note{margin-top:4px;font-size:11px;line-height:1.4;color:var(--muted)}
+.demo-foot{border-top:1px solid var(--line-soft);padding:16px;background:color-mix(in srgb,var(--paper) 55%,var(--surface))}
+.demo-foot .eyebrow{margin-bottom:12px}
+.knobs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.knob{
+  height:40px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:0 14px;border-radius:var(--radius-sm);border:1px solid var(--hairline);
+  background:var(--paper);font-size:13px;
+}
+.knob .mono{font-size:13px;font-weight:500}
+.demo-actions{margin-top:12px;display:flex;align-items:center;gap:12px}
+.run{
+  min-height:32px;padding:0 12px;border:0;border-radius:var(--radius-sm);
+  background:var(--signal);color:#fff;font-size:13px;font-weight:600;
+  transition:background-color .15s ease-out,transform .15s ease-out;
+}
+.run:hover{background:color-mix(in srgb,var(--signal) 84%,#000)}
+.run:active{transform:translateY(1px)}
+.demo-note{font-size:12px;color:var(--muted)}
+.demo-caption{margin-top:12px;max-width:68ch;font-size:13px;line-height:1.6;color:var(--muted)}
+.demo-caption strong{color:var(--ink);font-weight:600}
+
+/* ---------- chapters ---------- */
+.chapters{margin-top:64px}
+.chapters-head{margin-bottom:20px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.chapter-groups{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px}
+.group h3{font-size:18px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.group h3 a:hover{color:var(--signal-ink);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--signal) 40%,transparent);text-underline-offset:4px}
+.group .open{
+  display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;
+  border:1px solid var(--hairline);border-radius:999px;color:var(--muted);font:400 11px/1 var(--sans);
+}
+.index-list{list-style:none;margin:0;padding:0;border:1px solid var(--hairline);border-radius:var(--radius-sm);overflow:hidden}
+.index-list li + li{border-top:1px solid var(--line-soft)}
+.index-list a{
+  display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 12px;
+  font-size:14px;transition:background-color .15s ease-out;
+}
+.index-list a:hover{background:var(--surface)}
+.idx{font:400 11px/1 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums;flex:none;width:24px}
+.idx-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idx-arrow{color:var(--muted-2);font-size:14px;opacity:0;transition:opacity .15s ease-out,transform .15s ease-out}
+.index-list a:hover .idx-arrow{opacity:1;transform:translateX(2px)}
+
+/* ---------- reader ---------- */
+.reader-shell{max-width:59.5rem;margin:0 auto}
+.reader-top{margin:0}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.breadcrumb a:hover{color:var(--signal-ink)}
+.breadcrumb .sep{color:var(--muted-2)}
+.breadcrumb .cur{color:var(--signal-ink);font-weight:500}
+.reader-label{margin-top:40px;font:500 12px/1 var(--mono);letter-spacing:.06em;color:var(--muted-2)}
+.reader-title{margin:12px 0 32px;font:400 48px/1.08 var(--serif);letter-spacing:-.03em;text-wrap:balance}
+.reader-grid{display:grid;grid-template-columns:minmax(0,44rem) 13rem;gap:40px;justify-content:center}
+.reader-body{font:400 18px/1.72 var(--serif);color:var(--ink)}
+.reader-body p{margin:0 0 24px;max-width:42rem}
+.reader-body p.lead{font-size:19px}
+.reader-body em{font-style:italic}
+.margin-note{
+  align-self:start;margin-top:8px;padding-left:16px;border-left:1px solid var(--hairline);
+  font:400 12px/1.65 var(--sans);color:var(--muted);
+}
+.margin-note strong{display:block;margin-bottom:6px;color:var(--ink);font-weight:600}
+.figure{margin:40px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);padding:20px 0}
+.figure-label{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2)}
+.figure-title{margin-top:8px;font:500 17px/1.4 var(--serif)}
+.figure-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+.figure-flow > div{border-left:2px solid var(--hairline);padding-left:12px}
+.figure-flow b{display:block;font:500 13px/1.4 var(--mono);font-variant-numeric:tabular-nums}
+.figure-flow span{font-size:13px;color:var(--muted)}
+.figcaption{margin-top:12px;font:400 13px/1.6 var(--sans);color:var(--muted);max-width:68ch}
+.figcaption strong{color:var(--ink);font-weight:600}
+.pager{margin-top:64px;border-top:1px solid var(--hairline);display:grid;grid-template-columns:1fr 1fr}
+.pager a{min-height:64px;padding:16px 0;font-size:14px;transition:color .15s ease-out}
+.pager a:hover{color:var(--signal-ink)}
+.pager .next{text-align:right}
+.pager small{display:block;font:400 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+
+/* ---------- token sheet ---------- */
+.tokens{margin-top:80px;border-top:1px solid var(--hairline);padding-top:24px}
+.tokens summary{cursor:pointer;font:500 15px/1.5 var(--serif);min-height:44px;display:flex;align-items:center}
+.tokens table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.tokens th,.tokens td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.tokens th{font:500 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+.tokens td code{font:400 12px/1.5 var(--mono);color:var(--signal-ink)}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .home-intro{padding-bottom:32px}
+  .try{margin-top:44px}
+  .chapter-groups{grid-template-columns:1fr}
+  .reader-grid{display:block}
+  .margin-note{margin-top:24px;padding:12px 0 0;border-left:0;border-top:1px solid var(--hairline)}
+  .reader-title{font-size:38px}
+  .topbar-in{padding:0 14px}
+  .tlink.hide-sm{display:none}
+  .surface-seg{display:none}
+  .theme-sm{display:inline-flex}
+}
+@media (max-width:520px){
+  main{padding:32px 20px 72px}
+  .knobs,.metrics{grid-template-columns:1fr}
+  .figure-flow{grid-template-columns:1fr;gap:10px}
+  .brand-name{font-size:17px}
+  .brand-tag{display:none}
+  .home-actions{gap:14px}
+  .seg button{padding:0 9px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#" aria-label="AI 工程图谱首页">
+      <span class="brand-name">AI 工程图谱</span>
+      <span class="brand-tag" aria-hidden="true">ATLAS</span>
+    </a>
+    <div class="topbar-spacer"></div>
+    <nav class="top-links" aria-label="视图与主题">
+      <div class="seg" role="group" aria-label="视图">
+        <button type="button" data-view-btn="home" aria-pressed="true">首页</button>
+        <button type="button" data-view-btn="reader" aria-pressed="false">阅读页</button>
+      </div>
+      <div class="seg surface-seg hide-sm" role="group" aria-label="深色底色预设">
+        <button type="button" data-surface-btn="graphite" aria-pressed="true" title="深灰 · Graphite"><span class="swatch" data-swatch="graphite" aria-hidden="true"></span>深灰</button>
+        <button type="button" data-surface-btn="ink" aria-pressed="false" title="纯黑 · Ink black"><span class="swatch" data-swatch="ink" aria-hidden="true"></span>纯黑</button>
+        <button type="button" data-surface-btn="forest" aria-pressed="false" title="墨绿 · Evergreen"><span class="swatch" data-swatch="forest" aria-hidden="true"></span>墨绿</button>
+      </div>
+      <button class="tlink hide-sm" type="button" id="theme-btn" aria-pressed="false" aria-label="切换深色 / 浅色">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span id="theme-label">深色</span>
+      </button>
+      <button class="tlink theme-sm" type="button" id="theme-btn-sm" aria-pressed="false" aria-label="切换深色 / 浅色">
+        <span id="theme-label-sm">深色</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================ HOME ============================ -->
+<section class="view" id="view-home" aria-label="首页样张">
+  <!-- Single editorial column. No cover, no cover shadow, no mock book. -->
+  <header class="home-intro">
+    <p class="eyebrow">AI ENGINEERING / SYSTEM MAP · 12 CHAPTERS</p>
+    <h1 class="home-title serif">训练之后的一切</h1>
+    <p class="home-lede">训练让模型学到它知道什么。工程让它真的能被用起来：上下文怎么组织、证据怎么召回、Agent 在哪一步停下来、出了错怎么被观测到。这份图谱按系统而不是按章节顺序组织这四层。</p>
+    <p class="home-lede">12 章正文、12 个可交互实验、一张跨章节的概念索引。每一条结论都能回到它的正典章节。</p>
+    <div class="home-actions">
+      <a class="btn btn-primary" href="#view-reader" data-go-reader>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+        开始阅读
+      </a>
+      <nav class="quiet-links" aria-label="快速入口">
+        <a href="#chapters">章节目录</a>
+        <a href="#chapters">概念索引</a>
+        <a href="#chapters">系统总框架 ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="try" aria-labelledby="try-title">
+    <div class="eyebrow">TRY ONE · 教学示意</div>
+    <h2 class="section-title serif" id="try-title">试一个</h2>
+    <p class="prose">来自第 03 章。点「运行」，看同一条查询在 Exact / BM25 / Dense 三条路径上如何汇合；数字是示意值，不是基准测试。</p>
+
+    <div class="demo">
+      <div class="demo-body">
+        <div class="stream" id="stream" aria-live="polite">按「运行」查看一次查询路由。</div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">精确匹配</div>
+            <div class="metric-num">01<small> 条</small></div>
+            <div class="metric-note">错误码、标识符、版本号</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">BM25</div>
+            <div class="metric-num">24<small> 条</small></div>
+            <div class="metric-note">术语与稀有词权重</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Dense</div>
+            <div class="metric-num">18<small> 条</small></div>
+            <div class="metric-note">语义近似，需证据复核</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-foot">
+        <div class="eyebrow">Adjust · 教学示意</div>
+        <div class="knobs">
+          <div class="knob"><span>查询类型</span><span class="mono">混合 / 术语</span></div>
+          <div class="knob"><span>授权范围</span><span class="mono">Tenant A</span></div>
+        </div>
+        <div class="demo-actions">
+          <button class="run" type="button" id="run-btn">运行</button>
+          <span class="demo-note" id="run-note">静态内容在动画关闭时依然完整可读</span>
+        </div>
+      </div>
+    </div>
+    <p class="demo-caption"><strong>图 3.1.</strong> 三条候选路径在融合前各自保留来源与授权边界。融合排序不等于证据成立，RRF 分数也不能跨检索器直接相加。</p>
+  </section>
+
+  <section class="chapters" id="chapters" aria-labelledby="chapters-title">
+    <div class="chapters-head">
+      <h2 class="section-title serif" id="chapters-title">章节</h2>
+      <span class="eyebrow">12 chapters · 4 layers</span>
+    </div>
+    <div class="chapter-groups">
+      <div class="group">
+        <h3 class="serif"><a href="#">01 模型基础</a><a class="open" href="#" aria-label="打开模型基础">↗</a></h3>
+        <ul class="index-list">
+          <li><a href="#"><span class="idx">01</span><span class="idx-title">Model / API / Context 基础</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">02</span><span class="idx-title">企业检索基础</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">03</span><span class="idx-title">混合检索与 Query Routing</span><span class="idx-arrow">→</span></a></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3 class="serif"><a href="#">02 检索与 RAG</a><a class="open" href="#" aria-label="打开检索与 RAG">↗</a></h3>
+        <ul class="index-list">
+          <li><a href="#"><span class="idx">04</span><span class="idx-title">RAG 可靠性与选择性回答</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">05</span><span class="idx-title">文档 / PDF RAG</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">06</span><span class="idx-title">Skills / MCP / Tools</span><span class="idx-arrow">→</span></a></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3 class="serif"><a href="#">03 Agent 工程</a><a class="open" href="#" aria-label="打开 Agent 工程">↗</a></h3>
+        <ul class="index-list">
+          <li><a href="#"><span class="idx">07</span><span class="idx-title">Memory 与上下文工程</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">08</span><span class="idx-title">Agent / Workflow / Orchestration</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">09</span><span class="idx-title">可靠性 / 评估 / 可观测性</span><span class="idx-arrow">→</span></a></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3 class="serif"><a href="#">04 评估与生产</a><a class="open" href="#" aria-label="打开评估与生产">↗</a></h3>
+        <ul class="index-list">
+          <li><a href="#"><span class="idx">10</span><span class="idx-title">Serving / 部署 / AI 平台</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">11</span><span class="idx-title">Data / SQL / Lakehouse</span><span class="idx-arrow">→</span></a></li>
+          <li><a href="#"><span class="idx">12</span><span class="idx-title">FDE 客户交付与验收</span><span class="idx-arrow">→</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ============================ READER ============================ -->
+<section class="view" id="view-reader" aria-label="阅读页样张">
+ <div class="reader-shell">
+  <div class="reader-top">
+    <nav class="breadcrumb" aria-label="面包屑">
+      <a href="#" data-go-home>目录</a><span class="sep">›</span>
+      <a href="#">03 混合检索与 Query Routing</a><span class="sep">›</span>
+      <span class="cur mono">03.1</span>
+    </nav>
+  </div>
+
+  <div class="reader-grid" style="margin-top:24px">
+    <article class="reader-body">
+      <div class="reader-label mono">03.1 / TWO PHASES</div>
+      <h1 class="reader-title">混合检索与 Query Routing</h1>
+      <p class="lead">企业知识库同时包含自然语言说明、专业术语、错误码、结构化属性与实体关系。任何单一检索器都只能覆盖其中一部分，所以问题不是「选哪个」，而是「按什么证据形状分派」。</p>
+      <p>查询进来之后，第一步不是召回，而是判断它的证据形状：一个错误码更像精确匹配，一段故障描述更像 BM25 的稀有词，而一句「怎么回滚上次发布」需要语义召回。授权与租户范围在进入候选集之前就已经确定，模型不负责给权限。</p>
+      <p>三条路径的结果在融合层汇合。融合只解决排序，不证明任何一条证据成立；原始 BM25 分数与 cosine 相似度不能直接相加，RRF 也不会把冲突的说法变成事实。之后的六道证据门才决定回答、升级，还是检索更多。</p>
+
+      <figure class="figure">
+        <div class="figure-label">Fig. 3.1</div>
+        <div class="figure-title serif">混合检索流水线</div>
+        <div class="figure-flow">
+          <div><b>STEP 1</b><span>Documents · Exact / Keyword 字段 · BM25 索引 · Dense 向量索引 · Graph 关系库</span></div>
+          <div><b>STEP 2</b><span>Query Analysis · query type · domain · entities · identifiers · time scope</span></div>
+          <div><b>STEP 3</b><span>权限与元数据过滤 · Identity → Tenant / Role / ACL → Authorized Candidate Space</span></div>
+        </div>
+        <figcaption class="figcaption"><strong>图 3.1.</strong> 三个候选来源在授权空间内并行产生，融合前各自保留来源标识。示意结构，不代表具体引擎的执行顺序。</figcaption>
+      </figure>
+
+      <p>把这条流水线当作判定顺序而不是部署清单：授权失败要在候选集之外被拒绝，证据不足要在回答之前被识别。任何一步被跳过，后面都没有补偿机制。</p>
+
+      <nav class="pager" aria-label="章节导航">
+        <a href="#"><small>上一章</small>02 企业检索基础</a>
+        <a class="next" href="#"><small>下一章</small>04 RAG 可靠性与选择性回答</a>
+      </nav>
+    </article>
+
+    <aside class="margin-note" aria-label="边注">
+      <strong>边界提示</strong>
+      匹配到相似文本，不等于该文本支持当前主张。表格单元格的行、单位与版本都需要单独对齐。
+      <br><br>
+      <span class="mono">§3.4 / §4.2</span>
+    </aside>
+  </div>
+ </div>
+</section>
+
+<details class="tokens">
+  <summary>设计令牌对照 · 参照站 / 改版前 / 本样张（scope B，无书封）</summary>
+  <table>
+    <thead><tr><th>Token</th><th>learn-inference.com</th><th>本站改版前</th><th>本样张 / 落地值</th></tr></thead>
+    <tbody>
+      <tr><td>页面底色</td><td><code>#ffffff</code> 纯白单平面</td><td><code>#edf0ea</code> rail + <code>#fcfdfb</code> page 双平面</td><td><code>#ffffff</code> 单平面</td></tr>
+      <tr><td>深色底色</td><td>深色 <code>#0c0c09</code></td><td><code>#0f1211</code> / <code>#181c1a</code> 墨绿多层表面</td><td><strong>默认中性深灰 <code>#212121</code></strong>；可选 纯黑 / 墨绿 预设</td></tr>
+      <tr><td>正文 / 标题</td><td>Inter 16/26 正文，Literata 20px 小标题、48px 章标题</td><td>Geist 67.68px/590 首页标题、43.2px Reader 标题</td><td>衬线 20px 小标题、48px 章标题，16/26 正文</td></tr>
+      <tr><td>字体角色</td><td>Inter UI / Literata 编辑 / Geist Mono 数字</td><td>Geist + Geist Mono（无衬线编辑层）</td><td>系统无衬线 UI / 中文衬线编辑 / 等宽数字</td></tr>
+      <tr><td>信号色</td><td><code>#00a544</code> 用于封面、链接 hover、当前节点</td><td><code>#2f6850</code> 深墨绿，用于选中与填充</td><td><code>#00a544</code> 点状信号；深色 <code>#3ddc84</code></td></tr>
+      <tr><td>分隔</td><td><code>#deded8</code> 1px hairline，表面 <code>#f8f8f5</code></td><td>浅色 tint 色块 + 描边，圆角元素占比 ~20%</td><td>1px hairline + 1 层表面，几乎无填充块</td></tr>
+      <tr><td>容器</td><td><code>max-width:64rem</code>，20px gutter，首屏 15rem + 1fr 封面列</td><td>240px 常驻侧栏 + 内容 + inspector 三栏</td><td><code>64rem</code> 单列，<strong>无封面列</strong></td></tr>
+      <tr><td>品牌标识</td><td>站点自有图形 logo（不复用）</td><td>项目自带通用 BookIcon + 中英字标</td><td><strong>纯文字字标</strong>，不描摹任何第三方 logo</td></tr>
+      <tr><td>圆角</td><td>8 / 10 / 14px，非统一大圆角</td><td>10px / 0.75rem / 1rem 多套</td><td>8 / 10 / 14px 三档</td></tr>
+      <tr><td>动效</td><td>150ms transition-colors，sticky 64px 顶栏</td><td>200ms ease-out，方向感知隐藏顶栏</td><td>150ms 颜色/位移，静态内容不等待动画</td></tr>
+    </tbody>
+  </table>
+</details>
+
+</main>
+
+<script>
+(function(){
+  const root = document.documentElement;
+  const viewBtns = [...document.querySelectorAll('[data-view-btn]')];
+  const themeBtns = [document.getElementById('theme-btn'), document.getElementById('theme-btn-sm')];
+  const themeLabels = [document.getElementById('theme-label'), document.getElementById('theme-label-sm')];
+  const surfaceBtns = [...document.querySelectorAll('[data-surface-btn]')];
+
+  function setSurface(s){
+    root.setAttribute('data-surface', s);
+    surfaceBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.surfaceBtn === s)));
+    try{localStorage.setItem('prototype-surface', s)}catch{}
+  }
+  let initialSurface = 'graphite';
+  try{
+    const stored = localStorage.getItem('prototype-surface');
+    if(['graphite','ink','forest'].includes(stored)) initialSurface = stored;
+  }catch{}
+  setSurface(initialSurface);
+
+  function setView(v){
+    root.setAttribute('data-view', v);
+    viewBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.viewBtn === v)));
+    window.scrollTo({top:0,behavior:'instant'});
+  }
+  function setTheme(t){
+    root.setAttribute('data-theme', t);
+    const dark = t === 'dark';
+    themeBtns.forEach(b => b && b.setAttribute('aria-pressed', String(dark)));
+    themeLabels.forEach(l => l && (l.textContent = dark ? '浅色' : '深色'));
+  }
+  viewBtns.forEach(b => b.addEventListener('click', () => setView(b.dataset.viewBtn)));
+  themeBtns.forEach(b => b && b.addEventListener('click', () => setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark')));
+  surfaceBtns.forEach(b => b.addEventListener('click', () => { setSurface(b.dataset.surfaceBtn); setTheme('dark'); }));
+  document.querySelectorAll('[data-go-reader]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setView('reader'); }));
+  document.querySelectorAll('[data-go-home]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setView('home'); }));
+
+  // One authored motion moment: a bounded, reader-initiated stream.
+  const runBtn = document.getElementById('run-btn');
+  const stream = document.getElementById('stream');
+  const note = document.getElementById('run-note');
+  const full = '精确匹配命中错误码 E-2041 → BM25 召回 24 条运维记录 → Dense 补充 18 条语义近似 → 融合后进入证据门 G0–G5。';
+  let timer = null;
+  runBtn.addEventListener('click', () => {
+    if (timer) { clearInterval(timer); timer = null; }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    stream.classList.add('is-live');
+    if (reduce) { stream.textContent = full; note.textContent = '已减少动态效果：完整文本直接呈现'; return; }
+    let i = 0;
+    stream.textContent = '';
+    note.textContent = '正在演示查询路由…';
+    timer = setInterval(() => {
+      i += 2;
+      stream.textContent = full.slice(0, i);
+      if (i >= full.length) { clearInterval(timer); timer = null; note.textContent = '演示结束 · 数字为教学示意值'; }
+    }, 55);
+  });
+})();
+</script>
+</body>
+</html>
