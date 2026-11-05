@@ -118,7 +118,7 @@ async function capture(page, selector, name) {
         "CH08 " + cfg.width + " graph");
       await lab.locator("[data-arch-reset]").click();
       assert.equal(await lab.getAttribute("data-mode"), "loop");
-      assert.equal(await choice.filter({ has: page.locator(":checked") }).count(), 0);
+      assert.equal(await lab.locator("input[data-arch-signal]:checked").count(), 0);
       if (cfg.width === 390 || cfg.width === 1440) {
         await capture(page, ".lab-controls", "ch08-controls-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
       }
