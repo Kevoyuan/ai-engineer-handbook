@@ -1440,11 +1440,11 @@ body,
    A .tsc / .table-scroll / .fig wrapper is itself the wide plate; its inner
    .tw is excluded here so the wrapper can grow without being scrolled by a
    1037px child at 608px (the CH05 / CH09 clipped-table screenshots). */
-.chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview, .tsc, .table-scroll, .fig, .g3, .g4, .g5, .lane3):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *, .two *, .g2 *, .g3 *, .g4 *, .g5 *, .qa-grid *, .qwall *, .wheel-wrap *, .lane3 *, .cover *, .cap-stack *, .harness-wrap *) {
+.chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .lab, .archify-overview, .tsc, .table-scroll, .fig, .g3, .g4, .g5, .lane3):not(.concept-demo *, .bfs-canvas *, .lab *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *, .two *, .g2 *, .g3 *, .g4 *, .g5 *, .qa-grid *, .qwall *, .wheel-wrap *, .lane3 *, .cover *, .cap-stack *, .harness-wrap *) {
   max-inline-size: 100%;
 }
 @container (min-width: 60rem) {
-  .chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .archify-overview, .tsc, .table-scroll, .fig, .g3, .g4, .g5, .lane3):not(.concept-demo *, .bfs-canvas *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *, .two *, .g2 *, .g3 *, .g4 *, .g5 *, .qa-grid *, .qwall *, .wheel-wrap *, .lane3 *, .cover *, .cap-stack *, .harness-wrap *) {
+  .chapter-body .canonical-content :is(.tw, pre, .bfs-canvas, figure, .concept-demo, .lab, .archify-overview, .tsc, .table-scroll, .fig, .g3, .g4, .g5, .lane3):not(.concept-demo *, .bfs-canvas *, .lab *, .archify-overview *, figure *, .tw *, .tsc *, .table-scroll *, .fig *, .two *, .g2 *, .g3 *, .g4 *, .g5 *, .qa-grid *, .qwall *, .wheel-wrap *, .lane3 *, .cover *, .cap-stack *, .harness-wrap *) {
     width: calc(100cqw - 2rem);
     max-inline-size: none;
     margin-inline: calc((var(--measure) - (100cqw - 2rem)) / 2);
@@ -4603,4 +4603,183 @@ body {
   .chapter-body .reader-bottom-direction { font-size: 0.625rem; }
   .chapter-body .reader-bottom-title { font-size: 0.875rem; line-height: 1.4; }
   .chapter-body .reader-bottom-arrow { font-size: 1rem; }
+}
+
+/* ------------------------------------------------------------------
+   Design-system extraction · Teaching figure adaptive composition
+   Applies to existing `.lab` modules (CH08 architecture + CH09 cost).
+   Use the actual LAB width for layout, not the 1100px Reader scroll owner:
+   a 608px teaching fixture must not pretend it has room for two ~480px
+   topologies. Keep one reading flow and zero nested scrollbars.
+   ------------------------------------------------------------------ */
+.chapter-body .canonical-content .lab {
+  container-type: inline-size;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: visible;
+  background: var(--plate);
+  border-color: var(--hairline);
+}
+.chapter-body .canonical-content .lab :is(
+  .lab-head, .lab-grid, .lab-controls, .lab-result, .lab-topologies,
+  .lab-topology, .lab-seq, .lab-graph-grid, .lab-branches,
+  .lab-result-head, .lab-result-head > div
+) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content .lab .lab-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.25rem, 3cqw, 2rem);
+}
+.chapter-body .canonical-content .lab :is(.lab-controls, .lab-result) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+.chapter-body .canonical-content .lab .lab-controls {
+  margin: 0;
+}
+.chapter-body .canonical-content .lab .lab-result {
+  border-top: 1px solid var(--hairline);
+  padding-top: clamp(1rem, 3cqw, 1.5rem);
+}
+.chapter-body .canonical-content .lab .lab-head {
+  margin-bottom: clamp(1rem, 3cqw, 1.5rem);
+}
+.chapter-body .canonical-content .lab .lab-checks {
+  gap: 0;
+  border-top: 1px solid var(--hairline);
+}
+.chapter-body .canonical-content .lab .lab-check {
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.875rem 0.625rem;
+  align-items: flex-start;
+}
+.chapter-body .canonical-content .lab .lab-check:hover {
+  border-color: var(--hairline);
+  background: color-mix(in srgb, var(--foreground) 3%, transparent);
+}
+.chapter-body .canonical-content .lab .lab-check:has(input:checked) {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+.chapter-body .canonical-content .lab .lab-check input {
+  flex: none;
+  margin-top: 0.2rem;
+}
+.chapter-body .canonical-content .lab .lab-check strong,
+.chapter-body .canonical-content .lab .lab-check small {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.chapter-body .canonical-content .lab .lab-result-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.chapter-body .canonical-content .lab .lab-result-title {
+  color: var(--foreground);
+  font-weight: 650;
+  overflow-wrap: break-word;
+}
+.chapter-body .canonical-content .lab .lab-score {
+  justify-self: end;
+}
+.chapter-body .canonical-content .lab .lab-topology {
+  overflow: hidden;
+  background: var(--page);
+  border-color: var(--hairline);
+  border-radius: 0.625rem;
+  padding: clamp(0.65rem, 1.8cqw, 1rem);
+}
+.chapter-body .canonical-content .lab[data-mode="loop"] .lab-topology-loop,
+.chapter-body .canonical-content .lab[data-mode="gated"] .lab-topology-loop,
+.chapter-body .canonical-content .lab[data-mode="graph"] .lab-topology-graph {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--hairline));
+  background: color-mix(in srgb, var(--primary) 3%, var(--page));
+}
+.chapter-body .canonical-content .lab .lab-node {
+  min-inline-size: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.chapter-body .canonical-content .lab .lab-seq {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto
+    minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(0.25rem, 0.75cqw, 0.5rem);
+  align-items: center;
+}
+.chapter-body .canonical-content .lab .lab-seq > .lab-arrow,
+.chapter-body .canonical-content .lab .lab-graph-grid > .lab-arrow {
+  justify-self: center;
+}
+.chapter-body .canonical-content .lab .lab-graph-grid {
+  grid-template-columns:
+    minmax(0, 0.8fr) 0.85rem minmax(0, 1.3fr) 0.85rem
+    minmax(0, 0.75fr) 0.85rem minmax(0, 1.1fr);
+  gap: clamp(0.25rem, 0.8cqw, 0.5rem);
+  align-items: center;
+}
+.chapter-body .canonical-content .lab .lab-graph-grid :is(.lab-node, .lab-branches) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+@container (min-width: 54rem) {
+  .chapter-body .canonical-content .lab .lab-grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+  .chapter-body .canonical-content .lab .lab-result {
+    border-top: 0;
+    border-left: 1px solid var(--hairline);
+    padding-top: 0;
+    padding-left: clamp(1rem, 2.6cqw, 1.75rem);
+  }
+}
+@container (max-width: 40rem) {
+  .chapter-body .canonical-content .lab .lab-result-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chapter-body .canonical-content .lab .lab-score {
+    justify-self: start;
+    white-space: normal;
+  }
+  .chapter-body .canonical-content .lab .lab-graph-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+  .chapter-body .canonical-content .lab .lab-graph-grid > .lab-arrow {
+    transform: rotate(90deg);
+    margin: 0.15rem auto;
+  }
+  .chapter-body .canonical-content .lab .lab-branches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 32rem) {
+  .chapter-body .canonical-content .lab .lab-seq {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+  .chapter-body .canonical-content .lab .lab-seq > .lab-arrow {
+    transform: rotate(90deg);
+    margin-inline: auto;
+  }
+  .chapter-body .canonical-content .lab .lab-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (forced-colors: active) {
+  .chapter-body .canonical-content .lab :is(.lab-check, .lab-topology) {
+    border-color: CanvasText;
+  }
+  .chapter-body .canonical-content .lab :is(.lab-check:has(input:checked), .lab-topology) {
+    background: Canvas;
+  }
 }
