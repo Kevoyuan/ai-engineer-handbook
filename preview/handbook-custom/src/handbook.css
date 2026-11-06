@@ -4800,3 +4800,208 @@ body {
     background: Canvas;
   }
 }
+
+/* ------------------------------------------------------------------
+   Layered architecture readings · CH06 and CH10
+   A shared, source-marked diagram grammar for four ordered boundary
+   ledgers and one runtime-context inventory. Container widths (not the
+   Reader viewport) decide composition. Technical facts and stage labels
+   stay in their canonical authored HTML.
+   ------------------------------------------------------------------ */
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) {
+  container-type: inline-size;
+  min-inline-size: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--plate);
+  overflow: visible;
+  color: var(--foreground);
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) :is(
+  .bfs-body, .bfs-flow-container, .bfs-grid, .bfs-card, .bfs-card-head,
+  .bfs-card-title, .bfs-card-desc
+) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-head {
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: clamp(.875rem, 2cqw, 1.25rem);
+  margin-bottom: .5rem;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-title {
+  font: 600 clamp(1rem, 2.1cqw, 1.3rem)/1.48 var(--font-sans);
+  letter-spacing: -.012em;
+  text-wrap: balance;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-subtitle {
+  max-width: 70ch;
+  line-height: 1.72;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-stage-pill {
+  display: inline;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font: 550 .6875rem/1.5 var(--font-mono);
+  letter-spacing: .04em;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-card-title {
+  font: 600 clamp(.875rem, 1.55cqw, 1rem)/1.55 var(--font-sans);
+  color: var(--foreground);
+  letter-spacing: -.005em;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-card-desc {
+  font: 400 .8125rem/1.74 var(--font-sans);
+  color: var(--muted-foreground);
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+/* A stage ledger is a reading timeline, not five colored CTA cards.
+   The modest rail visually connects boundaries; text tells their roles. */
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container {
+  --atlas-rail-pad: 1.75rem;
+  display: grid;
+  gap: 0;
+  padding: 0 0 0 var(--atlas-rail-pad);
+  margin: 0;
+  position: relative;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container::before {
+  content: "";
+  position: absolute;
+  left: .375rem;
+  top: 1.2rem;
+  bottom: 1.2rem;
+  width: 1px;
+  background: var(--hairline);
+  opacity: 1;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, .38fr) minmax(0, 1fr);
+  grid-template-areas:
+    "stage title"
+    "stage description";
+  column-gap: clamp(.875rem, 2.6cqw, 1.75rem);
+  row-gap: .25rem;
+  align-items: start;
+  justify-content: initial;
+  position: relative;
+  margin: 0 !important;
+  padding: clamp(.95rem, 2.1cqw, 1.35rem) .25rem;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card::before {
+  content: "";
+  position: absolute;
+  top: 1.3rem;
+  left: calc(-1 * var(--atlas-rail-pad) + .125rem);
+  z-index: 1;
+  width: .5rem;
+  height: .5rem;
+  border: 1px solid var(--muted-foreground);
+  background: var(--plate);
+  border-radius: 50%;
+  box-shadow: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card:last-child {
+  border-bottom: 0;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card:hover {
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-strip {
+  display: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-head {
+  grid-area: stage;
+  align-self: start;
+  margin: .125rem 0 0;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-title {
+  grid-area: title;
+  margin: 0;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-desc {
+  grid-area: description;
+  margin: 0;
+  max-width: 68ch;
+}
+@container (max-width: 38rem) {
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stage" "title" "description";
+    row-gap: .25rem;
+  }
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-head {
+    margin: 0 0 .125rem;
+  }
+}
+/* CH10 runtime prerequisites are not a six-color dashboard: a flat
+   capability inventory with room to read identifiers at each width. */
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 1rem .5rem;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  overflow: visible;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card:hover {
+  background: transparent;
+  border-color: var(--hairline);
+  box-shadow: none;
+  transform: none;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card .bfs-strip {
+  display: none;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card .bfs-card-head {
+  margin: 0 0 .55rem;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card .bfs-card-desc {
+  margin-top: .35rem;
+}
+@container (min-width: 46rem) {
+  .chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.6rem;
+  }
+}
+@container (min-width: 70rem) {
+  .chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (forced-colors: active) {
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container::before,
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card::before {
+    background: CanvasText;
+    border-color: CanvasText;
+  }
+}
