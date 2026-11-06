@@ -2,7 +2,7 @@
   <h2 class="sub" id="production-agent-multitenancy-title"><span class="i18n-text" data-i18n-zh="Production Multi-Tenant Agent：把 Tenant Isolation 做成控制面" data-i18n-en="Production Multi-Tenant Agents: make tenant isolation a control plane">Production Multi-Tenant Agent：把 Tenant Isolation 做成控制面</span> <small>§10.T</small></h2>
   <p class="lead"><span class="i18n-text" data-i18n-zh="真正的多租户边界不是用 Prompt 告诉模型不要看别人数据，而是：即使模型、Router 或 Tool Arguments 出错，Tenant A 的执行仍然无法读取、修改、调用或推断 Tenant B 的受保护资源。" data-i18n-en="A real multi-tenant boundary is not a prompt telling the model to avoid other customers' data. Even when the model, router, or tool arguments are wrong, an execution for Tenant A must still be unable to read, mutate, invoke, or infer Tenant B's protected resources.">真正的多租户边界不是用 Prompt 告诉模型不要看别人数据，而是：即使模型、Router 或 Tool Arguments 出错，Tenant A 的执行仍然无法读取、修改、调用或推断 Tenant B 的受保护资源。</span></p>
 
-  <div class="bfs-canvas rv" id="fig-10-t1">
+  <div class="bfs-canvas rv atlas-stage-ledger" id="fig-10-t1">
     <div class="bfs-head"><div>
       <span class="bfs-tag"><span class="bfs-tag-dot"></span>FIG.10.T1 · TENANT ISOLATION CONTROL PLANE</span>
       <h2 class="bfs-title"><span class="i18n-text" data-i18n-zh="Tenant Context 必须从身份层贯穿到每一个资源访问点" data-i18n-en="Tenant context must flow from identity to every resource access point">Tenant Context 必须从身份层贯穿到每一个资源访问点</span></h2>
