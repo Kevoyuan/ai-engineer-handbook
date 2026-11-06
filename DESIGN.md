@@ -264,6 +264,20 @@ The CH04 Evidence Gates lesson adds a **secondary, genuinely parameterized teach
 
 **Extraction policy:** this is the first parameterized pattern, not a license to refactor every existing lesson. Extract a shared `InteractiveFigure` shell only after at least three teaching experiments prove the same control/outcome/explanation grammar. Preserve each diagram's topology, domain-specific metric semantics, case provenance and failure boundaries.
 
+## Teaching figures · reusable container-first composition (CH08 + CH09)
+
+**Root cause.** The CH08 Architecture Explorer screenshot showed a roughly 38rem lab with a two-track grid and an outer topology wider than the result column. Existing `@container (max-width: 48rem)` checks were using the wide Reader pane, not the actual lab width. Never mask this with clipping or a hidden scrollbar.
+
+**Extracted visual grammar.** Existing source-authored teaching labs already share `.lab-grid`, `.lab-controls`, `.lab-result` and `.lab-node`. Their geometry, neutral surfaces, visible focus and checked-state signals are now owned together in `preview/handbook-custom/src/handbook.css`. The `.lab` establishes `container-type: inline-size` and child grids use `minmax(0, ...)`. The Reader's 38rem text measure remains the default; top-level labs may expand into the already-established wide-plate space, but never when nested inside an authored multi-column grid or another figure.
+
+**Responsive model.** At lab widths below 54rem, present controls → interpretation → topology as a single reading column; above 54rem, allow two columns if both can show their content. Below 40rem, the 7-stage explicit graph becomes a vertical node/arrow flow; below 32rem the 5-step local loop also stacks vertically. The CH09 three-operand cost equation likewise stacks its mathematical operators between the source-authored stages below 40rem; never let the multiplication/division symbols float above the formula. No overlapping nodes, truncated required labels, extra sideways scroll panes, or viewport-only breakpoints. All illustrated branches remain visible, including when not selected.
+
+**Information hierarchy.** One outer plate, then quiet hairline separation between controls and result; avoid nested decorative boxes. A selected case gets subtle token-derived emphasis, not a new saturated palette. This takes the explanatory principle of learn-inference.com's Three Layers—separate responsibilities and tradeoffs before illustrating connections—without copying that project's design or replacing the canonical handbook's technical content.
+
+**Extraction boundary.** The two existing legacy `.lab` experiences (CH08 architecture, CH09 cost) share a CSS grammar but have distinct decision and calculation models; do not introduce a premature generic React abstraction. CH03/04/08 React teaching experiments remain domain-specific until a dedicated review proves one cross-chapter interaction contract in at least three uses. Source-authored HTML and generated `src/content-base.css` are not edit targets for this presentation-only repair.
+
+**Acceptance.** Real browsers at 320, 390, 768, 1152, 1440 and 1728px must check the element rectangles of controls, result, graph, branch nodes and loop nodes against the lab frame in both languages and themes. Test CH08 seven signals, gated/graph changes, Reset, CH09 slider recomputation, forced-colors and keyboard focus. Continue to build, regenerate and publish `web/site` from source, and preserve mobile topbar, chapter pagination and scroll ownership.
+
 ## Parameterized teaching experiments · CH03 routing and CH08 bounded execution
 
 After the first CH04 Risk–Coverage experiment, CH03 and CH08 extend the **same instructional grammar** without replacing their canonical graph-first diagrams, decision traces, article content, accessible playback, or knowledge checks. Both are mounted after the lesson takeaway inside the existing chapter-local `#concept-demo`. The experiments remain optional **authored deterministic fixtures**, never inferred execution traces or silent claims about a particular vendor/system.
