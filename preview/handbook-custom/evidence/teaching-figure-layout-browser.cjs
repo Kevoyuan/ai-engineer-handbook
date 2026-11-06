@@ -133,6 +133,20 @@ async function capture(page, selector, name) {
       await assertContained(page, costRoot,
         [".lab-grid", ".lab-controls", ".lab-result", ".lab-equation", ".lab-metrics", ".lab-node"],
         "CH09 cost " + cfg.width);
+      const costLab = await measure(page, costRoot);
+      if (costLab.width <= 640) {
+        const equationStages = await page.locator(costRoot + " .lab-equation-row > *").evaluateAll(nodes =>
+          nodes.map(node => {
+            const box = node.getBoundingClientRect();
+            return { top: box.top, bottom: box.bottom };
+          })
+        );
+        assert.equal(equationStages.length, 5, "Three operands and two operators");
+        for (let i = 1; i < equationStages.length; i++) {
+          assert.ok(equationStages[i].top >= equationStages[i - 1].bottom - 1,
+            "CH09 cost equation must follow node / operator / node in visible reading order");
+        }
+      }
       if (cfg.width === 390 || cfg.width === 1440) {
         await capture(page, costRoot + " .lab-equation", "ch09-cost-" + cfg.width + "-" + (cfg.en ? "en" : "zh"));
       }
