@@ -307,3 +307,13 @@ A user asked to add an icon to the website. This is a **document-head asset addi
 - **No full icon suite.** No ICO, `apple-touch-icon`, web manifest or `theme-color` meta in this pass. Browsers that do not read SVG icons fall back to their default tab glyph; that is an accepted, documented limitation, not a broken state.
 - **Accessibility floor unchanged.** The SVG carries a `<title>` as its accessible name; 44px targets, 4.5:1 ordinary text, visible focus, `prefers-reduced-motion` and zero page-level horizontal overflow are unchanged. `test:a11y` 28 routes / 0 violations.
 - **Verification.** `npm run build` (JS/CSS hashes unchanged), `test:ui` 17 groups, `test:a11y` 28 routes / 0 violations, `node web/validate.mjs` PASS, and a light/dark browser smoke check confirming the browser requests `/favicon.svg` with `200 image/svg+xml`, `pageOver 0`, 0 page errors. `diff -rq dist web/site` IDENTICAL; `content/*.json` unchanged.
+
+## CH06 + CH10 architecture diagrams · source-marked reading patterns (2026-11-06)
+
+The authored panels `#fig-6-a1`, `#fig-6-b2`, `#fig-10-r2`, `#fig-10-t1` implement a shared ordered `atlas-stage-ledger` pattern; `#fig-10-r1` implements `atlas-context-matrix`. They retain existing source copy, stage counts, bilingual spans, and resource/policy boundary claims. Never conflate CH10's six parallel runtime prerequisites with a mandatory order of execution.
+
+- `container-type:inline-size` is owned by the diagram. Under 38rem of actual ledger width, a stage label, title and description stack vertically; above it the left label rail and right explanation share a row without min-content overflow. A neutral, non-interactive rail connects ordered stages. Do not animate static cards as though they were buttons.
+- The CH10 runtime inventory shows one, two or three columns at 0–46rem, 46–70rem and 70rem+ respectively, with `minmax(0,1fr)` tracks. All six entries remain accessible in normal reading order. The heading, summary and source callout remain outside the stages.
+- Preserve paper/plate/hairline tokens, Chinese/English reading measure, reduced-motion and forced-colors, all 44px *actual* control targets elsewhere. Static diagrams require no new keyboard action or state; text remains the primary meaning and colors have no independent semantics.
+- `evidence/architecture-ledger-browser.cjs` validates all five diagrams' count and measured rectangles at 320/390/768/1152/1440/1728px, zh/en and dark/light, confirming no clipping, unexpected column layout, huge horizontal overflow, hidden labels or decorative hover jumps. CI must produce screenshots from the **real component**, then update generated `web/site` only after tests pass.
+

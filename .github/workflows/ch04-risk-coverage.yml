@@ -1,4 +1,4 @@
-name: Atlas Responsive Teaching Figure verification
+name: Atlas Layered Architecture Diagram verification
 
 on:
   pull_request:
@@ -19,6 +19,9 @@ on:
       - "preview/handbook-custom/evidence/reader-pagination-browser.cjs"
       - "preview/handbook-custom/evidence/scrollbar-browser.cjs"
       - "preview/handbook-custom/evidence/teaching-figure-layout-browser.cjs"
+      - "preview/handbook-custom/evidence/architecture-ledger-browser.cjs"
+      - "web/assets/ch06-*.html"
+      - "web/assets/ch10-*.html"
       - "preview/handbook-custom/evidence/capture-parameter-lab.cjs"
       - ".github/workflows/ch04-risk-coverage.yml"
   workflow_dispatch:
@@ -87,6 +90,15 @@ jobs:
           PARAMETER_VISUAL_DIR="$PWD/evidence/parameterized-labs-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/reader-pagination-browser.cjs
           SCROLLBAR_VISUAL_DIR="$PWD/evidence/scrollbar-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/scrollbar-browser.cjs
           TEACHING_VISUAL_DIR="$PWD/evidence/teaching-figure-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/teaching-figure-layout-browser.cjs
+          ARCH_LEDGER_VISUAL_DIR="$PWD/evidence/architecture-ledger-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/architecture-ledger-browser.cjs
+      - name: Save layered architecture review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-architecture-ledger-review
+          path: preview/handbook-custom/evidence/architecture-ledger-review/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Save teaching figure screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -127,7 +139,7 @@ jobs:
   sync-published-site:
     name: Commit verified web/site artifact to PR branch
     needs: build-and-exercise
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'web/design-system-responsive-teaching-figures-20261106' && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'web/ch06-ch10-architecture-ledgers-20261106' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -167,5 +179,5 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build(web): sync verified responsive teaching figure assets"
+          git commit -m "build(web): sync verified CH06 and CH10 architecture assets"
           git push origin "HEAD:refs/heads/$HEAD_BRANCH"
