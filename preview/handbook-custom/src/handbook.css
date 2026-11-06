@@ -4761,6 +4761,23 @@ body {
   .chapter-body .canonical-content .lab .lab-branches {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  /* CH09: multiplication/division signs must stay BETWEEN the cost stages,
+     never float above them when an authored three-up formula is narrowed. */
+  .chapter-body .canonical-content .lab .lab-equation-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    align-items: center;
+  }
+  .chapter-body .canonical-content .lab .lab-equation-row > .lab-arrow {
+    justify-self: center;
+    transform: none;
+    margin: 0.1rem 0;
+  }
+  .chapter-body .canonical-content .lab .lab-equation-row > .lab-node {
+    width: 100%;
+    min-inline-size: 0;
+  }
 }
 @container (max-width: 32rem) {
   .chapter-body .canonical-content .lab .lab-seq {
