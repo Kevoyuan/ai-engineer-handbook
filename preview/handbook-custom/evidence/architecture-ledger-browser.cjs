@@ -54,15 +54,36 @@ async function capture(page, spec, cfg) {
     (cfg.width === 1440 && cfg.en && cfg.dark);
   if (!isSelected || !["#fig-6-a1", "#fig-10-r1", "#fig-10-t1"].includes(spec.selector)) return;
   fs.mkdirSync(visualDir, { recursive: true });
-  const node = page.locator(".canonical-content " + spec.selector);
-  await node.scrollIntoViewIfNeeded({ timeout: 15000 });
-  await node.screenshot({
-    path: path.join(visualDir, spec.selector.slice(1) + "-" + cfg.width + (cfg.en ? "-en" : "-zh") + (cfg.dark ? "-dark" : "-light") + ".png"),
-    animations: "disabled",
-    timeout: 15000,
-  });
+  const selector = ".canonical-content " + spec.selector;
+  const node = page.locator(selector);
+  // Reader desktop and phone use different scroll owners. A full-element
+  // locator screenshot of a taller-than-viewport target can capture unrelated
+  // prior article content in a nested scroller. Take two real viewport crops.
+  for (const position of ["start", "end"]) {
+    await node.evaluate((el, block) => {
+      el.style.scrollMarginTop = "72px";
+      el.scrollIntoView({ block, inline: "nearest", behavior: "instant" });
+    }, position);
+    await page.evaluate(() => new Promise(resolve =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const rect = await node.boundingBox();
+    assert(rect && rect.y < 880 && rect.y + rect.height > 48,
+      spec.selector + " is not visible in its " + position + " viewport crop");
+    if (position === "start") {
+      const heading = await node.locator(".bfs-title").boundingBox();
+      assert(heading && heading.y >= 40 && heading.y < 880,
+        spec.selector + " heading must be visible in start screenshot");
+    }
+    await page.screenshot({
+      path: path.join(visualDir, spec.selector.slice(1) + "-" + cfg.width +
+        (cfg.en ? "-en" : "-zh") + (cfg.dark ? "-dark" : "-light") +
+        "-" + position + ".png"),
+      fullPage: false,
+      animations: "disabled",
+      timeout: 15000,
+    });
+  }
 }
-
 (async () => {
   const browser = await chromium.launch({ headless: true });
   try {
