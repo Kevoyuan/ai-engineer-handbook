@@ -450,6 +450,21 @@
   min-inline-size: 0;
   max-inline-size: 100%;
 }
+/* Checkbox copy is engineering decision evidence, not tiny dashboard meta. */
+.chapter-body .canonical-content .atlas-figure-shell .lab-check strong {
+  font-family: var(--font-sans);
+  font-size: .875rem;
+  line-height: 1.48;
+  font-weight: 600;
+}
+.chapter-body .canonical-content .atlas-figure-shell .lab-check small {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: .8125rem;
+  line-height: 1.58;
+  color: var(--muted-foreground);
+  overflow-wrap: break-word;
+}
 @container (max-width: 40rem) {
   /* Compact figures need more readable hierarchy, not tiny desktop labels. */
   .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-title, .lab-title) {
