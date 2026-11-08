@@ -1,80 +1,3 @@
-/* Extracted teaching-figure visual grammar · canonical owner
-   Used by CH06 (2), CH08 (2), CH10 (3), plus CH09 legacy .lab.
-   Do not split layout into chapter-specific overrides or change source truth.
-   Structural rules below are moved verbatim from handbook.css.
-*/
-.chapter-body .canonical-content .atlas-figure-shell {
-  --figure-hairline: var(--hairline);
-  --figure-background: var(--plate);
-  --figure-ink: var(--foreground);
-  --figure-summary: var(--muted-foreground);
-  --figure-title-size: clamp(1.0625rem, 2.05cqw, 1.325rem);
-  --figure-body-size: .875rem;
-  --figure-section-space: clamp(1rem, 2.4cqw, 1.5rem);
-  container-type: inline-size;
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-head, .lab-head) {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-title, .lab-title) {
-  color: var(--figure-ink);
-  font-family: var(--font-sans);
-  font-size: var(--figure-title-size);
-  line-height: 1.42;
-  font-weight: 600;
-  letter-spacing: -.012em;
-  overflow-wrap: break-word;
-  word-break: normal;
-  text-wrap: pretty;
-}
-.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-subtitle, .lab-sub) {
-  max-inline-size: 68ch;
-  margin-top: .35rem;
-  color: var(--figure-summary);
-  font-family: var(--font-sans);
-  font-size: var(--figure-body-size);
-  line-height: 1.72;
-  font-weight: 400;
-  letter-spacing: 0;
-  overflow-wrap: break-word;
-  word-break: normal;
-}
-.chapter-body .canonical-content .atlas-figure-shell :is(
-  .bfs-body, .bfs-grid, .bfs-flow-container, .bfs-card, .lab-grid,
-  .lab-controls, .lab-result, .lab-result-head, .lab-topologies
-) {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-@container (max-width: 40rem) {
-  /* Compact figures need more readable hierarchy, not tiny desktop labels. */
-  .chapter-body .canonical-content .atlas-figure-shell {
-    --figure-title-size: 1.125rem;
-    --figure-body-size: .9375rem;
-    --figure-section-space: 1rem;
-  }
-  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-card-title, .lab-result-title) {
-    font-size: .9375rem;
-    line-height: 1.55;
-  }
-  .chapter-body .canonical-content .atlas-figure-shell .bfs-card-desc {
-    font-size: .875rem;
-    line-height: 1.72;
-  }
-}
-@media (forced-colors: active) {
-  .chapter-body .canonical-content .atlas-figure-shell {
-    --figure-background: Canvas;
-    --figure-hairline: CanvasText;
-    --figure-ink: CanvasText;
-    --figure-summary: CanvasText;
-  }
-}
-
-/* Existing source-authored CH08/09 figure layouts, now one owned module. */
 /* ------------------------------------------------------------------
    Teaching figure adaptive composition
    Applies to existing `.lab` modules (CH08 architecture + CH09 cost).
@@ -473,5 +396,84 @@
   .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card::before {
     background: CanvasText;
     border-color: CanvasText;
+  }
+}
+
+/* Extracted teaching-figure visual grammar · canonical owner
+   Used by CH06 (2), CH08 (2), CH10 (3), plus CH09 legacy .lab.
+   Do not split layout into chapter-specific overrides or change source truth.
+   Structural rules below are moved verbatim from handbook.css.
+*/
+.chapter-body .canonical-content .atlas-figure-shell {
+  --figure-hairline: var(--hairline);
+  --figure-background: var(--plate);
+  --figure-ink: var(--foreground);
+  --figure-summary: var(--muted-foreground);
+  --figure-title-size: clamp(1.0625rem, 2.05cqw, 1.325rem);
+  --figure-body-size: .875rem;
+  --figure-section-space: clamp(1rem, 2.4cqw, 1.5rem);
+  container-type: inline-size;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-head, .lab-head) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-title, .lab-title) {
+  color: var(--figure-ink);
+  font-family: var(--font-sans);
+  font-size: var(--figure-title-size);
+  line-height: 1.42;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  overflow-wrap: break-word;
+  word-break: normal;
+  text-wrap: pretty;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-subtitle, .lab-sub) {
+  max-inline-size: 68ch;
+  margin-top: .35rem;
+  color: var(--figure-summary);
+  font-family: var(--font-sans);
+  font-size: var(--figure-body-size);
+  line-height: 1.72;
+  font-weight: 400;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(
+  .bfs-body, .bfs-grid, .bfs-flow-container, .bfs-card, .lab-grid,
+  .lab-controls, .lab-result, .lab-result-head, .lab-topologies
+) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+@container (max-width: 40rem) {
+  /* Compact figures need more readable hierarchy, not tiny desktop labels. */
+  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-title, .lab-title) {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-subtitle, .lab-sub) {
+    font-size: .9375rem;
+    line-height: 1.72;
+  }
+  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-card-title, .lab-result-title) {
+    font-size: .9375rem;
+    line-height: 1.55;
+  }
+  .chapter-body .canonical-content .atlas-figure-shell .bfs-card-desc {
+    font-size: .875rem;
+    line-height: 1.72;
+  }
+}
+@media (forced-colors: active) {
+  .chapter-body .canonical-content .atlas-figure-shell {
+    --figure-background: Canvas;
+    --figure-hairline: CanvasText;
+    --figure-ink: CanvasText;
+    --figure-summary: CanvasText;
   }
 }
