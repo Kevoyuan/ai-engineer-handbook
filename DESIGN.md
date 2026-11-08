@@ -164,7 +164,7 @@ The common shell owns only:
 
 CH08 `.lab[data-architecture-explorer]` is a decision input → interpretation → bounded loop / outer graph teaching simulator. It stacks controls and results below 54rem lab width. Its outer Graph stacks below 40rem and local loop below 32rem, retaining seven original signals, exact `loop/gated/graph` state transitions and Reset. CH09 cost teaching formula is an independently authored quantitative case whose three operands and two operators must remain in mathematical reading order on narrow screens. Keep selected state distinguishable with text, not color alone.
 
-**Extraction threshold:** a shared Figure Shell is justified by ≥3 instances with the same reading/semantic intent. Preserve GraphCanvas's node/edge, DecisionTrace's frame control and chapter-specific simulation logic as separate APIs. Do not turn domain logic into an overly generic React component merely because boxes share a border.
+CH08 structure-signal choices use readable ~14px labels, ~13px explanatory text and at least 44px activation height at compact widths; they must remain keyboard accessible.\n\n**Extraction threshold:** a shared Figure Shell is justified by ≥3 instances with the same reading/semantic intent. Preserve GraphCanvas's node/edge, DecisionTrace's frame control and chapter-specific simulation logic as separate APIs. Do not turn domain logic into an overly generic React component merely because boxes share a border.
 
 ## 6. Educational experiments, evidence and safety
 
