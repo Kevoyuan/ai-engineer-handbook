@@ -77,6 +77,16 @@ async function checkFigure(page, selector, cfg) {
     assert(child.left >= info.figure.left-3 && child.right <= info.figure.right+3,
       selector + " descendant exceeds shell: " + JSON.stringify(child));
   }
+  if(selector.includes("data-architecture-explorer")) {
+    const inputType = await root.locator(".lab-check").first().evaluate(el => ({
+      strong:parseFloat(getComputedStyle(el.querySelector("strong")).fontSize),
+      detail:parseFloat(getComputedStyle(el.querySelector("small")).fontSize),
+      target:el.getBoundingClientRect().height,
+    }));
+    assertNumber(inputType.strong,13.8,"CH08 option label too small");
+    assertNumber(inputType.detail,12.8,"CH08 option explanatory text too small");
+    assertNumber(inputType.target,44,"CH08 checkbox target too small");
+  }
   return info;
 }
 
