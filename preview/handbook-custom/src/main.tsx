@@ -101,6 +101,7 @@ import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import "./index.css";
 import "./handbook.css";
+import "./teaching-figures.css";
 import "./architecture.css";
 const groups = [
   {

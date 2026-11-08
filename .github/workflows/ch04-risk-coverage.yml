@@ -1,4 +1,4 @@
-name: Atlas Layered Architecture Diagram verification
+name: Atlas Figure Shell and Design Contract verification
 
 on:
   pull_request:
@@ -10,6 +10,8 @@ on:
       - "preview/handbook-custom/src/reader.tsx"
       - "preview/handbook-custom/src/main.tsx"
       - "preview/handbook-custom/src/handbook.css"
+      - "preview/handbook-custom/src/teaching-figures.css"
+      - "docs/design-history/**"
       - "preview/handbook-custom/src/reliability-lab.*"
       - "preview/handbook-custom/src/query-route-lab.tsx"
       - "preview/handbook-custom/src/agent-retry-lab.tsx"
@@ -20,6 +22,8 @@ on:
       - "preview/handbook-custom/evidence/scrollbar-browser.cjs"
       - "preview/handbook-custom/evidence/teaching-figure-layout-browser.cjs"
       - "preview/handbook-custom/evidence/architecture-ledger-browser.cjs"
+      - "preview/handbook-custom/evidence/figure-shell-browser.cjs"
+      - "web/assets/ch08-loop-vs-graph.html"
       - "web/assets/ch06-*.html"
       - "web/assets/ch10-*.html"
       - "preview/handbook-custom/evidence/capture-parameter-lab.cjs"
@@ -91,6 +95,15 @@ jobs:
           SCROLLBAR_VISUAL_DIR="$PWD/evidence/scrollbar-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/scrollbar-browser.cjs
           TEACHING_VISUAL_DIR="$PWD/evidence/teaching-figure-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/teaching-figure-layout-browser.cjs
           ARCH_LEDGER_VISUAL_DIR="$PWD/evidence/architecture-ledger-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/architecture-ledger-browser.cjs
+          FIGURE_SHELL_VISUAL_DIR="$PWD/evidence/figure-shell-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/figure-shell-browser.cjs
+      - name: Save shared Figure Shell screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-figure-shell-review
+          path: preview/handbook-custom/evidence/figure-shell-review/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Save layered architecture review screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -135,11 +148,11 @@ jobs:
   # Avoid giving untrusted build/source steps write credentials. The only write
   # happens in a separate, shell-only job after the published artifact passed
   # TypeScript, Vite and real-browser tests. This is intentionally limited to
-  # the same-repo scrollbar review branch, never main or third-party PRs.
+  # this same-repository design-system consolidation branch, never main or third-party PRs.
   sync-published-site:
     name: Commit verified web/site artifact to PR branch
     needs: build-and-exercise
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'web/ch06-ch10-architecture-ledgers-20261106' && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'web/figure-shell-design-contract-20261108' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -179,5 +192,5 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build(web): sync verified CH06 and CH10 architecture assets"
+          git commit -m "build(web): sync verified design-system figure shell assets"
           git push origin "HEAD:refs/heads/$HEAD_BRANCH"

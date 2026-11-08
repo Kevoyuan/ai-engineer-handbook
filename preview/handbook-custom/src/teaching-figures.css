@@ -1,0 +1,494 @@
+/* ------------------------------------------------------------------
+   Teaching figure adaptive composition
+   Applies to existing `.lab` modules (CH08 architecture + CH09 cost).
+   Use the actual LAB width for layout, not the 1100px Reader scroll owner:
+   a 608px teaching fixture must not pretend it has room for two ~480px
+   topologies. Keep one reading flow and zero nested scrollbars.
+   ------------------------------------------------------------------ */
+.chapter-body .canonical-content .lab {
+  container-type: inline-size;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: visible;
+  background: var(--plate);
+  border-color: var(--hairline);
+}
+.chapter-body .canonical-content .lab :is(
+  .lab-head, .lab-grid, .lab-controls, .lab-result, .lab-topologies,
+  .lab-topology, .lab-seq, .lab-graph-grid, .lab-branches,
+  .lab-result-head, .lab-result-head > div
+) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content .lab .lab-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.25rem, 3cqw, 2rem);
+}
+.chapter-body .canonical-content .lab :is(.lab-controls, .lab-result) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+.chapter-body .canonical-content .lab .lab-controls {
+  margin: 0;
+}
+.chapter-body .canonical-content .lab .lab-result {
+  border-top: 1px solid var(--hairline);
+  padding-top: clamp(1rem, 3cqw, 1.5rem);
+}
+.chapter-body .canonical-content .lab .lab-head {
+  margin-bottom: clamp(1rem, 3cqw, 1.5rem);
+}
+.chapter-body .canonical-content .lab .lab-checks {
+  gap: 0;
+  border-top: 1px solid var(--hairline);
+}
+.chapter-body .canonical-content .lab .lab-check {
+  min-height: 44px;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.875rem 0.625rem;
+  align-items: flex-start;
+}
+.chapter-body .canonical-content .lab .lab-check:hover {
+  border-color: var(--hairline);
+  background: color-mix(in srgb, var(--foreground) 3%, transparent);
+}
+.chapter-body .canonical-content .lab .lab-check:has(input:checked) {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+.chapter-body .canonical-content .lab .lab-check input {
+  flex: none;
+  margin-top: 0.2rem;
+}
+.chapter-body .canonical-content .lab .lab-check strong,
+.chapter-body .canonical-content .lab .lab-check small {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.chapter-body .canonical-content .lab .lab-result-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.chapter-body .canonical-content .lab .lab-result-title {
+  color: var(--foreground);
+  font-weight: 650;
+  overflow-wrap: break-word;
+}
+.chapter-body .canonical-content .lab .lab-score {
+  justify-self: end;
+}
+.chapter-body .canonical-content .lab .lab-topology {
+  overflow: hidden;
+  background: var(--page);
+  border-color: var(--hairline);
+  border-radius: 0.625rem;
+  padding: clamp(0.65rem, 1.8cqw, 1rem);
+}
+.chapter-body .canonical-content .lab[data-mode="loop"] .lab-topology-loop,
+.chapter-body .canonical-content .lab[data-mode="gated"] .lab-topology-loop,
+.chapter-body .canonical-content .lab[data-mode="graph"] .lab-topology-graph {
+  border-color: color-mix(in srgb, var(--primary) 55%, var(--hairline));
+  background: color-mix(in srgb, var(--primary) 3%, var(--page));
+}
+.chapter-body .canonical-content .lab .lab-node {
+  min-inline-size: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.chapter-body .canonical-content .lab .lab-seq {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto
+    minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(0.25rem, 0.75cqw, 0.5rem);
+  align-items: center;
+}
+.chapter-body .canonical-content .lab .lab-seq > .lab-arrow,
+.chapter-body .canonical-content .lab .lab-graph-grid > .lab-arrow {
+  justify-self: center;
+}
+.chapter-body .canonical-content .lab .lab-graph-grid {
+  grid-template-columns:
+    minmax(0, 0.8fr) 0.85rem minmax(0, 1.3fr) 0.85rem
+    minmax(0, 0.75fr) 0.85rem minmax(0, 1.1fr);
+  gap: clamp(0.25rem, 0.8cqw, 0.5rem);
+  align-items: center;
+}
+.chapter-body .canonical-content .lab .lab-graph-grid :is(.lab-node, .lab-branches) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+@container (min-width: 54rem) {
+  .chapter-body .canonical-content .lab .lab-grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+  .chapter-body .canonical-content .lab .lab-result {
+    border-top: 0;
+    border-left: 1px solid var(--hairline);
+    padding-top: 0;
+    padding-left: clamp(1rem, 2.6cqw, 1.75rem);
+  }
+}
+@container (max-width: 40rem) {
+  .chapter-body .canonical-content .lab .lab-result-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .chapter-body .canonical-content .lab .lab-score {
+    justify-self: start;
+    white-space: normal;
+  }
+  .chapter-body .canonical-content .lab .lab-graph-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+  .chapter-body .canonical-content .lab .lab-graph-grid > .lab-arrow {
+    transform: rotate(90deg);
+    margin: 0.15rem auto;
+  }
+  .chapter-body .canonical-content .lab .lab-branches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* CH09: multiplication/division signs must stay BETWEEN the cost stages,
+     never float above them when an authored three-up formula is narrowed. */
+  .chapter-body .canonical-content .lab .lab-equation-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    align-items: center;
+  }
+  .chapter-body .canonical-content .lab .lab-equation-row > .lab-arrow {
+    justify-self: center;
+    transform: none;
+    margin: 0.1rem 0;
+  }
+  .chapter-body .canonical-content .lab .lab-equation-row > .lab-node {
+    width: 100%;
+    min-inline-size: 0;
+  }
+}
+@container (max-width: 32rem) {
+  .chapter-body .canonical-content .lab .lab-seq {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem;
+  }
+  .chapter-body .canonical-content .lab .lab-seq > .lab-arrow {
+    transform: rotate(90deg);
+    margin-inline: auto;
+  }
+  .chapter-body .canonical-content .lab .lab-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (forced-colors: active) {
+  .chapter-body .canonical-content .lab :is(.lab-check, .lab-topology) {
+    border-color: CanvasText;
+  }
+  .chapter-body .canonical-content .lab :is(.lab-check:has(input:checked), .lab-topology) {
+    background: Canvas;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Layered architecture readings · CH06 and CH10
+   A shared, source-marked diagram grammar for four ordered boundary
+   ledgers and one runtime-context inventory. Container widths (not the
+   Reader viewport) decide composition. Technical facts and stage labels
+   stay in their canonical authored HTML.
+   ------------------------------------------------------------------ */
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) {
+  container-type: inline-size;
+  min-inline-size: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--plate);
+  overflow: visible;
+  color: var(--foreground);
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) :is(
+  .bfs-body, .bfs-flow-container, .bfs-grid, .bfs-card, .bfs-card-head,
+  .bfs-card-title, .bfs-card-desc
+) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-head {
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: clamp(.875rem, 2cqw, 1.25rem);
+  margin-bottom: .5rem;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-title {
+  font: 600 clamp(1rem, 2.1cqw, 1.3rem)/1.48 var(--font-sans);
+  letter-spacing: -.012em;
+  text-wrap: balance;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-subtitle {
+  max-width: 70ch;
+  line-height: 1.72;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-stage-pill {
+  display: inline;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font: 550 .6875rem/1.5 var(--font-mono);
+  letter-spacing: .04em;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-card-title {
+  font: 600 clamp(.875rem, 1.55cqw, 1rem)/1.55 var(--font-sans);
+  color: var(--foreground);
+  letter-spacing: -.005em;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.chapter-body .canonical-content :is(.atlas-stage-ledger, .atlas-context-matrix) .bfs-card-desc {
+  font: 400 .8125rem/1.74 var(--font-sans);
+  color: var(--muted-foreground);
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+/* A stage ledger is a reading timeline, not five colored CTA cards.
+   The modest rail visually connects boundaries; text tells their roles. */
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container {
+  --atlas-rail-pad: 1.75rem;
+  display: grid;
+  gap: 0;
+  padding: 0 0 0 var(--atlas-rail-pad);
+  margin: 0;
+  position: relative;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container::before {
+  content: "";
+  position: absolute;
+  left: .375rem;
+  top: 1.2rem;
+  bottom: 1.2rem;
+  width: 1px;
+  background: var(--hairline);
+  opacity: 1;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, .38fr) minmax(0, 1fr);
+  grid-template-areas:
+    "stage title"
+    "stage description";
+  column-gap: clamp(.875rem, 2.6cqw, 1.75rem);
+  row-gap: .25rem;
+  align-items: start;
+  justify-content: initial;
+  position: relative;
+  margin: 0 !important;
+  padding: clamp(.95rem, 2.1cqw, 1.35rem) .25rem;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  transform: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card::before {
+  content: "";
+  position: absolute;
+  top: 1.3rem;
+  left: calc(-1 * var(--atlas-rail-pad) + .125rem);
+  z-index: 1;
+  width: .5rem;
+  height: .5rem;
+  border: 1px solid var(--muted-foreground);
+  background: var(--plate);
+  border-radius: 50%;
+  box-shadow: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card:last-child {
+  border-bottom: 0;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card:hover {
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-strip {
+  display: none;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-head {
+  grid-area: stage;
+  align-self: start;
+  margin: .125rem 0 0;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-title {
+  grid-area: title;
+  margin: 0;
+}
+.chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-desc {
+  grid-area: description;
+  margin: 0;
+  max-width: 68ch;
+}
+@container (max-width: 38rem) {
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "stage" "title" "description";
+    row-gap: .25rem;
+  }
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card > .bfs-card-head {
+    margin: 0 0 .125rem;
+  }
+}
+/* CH10 runtime prerequisites are not a six-color dashboard: a flat
+   capability inventory with room to read identifiers at each width. */
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 1rem .5rem;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  overflow: visible;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card:hover {
+  background: transparent;
+  border-color: var(--hairline);
+  box-shadow: none;
+  transform: none;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card .bfs-strip {
+  display: none;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card .bfs-card-head {
+  margin: 0 0 .55rem;
+}
+.chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 > .bfs-card .bfs-card-desc {
+  margin-top: .35rem;
+}
+@container (min-width: 46rem) {
+  .chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.6rem;
+  }
+}
+@container (min-width: 70rem) {
+  .chapter-body .canonical-content .atlas-context-matrix .bfs-grid.bfs-g3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (forced-colors: active) {
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container::before,
+  .chapter-body .canonical-content .atlas-stage-ledger .bfs-flow-container > .bfs-card::before {
+    background: CanvasText;
+    border-color: CanvasText;
+  }
+}
+
+/* Extracted teaching-figure visual grammar · canonical owner
+   Used by CH06 (2), CH08 (2), CH10 (3), plus CH09 legacy .lab.
+   Do not split layout into chapter-specific overrides or change source truth.
+   Structural rules below are moved verbatim from handbook.css.
+*/
+.chapter-body .canonical-content .atlas-figure-shell {
+  --figure-hairline: var(--hairline);
+  --figure-background: var(--plate);
+  --figure-ink: var(--foreground);
+  --figure-summary: var(--muted-foreground);
+  --figure-title-size: clamp(1.0625rem, 2.05cqw, 1.325rem);
+  --figure-body-size: .875rem;
+  --figure-section-space: clamp(1rem, 2.4cqw, 1.5rem);
+  container-type: inline-size;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-head, .lab-head) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-title, .lab-title) {
+  color: var(--figure-ink);
+  font-family: var(--font-sans);
+  font-size: var(--figure-title-size);
+  line-height: 1.42;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  overflow-wrap: break-word;
+  word-break: normal;
+  text-wrap: pretty;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(.bfs-subtitle, .lab-sub) {
+  max-inline-size: 68ch;
+  margin-top: .35rem;
+  color: var(--figure-summary);
+  font-family: var(--font-sans);
+  font-size: var(--figure-body-size);
+  line-height: 1.72;
+  font-weight: 400;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.chapter-body .canonical-content .atlas-figure-shell :is(
+  .bfs-body, .bfs-grid, .bfs-flow-container, .bfs-card, .lab-grid,
+  .lab-controls, .lab-result, .lab-result-head, .lab-topologies
+) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+/* Checkbox copy is engineering decision evidence, not tiny dashboard meta. */
+.chapter-body .canonical-content .atlas-figure-shell .lab-check strong {
+  font-family: var(--font-sans);
+  font-size: .875rem;
+  line-height: 1.48;
+  font-weight: 600;
+}
+.chapter-body .canonical-content .atlas-figure-shell .lab-check small {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: .8125rem;
+  line-height: 1.58;
+  color: var(--muted-foreground);
+  overflow-wrap: break-word;
+}
+@container (max-width: 40rem) {
+  /* Compact figures need more readable hierarchy, not tiny desktop labels. */
+  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-title, .lab-title) {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-subtitle, .lab-sub) {
+    font-size: .9375rem;
+    line-height: 1.72;
+  }
+  .chapter-body .canonical-content .atlas-figure-shell :is(.bfs-card-title, .lab-result-title) {
+    font-size: .9375rem;
+    line-height: 1.55;
+  }
+  .chapter-body .canonical-content .atlas-figure-shell .bfs-card-desc {
+    font-size: .875rem;
+    line-height: 1.72;
+  }
+}
+@media (forced-colors: active) {
+  .chapter-body .canonical-content .atlas-figure-shell {
+    --figure-background: Canvas;
+    --figure-hairline: CanvasText;
+    --figure-ink: CanvasText;
+    --figure-summary: CanvasText;
+  }
+}
