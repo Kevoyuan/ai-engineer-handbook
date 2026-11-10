@@ -23,6 +23,7 @@ on:
       - "preview/handbook-custom/evidence/teaching-figure-layout-browser.cjs"
       - "preview/handbook-custom/evidence/architecture-ledger-browser.cjs"
       - "preview/handbook-custom/evidence/figure-shell-browser.cjs"
+      - "preview/handbook-custom/evidence/sitewide-design-audit-browser.cjs"
       - "web/assets/ch08-loop-vs-graph.html"
       - "web/assets/ch06-*.html"
       - "web/assets/ch10-*.html"
@@ -96,6 +97,15 @@ jobs:
           TEACHING_VISUAL_DIR="$PWD/evidence/teaching-figure-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/teaching-figure-layout-browser.cjs
           ARCH_LEDGER_VISUAL_DIR="$PWD/evidence/architecture-ledger-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/architecture-ledger-browser.cjs
           FIGURE_SHELL_VISUAL_DIR="$PWD/evidence/figure-shell-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/figure-shell-browser.cjs
+          SITEWIDE_AUDIT_DIR="$PWD/evidence/sitewide-audit-review" HANDBOOK_URL=http://127.0.0.1:4180/ node evidence/sitewide-design-audit-browser.cjs
+      - name: Save all-page design audit screenshots and metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-sitewide-design-audit-20261110
+          path: preview/handbook-custom/evidence/sitewide-audit-review/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Save shared Figure Shell screenshots
         if: always()
         uses: actions/upload-artifact@v4
