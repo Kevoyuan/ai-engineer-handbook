@@ -44,7 +44,7 @@ async function inspect(page,env,id,hash,selector){await open(page,hash,selector)
   const ctx=await browser.newContext({viewport:{width:env.w,height:env.h},reducedMotion:'reduce'});
   await ctx.addInitScript(({lang,theme})=>{localStorage.setItem('preview-locale',JSON.stringify(lang==='en'));localStorage.setItem('preview-theme',JSON.stringify(theme!=='light'));localStorage.setItem('preview-dark-preset',JSON.stringify(theme==='light'?'graphite':theme));},env);
   const page=await ctx.newPage();const runtime=[];page.on('pageerror',e=>runtime.push(String(e).slice(0,220)));
-  for(const [id,hash,selector] of [['Atlas','#home/all','.atlas-shell'],['Notebook','#home/saved','.notebook-shell'],['Concept','#concept/query-routing','.concept-page'],['Architecture','#map','.architecture-page']]){
+  for(const [id,hash,selector] of [['Atlas','#home/all','.atlas-shell'],['Notebook','#home/saved','.notebook-shell'],['Concept','#concept/query-routing','.concept-page'],['Architecture','#map','.knowledge-map']]){
    await inspect(page,env,id,hash,selector);
   }
   await open(page,'#home/all','.atlas-shell');
